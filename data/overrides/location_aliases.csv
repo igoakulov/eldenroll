@@ -1,0 +1,482 @@
+label,location_id
+Abandoned Cave,caelid_abandonedcave
+Academy Crystal Cave,liurnia_academycave
+Academy of Raya Lucaria,academy
+Ainsel River,ainsel_start
+Ainsel River - Boss,ainsel_boss
+Ainsel River Main,ainsel
+"Altus Plateau - Abandoned Coffin, Ruin-Strewn Precipice Exit",altus
+Altus Plateau - Altus Highway Junction,altus
+"Altus Plateau - Bower of Bounty, Writheblood Ruins",altus
+"Altus Plateau - East Windmill Village, Highway Lookout Tower",altus
+"Altus Plateau - Erdtree-Gazing Hill, Lux Ruins",altus
+"Altus Plateau - Forest-Spanning Greatbridge, St. Trina's Hideaway, Sainted Hero's Grave Entrance",altus
+Altus Plateau - Golden Lineage Evergaol,altus
+Altus Plateau - Mirage Rise; Mt. Gelmir - Bridge of Iniquity,altus
+"Altus Plateau - Perfumer's Ruins, Unsightly Catacombs Entrance",altus
+"Altus Plateau - Rampartside Path, Altus Tunnel Entrance",altus
+Altus Plateau - Road of Iniquity Side Path,altus
+Altus Plateau - Second Church of Marika,altus
+Altus Plateau - Shaded Castle,altus
+Altus Plateau - South of Tree Sentinel Duo,altus
+"Altus Plateau - Tree Sentinel Duo, Perfumer's Grotto Entrance",altus
+"Altus Plateau - Village Windmill Pasture, East Windmill Pasture",altus
+Altus Plateau - West Windmill Pasture,altus
+Altus Plateau - West Windmill Village,altus
+"Altus Plateau - West of Tree Sentinel Duo, Stormcaller Church",altus
+Altus Plateau - Windmill Heights,altus
+"Altus Plateau - Woodfolk Ruins, Minor Erdtree",altus
+"Altus Plateau - Wyndham Ruins, Wyndham Catacombs Entrance",altus
+Altus Tunnel,altus_tunnel
+Auriza Hero's Grave,outskirts_grave
+Auriza Side Tomb,outskirts_sidetomb
+"Bellum Highway - Church of Inhibition, Southwest of Grand Lift of Dectus",bellum
+Bellum Highway - Converted Fringe Tower; Liurnia of the Lakes - Black Knife Catacombs Entrance,bellum
+Bellum Highway - East Raya Lucaria Gate,bellum
+"Bellum Highway - Frenzied Flame Village, Minor Erdtree",bellum
+Bellum Highway - Frenzy-Flaming Tower,bellum
+Black Knife Catacombs,liurnia_blackknifecatacombs
+"Caelid - Caelem Ruins, Forsaken Ruins, Minor Erdtree, Minor Erdtree Catacombs Entrance",caelid
+Caelid - Caelid Highway South,caelid
+"Caelid - Cathedral of Dragon Communion, Caelid Catacombs Entrance",caelid
+Caelid - Central Radahn Arena,caelid
+Caelid - Deep Siofra Well; Greyoll's Dragonbarrow - Dragonbarrow West,caelid
+Caelid - East Aeonia Swamp,caelid
+"Caelid - East Sellia, Church of the Plague, Sellia Hideaway Entrance",caelid
+"Caelid - Far Southwest Radahn Arena, Aeonia Swamp Bank Southeast Cliffside",caelid
+Caelid - Fort Gael North,caelid
+"Caelid - Fort Gael, Caelid Waypoint Ruins, Gaol Cave Entrance",caelid
+Caelid - Gowry's Shack,caelid
+Caelid - Impassable Greatbridge,caelid
+Caelid - Redmane Castle,caelid
+Caelid - Redmane Castle South Cliffside,caelid
+"Caelid - Smoldering Church, Rotview Balcony",caelid
+"Caelid - Smoldering Wall, Abandoned Cave Entrance",caelid
+Caelid - South Great-Jar Area,caelid
+Caelid - Southern Aeonia Swamp Bank,caelid
+Caelid - Southwest of Caelid Highway South,caelid
+Caelid - West Aeonia Swamp,caelid
+"Caelid - West Sellia, Sellia Crystal Tunnel Entrance",caelid
+Caelid - West of Caelid Highway South,caelid
+Caelid Catacombs,caelid_catacombs
+"Capital Outskirts - Capital Rampart, Auriza Side Tomb Entrance",outskirts
+"Capital Outskirts - Capital Rampart, Auriza Side Tomb Entrance (Ashen)",outskirts
+Capital Outskirts - East of Outer Wall Phantom Tree,outskirts
+Capital Outskirts - Minor Erdtree,outskirts
+"Capital Outskirts - Northeast Outer Wall Battleground, Hermit Merchant's Shack",outskirts
+Capital Outskirts - Northwest Outer Wall Battleground,outskirts
+Capital Outskirts - Outer Wall Phantom Tree,outskirts
+Capital Outskirts - South of Minor Erdtree,outskirts
+Capital Outskirts - South of Outer Wall Phantom Tree,outskirts
+Capital Outskirts - Southeast Outer Wall Battleground,outskirts
+Capital Outskirts - Southwest Outer Wall Battleground,outskirts
+Cave of the Forlorn,snowfield_cave
+Chapel of Anticipation,chapel_start
+Cliffbottom Catacombs,liurnia_cliffbottomcatacombs
+Coastal Cave,limgrave_coastalcave
+Consecrated Snowfield - Apostate Derelict,snowfield
+Consecrated Snowfield - Consecrated Snowfield Catacombs Entrance,snowfield
+Consecrated Snowfield - East of Ordina,snowfield
+"Consecrated Snowfield - Hidden Path to the Haligtree, Southeast Foggy Area",snowfield
+Consecrated Snowfield - North of Yelough Anix Ruins,snowfield
+"Consecrated Snowfield - Northeast Foggy Area, Inner Consecrated Snowfield",snowfield
+"Consecrated Snowfield - Northwest Foggy Area, East of Yelough Anix Ruins",snowfield
+"Consecrated Snowfield - Ordina, Liturgical Town",snowfield
+Consecrated Snowfield - South of Ordina,snowfield
+Consecrated Snowfield - Southeast of Ordina,snowfield
+Consecrated Snowfield - West of Ordina,snowfield
+"Consecrated Snowfield - Yelough Anix Ruins, Yelough Anix Tunnel Entrance",snowfield
+Consecrated Snowfield Catacombs,snowfield_catacombs
+Crumbling Farum Azula,farumazula
+Deathtouched Catacombs,stormhill_catacombs
+Deeproot Depths,deeproot
+Divine Tower of Caelid,caelid_tower
+Divine Tower of East Altus,leyndell_tower
+Divine Tower of Limgrave,limgrave_tower
+Divine Tower of Liurnia,liurnia_tower
+Divine Tower of West Altus,altus_tower_inner
+Dragonbarrow Cave,dragonbarrow_cave
+Earthbore Cave,peninsula_earthborecave
+East Limgrave,limgrave
+East Limgrave (Meteored),limgrave
+East Liurnia,liurnia
+Far Northwest Caelid,caelid
+Flame Peak - Northeast Giants' Gravepost,flamepeak
+Flame Peak - Northwest Giants' Gravepost,flamepeak
+Flame Peak - Southwest Giants' Gravepost,flamepeak
+Gael Tunnel,caelid_gaeltunnel
+Gaol Cave,caelid_gaolcave
+Gelmir Hero's Grave,gelmir_grave
+Giant-Conquering Hero's Grave,flamepeak_grave
+Giants' Mountaintop Catacombs,mountaintops_catacombs
+Greyoll's Dragonbarrow - Bestial Sanctum,dragonbarrow
+Greyoll's Dragonbarrow - Divine Tower of Caelid Entrance,dragonbarrow
+Greyoll's Dragonbarrow - Dragonbarrow Fork,dragonbarrow
+Greyoll's Dragonbarrow - Fort Faroth,dragonbarrow
+Greyoll's Dragonbarrow - Isolated Merchant's Shack,dragonbarrow
+"Greyoll's Dragonbarrow - Minor Erdtree, Dragonbarrow Cave Entrance",dragonbarrow
+Greyoll's Dragonbarrow - Northwest Farum Greatbridge,dragonbarrow
+"Greyoll's Dragonbarrow - South of Divine Tower of Caelid, Deep Siofra Well",dragonbarrow
+"Greyoll's Dragonbarrow - Southeast Farum Greatbridge, Lenne's Rise",dragonbarrow
+Greyoll's Dragonbarrow - Southwest Farum Greatbridge,dragonbarrow
+Groveside Cave,limgrave_grovesidecave
+Hidden Path to the Haligtree,snowfield_hiddenpath
+Highroad Cave,limgrave_highroadcave
+Impaler's Catacombs,peninsula_impalerscatacombs
+Lake of Rot,lakeofrot
+Lakeside Crystal Cave,liurnia_lakesidecave
+"Leyndell, Ashen Capital",leyndell2
+"Leyndell, Royal Capital",leyndell
+"Limgrave - Agheel Lake North, Murkwater Cave Entrance",limgrave
+"Limgrave - Agheel Lake South, Forlorn Hound Evergaol",limgrave
+"Limgrave - Agheel Lake, Dragon-Burnt Ruins",limgrave
+Limgrave - Artist's Shack,limgrave
+"Limgrave - Church of Dragon Communion, Coastal Cave Exit",limgrave_dragonchurch
+"Limgrave - Church of Elleh, Stranded Graveyard Exit",limgrave
+Limgrave - Coastal Cave Entrance,limgrave
+Limgrave - Fort Haight,limgrave
+Limgrave - Fort Haight West,limgrave
+Limgrave - Fort Haight West (Meteored),limgrave
+"Limgrave - Gatefront, Stormhill Evergaol, Groveside Cave Entrance, Limgrave Tunnels Entrance",limgrave
+Limgrave - Mistwood Outskirts,limgrave
+"Limgrave - Murkwater Coast, Murkwater Catacombs Entrance",limgrave
+Limgrave - Rear Gael Tunnel Entrance; Caelid - Gael Tunnel Entrance,limgrave
+Limgrave - Seaside Ruins,limgrave
+"Limgrave - Siofra River Well, Mistwood Ruins, Minor Erdtree, Nokron Entrance",limgrave
+Limgrave - South of Stranded Graveyard Exit,limgrave
+Limgrave - South of Summonwater Village,limgrave
+Limgrave - Southwest of Fort Haight,limgrave
+Limgrave - Stormfoot Catacombs Entrance,limgrave
+Limgrave - Summonwater Village,limgrave
+Limgrave - Summonwater Village Outskirts,limgrave
+"Limgrave - Third Church of Marika, Gaol Cave Exit",limgrave
+Limgrave - Waypoint Ruins,limgrave
+Limgrave Tunnels,limgrave_tunnels
+"Liurnia - Liurnia Highway South Endpoint, Path to Stormhill",liurnia
+"Liurnia of the Lakes - Artist's Shack, Eastern Liurnia Lake Shore",liurnia
+"Liurnia of the Lakes - Behind Caria Manor, Royal Grave Evergaol, Part of Ravine",liurnia
+"Liurnia of the Lakes - Boilprawn Shack, Fallen Ruins of the Lake",liurnia
+Liurnia of the Lakes - Caria Manor,liurnia
+Liurnia of the Lakes - Church of Irith,liurnia
+Liurnia of the Lakes - Church of Vows,liurnia
+Liurnia of the Lakes - Converted Tower,liurnia
+"Liurnia of the Lakes - Cuckoo's Evergaol, West of Meeting Place",liurnia
+Liurnia of the Lakes - Eastern Tableland Southeast Cliffside,liurnia
+"Liurnia of the Lakes - Eastern Tableland, Ainsel River Well",liurnia
+"Liurnia of the Lakes - Far West Gate Town, North Rose Church",liurnia
+"Liurnia of the Lakes - Folly on the Lake, South Rose Church",liurnia
+Liurnia of the Lakes - Foot of the Four Belfries,liurnia
+Liurnia of the Lakes - Gate Town Bridge,liurnia
+Liurnia of the Lakes - Gate Town Northwest,liurnia
+Liurnia of the Lakes - Gate Town Southeast,liurnia
+Liurnia of the Lakes - Gate Town Southwest,liurnia
+Liurnia of the Lakes - Highway Lookout Tower,liurnia
+"Liurnia of the Lakes - Jarburg, Divine Tower of Liurnia Entrance",liurnia
+"Liurnia of the Lakes - Lake-Facing Cliffs, Stormveil Castle Exit, Stillwater Cave Entrance",liurnia
+"Liurnia of the Lakes - Laskyar Ruins, Malefactor's Evergaol",liurnia
+Liurnia of the Lakes - Liurnia Highway Far North,liurnia
+Liurnia of the Lakes - Liurnia Highway North,liurnia
+"Liurnia of the Lakes - Liurnia Highway South, Purified Ruins, Cliffbottom Catacombs Entrance",liurnia
+Liurnia of the Lakes - Liurnia Lake Shore,liurnia
+"Liurnia of the Lakes - Main Academy Gate, Academy of Raya Lucaria Entrance",liurnia
+Liurnia of the Lakes - Mausoleum Compound,liurnia
+"Liurnia of the Lakes - Meeting Place, Academy Crystal Cave Entrance",liurnia
+"Liurnia of the Lakes - Minor Erdtree, Road's End Catacombs Entrance",liurnia
+Liurnia of the Lakes - North of Gate Town Bridge,liurnia
+Liurnia of the Lakes - North of Scenic Isle,liurnia
+Liurnia of the Lakes - North of Sorcerer's Isle,liurnia
+"Liurnia of the Lakes - Northern Liurnia Lake Shore, Kingsrealm Ruins",liurnia
+"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise",liurnia
+Liurnia of the Lakes - Ravine-Veiled Village; Bellum Highway - Grand Lift of Dectus; Altus Plateau - Altus Plateau; Ruin-Strewn Precipice Entrance,liurnia
+Liurnia of the Lakes - Revenger's Shack,liurnia
+Liurnia of the Lakes - Road to the Manor,liurnia
+"Liurnia of the Lakes - Ruined Labyrinth, Uld Palace Ruins",liurnia
+"Liurnia of the Lakes - Scenic Isle, Laskyar Ruins",liurnia
+"Liurnia of the Lakes - Slumbering Wolf's Shack, Lakeside Crystal Cave Entrance",liurnia
+"Liurnia of the Lakes - Sorcerer's Isle West, East Belfry",liurnia
+Liurnia of the Lakes - South Raya Lucaria Gate,liurnia
+"Liurnia of the Lakes - South of Caria Manor, West of Ravine Entrance",liurnia
+"Liurnia of the Lakes - South of Mausoleum Compound, Raya Lucaria Crystal Tunnel Entrance",liurnia
+"Liurnia of the Lakes - South of Scenic Isle, East of Slumbering Wolf's Shack",liurnia
+"Liurnia of the Lakes - Southeast Ravine, Lake at Caria Manor Entrance; Bellum Highway - Bellum Church",liurnia
+Liurnia of the Lakes - Temple Quarter,liurnia
+"Liurnia of the Lakes - Testu's Rise, East Gate Bridge Trestle",liurnia
+"Liurnia of the Lakes - The Four Belfries, Giant's Caravan Below",liurnia
+Liurnia of the Lakes - Village of the Albinaurics,liurnia
+Liurnia of the Lakes - West Albinauric Village,liurnia
+Liurnia of the Lakes - West of Church of Irith,liurnia
+Liurnia of the Lakes - West of Raya Lucaria Crystal Tunnel; Bellum Highway - South of East Raya Lucaria Gate,liurnia
+Liurnia of the Lakes - West of Scenic Isle,liurnia
+Liurnia to Altus Plateau,precipice
+Minor Erdtree Catacombs,caelid_erdtreecatacombs
+Miquella's Haligtree,haligtree
+Miquella's Haligtree - Elphael,haligtree_elphael
+Mohgwyn Palace,mohgwyn
+Moonlight Altar - Cathedral of Manus Celes,moonlight
+Moonlight Altar - Lunar Estate Ruins,moonlight
+Moonlight Altar - Moonfolk Ruins,moonlight
+Moonlight Altar - Ringleader's Evergaol,moonlight
+Moonlight Altar - West of Deep Ainsel Well,moonlight
+Morne Tunnel,peninsula_tunnel
+"Mountaintops of the Giants - Ancient Snow Valley Ruins, Stargazers' Ruins",mountaintops
+"Mountaintops of the Giants - Before Freezing Lake, Heretical Rise",mountaintops
+Mountaintops of the Giants - Before Grand Lift of Rold,mountaintops
+Mountaintops of the Giants - East Zamor Ruins; Flame Peak - Giant-Conquering Hero's Grave Entrance,mountaintops
+Mountaintops of the Giants - Forbidden Lands Midway,mountaintops
+Mountaintops of the Giants - Freezing Lake North Cliffside,mountaintops
+Mountaintops of the Giants - Guardians' Garrison,mountaintops
+Mountaintops of the Giants - North Castle Sol,mountaintops
+Mountaintops of the Giants - North of Zamor Ruins; Flame Peak - Hero's Grave North Cliffside,mountaintops
+Mountaintops of the Giants - Northeast Freezing Lake,mountaintops
+Mountaintops of the Giants - Northwest Freezing Lake,mountaintops
+"Mountaintops of the Giants - Northwest of Freezing Lake, East of Castle Sol",mountaintops
+"Mountaintops of the Giants - Shack of the Lofty; Consecrated Snowfield - Minor Erdtree, Albinauric Rise, Cave of the Forlorn Entrance",mountaintops
+"Mountaintops of the Giants - South Castle Sol, Snow Valley Ruins Overlook",mountaintops
+Mountaintops of the Giants - Southeast Freezing Lake,mountaintops
+"Mountaintops of the Giants - Southwest Freezing Lake, Lord Contender's Evergaol, Spiritcaller Cave Entrance",mountaintops
+"Mountaintops of the Giants - West Zamor Ruins, Grand Lift of Rold",mountaintops
+Mountaintops of the Giants - West of Castle Sol; Consecrated Snowfield - North of Minor Erdtree,mountaintops
+Mountaintops of the Giants - West of First Church of Marika,mountaintops
+"Mountaintops of the Giants - Whiteridge Road, Minor Erdtree",mountaintops
+Mt. Gelmir - Before Hermit Shack,gelmir
+"Mt. Gelmir - Craftsman's Shack, Hermit's Shack",gelmir
+"Mt. Gelmir - First Mt. Gelmir Campsite, Corpse-Stench Shack; Altus Plateau - West of Shaded Castle",gelmir
+Mt. Gelmir - Fort Laiedd,gelmir
+"Mt. Gelmir - Minor Erdtree, Seethewater Cave Entrance",gelmir
+"Mt. Gelmir - Ninth Mt. Gelmir Campsite, Road of Iniquity, Volcano Manor Entrance",gelmir
+"Mt. Gelmir - Primeval Sorcerer Azur, Gelmir Hero's Grave Entrance",gelmir
+"Mt. Gelmir - Seethewater River, Hermit Village, Wyndham Catacombs Entrance, Sage's Cave Entrance, Abductor Virgins Exit",gelmir
+Mt. Gelmir - Seethewater Terminus,gelmir
+Mt. Gelmir - Volcano Cave Entrance,gelmir
+Murkwater Catacombs,limgrave_murkwatercatacombs
+Murkwater Cave,limgrave_murkwatercave
+Nokron,siofra_nokron
+Nokron Start,siofrabank_nokron
+"Nokron, Eternal City - Boss",siofra_nokron
+North Altus Plateau,altus
+Northeast Capital Outskirts,outskirts
+Northeast Mountaintops,mountaintops
+Northwest Mountaintops,mountaintops
+Old Altus Tunnel,altus_oldtunnel
+Ordina; Ordina Outskirts,snowfield_hiddenpath
+Perfumer's Grotto,altus_grotto
+Raya Lucaria Crystal Tunnel,liurnia_tunnel
+Road's End Catacombs,liurnia_roadsendcatacombs
+Roundtable Hold,roundtable
+Ruin-Strewn Precipice,precipice
+Sage's Cave,altus_sagescave
+Sainted Hero's Grave,altus_grave
+Seethewater Cave,gelmir_seethewatercave
+Sellia Crystal Tunnel,caelid_selliatunnel
+Sellia Hideaway,dragonbarrow_selliahideaway
+Siofra River,siofra
+Siofra River - Boss,siofra
+Siofra River Start,siofra
+Southeast Caelid,caelid
+Southeast Mountaintops,mountaintops
+Southeast Weeping Peninsula Coast,peninsula
+Southwest Liurnia,liurnia
+Southwest Mountaintops,mountaintops
+Spiritcaller Cave,mountaintops_cave
+Stillwater Cave,liurnia_stillwatercave
+Stone Platform,erdtree
+Stormfoot Catacombs,limgrave_stormfootcatacombs
+Stormhill - North of Stormhill Shack,stormhill
+Stormhill - North of Warmaster's Shack,stormhill
+Stormhill - Northeast Cliffside,stormhill
+"Stormhill - Northwest Cliffside, Limgrave Colosseum Entrance",stormhill
+Stormhill - Path to Liurnia,stormhill
+"Stormhill - Saintsbridge, Deathtouched Catacombs Entrance; Limgrave - Highroad Cave Entrance",stormhill
+"Stormhill - Stormhill Shack, Stormveil Castle Entrance",stormhill
+"Stormhill - Warmaster's Shack, Stormgate",stormhill
+Stormveil Castle,stormveil
+Stranded Graveyard,graveyard
+Subterranean Shunning-Grounds,sewer
+Tombsward Catacombs,peninsula_tombswardcatacombs
+Tombsward Cave,peninsula_tombswardcave
+Unsightly Catacombs,altus_catacombs
+Volcano Cave,gelmir_volcanocave
+Volcano Manor,volcano
+War-Dead Catacombs,caelid_wardead
+"Weeping Peninsula - Beside the Crater-Pocked Glade, Oridys's Rise",peninsula
+"Weeping Peninsula - Bridge of Sacrifice, Forest Lookout Tower, Earthbore Cave Entrance",peninsula
+Weeping Peninsula - Castle Morne,peninsula
+Weeping Peninsula - Castle Morne Approach North,peninsula
+Weeping Peninsula - Castle Morne Approach Northwest Cliffside,peninsula
+Weeping Peninsula - Castle Morne Approach South,peninsula
+"Weeping Peninsula - Castle Morne Rampart, Ailing Village Outskirts",peninsula
+"Weeping Peninsula - Church of Pilgrimage, Demi-Human Forest Ruins",peninsula
+"Weeping Peninsula - Fourth Church of Marika, Witchbane Ruins",peninsula
+Weeping Peninsula - Impaler's Catacombs Entrance,peninsula
+Weeping Peninsula - Isolated Merchant's Shack,peninsula
+"Weeping Peninsula - Minor Erdtree, Tombsward Catacombs Entrance, Morne Tunnel Entrance",peninsula
+Weeping Peninsula - Morne Moangrave,peninsula
+Weeping Peninsula - North of Fourth Church of Marika,peninsula
+Weeping Peninsula - Tombsward Ruins,peninsula
+Weeping Peninsula - Tombsward; Weeping Evergaol; Tombsward Cave Entrance,peninsula
+Weeping Peninsula - Tower of Return,peninsula
+West Consecrated Snowfield,snowfield
+West Limgrave,limgrave
+West Liurnia,liurnia
+West Weeping Peninsula,peninsula
+Wyndham Catacombs,gelmir_wyndhamcatacombs
+Yelough Anix Tunnel,snowfield_tunnel
+[DLC] Abyssal Woods - Alcove North of Central Woods,abyssal
+[DLC] Abyssal Woods - Between Divided Falls and Manse,abyssal
+[DLC] Abyssal Woods - Central Abyssal Woods,abyssal
+[DLC] Abyssal Woods - Central Woods South Edge,abyssal
+[DLC] Abyssal Woods - East of Divided Falls,abyssal
+"[DLC] Abyssal Woods - Forsaken Graveyard, Darklight Catacombs Exit",scadualtus_catacombs
+[DLC] Abyssal Woods - South Winter-Lantern River by Woodland Trail,abyssal
+[DLC] Abyssal Woods - Woodland Trail East Edge,abyssal
+[DLC] Ancient Ruins of Rauh - Divine Beast Pantheon,rauhruins
+"[DLC] Ancient Ruins of Rauh - East Ruins Grace and Cave Entrance, Scorpion Cave",rauhruins
+[DLC] Ancient Ruins of Rauh - Furnace Golem Area,rauhruins
+[DLC] Ancient Ruins of Rauh - Hippo Pond,rauhruins
+[DLC] Ancient Ruins of Rauh - North Church of the Bud,rauhruins
+[DLC] Ancient Ruins of Rauh - South Belfry Area,rauhruins_limited
+"[DLC] Ancient Ruins of Rauh - South Church of the Bud, Sealing Tree",rauhruins
+"[DLC] Ancient Ruins of Rauh - South Church of the Bud, Sealing Tree, Grand Stairway, West Ruins Cave Upper Levels (Unsealed)",rauhruins
+"[DLC] Ancient Ruins of Rauh - Spiritspring Courtyard, Rot Ruins",rauhruins
+[DLC] Ancient Ruins of Rauh - West Ruins Cave Entrance and Grace,rauhruins
+"[DLC] Ancient Ruins of Rauh - West Ruins Cave Upper Levels, Grand Stairway",rauhruins
+"[DLC] Ancient Ruins of Rauh - West Ruins Northeast Cliffside, East Ruins Cave Exit",rauhruins
+[DLC] Belurat Gaol,gravesite_gaol
+"[DLC] Belurat, Tower Settlement",belurat
+"[DLC] Belurat, Tower Settlement Swamp",belurat_swamp
+[DLC] Bonny Gaol,scadualtus_gaol
+[DLC] Central Scadu Altus,scadualtus
+"[DLC] Cerulean Coast - Demi-Human Beach, Ravine North",cerulean
+"[DLC] Cerulean Coast - Dragon Area, Beach-Facing Coffin",cerulean
+[DLC] Cerulean Coast - Path to The Fissure,cerulean
+[DLC] Cerulean Coast - Ravine Northeast,cerulean
+[DLC] Cerulean Coast - Ravine South,cerulean
+"[DLC] Cerulean Coast - Southern Nameless Mausoleum, Far Southwest Coast",cerulean
+"[DLC] Cerulean Coast - The Fissure South, Stone Coffin Fissure Entrance",cerulean
+[DLC] Charo's Hidden Grave - Charo's Hidden Grave,charo
+[DLC] Charo's Hidden Grave - South Central Lake,charo
+[DLC] Charo's Hidden Grave - Southeast Mariner Area,charo
+[DLC] Darklight Catacombs,scadualtus_catacombs
+[DLC] Dragon's Pit,gravesite_dragonpit
+[DLC] Enir-Ilim,enirilim
+[DLC] Finger Birthing Grounds,fingergrounds
+[DLC] Finger Ruins of Dheo - Northeast,hinterland_dheo
+[DLC] Finger Ruins of Dheo - Northwest,hinterland_dheo
+"[DLC] Finger Ruins of Dheo - West, Hanging Bell",hinterland_dheo
+[DLC] Finger Ruins of Rhia - Climb to Finger-Weaver's Hovel,cerulean_rhia
+[DLC] Finger Ruins of Rhia - Far Southwest from Cerulean Coast,cerulean_rhia
+[DLC] Finger Ruins of Rhia - Finger-Weaver's Hovel,cerulean_rhia
+[DLC] Finger Ruins of Rhia - Southeast,cerulean_rhia
+[DLC] Finger Ruins of Rhia - Southwest,cerulean_rhia
+[DLC] Fog Rift Catacombs,gravesite_catacombs
+[DLC] Foot of the Jagged Peak - Drake Lake,jaggedpeak_foot
+"[DLC] Foot of the Jagged Peak - Foot of the Jagged Peak, Drake Duo Area",jaggedpeak_foot
+[DLC] Foot of the Jagged Peak - Grand Altar of Dragon Communion,jaggedpeak_foot
+[DLC] Gravesite Plain - Belurat Main Gate Cross,gravesite
+[DLC] Gravesite Plain - Castle Front,gravesite
+[DLC] Gravesite Plain - Church of Benediction,gravesite
+[DLC] Gravesite Plain - Church of Consolation,gravesite
+"[DLC] Gravesite Plain - Cliffroad Terminus, Prospect Town",gravesite
+[DLC] Gravesite Plain - Downstream of Ellac River Cave,ellac
+"[DLC] Gravesite Plain - Dragon Lake, Belurat Gaol Entrance",gravesite
+[DLC] Gravesite Plain - East Castle Ensis,ensis
+[DLC] Gravesite Plain - East of Ensis Castle Front,gravesite
+[DLC] Gravesite Plain - Elder's Hovel,gravesite
+[DLC] Gravesite Plain - Ellac Greatbridge,gravesite
+[DLC] Gravesite Plain - Ellac River Cave,ellac
+[DLC] Gravesite Plain - Ellac River Downstream,ellac
+[DLC] Gravesite Plain - Ellac River End,ellac
+"[DLC] Gravesite Plain - Greatbridge North, Abandoned Ailing Village",gravesite
+[DLC] Gravesite Plain - North Fog Rift Fort,ensis_fort
+[DLC] Gravesite Plain - North of Scorched Ruins,gravesite
+[DLC] Gravesite Plain - Northern Nameless Mausoleum,rauhbase_high
+[DLC] Gravesite Plain - Pillar Path Cross,gravesite
+[DLC] Gravesite Plain - Pillar Path Northeast Cliffside,gravesite
+"[DLC] Gravesite Plain - Pillar Path Waypoint, Ruined Forge Lava Intake Entrance",gravesite
+[DLC] Gravesite Plain - Prospect Town West Cliffside,gravesite
+[DLC] Gravesite Plain - Rivermouth Cave Entrance,ellac
+[DLC] Gravesite Plain - Scorched Ruins,gravesite
+[DLC] Gravesite Plain - South of Church of Consolation,gravesite
+[DLC] Gravesite Plain - South of Dragon Lake,gravesite
+"[DLC] Gravesite Plain - South of Scorched Ruins, Gravesite Plain South Cliffside",gravesite
+[DLC] Gravesite Plain - Southeast Poison Swamp,gravesite
+"[DLC] Gravesite Plain - Suppressing Pillar, Dragon's Pit Entrance",gravesite
+[DLC] Gravesite Plain - Three-Path Cross,gravesite
+[DLC] Gravesite Plain - West Castle Ensis,ensis
+"[DLC] Gravesite Plain - Western Nameless Mausoleum, East of Prospect Town, West of Scorched Ruins",gravesite
+[DLC] Jagged Peak - Between Jagged Peak Mountainside and Summit,jaggedpeak
+"[DLC] Jagged Peak - Jagged Peak Summit, Bayle Arena",jaggedpeak
+[DLC] Jagged Peak - Senessax Lake,jaggedpeak
+[DLC] Lamenter's Gaol,charo_gaol
+[DLC] Midra's Manse,midramanse
+[DLC] Northwest Gravesite Plain; West Scadu Altus; Rauh Ruins,gravesite
+[DLC] Northwest Gravesite Plain; West Scadu Altus; Rauh Ruins (Unsealed),gravesite
+[DLC] Rauh Base - Above Fog Rift,rauhbase
+[DLC] Rauh Base - Ancient Ruins Base,rauhbase
+[DLC] Rauh Base - Bloodfiend Cave,rauhbase
+[DLC] Rauh Base - Northeast Bear Woods,rauhbase
+[DLC] Rauh Base - Northwest Bear Woods,rauhbase
+"[DLC] Rauh Base - Ravine North, East Scorpion River",rauhbase
+[DLC] Rauh Base - Rot Area,rauhbase
+[DLC] Rauh Base - Scorpion River Catacombs Entrance,rauhbase
+[DLC] Rauh Base - Temple Town Ruins,rauhbase
+[DLC] Rauh Base - West Scorpion River,rauhbase
+[DLC] Rivermouth Cave,ellac_cave
+[DLC] Ruined Forge Lava Intake,gravesite_forge
+[DLC] Ruined Forge of Starfall Past,scadualtus_forge
+[DLC] Scadu Altus - Above Shadow Keep East Tunnel,scadualtus
+[DLC] Scadu Altus - Bonny Gaol Entrance,scadualtus
+[DLC] Scadu Altus - Bonny Village North Tree and Overlook,scadualtus
+"[DLC] Scadu Altus - Castle Ensis Exit, Ruined Forge of Starfall Past Entrance",scadualtus
+"[DLC] Scadu Altus - Castle Watering Hole Northeast, North Ruins of Unte",scadualtus_recluse
+"[DLC] Scadu Altus - Castle Watering Hole Southeast, South Ruins of Unte",scadualtus_recluse
+[DLC] Scadu Altus - Cathedral of Manus Metyr,scadualtus
+[DLC] Scadu Altus - Church of the Crusade,scadualtus
+[DLC] Scadu Altus - East of Scaduview Cross,scadualtus_high
+"[DLC] Scadu Altus - Eastern Nameless Mausoleum, Hippo Duo Pond",scadualtus_recluse
+[DLC] Scadu Altus - Finger Ruins of Miyr,scadualtus_miyr
+[DLC] Scadu Altus - Furnace Golem Area,scadualtus
+"[DLC] Scadu Altus - Highroad Cross, Highway Fork",scadualtus
+"[DLC] Scadu Altus - Main Bonny Village, Whipping Hut",scadualtus
+[DLC] Scadu Altus - Manus Metyr Graveyard and West Cliffside,scadualtus
+"[DLC] Scadu Altus - Moorth Highway Camp, South Bear Woods",scadualtus
+"[DLC] Scadu Altus - Moorth Highway South, Fort of Reprimand",scadualtus
+"[DLC] Scadu Altus - Moorth Ruins, Bonny Village West Entrance",scadualtus
+[DLC] Scadu Altus - Path to Village of Flies,scadualtus_recluse
+[DLC] Scadu Altus - Poison Swamp,scadualtus
+"[DLC] Scadu Altus - Recluses' River Downstream, Village of Flies",scadualtus_recluse
+[DLC] Scadu Altus - Recluses' River Upstream,scadualtus_recluse
+"[DLC] Scadu Altus - Road to Manus Metyr, Rabbath's Rise Building",scadualtus
+[DLC] Scadu Altus - Scadu Altus West,scadualtus
+[DLC] Scadu Altus - Scaduview Cross,scadualtus_high
+[DLC] Scadu Altus - Second Furnace Golem Area,scadualtus
+[DLC] Scadu Altus - West of Moorth Highway South,scadualtus
+"[DLC] Scaduview - East of Fingerstone Hill Crater, Colossal Fingercreeper Cave",scaduview
+[DLC] Scaduview - Fingerstone Hill Crater,scaduview
+"[DLC] Scaduview - Hinterland Bridge, West Fingerstone Hill",scaduview
+[DLC] Scaduview - North Hinterland,hinterland
+[DLC] Scaduview - South Hinterland,hinterland
+"[DLC] Scaduview - South Scadutree Base, Lower Shadow Keep Exit",scadutree_base
+[DLC] Scaduview - Southwest Fingerstone Hill,hinterland
+"[DLC] Scaduview - Specimen Storehouse Exit, Commander Gaius' Arena",scaduview
+[DLC] Scorpion River Catacombs,rauhbase_catacombs
+[DLC] Shadow Keep,shadowkeep
+[DLC] Shadow Keep - Church District,shadowkeep_church
+[DLC] Shadow Keep - Drained Church District,shadowkeep_church_lower
+[DLC] Shadow Keep - West Rampart,westrampart
+[DLC] Southeast Gravesite Plain; Fort Reprimand; Foot of the Jagged Peak; North Finger Ruins of Rhia; West Abyssal Woods,gravesite
+[DLC] Southwest Cerulean Coast,cerulean
+[DLC] Southwest Gravesite Plain; Northwest Cerulean Coast,gravesite
+[DLC] Specimen Storehouse - Eighth Floor,storehouse
+[DLC] Specimen Storehouse - Fifth Floor,storehouse
+[DLC] Specimen Storehouse - First Floor,storehouse
+[DLC] Specimen Storehouse - Fourth Floor,storehouse
+[DLC] Specimen Storehouse - Ninth Floor,storehouse
+[DLC] Specimen Storehouse - Rafters,storehouse
+[DLC] Specimen Storehouse - Second Floor,storehouse
+[DLC] Specimen Storehouse - Seventh Floor,storehouse
+[DLC] Specimen Storehouse - Shadow Tower,storehouse
+[DLC] Specimen Storehouse - Sixth Floor,storehouse
+[DLC] Specimen Storehouse - Third Floor,storehouse
+[DLC] Stone Coffin Fissure,fissure
+[DLC] Taylew's Ruined Forge,rauhbase_forge
