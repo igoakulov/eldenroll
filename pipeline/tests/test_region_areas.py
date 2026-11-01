@@ -27,15 +27,15 @@ needs_files = pytest.mark.skipif(
 )
 
 EXPECTED_AREAS: dict[int, int] = {
-    1: 29,
-    30: 19,
+    1: 27,
+    30: 22,
     50: 16,
     60: 21,
     65: 5,
     70: 4,
     80: 10,
     100: 7,
-    110: 3,
+    110: 2,
     115: 5,
     120: 2,
     130: 3,
@@ -46,15 +46,15 @@ EXPECTED_AREAS: dict[int, int] = {
     165: 2,
 }
 EXPECTED_SLOTS: dict[int, int] = {
-    1: 693,
-    30: 643,
+    1: 689,
+    30: 648,
     50: 315,
     60: 549,
     65: 151,
     70: 108,
     80: 233,
     100: 179,
-    110: 95,
+    110: 94,
     115: 123,
     120: 104,
     130: 13,
@@ -104,6 +104,14 @@ def test_slot_counts_per_region_match_the_document() -> None:
     }
     assert per_region == EXPECTED_SLOTS
     assert sum(per_region.values()) == 4257
+
+
+@needs_files
+@pytest.mark.parametrize("area", ["chapel", "siofra_limited", "farumazula_limited", "mohgwyn"])
+def test_places_reached_only_from_liurnia_are_in_liurnia(area: str) -> None:
+    areas = load_region_areas(AREAS_CSV, region_ids=_region_ids())
+
+    assert areas[area] == "liurnia"
 
 
 def test_duplicate_area_is_a_loader_error(tmp_path: Path) -> None:

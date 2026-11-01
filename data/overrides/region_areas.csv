@@ -24,10 +24,10 @@ peninsula_tunnel,limgrave
 peninsula_tombswardcatacombs,limgrave
 peninsula_tombswardcave,limgrave
 chapel_start,limgrave
-chapel,limgrave
+chapel,liurnia
 roundtable,limgrave
 siofra,limgrave
-siofra_limited,limgrave
+siofra_limited,liurnia
 liurnia,liurnia
 liurnia_academycave,liurnia
 liurnia_blackknifecatacombs,liurnia
@@ -112,7 +112,7 @@ flamepeak,mountaintops
 flamepeak_grave,mountaintops
 farumazula_start,farumazula
 farumazula,farumazula
-farumazula_limited,farumazula
+farumazula_limited,liurnia
 snowfield,snowfield
 snowfield_hiddenpath,snowfield
 snowfield_catacombs,snowfield

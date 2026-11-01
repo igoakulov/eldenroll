@@ -239,6 +239,7 @@ def test_every_boss_override_names_a_real_boss_on_that_label() -> None:
         ("Putrid Tree Spirit", "War-Dead Catacombs", "caelid"),
         ("Metyr, Mother of Fingers", "[DLC] Finger Birthing Grounds", "dlc_gravesite"),
         ("Jori, Elder Inquisitor", JORI_LABEL, "dlc_shadowkeep"),
+        ("Grafted Scion", "Chapel of Anticipation", "liurnia"),
     ],
 )
 def test_owner_confirmed_boss_regions(boss: str, label: str, region: str) -> None:
