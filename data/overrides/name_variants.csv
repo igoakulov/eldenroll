@@ -1,0 +1,2 @@
+source_id,source_name,canonical_name,reason,reviewer
+17f693ced0bl0i0oh402gmm7bjbdty,Redmane Knight Helm,Redmane Knight Gauntlets,"armors.json row is categorised Gauntlets at weight 3.9 with no description; iteminfo id 1800200 holds the canonical name",owner
