@@ -240,6 +240,16 @@ def test_every_boss_override_names_a_real_boss_on_that_label() -> None:
         ("Metyr, Mother of Fingers", "[DLC] Finger Birthing Grounds", "dlc_gravesite"),
         ("Jori, Elder Inquisitor", JORI_LABEL, "dlc_shadowkeep"),
         ("Grafted Scion", "Chapel of Anticipation", "liurnia"),
+        (
+            "Count Ymir, Mother of Fingers",
+            "[DLC] Scadu Altus - Cathedral of Manus Metyr",
+            "dlc_gravesite",
+        ),
+        (
+            "Dryleaf Dane",
+            "[DLC] Scadu Altus - Moorth Ruins, Bonny Village West Entrance",
+            "dlc_gravesite",
+        ),
     ],
 )
 def test_owner_confirmed_boss_regions(boss: str, label: str, region: str) -> None:

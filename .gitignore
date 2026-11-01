@@ -1,5 +1,6 @@
 # ---- raw inputs and planning docs (not published) ----
 raw/
+.claude/
 
 # ---- python ----
 __pycache__/
