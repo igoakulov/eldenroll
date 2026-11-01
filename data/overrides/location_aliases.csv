@@ -19,6 +19,7 @@ Altus Plateau - Road of Iniquity Side Path,altus
 Altus Plateau - Second Church of Marika,altus
 Altus Plateau - Shaded Castle,altus
 Altus Plateau - South of Tree Sentinel Duo,altus
+Altus Plateau - Southwest of Tree Sentinel Duo,altus
 "Altus Plateau - Tree Sentinel Duo, Perfumer's Grotto Entrance",altus
 "Altus Plateau - Village Windmill Pasture, East Windmill Pasture",altus
 Altus Plateau - West Windmill Pasture,altus
@@ -42,6 +43,7 @@ Caelid - Caelid Highway South,caelid
 Caelid - Central Radahn Arena,caelid
 Caelid - Deep Siofra Well; Greyoll's Dragonbarrow - Dragonbarrow West,caelid
 Caelid - East Aeonia Swamp,caelid
+"Caelid - East Sellia, Church of the Plague",caelid
 "Caelid - East Sellia, Church of the Plague, Sellia Hideaway Entrance",caelid
 "Caelid - Far Southwest Radahn Arena, Aeonia Swamp Bank Southeast Cliffside",caelid
 Caelid - Fort Gael North,caelid
@@ -63,6 +65,7 @@ Caelid Catacombs,caelid_catacombs
 "Capital Outskirts - Capital Rampart, Auriza Side Tomb Entrance (Ashen)",outskirts
 Capital Outskirts - East of Outer Wall Phantom Tree,outskirts
 Capital Outskirts - Minor Erdtree,outskirts
+"Capital Outskirts - Minor Erdtree Church, Sealed Tunnel Entrance",outskirts
 "Capital Outskirts - Northeast Outer Wall Battleground, Hermit Merchant's Shack",outskirts
 Capital Outskirts - Northwest Outer Wall Battleground,outskirts
 Capital Outskirts - Outer Wall Phantom Tree,outskirts
@@ -77,6 +80,7 @@ Coastal Cave,limgrave_coastalcave
 Consecrated Snowfield - Apostate Derelict,snowfield
 Consecrated Snowfield - Consecrated Snowfield Catacombs Entrance,snowfield
 Consecrated Snowfield - East of Ordina,snowfield
+Consecrated Snowfield - Far West Cliffside,snowfield
 "Consecrated Snowfield - Hidden Path to the Haligtree, Southeast Foggy Area",snowfield
 Consecrated Snowfield - North of Yelough Anix Ruins,snowfield
 "Consecrated Snowfield - Northeast Foggy Area, Inner Consecrated Snowfield",snowfield
@@ -84,6 +88,7 @@ Consecrated Snowfield - North of Yelough Anix Ruins,snowfield
 "Consecrated Snowfield - Ordina, Liturgical Town",snowfield
 Consecrated Snowfield - South of Ordina,snowfield
 Consecrated Snowfield - Southeast of Ordina,snowfield
+Consecrated Snowfield - Southwest Foggy Area,snowfield
 Consecrated Snowfield - West of Ordina,snowfield
 "Consecrated Snowfield - Yelough Anix Ruins, Yelough Anix Tunnel Entrance",snowfield
 Consecrated Snowfield Catacombs,snowfield_catacombs
@@ -100,6 +105,7 @@ Earthbore Cave,peninsula_earthborecave
 East Limgrave,limgrave
 East Limgrave (Meteored),limgrave
 East Liurnia,liurnia
+East Liurnia / Liurnia to Atlus Plateau,liurnia
 Far Northwest Caelid,caelid
 Flame Peak - Northeast Giants' Gravepost,flamepeak
 Flame Peak - Northwest Giants' Gravepost,flamepeak
@@ -125,6 +131,7 @@ Highroad Cave,limgrave_highroadcave
 Impaler's Catacombs,peninsula_impalerscatacombs
 Lake of Rot,lakeofrot
 Lakeside Crystal Cave,liurnia_lakesidecave
+Leyndell - Divine Tower of East Altus Entrance; Mountaintops of the Giants - Forbidden Lands Start,mountaintops_start
 "Leyndell, Ashen Capital",leyndell2
 "Leyndell, Royal Capital",leyndell
 "Limgrave - Agheel Lake North, Murkwater Cave Entrance",limgrave
@@ -134,6 +141,7 @@ Limgrave - Artist's Shack,limgrave
 "Limgrave - Church of Dragon Communion, Coastal Cave Exit",limgrave_dragonchurch
 "Limgrave - Church of Elleh, Stranded Graveyard Exit",limgrave
 Limgrave - Coastal Cave Entrance,limgrave
+Limgrave - Dragon-Burnt Ruins,limgrave
 Limgrave - Fort Haight,limgrave
 Limgrave - Fort Haight West,limgrave
 Limgrave - Fort Haight West (Meteored),limgrave
@@ -160,7 +168,9 @@ Liurnia of the Lakes - Caria Manor,liurnia
 Liurnia of the Lakes - Church of Irith,liurnia
 Liurnia of the Lakes - Church of Vows,liurnia
 Liurnia of the Lakes - Converted Tower,liurnia
+"Liurnia of the Lakes - Crystalline Woods, Path to the Four Belfries",liurnia
 "Liurnia of the Lakes - Cuckoo's Evergaol, West of Meeting Place",liurnia
+Liurnia of the Lakes - Eastern Tableland Northeast Cliffside,liurnia
 Liurnia of the Lakes - Eastern Tableland Southeast Cliffside,liurnia
 "Liurnia of the Lakes - Eastern Tableland, Ainsel River Well",liurnia
 "Liurnia of the Lakes - Far West Gate Town, North Rose Church",liurnia
@@ -203,16 +213,20 @@ Liurnia of the Lakes - Temple Quarter,liurnia
 "Liurnia of the Lakes - Testu's Rise, East Gate Bridge Trestle",liurnia
 "Liurnia of the Lakes - The Four Belfries, Giant's Caravan Below",liurnia
 Liurnia of the Lakes - Village of the Albinaurics,liurnia
+Liurnia of the Lakes - Village of the Albinaurics; Moonlight Altar - Moonfolk Ruins,liurnia
 Liurnia of the Lakes - West Albinauric Village,liurnia
 Liurnia of the Lakes - West of Church of Irith,liurnia
 Liurnia of the Lakes - West of Raya Lucaria Crystal Tunnel; Bellum Highway - South of East Raya Lucaria Gate,liurnia
 Liurnia of the Lakes - West of Scenic Isle,liurnia
 Liurnia to Altus Plateau,precipice
+Liurnia to Atlus Plateau,precipice
 Minor Erdtree Catacombs,caelid_erdtreecatacombs
 Miquella's Haligtree,haligtree
 Miquella's Haligtree - Elphael,haligtree_elphael
 Mohgwyn Palace,mohgwyn
+"Moonlight Altar - Altar South, Chelona's Rise",moonlight
 Moonlight Altar - Cathedral of Manus Celes,moonlight
+Moonlight Altar - Deep Ainsel Well,moonlight
 Moonlight Altar - Lunar Estate Ruins,moonlight
 Moonlight Altar - Moonfolk Ruins,moonlight
 Moonlight Altar - Ringleader's Evergaol,moonlight
@@ -221,19 +235,24 @@ Morne Tunnel,peninsula_tunnel
 "Mountaintops of the Giants - Ancient Snow Valley Ruins, Stargazers' Ruins",mountaintops
 "Mountaintops of the Giants - Before Freezing Lake, Heretical Rise",mountaintops
 Mountaintops of the Giants - Before Grand Lift of Rold,mountaintops
+Mountaintops of the Giants - East Zamor Ruins,mountaintops
 Mountaintops of the Giants - East Zamor Ruins; Flame Peak - Giant-Conquering Hero's Grave Entrance,mountaintops
 Mountaintops of the Giants - Forbidden Lands Midway,mountaintops
 Mountaintops of the Giants - Freezing Lake North Cliffside,mountaintops
 Mountaintops of the Giants - Guardians' Garrison,mountaintops
 Mountaintops of the Giants - North Castle Sol,mountaintops
+Mountaintops of the Giants - North of Zamor Ruins,mountaintops
 Mountaintops of the Giants - North of Zamor Ruins; Flame Peak - Hero's Grave North Cliffside,mountaintops
 Mountaintops of the Giants - Northeast Freezing Lake,mountaintops
+Mountaintops of the Giants - Northeast Giants' Gravepost,flamepeak
 Mountaintops of the Giants - Northwest Freezing Lake,mountaintops
+Mountaintops of the Giants - Northwest Giants' Gravepost,flamepeak
 "Mountaintops of the Giants - Northwest of Freezing Lake, East of Castle Sol",mountaintops
 "Mountaintops of the Giants - Shack of the Lofty; Consecrated Snowfield - Minor Erdtree, Albinauric Rise, Cave of the Forlorn Entrance",mountaintops
 "Mountaintops of the Giants - South Castle Sol, Snow Valley Ruins Overlook",mountaintops
 Mountaintops of the Giants - Southeast Freezing Lake,mountaintops
 "Mountaintops of the Giants - Southwest Freezing Lake, Lord Contender's Evergaol, Spiritcaller Cave Entrance",mountaintops
+Mountaintops of the Giants - Southwest Giants' Gravepost,flamepeak
 "Mountaintops of the Giants - West Zamor Ruins, Grand Lift of Rold",mountaintops
 Mountaintops of the Giants - West of Castle Sol; Consecrated Snowfield - North of Minor Erdtree,mountaintops
 Mountaintops of the Giants - West of First Church of Marika,mountaintops
@@ -254,6 +273,7 @@ Nokron,siofra_nokron
 Nokron Start,siofrabank_nokron
 "Nokron, Eternal City - Boss",siofra_nokron
 North Altus Plateau,altus
+North Atlus Plateau,altus
 Northeast Capital Outskirts,outskirts
 Northeast Mountaintops,mountaintops
 Northwest Mountaintops,mountaintops
@@ -271,21 +291,25 @@ Sellia Crystal Tunnel,caelid_selliatunnel
 Sellia Hideaway,dragonbarrow_selliahideaway
 Siofra River,siofra
 Siofra River - Boss,siofra
+Siofra River Bank,siofra
 Siofra River Start,siofra
 Southeast Caelid,caelid
 Southeast Mountaintops,mountaintops
 Southeast Weeping Peninsula Coast,peninsula
 Southwest Liurnia,liurnia
-Southwest Mountaintops,mountaintops
+Southwest Mountaintops,snowfield
 Spiritcaller Cave,mountaintops_cave
 Stillwater Cave,liurnia_stillwatercave
 Stone Platform,erdtree
 Stormfoot Catacombs,limgrave_stormfootcatacombs
+Stormhill - Forested West Cliffside,stormhill
 Stormhill - North of Stormhill Shack,stormhill
 Stormhill - North of Warmaster's Shack,stormhill
 Stormhill - Northeast Cliffside,stormhill
+Stormhill - Northwest Cliffside,stormhill
 "Stormhill - Northwest Cliffside, Limgrave Colosseum Entrance",stormhill
 Stormhill - Path to Liurnia,stormhill
+"Stormhill - Saintsbridge, Deathtouched Catacombs Entrance, Highroad Cave Entrance",stormhill
 "Stormhill - Saintsbridge, Deathtouched Catacombs Entrance; Limgrave - Highroad Cave Entrance",stormhill
 "Stormhill - Stormhill Shack, Stormveil Castle Entrance",stormhill
 "Stormhill - Warmaster's Shack, Stormgate",stormhill
@@ -302,6 +326,7 @@ War-Dead Catacombs,caelid_wardead
 "Weeping Peninsula - Bridge of Sacrifice, Forest Lookout Tower, Earthbore Cave Entrance",peninsula
 Weeping Peninsula - Castle Morne,peninsula
 Weeping Peninsula - Castle Morne Approach North,peninsula
+Weeping Peninsula - Castle Morne Approach Northeast Cliffside,peninsula
 Weeping Peninsula - Castle Morne Approach Northwest Cliffside,peninsula
 Weeping Peninsula - Castle Morne Approach South,peninsula
 "Weeping Peninsula - Castle Morne Rampart, Ailing Village Outskirts",peninsula
