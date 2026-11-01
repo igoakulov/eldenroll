@@ -1,0 +1,123 @@
+"""Read the fifteen base-game JSON documents from `raw/json-no-dlc/`.
+
+Each file is a JSON array whose records carry a unique `id`. Every record also has a `name`,
+but names repeat (`items` holds 15 duplicate names), so the id is the identity and the name a
+label. Presence is validated; types are not, because the sources mix numbers, numeric
+strings and `null`, and each consumer knows its own shape.
+"""
+
+from __future__ import annotations
+
+import json
+from collections.abc import Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import cast
+
+from eldenrando.loaders.schema import LoaderError, require_mapping
+
+JSON_FILES: dict[str, tuple[str, ...]] = {
+    "ammos": ("id", "name", "type", "attackPower", "passive"),
+    "armors": ("id", "name", "category", "dmgNegation", "resistance", "weight"),
+    "ashes": ("id", "name", "affinity", "skill"),
+    "bosses": ("id", "name", "region", "location", "drops"),
+    "classes": ("id", "name", "stats"),
+    "creatures": ("id", "name"),
+    "incantations": ("id", "name", "type", "requires"),
+    "items": ("id", "name", "type"),
+    "locations": ("id", "name", "region"),
+    "npcs": ("id", "name", "role"),
+    "shields": ("id", "name", "requiredAttributes", "category", "weight"),
+    "sorceries": ("id", "name", "type", "requires"),
+    "spirits": ("id", "name", "effect"),
+    "talismans": ("id", "name", "effect"),
+    "weapons": ("id", "name", "requiredAttributes", "category", "weight"),
+}
+
+
+@dataclass(frozen=True, slots=True)
+class JsonDocument:
+    """One parsed JSON document: its logical name, its file, and its records."""
+
+    name: str
+    path: Path
+    records: tuple[dict[str, object], ...]
+
+    @property
+    def count(self) -> int:
+        """Return the number of records."""
+        return len(self.records)
+
+    @property
+    def ids(self) -> tuple[str, ...]:
+        """Return every record id, in file order."""
+        return tuple(cast("str", record["id"]) for record in self.records)
+
+
+def read_records(
+    path: Path,
+    *,
+    required_fields: Sequence[str] = (),
+) -> tuple[dict[str, object], ...]:
+    """Return the records at `path`, or raise `LoaderError`."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise LoaderError(f"{path}: cannot read ({exc})") from exc
+    except UnicodeDecodeError as exc:
+        raise LoaderError(f"{path}: not UTF-8 ({exc})") from exc
+    try:
+        document = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise LoaderError(f"{path}: invalid JSON ({exc})") from exc
+    if not isinstance(document, list):
+        raise LoaderError(f"{path}: expected a list, got {type(document).__name__}")
+    entries = cast("list[object]", document)
+    records: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for index, entry in enumerate(entries):
+        where = f"{path}: record {index}"
+        record = _record(entry, where)
+        record_id = _string_field(record, "id", where)
+        _string_field(record, "name", where)
+        if record_id in seen:
+            raise LoaderError(f"{where}: duplicate id {record_id!r}")
+        seen.add(record_id)
+        for field in required_fields:
+            if field not in record:
+                raise LoaderError(f"{where}: missing field {field!r}")
+        records.append(record)
+    return tuple(records)
+
+
+def _string_field(record: dict[str, object], key: str, where: str) -> str:
+    """Return a required string field of a record."""
+    value = record.get(key)
+    if not isinstance(value, str):
+        raise LoaderError(f"{where}.{key}: expected a string, got {type(value).__name__}")
+    return value
+
+
+def _record(entry: object, where: str) -> dict[str, object]:
+    """Return one JSON object with string field names."""
+    mapping = require_mapping(entry, where)
+    out: dict[str, object] = {}
+    for key, value in mapping.items():
+        if not isinstance(key, str):
+            raise LoaderError(f"{where}: field name {key!r} is not a string")
+        out[key] = value
+    return out
+
+
+def load_document(directory: Path, name: str) -> JsonDocument:
+    """Return one known document from `directory`, or raise `LoaderError`."""
+    fields = JSON_FILES.get(name)
+    if fields is None:
+        raise LoaderError(f"{directory}: unknown JSON document {name!r}")
+    path = directory / f"{name}.json"
+    return JsonDocument(name=name, path=path, records=read_records(path, required_fields=fields))
+
+
+def load_all_documents(directory: Path) -> dict[str, JsonDocument]:
+    """Return all fifteen documents, keyed by logical name."""
+    return {name: load_document(directory, name) for name in JSON_FILES}
