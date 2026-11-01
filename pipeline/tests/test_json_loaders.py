@@ -22,6 +22,18 @@ from eldenrando.loaders.schema import LoaderError
 JSON_DIR = Path(__file__).resolve().parents[2] / "raw" / "json-no-dlc"
 needs_data = pytest.mark.skipif(not JSON_DIR.is_dir(), reason="raw source data not present")
 
+REPEATED_NAMES: dict[str, int] = {
+    "ammos": 1,
+    "armors": 2,
+    "bosses": 2,
+    "classes": 1,
+    "creatures": 3,
+    "items": 15,
+    "locations": 3,
+    "npcs": 1,
+    "weapons": 1,
+}
+
 EXPECTED_COUNTS: dict[str, int] = {
     "ammos": 53,
     "armors": 568,
@@ -65,16 +77,21 @@ def test_every_record_has_a_string_name() -> None:
 
 
 @needs_data
-def test_known_record_shape_gaps() -> None:
+def test_names_repeat_across_records() -> None:
     documents = load_all_documents(JSON_DIR)
-    bosses = documents["bosses"].records
-    items = documents["items"].records
-    locations = documents["locations"].records
 
-    assert sum(1 for record in bosses if "healthPoints" not in record) == 1
-    assert sum(1 for record in items if "effect" not in record) == 3
-    assert sum(1 for record in locations if "description" not in record) == 2
-    assert sum(1 for record in locations if "Liurnia of the Lakes" in record) == 2
+    for name, expected in REPEATED_NAMES.items():
+        names = [cast("str", record["name"]) for record in documents[name].records]
+        assert len(names) - len(set(names)) == expected, name
+
+
+@needs_data
+def test_duplicate_armor_name_carries_two_categories() -> None:
+    armors = load_document(JSON_DIR, "armors").records
+    redmane = [record for record in armors if record["name"] == "Redmane Knight Helm"]
+
+    assert len(redmane) == 2
+    assert {record["category"] for record in redmane} == {"Gauntlets", "Helm"}
 
 
 @needs_data
@@ -135,8 +152,8 @@ def test_missing_required_field_is_a_loader_error(tmp_path: Path) -> None:
     source = tmp_path / "field.json"
     source.write_text('[{"id": "a", "name": "x"}]', encoding="utf-8")
 
-    with pytest.raises(LoaderError, match=r"record 0: missing field 'weight'"):
-        read_records(source, required_fields=("weight",))
+    with pytest.raises(LoaderError, match=r"record 0: missing field 'category'"):
+        read_records(source, required_fields=("category",))
 
 
 def test_unknown_document_name_is_a_loader_error(tmp_path: Path) -> None:

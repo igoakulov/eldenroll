@@ -13,8 +13,8 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import CsvTable, read_table
 
 WEAPON_CATEGORY_COLUMNS: tuple[str, ...] = ("Weapon Class", "Weapon")
-ASH_COMPATIBILITY_COLUMNS: tuple[str, ...] = ("Name", "Standard", "NONE")
-SOMBER_WEAPON_COLUMNS: tuple[str, ...] = ("Unique Skill Weapon", "Name", "AtkId")
+ASH_COMPATIBILITY_COLUMNS: tuple[str, ...] = ("Name",)
+SOMBER_WEAPON_COLUMNS: tuple[str, ...] = ("Name",)
 
 
 def load_weapon_categories(path: Path) -> CsvTable:

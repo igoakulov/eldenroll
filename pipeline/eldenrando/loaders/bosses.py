@@ -13,7 +13,7 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import CsvTable, read_table
 
 BOSS_CREATURE_HEADER_ROW = 1
-BOSS_CREATURE_COLUMNS: tuple[str, ...] = ("Location", "Name", "Npc_ID", "Chara_ID", "LookupID")
+BOSS_CREATURE_COLUMNS: tuple[str, ...] = ("Location", "Name")
 BOSS_SUMMARY_COLUMNS: tuple[str, ...] = ("Encounter Name", "Region", "Location")
 
 

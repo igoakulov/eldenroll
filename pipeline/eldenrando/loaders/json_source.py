@@ -16,22 +16,24 @@ from typing import cast
 
 from eldenrando.loaders.schema import LoaderError, require_mapping
 
+# Logical name -> the only fields the build reads beyond `id` and `name`. An empty tuple
+# means the file is parsed for its record count and identity, nothing else.
 JSON_FILES: dict[str, tuple[str, ...]] = {
-    "ammos": ("id", "name", "type", "attackPower", "passive"),
-    "armors": ("id", "name", "category", "dmgNegation", "resistance", "weight"),
-    "ashes": ("id", "name", "affinity", "skill"),
-    "bosses": ("id", "name", "region", "location", "drops"),
-    "classes": ("id", "name", "stats"),
-    "creatures": ("id", "name"),
-    "incantations": ("id", "name", "type", "requires"),
-    "items": ("id", "name", "type"),
-    "locations": ("id", "name", "region"),
-    "npcs": ("id", "name", "role"),
-    "shields": ("id", "name", "requiredAttributes", "category", "weight"),
-    "sorceries": ("id", "name", "type", "requires"),
-    "spirits": ("id", "name", "effect"),
-    "talismans": ("id", "name", "effect"),
-    "weapons": ("id", "name", "requiredAttributes", "category", "weight"),
+    "ammos": (),
+    "armors": ("category",),
+    "ashes": (),
+    "bosses": (),
+    "classes": (),
+    "creatures": (),
+    "incantations": ("requires",),
+    "items": (),
+    "locations": (),
+    "npcs": (),
+    "shields": ("requiredAttributes",),
+    "sorceries": ("requires",),
+    "spirits": (),
+    "talismans": (),
+    "weapons": ("requiredAttributes",),
 }
 
 

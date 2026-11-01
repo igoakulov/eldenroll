@@ -11,14 +11,8 @@ from pathlib import Path
 
 from eldenrando.loaders.csv_source import CsvTable, read_table
 
-DROP_LOCATION_COLUMNS: tuple[str, ...] = (
-    "Location",
-    "Name",
-    "Npc_ID",
-    "Chara_ID",
-    "itemLotId_enemy",
-)
-ITEM_DROP_COLUMNS: tuple[str, ...] = ("NPC ID", "ItemLot_Enemy ID", "Name", "Location #1")
+DROP_LOCATION_COLUMNS: tuple[str, ...] = ("Location", "Name")
+ITEM_DROP_COLUMNS: tuple[str, ...] = ("ItemLot_Enemy ID", "Items Drop 1", "Item Chance 1")
 
 
 def load_drop_locations(path: Path) -> CsvTable:

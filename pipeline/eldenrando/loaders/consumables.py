@@ -11,7 +11,7 @@ from pathlib import Path
 
 from eldenrando.loaders.csv_source import CsvTable, read_table
 
-CONSUMABLE_COLUMNS: tuple[str, ...] = ("Name", "AtkId", "subCategory1", "subCategory2")
+CONSUMABLE_COLUMNS: tuple[str, ...] = ("Name", "subCategory1", "subCategory2")
 
 
 def load_consumable_categories(path: Path) -> CsvTable:

@@ -73,13 +73,6 @@ def test_weapon_table_keeps_class_separators() -> None:
     assert len(classes) == 42
 
 
-@needs_data
-def test_drop_location_header_has_one_blank_column() -> None:
-    table = load_drop_locations(CSV_DIR / "item_drop_locations.csv")
-
-    assert table.header.count("") == 1
-
-
 def test_missing_csv_is_a_loader_error(tmp_path: Path) -> None:
     with pytest.raises(LoaderError, match="cannot read"):
         read_table(tmp_path / "absent.csv")
