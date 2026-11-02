@@ -1,2 +1,22 @@
 source_id,source_name,canonical_name,reason,reviewer
 17f693ced0bl0i0oh402gmm7bjbdty,Redmane Knight Helm,Redmane Knight Gauntlets,"armors.json row is categorised Gauntlets at weight 3.9 with no description; iteminfo id 1800200 holds the canonical name",owner
+15120700,Sacred Butchering Knife,Butchering Knife,"iteminfo names this id Sacred Butchering Knife; the weapon CSV and the JSON both call it Butchering Knife",owner
+681100,War Surgeon Gown (Altered),War Surgeon Gown,"iteminfo has only the altered form; it can be unaltered, and no catalog name carries (Altered)",owner
+721100,Beast Champion Armor (Altered),Beast Champion Armor,"iteminfo has only the altered form; it can be unaltered, and no catalog name carries (Altered)",owner
+991100,Errant Sorcerer Robe (Altered),Errant Sorcerer Robe,"iteminfo has only the altered form; it can be unaltered, and no catalog name carries (Altered)",owner
+17f693fc837l0i0off9ln8pmeyhp0g,Nox Monk Bracelets,Nox Bracelets,"armors.json and the drop CSVs say Nox Monk; the mod and the game say Nox Bracelets",owner
+17f69820f0al0i0pnb1d742cf4p6ji,Nox Monk Greaves,Nox Greaves,"armors.json and the drop CSVs say Nox Monk; the mod and the game say Nox Greaves",owner
+17f697c8d05l0i0o81mkc86pyw8tdh,Chain Gauntlets,Gauntlets,"armors.json names the chain set's arm piece Chain Gauntlets; the mod's id 1100200 and Kale's shop line call it Gauntlets",owner
+17f69a5c5bbl0i0o9b3mzby0ky19w,Champion Gauntlets,Champion Bracers,"armors.json holds a second record of Champion Bracers under this name, with a byte-identical image",owner
+17f692d4de3l0i0pf68kg5ine04x3,Blackflame Monk Greave,Blackflame Monk Greaves,armors.json misspells the name,agent
+17f697838dbl0i0nqpyyrpkl1polw,Godksin Noble Robe,Godskin Noble Robe,armors.json misspells the name,agent
+17f69bf199dl0i0pn8qhruxql5jeou,Old Sorcerer Legwraps,Old Sorcerer's Legwraps,armors.json misspells the name,agent
+17f697c8bb1l0i1ozxd3885l5ejmcw,Prince Of Death's Star,Prince of Death's Staff,"weapons.json misnames it; the record is a glintstone staff described as part of the Prince of Death",agent
+17f698685e3l0i1pmwzhhrnhxcf81,Sword Of St Trina,Sword of St. Trina,weapons.json misspells the name,agent
+17f6971b61dl0hykyaiiyblbxaeim,Oracle Bubble,Oracle Bubbles,"sorceries.json drops the plural; the mod names the spell Oracle Bubbles and the record describes the claymen's sorcery",agent
+17f690418f4l0hyns68vsg9zhbc6w,Beast Claw,Beast Claw (Incantation),"incantations.json drops the suffix the mod uses to tell it from the Beast Claw weapon",agent
+17f693c22edl0hynsdj8fz0ddz4vni,Aspect Of The Crucible: Breath,Aspects of the Crucible: Breath,incantations.json misspells the name,agent
+17f696d3fddl0hynve32uy42tb6pip,Burn O Flame!,"Burn, O Flame!",incantations.json drops the comma,agent
+17f6909836cl0hynxdbh1rpx4s4xfb,Ekzyke's Decay,Ekzykes's Decay,"incantations.json holds a further record of the spell, misspelled, with the same stats",agent
+17f692cd88cl0hynyo45u48tb1tyn,Ezykes's Decay,Ekzykes's Decay,"incantations.json holds a further record of the spell, misspelled, with the same stats",agent
+17f69535c25l0hyo1gmmkqtdazls9,Gurrang's Beast Claw,Gurranq's Beast Claw,incantations.json misspells the name,agent

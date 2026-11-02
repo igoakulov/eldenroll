@@ -11,11 +11,13 @@ Items whose slugs collide all take a category suffix; a unique slug takes none.
 from __future__ import annotations
 
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import replace
 
 from eldenrando.errors import BuildError
 from eldenrando.model.item import Category, Item
+from eldenrando.model.item_catalog import ItemCatalog
+from eldenrando.model.name_variant import NameVariant
 from eldenrando.normalize.slug import slugify
 
 _NEVER_A_ROW: frozenset[str] = frozenset({"Lamenter's Mask - Attack"})
@@ -60,10 +62,41 @@ def new_item(
     )
 
 
+def none_item() -> Item:
+    """Return the row a slot samples for a deliberately empty result (`prd.md` §6.7)."""
+    return new_item("none", "none", str_bonus_2h=False)
+
+
+def canonical_names(
+    catalog: ItemCatalog, group: str, kind: str, variants: Mapping[str, NameVariant]
+) -> tuple[str, ...]:
+    """Return the canonical name of every `kind` id in a catalog group, or raise `BuildError`."""
+    source_names = catalog.names[kind]
+    out: list[str] = []
+    for item_id in catalog.groups[group].items[kind]:
+        source_name = source_names.get(item_id)
+        if source_name is None:
+            raise BuildError(f"{kind} id {item_id} has no name")
+        variant = variants.get(str(item_id))
+        if variant is None:
+            out.append(source_name)
+        elif variant.source_name == source_name:
+            out.append(variant.canonical_name)
+        else:
+            raise BuildError(
+                f"name variant for id {item_id} expects {variant.source_name!r}, "
+                f"source says {source_name!r}"
+            )
+    return tuple(out)
+
+
 def build_item_table(items: Iterable[Item]) -> tuple[Item, ...]:
     """Return the rows in input order with final ids, or raise `BuildError`."""
     rows = tuple(items)
     _reject_excluded(rows)
+    empties = sorted(row.name for row in rows if row.category == "none")
+    if len(empties) > 1:
+        raise BuildError(f"item table holds {len(empties)} none rows: {', '.join(empties)}")
     _reject_repeats(f"{row.category}: {row.name}" for row in rows)
     _reject_repeats(f"{row.category}: {row.id}" for row in rows)
     slug_counts = Counter(row.id for row in rows)

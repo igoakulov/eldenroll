@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import build_item_table, new_item
+from eldenrando.build.items import build_item_table, new_item, none_item
 from eldenrando.errors import BuildError
 from eldenrando.loaders.iteminfo import load_item_catalog
 from eldenrando.normalize.slug import slugify
@@ -175,6 +175,29 @@ def test_excluded_name_stops_the_build(name: str) -> None:
 
 
 def test_the_none_row_is_allowed() -> None:
-    rows = build_item_table([new_item("none", "none")])
+    rows = build_item_table([none_item()])
 
     assert rows[0].id == "none"
+
+
+def test_the_none_row_holds_exactly_the_documented_values() -> None:
+    assert none_item().to_row() == {
+        "id": "none",
+        "name": "none",
+        "category": "none",
+        "subcategory": None,
+        "infusable": None,
+        "str_bonus_2h": False,
+        "alias": None,
+        "image": None,
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "fth": 0,
+        "arc": 0,
+    }
+
+
+def test_a_second_none_row_stops_the_build() -> None:
+    with pytest.raises(BuildError, match="2 none rows"):
+        build_item_table([none_item(), new_item("empty", "none")])
