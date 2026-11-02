@@ -52,6 +52,7 @@ NOT_IN_THE_COMPATIBILITY_SHEET = {
     "Scattershot Throw",
     "Shield Strike",
     "Shriek of Sorrow",
+    "Spinning Gravity Thrust",
     "Swift Slash",
     "The Poison Flower Blooms Twice",
     "Wall of Sparks",
@@ -96,10 +97,10 @@ def names(ashes: tuple[Item, ...]) -> set[str]:
 
 
 @needs_files
-def test_rows_names_and_slugs_are_all_110(ashes: tuple[Item, ...]) -> None:
-    assert len(ashes) == 110
-    assert len({row.name for row in ashes}) == 110
-    assert len({row.id for row in ashes}) == 110
+def test_rows_names_and_slugs_are_all_111(ashes: tuple[Item, ...]) -> None:
+    assert len(ashes) == 111
+    assert len({row.name for row in ashes}) == 111
+    assert len({row.id for row in ashes}) == 111
     assert {row.category for row in ashes} == {"ash"}
 
 
@@ -115,7 +116,8 @@ def test_ash_sources_file_lists_every_weapon() -> None:
         "Spinning Strikes": ("Banished Knight's Halberd +8",),
         "Glintblade Phalanx": ("Rogier's Rapier +8",),
         "Braggart's Roar": ("Iron Ball", "Battle Hammer", "Rotten Battle Hammer"),
-        "Blind Spot": ("Backhand Blade", "Reverse-Bladed Sword"),
+        "Blind Spot": ("Backhand Blade", "Reverse-Bladed Sword", "Smithscript Cirque"),
+        "Spinning Gravity Thrust": ("Sword Lance",),
         "Overhead Stance": ("Great Katana", "Reed Great Katana"),
         "Palm Blast": ("Dryleaf Arts", "Dane's Footwork"),
         "Shield Strike": ("Dueling Shield", "Carian Thrusting Shield", "Ritual Thrusting Shield"),
@@ -243,7 +245,7 @@ def test_pools_so_far_join_without_a_collision(
 
     table = build_item_table(rows)
 
-    assert len(table) == 1269
+    assert len(table) == 1270
     assert [row.id for row in table] == [row.id for row in rows]
 
 

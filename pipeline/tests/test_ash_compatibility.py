@@ -11,7 +11,6 @@ from eldenrando.build.items import new_item
 from eldenrando.errors import BuildError
 from eldenrando.loaders.ash_overrides import AshOverride, load_ash_overrides
 from eldenrando.loaders.csv_source import CsvTable
-from eldenrando.loaders.gaps import load_gaps
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.model.ash_compatibility import AshCompatibility
 from eldenrando.model.item import Item
@@ -63,6 +62,7 @@ def _ash(name: str) -> Item:
 def test_parry_fits_what_the_docs_say(rows: dict[str, set[tuple[str, str | None]]]) -> None:
     assert rows["Parry"] == {
         ("weapon", "dagger"),
+        ("weapon", "throwing_blade"),
         ("weapon", "curved_sword"),
         ("weapon", "thrusting_sword"),
         ("weapon", "fist"),
@@ -121,14 +121,35 @@ def test_excluded_ashes_have_no_rows(rows: dict[str, set[tuple[str, str | None]]
 
 
 @needs_files
-def test_weapon_with_no_ash_is_only_in_a_class_the_list_tracks(sources: GapSources) -> None:
-    open_classes = {
-        gap.item.casefold().replace("-", "_").replace(" ", "_")
-        for gap in load_gaps(ROOT / "data" / "gaps.csv")
-        if gap.area == "class_ashes" and gap.status == "open"
-    }
-    missing = infusable_without_ashes(sources.table, sources.ash_compatibility)
-    assert {item.subcategory for item in missing} <= open_classes
+def test_every_weapon_that_can_hold_an_ash_has_one(sources: GapSources) -> None:
+    assert infusable_without_ashes(sources.table, sources.ash_compatibility) == ()
+
+
+@needs_files
+@pytest.mark.parametrize(
+    ("ash", "fit"),
+    [
+        ("Wall of Sparks", {("weapon", "perfume_bottle")}),
+        ("Overhead Stance", {("weapon", "great_katana")}),
+        ("Palm Blast", {("weapon", "hand_to_hand")}),
+        ("Blind Spot", {("weapon", "backhand_blade")}),
+        ("Igon's Drake Hunt", {("weapon", "greatbow")}),
+        ("Shield Strike", {("shield", None), ("weapon", "thrusting_shield")}),
+        ("Piercing Throw", {("weapon", "throwing_blade")}),
+        ("Wing Stance", {("weapon", "light_greatsword")}),
+    ],
+)
+def test_dlc_ash_fits_its_classes(
+    rows: dict[str, set[tuple[str, str | None]]], ash: str, fit: set[tuple[str, str | None]]
+) -> None:
+    assert rows[ash] == fit
+
+
+@needs_files
+def test_lightning_slash_does_not_fit_halberds(
+    rows: dict[str, set[tuple[str, str | None]]],
+) -> None:
+    assert ("weapon", "halberd") not in rows["Lightning Slash"]
 
 
 @needs_files

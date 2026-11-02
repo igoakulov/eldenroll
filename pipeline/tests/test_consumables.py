@@ -113,7 +113,7 @@ def test_later_steps_own_the_remaining_fields(consumables: tuple[Item, ...]) -> 
 
 
 @needs_files
-def test_the_whole_catalog_joins_into_1513_rows(consumables: tuple[Item, ...]) -> None:
+def test_the_whole_catalog_joins_into_1514_rows(consumables: tuple[Item, ...]) -> None:
     catalog = load_item_catalog(ITEMINFO)
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     pools = {
@@ -139,13 +139,13 @@ def test_the_whole_catalog_joins_into_1513_rows(consumables: tuple[Item, ...]) -
         "weapons": 487,
         "armor": 631,
         "talismans": 41,
-        "ashes": 110,
+        "ashes": 111,
         "sorceries": 67,
         "incantations": 86,
         "tools": 9,
         "consumables": 81,
     }
-    assert len(table) == 1513
+    assert len(table) == 1514
     assert [row.id for row in table if row.category == "none"] == ["none"]
     assert "none_none" not in {row.id for row in table}
     assert {row.id for row in rows} - {row.id for row in table} == {

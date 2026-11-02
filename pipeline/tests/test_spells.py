@@ -180,7 +180,7 @@ def test_names_shared_with_ashes_take_a_category_suffix(
     ids = {row.id for row in table}
     original = {row.id for row in rows}
 
-    assert len(table) == 1422
+    assert len(table) == 1423
     assert {variant.canonical_name for variant in variants.values()} <= {row.name for row in rows}
     assert original - ids == {"glintstone_pebble", "carian_greatsword", "glintblade_phalanx"}
     assert ids - original == {

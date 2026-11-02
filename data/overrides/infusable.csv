@@ -1,6 +1,8 @@
 item,infusable,reason,reviewer
 Ansbach's Longbow,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Ant's Skull Plate,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Beast Claw,true,"on the unique-skill sheet, but its skill can be taken off",owner
+Black Bow,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Black Steel Greathammer,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Black Steel Greatshield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Black Steel Twinblade,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
@@ -8,35 +10,84 @@ Bloodfiend's Arm,true,Fextralife's page says it can hold ashes; not on the uniqu
 Bloodfiend's Fork,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Bone Bow,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
 Bonny Butchering Knife,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Carian Knight's Sword,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Carian Sorcery Sword,false,on the unique-skill sheet with a skill that is also an ash; the owner says it cannot hold ashes,owner
+Cinquedea,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Claws of Night,false,on the unique-skill sheet with a skill that is also an ash; the owner says it cannot hold ashes,owner
+Clinging Bone,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Crucible Hornshield,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Crystal Knife,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Crystal Spear,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Crystal Sword,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Deadly Poison Perfume Bottle,false,"its own skill, which both wikis say cannot be changed; the other four bottles can change ashes",owner
+Dragon Greatclaw,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Dragonclaw Shield,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Erdtree Bow,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Erdtree Greatbow,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Fire Knight's Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Fire Knight's Shortsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Freyja's Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
-Golem Fist,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
+Frozen Needle,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Gargoyle's Black Axe,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Gargoyle's Black Blades,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Gargoyle's Black Halberd,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Golden Epitaph,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Golden Halberd,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Golem Fist,true,"Fextralife's page says it can hold ashes, except buff-type ones; the owner corrected an earlier ruling",owner
+Golem Greatbow,false,off the unique-skill sheet; Fextralife says it cannot be infused,owner
+Grafted Blade Greatsword,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Great Club,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Great Katana,true,"on the unique-skill sheet, but its skill can be taken off",owner
+Harp Bow,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Hefty Scimitar,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Icerind Hatchet,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Icon Shield,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Idus Sword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Inquisitor's Girandole,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Inseparable Sword,false,"Somber Stones and an ordinary skill, so it is off the unique-skill sheet; both wikis say it cannot hold ashes",owner
+Ivory Sickle,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Jellyfish Shield,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Lamenting Visage,false,"unique skill and Somber Stones; Fextralife's wording is unclear, so the owner assumes no",owner
+Lazuli Glintstone Sword,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Lion Greatbow,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Lizard Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Main-gauche,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Messmer Soldier Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Messmer Soldier's Axe,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Messmer Soldier's Spear,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Meteoric Ore Blade,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Milady,true,"on the unique-skill sheet, but its skill can be taken off",owner
+Miquellan Knight's Sword,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Pata,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Pulley Bow,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Queelign's Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Rabbath's Cannon,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
 Repeating Crossbow,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Ripple Blade,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Ripple Crescent Halberd,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Rotten Crystal Spear,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Rotten Crystal Sword,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Scorpion's Stinger,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Sentry's Torch,false,"its own skill and Somber Stones; Fextralife's wording is unclear, like Lamenting Visage",owner
+Serpent Bow,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Serpent Crest Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Serpentbone Blade,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Silver Grooved Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
-Smithscript Axe,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
-Smithscript Cirque,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
-Smithscript Dagger,false,on the unique-skill sheet with a skill that is also an ash; the owner says it cannot hold ashes,owner
-Smithscript Greathammer,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
-Smithscript Spear,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
+Silver Mirrorshield,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Smithscript Axe,true,"Fextralife's page says it can hold ashes, except buff-type ones; the owner corrected an earlier ruling",owner
+Smithscript Cirque,true,"Fextralife's page says it can hold ashes, except buff-type ones; the owner corrected an earlier ruling",owner
+Smithscript Dagger,true,"the owner corrected an earlier ruling; it is the only throwing blade, and Fextralife says it can hold ashes",owner
+Smithscript Greathammer,true,"Fextralife's page says it can hold ashes, except buff-type ones; the owner corrected an earlier ruling",owner
+Smithscript Spear,true,"Fextralife's page says it can hold ashes, except buff-type ones; the owner corrected an earlier ruling",owner
+Smoldering Shield,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Spread Crossbow,false,Fextralife says no but lists both stone types; the owner assumes no,owner
 Stone-Sheathed Sword,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
 Swift Spear,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
 Sword Lance,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Torchpole,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Treespear,false,"Somber Stones and an ordinary skill, so it is off the unique-skill sheet; both wikis say it cannot hold ashes",owner
+Troll Knight's Sword,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Troll's Hammer,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
+Varré's Bouquet,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet,owner
+Winged Greathorn,false,Fextralife's page says it cannot hold ashes; off the unique-skill sheet because its skill is ordinary or the sheet misses it,owner
 Wolf Crest Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner

@@ -36,6 +36,7 @@ from eldenrando.loaders.iteminfo import load_item_catalog
 from eldenrando.loaders.itemslots import load_slots
 from eldenrando.loaders.json_source import load_document
 from eldenrando.loaders.name_variants import load_name_variants
+from eldenrando.loaders.requirements import load_requirements
 from eldenrando.loaders.str_bonus import load_str_bonus
 from eldenrando.loaders.weapons import (
     load_ash_compatibility,
@@ -51,20 +52,13 @@ from eldenrando.model.name_variant import NameVariant
 from eldenrando.normalize.armor_slots import assign_armor_slots
 from eldenrando.normalize.infusable import assign_infusable
 from eldenrando.normalize.placement_names import PlacementNames, placement_names
+from eldenrando.normalize.requirements import (
+    REQUIREMENT_FIELDS,
+    STAT_NAMES,
+    assign_requirements,
+)
 from eldenrando.normalize.str_bonus import assign_str_bonus
 
-_STATS: Mapping[str, str] = {
-    "str": "str",
-    "strength": "str",
-    "dex": "dex",
-    "dexterity": "dex",
-    "int": "int",
-    "intelligence": "int",
-    "fai": "fth",
-    "faith": "fth",
-    "arc": "arc",
-    "arcane": "arc",
-}
 _ASH_SHEET_CLASSES: Mapping[str, str] = {"Staff": "glintstone_staff", "Seal": "sacred_seal"}
 _ASH_SHEET_FIRST_CLASS = "Dagger"
 _ASH_SHEET_NOT_A_CLASS = "NONE"
@@ -77,12 +71,6 @@ _SKILL_SUFFIX = re.compile(r"\s*(\[.*|#.*|\(.*|R1.*|R2.*|- .*)$")
 _UPGRADE = re.compile(r" \+\d+$")
 _ENIA = "Finger Reader Enia"
 _REMEMBRANCE = re.compile(r"for ((?:Elden )?Remembrance.*?)(?:, \d+ runes)? - flag")
-_REQUIREMENT_FIELDS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
-    ("weapons", "requiredAttributes", ("weapon", "shield")),
-    ("shields", "requiredAttributes", ("weapon", "shield")),
-    ("sorceries", "requires", ("sorcery", "incantation")),
-    ("incantations", "requires", ("sorcery", "incantation")),
-)
 _BASE_WITHOUT_AN_ID = frozenset({"Serpent-Hunter"})
 _KINDS: Mapping[str, str] = {
     "weapon": "weapon",
@@ -153,7 +141,7 @@ def requirement_gaps(sources: GapSources) -> tuple[Gap, ...]:
         if item.category in ("weapon", "shield", "sorcery", "incantation")
     }
     found: dict[str, list[tuple[Mapping[str, object], str]]] = {}
-    for document, field, categories in _REQUIREMENT_FIELDS:
+    for document, field, categories in REQUIREMENT_FIELDS:
         for record in sources.requirement_records[document]:
             variant = sources.variants.get(cast("str", record["id"]))
             name = cast("str", record["name"]) if variant is None else variant.canonical_name
@@ -192,7 +180,7 @@ def _stats(field: object) -> dict[str, int] | None:
     out: dict[str, int] = {}
     for entry in cast("list[object]", field):
         attribute = cast("Mapping[str, object]", entry)
-        stat = _STATS.get(str(attribute.get("name")).casefold())
+        stat = STAT_NAMES.get(str(attribute.get("name")).casefold())
         amount = attribute.get("amount")
         if stat is None or not isinstance(amount, int):
             return None
@@ -406,8 +394,16 @@ def load_sources(root: Path) -> GapSources:
     )
     ash_sheet = load_ash_compatibility(raw / "csv" / "ashes_compatibility_no_DLC.csv")
     json_dir = raw / "json-no-dlc"
+    requirement_records = {
+        document: load_document(json_dir, document).records for document, _, _ in REQUIREMENT_FIELDS
+    }
     return GapSources(
-        table=table,
+        table=assign_requirements(
+            table,
+            requirement_records,
+            variants,
+            load_requirements(overrides / "requirements.csv"),
+        ),
         catalog=catalog,
         variants=variants,
         ash_sources=ash_sources,
@@ -416,10 +412,7 @@ def load_sources(root: Path) -> GapSources:
             table, ash_sheet, load_ash_overrides(overrides / "ash_compatibility.csv")
         ),
         unique_skills=unique_skills,
-        requirement_records={
-            document: load_document(json_dir, document).records
-            for document, _, _ in _REQUIREMENT_FIELDS
-        },
+        requirement_records=requirement_records,
         slots=load_slots(raw / "pc_mod_data" / "itemslots_stable.txt"),
     )
 

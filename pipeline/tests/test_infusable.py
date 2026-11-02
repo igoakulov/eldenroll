@@ -31,7 +31,6 @@ def table() -> tuple[Item, ...]:
         ("Longsword", True),
         ("Brass Shield", True),
         ("Bandit's Curved Sword", True),
-        ("Inseparable Sword", True),
         ("Bloodhound's Fang", False),
         ("Dragon Halberd", False),
         ("Erdtree Greatshield", False),
@@ -45,7 +44,17 @@ def table() -> tuple[Item, ...]:
         ("Reed Great Katana", True),
         ("Firespark Perfume Bottle", True),
         ("Lamenting Visage", False),
-        ("Golem Fist", False),
+        ("Golem Fist", True),
+        ("Golem Greatbow", False),
+        ("Crystal Knife", False),
+        ("Erdtree Bow", False),
+        ("Varré's Bouquet", False),
+        ("Sentry's Torch", False),
+        ("Great Épée", True),
+        ("Miséricorde", True),
+        ("Treespear", False),
+        ("Inseparable Sword", False),
+        ("Deadly Poison Perfume Bottle", False),
         ("Spread Crossbow", False),
         ("Soldier's Crossbow", False),
         ("Hand Ballista", False),
@@ -56,10 +65,12 @@ def test_weapon_has_its_flag(table: tuple[Item, ...], name: str, expected: bool)
 
 
 @needs_files
-def test_no_smithscript_weapon_can_hold_an_ash(table: tuple[Item, ...]) -> None:
+def test_of_the_smithscript_weapons_only_the_shield_cannot_hold_an_ash(
+    table: tuple[Item, ...],
+) -> None:
     smithscript = [row for row in table if row.name.startswith("Smithscript")]
     assert len(smithscript) == 6
-    assert not any(row.infusable for row in smithscript)
+    assert [row.name for row in smithscript if not row.infusable] == ["Smithscript Shield"]
 
 
 @needs_files

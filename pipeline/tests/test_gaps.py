@@ -70,8 +70,8 @@ def test_the_file_is_written_the_way_the_writer_writes_it(tmp_path: Path) -> Non
     ("area", "count"),
     [
         ("requirements", 162),
-        ("holds_ash", 41),
-        ("ash_usable_on", 23),
+        ("holds_ash", 39),
+        ("ash_usable_on", 24),
         ("class_ashes", 8),
         ("remembrance_boss", 25),
     ],
