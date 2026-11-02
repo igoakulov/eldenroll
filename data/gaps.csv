@@ -1,0 +1,285 @@
+area,item,origin,problem,found_by,step,owner,status,answer,source
+requirements,Ancient Dragons' Lightning Spear,base,its stat record is all zeros,check,2.5.3,both,open,,
+requirements,Bandit's Curved Sword,base,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Catch Flame,base,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Clayman's Harpoon,base,its stat record is all zeros,check,2.5.3,both,open,,
+requirements,Eclipse Crest Greatshield,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,,
+requirements,Eclipse Crest Heater Shield,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,,
+requirements,Flame Sling,base,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Glintstone Breath,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,,
+requirements,Gravel Stone Seal,base,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Inseparable Sword,base,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Oracle Bubbles,base,"two stat records disagree: INT 10 vs INT 19, ARC 15",check,2.5.3,both,answered,"INT 19, ARC 15",owner (tasklist O39)
+requirements,Serpent-Hunter,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,,
+requirements,Siluria's Tree,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,"STR 27, DEX 13, FAI 20",weapons.json read with the unnamed value on the stat listed as 0 before it; not checked
+requirements,Sword of Night and Flame,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,"STR 12, DEX 12, INT 24, FAI 24",weapons.json read with the unnamed value on the stat listed as 0 before it; not checked
+requirements,Sword of St. Trina,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,"STR 10, DEX 12, INT 14",weapons.json read with the unnamed value on the stat listed as 0 before it; not checked
+requirements,Treespear,base,its stat record is blank or has a value with no stat name,check,2.5.3,both,open,"STR 15, DEX 22, FAI 18",weapons.json read with the unnamed value on the stat listed as 0 before it; not checked
+requirements,Golden Order Flail,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Hefty Scimitar,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Idus Sword,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Leontiel's Greatsword,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Reed Great Katana,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Reverse-Bladed Sword,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Ritual Thrusting Shield,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Silver Grooved Shield,tarnished,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Ancient Meteoric Ore Greatsword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Ansbach's Longbow,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Anvil Hammer,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Aspects of the Crucible: Bloom,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Aspects of the Crucible: Thorns,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Backhand Blade,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Barbed Staff-Spear,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Bayle's Flame Lightning,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Bayle's Tyranny,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Beast Claw,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Black Steel Greathammer,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Black Steel Greatshield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Black Steel Twinblade,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Blades of Stone,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Bloodfiend's Arm,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Bloodfiend's Fork,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Bloodfiend's Sacred Spear,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Bone Bow,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Bonny Butchering Knife,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Carian Sorcery Sword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Carian Thrusting Shield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Chilling Perfume Bottle,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Claws of Night,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Curseblade's Cirque,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Dancing Blade of Ranah,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Dane's Footwork,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Deadly Poison Perfume Bottle,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Death Knight's Longhaft Axe,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Death Knight's Twin Axes,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Devonia's Hammer,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Divine Beast Tornado,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Divine Bird Feathers,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Dragon-Hunter's Great Katana,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Dryleaf Arts,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Dryleaf Seal,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Dueling Shield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Electrocharge,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Euporia,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Falx,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Fire Knight's Greatsword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Fire Knight's Seal,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Fire Knight's Shortsword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Fire Serpent,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Firespark Perfume Bottle,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Fleeting Microcosm,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Flowerstone Gavel,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Forked-Tongue Hatchet,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Frenzyflame Perfume Bottle,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Freyja's Greatsword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Furious Blade of Ansbach,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Gazing Finger,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Ghostflame Breath,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Giant Golden Arc,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Glintblade Trio,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Glintstone Nail,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Glintstone Nails,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Golden Arcs,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Golden Lion Shield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Golem Fist,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Gravitational Missile,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Great Katana,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Greatsword of Damnation,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Greatsword of Radahn (Light),dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Greatsword of Radahn (Lord),dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Greatsword of Solitude,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Horned Warrior's Greatsword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Horned Warrior's Sword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Igon's Greatbow,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Impenetrable Thorns,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Knight's Lightning Spear,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Lamenting Visage,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Land of Shadow,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Leda's Sword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Light of Miquella,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Lightning Perfume Bottle,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Lizard Greatsword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Madding Hand,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Main-gauche,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Mass of Putrescence,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Maternal Staff,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Messmer Soldier Shield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Messmer Soldier's Axe,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Messmer Soldier's Spear,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Messmer's Orb,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Midra's Flame of Frenzy,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Milady,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Moonrithyll's Knight Sword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Multilayered Ring of Light,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Nanaya's Torch,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Obsidian Lamina,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Pata,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Pest-Thread Spears,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Poisoned Hand,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Poleblade of the Bud,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Putrescence Cleaver,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Queelign's Greatsword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Rabbath's Cannon,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,"STR 28, DEX 16",Fextralife weapon page and archived prd.md.bak section 17 agree; awaiting owner
+requirements,Rain of Fire,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Rakshasa's Great Katana,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Red Bear's Claw,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Rellana's Twin Blades,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Rellana's Twin Moons,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Repeating Crossbow,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Rings of Spectral Light,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Roar of Rugalea,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Rotten Butterflies,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Serpent Crest Shield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Serpent Flail,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Shadow Sunflower Blossom,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Shield of Night,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Smithscript Axe,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Smithscript Cirque,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Smithscript Dagger,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Smithscript Greathammer,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Smithscript Shield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Smithscript Spear,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Spear of the Impaler,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Spira,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Spiraltree Seal,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Spirit Glaive,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Spirit Sword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Spread Crossbow,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Staff of the Great Beyond,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Star-Lined Sword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Stone-Sheathed Sword,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Swift Spear,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Sword Lance,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Sword of Darkness,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Sword of Light,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Sword of Night,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Thiollier's Hidden Needle,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Tooth Whip,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Velvet Sword of St. Trina,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Verdigris Greatshield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Vortex of Putrescence,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Watchful Spirit,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Wolf Crest Shield,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+requirements,Wrath from Afar,dlc,"no stat record in the base-game files, so it would read as no requirement",check,2.5.3,both,open,,
+holds_ash,Hefty Scimitar,tarnished,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Idus Sword,tarnished,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Silver Grooved Shield,tarnished,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Ansbach's Longbow,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Beast Claw,dlc,"on the unique-skill sheet, but its skill Raging Beast is a real ash",check,2.4.5,both,applied,yes,owner (tasklist O35)
+holds_ash,Black Steel Greathammer,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Black Steel Greatshield,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Black Steel Twinblade,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Bloodfiend's Arm,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Bloodfiend's Fork,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Bone Bow,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Bonny Butchering Knife,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Carian Sorcery Sword,dlc,"on the unique-skill sheet, but its skill Impaling Thrust is a real ash",check,2.4.5,both,applied,no,owner
+holds_ash,Claws of Night,dlc,"on the unique-skill sheet, but its skill Scattershot Throw is a real ash",check,2.4.5,both,applied,no,owner
+holds_ash,Fire Knight's Greatsword,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Fire Knight's Shortsword,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Freyja's Greatsword,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Golem Fist,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, who knows it personally; Fextralife says yes"
+holds_ash,Great Katana,dlc,"on the unique-skill sheet, but its skill Overhead Stance is a real ash",check,2.4.5,both,applied,yes,owner (tasklist O35)
+holds_ash,Lamenting Visage,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Lizard Greatsword,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Main-gauche,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Messmer Soldier Shield,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Messmer Soldier's Axe,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Messmer Soldier's Spear,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Milady,dlc,"on the unique-skill sheet, but its skill Wing Stance is a real ash",check,2.4.5,both,applied,yes,owner
+holds_ash,Pata,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Queelign's Greatsword,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Rabbath's Cannon,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Repeating Crossbow,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Serpent Crest Shield,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Smithscript Axe,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, who knows it personally; Fextralife says yes"
+holds_ash,Smithscript Cirque,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,owner,applied,no,owner: no Smithscript weapon can hold ashes
+holds_ash,Smithscript Dagger,dlc,"on the unique-skill sheet, but its skill Piercing Throw, Scattershot Throw is a real ash",check,2.4.5,both,applied,no,owner
+holds_ash,Smithscript Greathammer,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, who knows it personally; Fextralife says yes"
+holds_ash,Smithscript Spear,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, who knows it personally; Fextralife says yes"
+holds_ash,Spread Crossbow,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Stone-Sheathed Sword,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,no,"owner, from Fextralife weapon page"
+holds_ash,Swift Spear,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Sword Lance,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,Wolf Crest Shield,dlc,"not on the unique-skill sheet, which lacks some DLC weapons",check,2.4.5,both,applied,yes,"owner, from Fextralife weapon page"
+holds_ash,50 DLC and Tarnished weapons on the unique-skill sheet,mixed,"The sheet was wrong for Great Katana and Beast Claw, so it may be wrong for others. These have a skill no ash carries, and they count as unable to hold ashes: Ancient Meteoric Ore Greatsword, Anvil Hammer, Barbed Staff-Spear, Bloodfiend's Sacred Spear, Curseblade's Cirque, Dancing Blade of Ranah, Death Knight's Longhaft Axe, Death Knight's Twin Axes, Devonia's Hammer, Dragon-Hunter's Great Katana, Euporia, Falx, Flowerstone Gavel, Forked-Tongue Hatchet, Gazing Finger, Golden Lion Shield, Golden Order Flail, Greatsword of Damnation, Greatsword of Radahn (Light), Greatsword of Radahn (Lord), Greatsword of Solitude, Horned Warrior's Greatsword, Horned Warrior's Sword, Leda's Sword, Leontiel's Greatsword, Madding Hand, Moonrithyll's Knight Sword, Nanaya's Torch, Obsidian Lamina, Poisoned Hand, Poleblade of the Bud, Putrescence Cleaver, Rakshasa's Great Katana, Red Bear's Claw, Rellana's Twin Blades, Serpent Flail, Shadow Sunflower Blossom, Shield of Night, Smithscript Shield, Spear of the Impaler, Spirit Glaive, Spirit Sword, Star-Lined Sword, Sword of Darkness, Sword of Light, Sword of Night, Thiollier's Hidden Needle, Tooth Whip, Velvet Sword of St. Trina, Verdigris Greatshield",manual,2.4.5,owner,applied,"no: a unique skill means no ashes, so infusable=false",owner
+ash_usable_on,Aspects of the Crucible: Wings,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Blind Spot,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,backhand blades,data.md 4.5
+ash_usable_on,Blinkbolt,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Carian Sovereignty,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Divine Beast Frost Stomp,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Dryleaf Whirlwind,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Flame Skewer,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Flame Spear,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Ghostflame Call,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Igon's Drake Hunt,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,greatbows,data.md 4.5; the ash never rolls
+ash_usable_on,Overhead Stance,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,great katanas,data.md 4.5
+ash_usable_on,Palm Blast,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,hand-to-hand arts,data.md 4.5
+ash_usable_on,Piercing Throw,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Raging Beast,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,applied,"beast claws, as a class",owner
+ash_usable_on,Rolling Sparks,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,perfume bottles only,data.md 4.5; owner confirmation pending (was tasklist O10)
+ash_usable_on,Savage Lion's Claw,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Scattershot Throw,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Shield Strike,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,all shields and thrusting shields,"data.md 4.5 and handoff, by the wiki"
+ash_usable_on,Shriek of Sorrow,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Swift Slash,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,The Poison Flower Blooms Twice,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_usable_on,Wall of Sparks,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,perfume bottles only,data.md 4.5; owner confirmation pending (was tasklist O10)
+ash_usable_on,Wing Stance,dlc,"the ash sheet has no row for it, so nothing says which weapons can hold it",check,2.4.6,both,open,,
+ash_sources,Smithscript Cirque,dlc,"ash_sources.csv lists it as a source of Blind Spot because the ash can be taken off, but no Smithscript weapon can hold ashes. Should Blind Spot still count it as a location?",manual,2.4.6,owner,applied,not a source: Blind Spot comes from Backhand Blade and Reverse-Bladed Sword,owner
+class_ashes,Backhand Blade,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,"Blind Spot, plus others to find",data.md 4.5
+class_ashes,Beast Claw,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,"Raging Beast, plus others to find",owner
+class_ashes,Great Katana,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,"Overhead Stance, plus others to find",owner (tasklist O37) and data.md 4.5
+class_ashes,Hand-to-Hand,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,"Palm Blast, plus others to find",data.md 4.5
+class_ashes,Light Greatsword,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,,
+class_ashes,Perfume Bottle,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,"Wall of Sparks, Rolling Sparks",data.md 4.5
+class_ashes,Throwing Blade,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,,
+class_ashes,Thrusting Shield,dlc,"the ash sheet has no column for this class, so its weapons have no ash list",check,2.4.6,both,open,"Shield Strike, plus others to find",data.md 4.5
+remembrance_boss,Elden Remembrance,base,"which boss gives it? Enia sells Marika's Hammer, Sacred Relic Sword for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of Hoarah Loux,base,"which boss gives it? Enia sells Axe of Godfrey, Hoarah Loux's Earthshaker for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Black Blade,base,"which boss gives it? Enia sells Black Blade, Maliketh's Black Blade for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Blasphemous,base,"which boss gives it? Enia sells Blasphemous Blade, Rykard's Rancor for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Blood Lord,base,"which boss gives it? Enia sells Bloodboon, Mohgwyn's Sacred Spear for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Dragonlord,base,"which boss gives it? Enia sells Dragon King's Cragblade, Placidusax's Ruin for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Fire Giant,base,"which boss gives it? Enia sells Burn, O Flame!, Giant's Red Braid for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Full Moon Queen,base,"which boss gives it? Enia sells Carian Regal Scepter, Rennala's Full Moon for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Grafted,base,"which boss gives it? Enia sells Axe of Godrick, Grafted Dragon for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Lichdragon,base,"which boss gives it? Enia sells Death Lightning, Fortissax's Lightning Spear for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Naturalborn,base,"which boss gives it? Enia sells Bastard's Stars, Waves of Darkness for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Omen King,base,"which boss gives it? Enia sells Morgott's Cursed Sword, Regal Omen Bairn for it",check,2.8.3,both,answered,Morgott,owner (tasklist O28)
+remembrance_boss,Remembrance of the Regal Ancestor,base,which boss gives it? Enia sells Winged Greathorn for it,check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Rot Goddess,base,"which boss gives it? Enia sells Hand of Malenia, Scarlet Aeonia for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Starscourge,base,"which boss gives it? Enia sells Lion Greatbow, Starscourge Greatsword for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of Putrescence,dlc,"which boss gives it? Enia sells Putrescence Cleaver, Vortex of Putrescence for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of a God and a Lord,dlc,"which boss gives it? Enia sells Greatsword of Radahn (Light), Greatsword of Radahn (Lord), Light of Miquella for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Dancing Lion,dlc,which boss gives it? Enia sells Divine Beast Frost Stomp for it,check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Impaler,dlc,"which boss gives it? Enia sells Messmer's Orb, Spear of the Impaler for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Lord of Frenzied Flame,dlc,"which boss gives it? Enia sells Greatsword of Damnation, Midra's Flame of Frenzy for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Mother of Fingers,dlc,"which boss gives it? Enia sells Gazing Finger, Staff of the Great Beyond for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Saint of the Bud,dlc,"which boss gives it? Enia sells Poleblade of the Bud, Rotten Butterflies for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Shadow Sunflower,dlc,"which boss gives it? Enia sells Land of Shadow, Shadow Sunflower Blossom for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Twin Moon Knight,dlc,"which boss gives it? Enia sells Rellana's Twin Blades, Rellana's Twin Moons for it",check,2.8.3,both,open,,
+remembrance_boss,Remembrance of the Wild Boar Rider,dlc,"which boss gives it? Enia sells Blades of Stone, Sword Lance for it",check,2.8.3,both,open,,
+armor_slot,Broken Gold Mask,tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,head,"owner, from the game id"
+armor_slot,Gold Tattoo (Arm),tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,arms,"owner, from the game id"
+armor_slot,Gold Tattoo (Chest),tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,body,"owner, from the game id"
+armor_slot,Gold Tattoo (Leg),tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,legs,"owner, from the game id"
+armor_slot,Leontiel's Armor,tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,body,"owner, from the game id"
+armor_slot,Leontiel's Boots,tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,legs,"owner, from the game id"
+armor_slot,Leontiel's Hat,tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,head,"owner, from the game id"
+armor_slot,Leontiel's Leather Gloves,tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,arms,"owner, from the game id"
+armor_slot,Leda's Armor,dlc,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,body,"owner, from the game id"
+armor_slot,146 armor pieces on the wiki,mixed,"armors.json has no record for them, so no file names their slot",manual,2.4.3,agent,applied,"Take the slot from the wiki's Armor Sets page: 10 are listed under Helms or Chests, 136 by their order in a set, which lists head, body, arms, legs. The game id agrees on all 146. Where armors.json has a record it still wins, because the page's order misleads for Commoner's Simple Garb and Noble's Gloves",owner chose the wiki; https://eldenring.wiki.gg/wiki/Armor_Sets
+paired_weapons,Grafted Dragon,base,"it is a fist, and prd.md 6.4 sets every fist to false, but both wikis say it is the one fist that is not paired",manual,2.4.4,owner,applied,"not paired, so it gets the bonus",owner
+paired_weapons,Starscourge Greatsword,base,"it is paired, but Fextralife says it alone still gets the two-handed Strength bonus on its unpaired attacks; wiki.gg does not mention this",manual,2.4.4,owner,applied,it gets the bonus,"owner, believing Fextralife paired+weapons"
+paired_weapons,Unique paired weapons,mixed,"no local file lists the paired weapons outside the exception classes, so they would wrongly get the two-handed STR bonus",manual,2.4.4,both,applied,"Ornamental Straight Sword, Rellana's Twin Blades, Starscourge Greatsword, Greatsword of Radahn (Lord), Greatsword of Radahn (Light), Falx, Dancing Blade of Ranah, Horned Warrior's Sword, Death Knight's Twin Axes","owner, from eldenring.wiki.gg Paired_Weapons and Fextralife paired+weapons"
+armor_sets,Bleed custom sets,base,"owner to compose, with White Mask (was tasklist O9)",manual,2.6.3,owner,open,,
+armor_sets,Rot and Poison custom sets,base,"owner to compose, with Mushroom Crown (was tasklist O9)",manual,2.6.3,owner,open,,
+armor_sets,Finger Robe,dlc,"the wiki lists it in the High Priest Set, but the mod has no item or slot with this name, so it is not in the pool",manual,2.3.3,owner,applied,"not a separate piece: it is the altered form of High Priest Robe, which is already a row, so it gets no row of its own",owner
+armor_sets,Blue Dancer custom sets,mixed,"owner to compose, naked or low weight (was tasklist O9)",manual,2.6.3,owner,open,,
+armor_sets,Per-set choices,mixed,"sets with extra variants need a choice, such as Raya Lucaria's 4 crowns and Gravebird's 2 chests",manual,2.6.1,both,open,,
+armor_sets,Set table,mixed,about 150 sets to vendor from https://eldenring.wiki.gg/wiki/Armor_Sets,manual,2.6.1,agent,open,,
+blue_dancer,Heavy weapon classes,mixed,"prd.md section 7 sets heavy weapon classes to zero with Blue Dancer Charm, but no document lists them",manual,2.9.5,owner,open,,
+blue_dancer,Light armor sets,mixed,"prd.md section 7 boosts light and no-piece sets with Blue Dancer Charm, but no document lists them",manual,2.9.5,owner,open,,
+rule_descriptions,28 combat rules,base,"prd.md section 7 has only their names, and each row needs a description",manual,2.9.3,both,open,,
+images,Missing and shared images,mixed,"all DLC art is absent, some base records have no file, and 4 pairs of items share one picture; data.md 4.3, 4.5, 4.6, 4.8, 4.9 and 7.4 hold the details. Split into rows at 8.7",manual,8.7,agent,open,,

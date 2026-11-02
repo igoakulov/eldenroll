@@ -1,0 +1,42 @@
+item,infusable,reason,reviewer
+Ansbach's Longbow,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Beast Claw,true,"on the unique-skill sheet, but its skill can be taken off",owner
+Black Steel Greathammer,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Black Steel Greatshield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Black Steel Twinblade,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Bloodfiend's Arm,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Bloodfiend's Fork,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Bone Bow,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Bonny Butchering Knife,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Carian Sorcery Sword,false,on the unique-skill sheet with a skill that is also an ash; the owner says it cannot hold ashes,owner
+Claws of Night,false,on the unique-skill sheet with a skill that is also an ash; the owner says it cannot hold ashes,owner
+Fire Knight's Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Fire Knight's Shortsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Freyja's Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Golem Fist,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
+Great Katana,true,"on the unique-skill sheet, but its skill can be taken off",owner
+Hefty Scimitar,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Idus Sword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Lamenting Visage,false,"unique skill and Somber Stones; Fextralife's wording is unclear, so the owner assumes no",owner
+Lizard Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Main-gauche,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Messmer Soldier Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Messmer Soldier's Axe,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Messmer Soldier's Spear,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Milady,true,"on the unique-skill sheet, but its skill can be taken off",owner
+Pata,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Queelign's Greatsword,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Rabbath's Cannon,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Repeating Crossbow,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Serpent Crest Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Silver Grooved Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Smithscript Axe,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
+Smithscript Cirque,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
+Smithscript Dagger,false,on the unique-skill sheet with a skill that is also an ash; the owner says it cannot hold ashes,owner
+Smithscript Greathammer,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
+Smithscript Spear,false,"the owner knows no Smithscript weapon or Golem Fist can hold ashes, though Fextralife says otherwise for some",owner
+Spread Crossbow,false,Fextralife says no but lists both stone types; the owner assumes no,owner
+Stone-Sheathed Sword,false,Fextralife's page says it cannot hold ashes; not on the unique-skill sheet,owner
+Swift Spear,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Sword Lance,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner
+Wolf Crest Shield,true,Fextralife's page says it can hold ashes; not on the unique-skill sheet,owner

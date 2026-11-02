@@ -341,14 +341,16 @@ def test_added_items_file_holds_the_three_weapons() -> None:
 @pytest.mark.parametrize(
     ("line", "message"),
     [
-        ("1,Old,New,,owner", "empty reason"),
-        ("1,Old,New,why,", "empty reviewer"),
-        (",Old,New,why,owner", "empty source_id"),
+        ("1,Old,New,false,,owner", "empty reason"),
+        ("1,Old,New,,why,owner", "empty by_name"),
+        ("1,Old,New,maybe,why,owner", "by_name is 'maybe'"),
+        ("1,Old,New,false,why,", "empty reviewer"),
+        (",Old,New,false,why,owner", "empty source_id"),
     ],
 )
 def test_incomplete_name_variant_stops_the_load(tmp_path: Path, line: str, message: str) -> None:
     path = tmp_path / "name_variants.csv"
-    path.write_text(f"source_id,source_name,canonical_name,reason,reviewer\n{line}\n")
+    path.write_text(f"source_id,source_name,canonical_name,by_name,reason,reviewer\n{line}\n")
 
     with pytest.raises(LoaderError, match=message):
         load_name_variants(path)
@@ -357,9 +359,9 @@ def test_incomplete_name_variant_stops_the_load(tmp_path: Path, line: str, messa
 def test_repeated_name_variant_id_stops_the_load(tmp_path: Path) -> None:
     path = tmp_path / "name_variants.csv"
     path.write_text(
-        "source_id,source_name,canonical_name,reason,reviewer\n"
-        "1,Old,New,why,owner\n"
-        "1,Old,Newer,why,owner\n"
+        "source_id,source_name,canonical_name,by_name,reason,reviewer\n"
+        "1,Old,New,false,why,owner\n"
+        "1,Old,Newer,false,why,owner\n"
     )
 
     with pytest.raises(LoaderError, match="duplicate source_id '1'"):

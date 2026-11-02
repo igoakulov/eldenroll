@@ -115,7 +115,7 @@ def test_ash_sources_file_lists_every_weapon() -> None:
         "Spinning Strikes": ("Banished Knight's Halberd +8",),
         "Glintblade Phalanx": ("Rogier's Rapier +8",),
         "Braggart's Roar": ("Iron Ball", "Battle Hammer", "Rotten Battle Hammer"),
-        "Blind Spot": ("Backhand Blade", "Reverse-Bladed Sword", "Smithscript Cirque"),
+        "Blind Spot": ("Backhand Blade", "Reverse-Bladed Sword"),
         "Overhead Stance": ("Great Katana", "Reed Great Katana"),
         "Palm Blast": ("Dryleaf Arts", "Dane's Footwork"),
         "Shield Strike": ("Dueling Shield", "Carian Thrusting Shield", "Ritual Thrusting Shield"),

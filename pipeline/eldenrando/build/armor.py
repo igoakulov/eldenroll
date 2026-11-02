@@ -5,8 +5,8 @@ in altered form are renamed by `name_variants.csv`; every other altered piece me
 unaltered row, and placement unions their locations. An altered piece with neither stops the
 build instead of dropping a row.
 
-`subcategory` and `image` stay at their defaults here; later steps fill them in and validation
-enforces them.
+`image` stays at its default here, and `normalize/armor_slots.py` sets `subcategory`; validation
+enforces both.
 """
 
 from __future__ import annotations
