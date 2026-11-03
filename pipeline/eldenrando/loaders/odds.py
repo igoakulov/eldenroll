@@ -1,7 +1,7 @@
 """Load an override file of base odds: the rows whose odds are not the default 1.
 
 Each row is a correction, so it carries a reason and a reviewer. An id is the key, because a name
-can repeat across categories or labels.
+can repeat across categories or labels. A file with no rows means every row keeps odds 1.
 """
 
 from __future__ import annotations
@@ -27,8 +27,6 @@ def load_odds(path: Path, key_column: str) -> dict[str, float]:
         if key in out:
             raise LoaderError(f"{path}: duplicate {key_column} {key!r}")
         out[key] = _odds(path, key, row[table.column("odds")])
-    if not out:
-        raise LoaderError(f"{path}: no rows")
     return out
 
 

@@ -53,7 +53,7 @@ from eldenrando.model.item_slot import ItemSlot
 from eldenrando.model.name_variant import NameVariant
 from eldenrando.normalize.armor_slots import assign_armor_slots
 from eldenrando.normalize.infusable import assign_infusable
-from eldenrando.normalize.item_odds import assign_item_odds
+from eldenrando.normalize.odds import assign_item_odds
 from eldenrando.normalize.placement_names import PlacementNames, placement_names
 from eldenrando.normalize.requirements import (
     REQUIREMENT_FIELDS,

@@ -12,7 +12,8 @@ from eldenrando.errors import BuildError
 from eldenrando.loaders.iteminfo import load_item_catalog
 from eldenrando.loaders.odds import load_odds
 from eldenrando.loaders.schema import LoaderError
-from eldenrando.normalize.item_odds import assign_item_odds
+from eldenrando.model.armor_set import ArmorSet
+from eldenrando.normalize.odds import assign_armor_set_odds, assign_item_odds
 from eldenrando.normalize.slug import slugify
 from eldenrando.paths import ITEM_INFO
 from eldenrando.validate.gaps import load_sources
@@ -214,7 +215,7 @@ def test_an_item_starts_at_odds_one() -> None:
 
 
 def test_odds_overrides_replace_only_the_named_items() -> None:
-    rows = (new_item("Hat", "armor"), new_item("Mask", "armor"))
+    rows = (new_item("Charm", "talisman"), new_item("Mask", "tool"))
 
     set_rows = assign_item_odds(rows, {"mask": 0})
 
@@ -254,3 +255,26 @@ def test_a_bad_odds_row_is_a_loader_error(tmp_path: Path, body: str, message: st
 
     with pytest.raises(LoaderError, match=message):
         load_odds(path, "item")
+
+
+def test_an_odds_file_with_no_rows_changes_nothing(tmp_path: Path) -> None:
+    path = tmp_path / "armor_set_odds.csv"
+    path.write_text("armor_set,odds,reason,reviewer\n", encoding="utf-8")
+
+    assert load_odds(path, "armor_set") == {}
+
+
+def test_an_armor_piece_cannot_take_odds_because_only_its_set_rolls() -> None:
+    with pytest.raises(BuildError, match="armor pieces roll through their set: hat"):
+        assign_item_odds((new_item("Hat", "armor", subcategory="head"),), {"hat": 2})
+
+
+def test_armor_set_odds_replace_only_the_named_sets() -> None:
+    sets = (ArmorSet("a_set", "A Set", ()), ArmorSet("b_set", "B Set", ()))
+
+    assert [row.odds for row in assign_armor_set_odds(sets, {"b_set": 3})] == [1, 3]
+
+
+def test_an_odds_row_for_no_armor_set_stops_the_build() -> None:
+    with pytest.raises(BuildError, match="armor_set_odds names no set: ghost"):
+        assign_armor_set_odds((ArmorSet("a_set", "A Set", ()),), {"ghost": 0})

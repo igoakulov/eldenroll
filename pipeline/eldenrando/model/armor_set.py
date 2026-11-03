@@ -15,3 +15,4 @@ class ArmorSet:
     id: str
     name: str
     pieces: tuple[str, ...]
+    odds: float = 1

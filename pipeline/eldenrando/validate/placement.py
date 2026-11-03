@@ -22,6 +22,7 @@ from eldenrando.loaders.boss_links import (
     load_slot_links,
 )
 from eldenrando.loaders.drops import load_drop_locations, load_item_drops
+from eldenrando.loaders.odds import load_odds
 from eldenrando.loaders.region_areas import load_region_areas
 from eldenrando.loaders.regions import load_regions
 from eldenrando.model.armor_set import ArmorSet
@@ -29,6 +30,7 @@ from eldenrando.model.boss_instance import BossInstance
 from eldenrando.model.item import Item
 from eldenrando.model.item_location import ItemLocation
 from eldenrando.model.region import ASHEN_CAPITAL, ROYAL_CAPITAL, SHUNNING_GROUNDS, Region
+from eldenrando.normalize.odds import assign_armor_set_odds
 from eldenrando.normalize.placement_names import placement_names
 from eldenrando.paths import ENEMY_DROPS, ENEMY_ITEM_LOTS
 from eldenrando.validate.gaps import GapSources, load_sources
@@ -132,5 +134,8 @@ def load_placement_data(root: Path, sources: GapSources | None = None) -> Placem
         region_of_location=load_region_areas(
             overrides / "region_areas.csv", region_ids={region.id for region in regions}
         ),
-        armor_sets=build_armor_sets(load_armor_sets(overrides / "armor_sets.csv"), loaded.table),
+        armor_sets=assign_armor_set_odds(
+            build_armor_sets(load_armor_sets(overrides / "armor_sets.csv"), loaded.table),
+            load_odds(overrides / "armor_set_odds.csv", "armor_set"),
+        ),
     )
