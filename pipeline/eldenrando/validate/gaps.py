@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
+from eldenrando.build.aliases import assign_aliases
 from eldenrando.build.armor import build_armor
 from eldenrando.build.ash_compatibility import build_ash_compatibility
 from eldenrando.build.ashes import build_ashes
@@ -26,6 +27,7 @@ from eldenrando.build.talismans import build_talismans
 from eldenrando.build.tools import build_tools
 from eldenrando.build.weapons import build_weapons
 from eldenrando.loaders.added_items import load_added_items
+from eldenrando.loaders.aliases import load_aliases
 from eldenrando.loaders.armor_slots import load_armor_slots
 from eldenrando.loaders.ash_overrides import load_ash_overrides
 from eldenrando.loaders.ash_sources import load_ash_sources
@@ -408,14 +410,17 @@ def load_sources(root: Path) -> GapSources:
         for document, _, _ in REQUIREMENT_FIELDS
     }
     return GapSources(
-        table=assign_item_odds(
-            assign_requirements(
-                table,
-                requirement_records,
-                variants,
-                load_requirements(overrides / "requirements.csv"),
+        table=assign_aliases(
+            assign_item_odds(
+                assign_requirements(
+                    table,
+                    requirement_records,
+                    variants,
+                    load_requirements(overrides / "requirements.csv"),
+                ),
+                load_odds(overrides / "item_odds.csv", "item"),
             ),
-            load_odds(overrides / "item_odds.csv", "item"),
+            load_aliases(overrides / "aliases.csv"),
         ),
         catalog=catalog,
         variants=variants,

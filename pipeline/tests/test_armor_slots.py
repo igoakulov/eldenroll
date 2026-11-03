@@ -165,7 +165,7 @@ def test_bad_slot_data_stops_the_build(
 )
 def test_validate_subcategories(row: Item, fails: bool) -> None:
     if fails:
-        with pytest.raises(BuildError, match="bad subcategory on: A"):
+        with pytest.raises(BuildError, match="bad category or subcategory on: A"):
             validate_subcategories([row])
     else:
         validate_subcategories([row])

@@ -26,11 +26,11 @@ def load_odds(path: Path, key_column: str) -> dict[str, float]:
         key = row[table.column(key_column)]
         if key in out:
             raise LoaderError(f"{path}: duplicate {key_column} {key!r}")
-        out[key] = _odds(path, key, row[table.column("odds")])
+        out[key] = parse_odds(path, key, row[table.column("odds")])
     return out
 
 
-def _odds(path: Path, key: str, text: str) -> float:
+def parse_odds(path: Path, key: str, text: str) -> float:
     """Return a finite number at or above 0, or raise `LoaderError`."""
     try:
         odds = float(text)

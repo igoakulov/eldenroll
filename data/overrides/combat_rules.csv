@@ -1,0 +1,29 @@
+id,name,description,odds
+none,None,No restriction.,4
+do_not_get_hit,Do not get hit,Defeat the boss without taking a hit.,1
+apply_status,Apply status,Apply a status effect to the boss at least once.,1
+take_riposte,Take riposte,Land at least one riposte on the boss.,1
+dodge_an_attack_with_duck_jump,Dodge an attack with duck / jump,"At least once, avoid a boss attack by crouching under it or jumping over it.",1
+stand_and_complete_3_full_gestures_without_getting_hit,Stand and complete 3 full gestures without getting hit,"At least once, stand still and finish 3 gestures in a row without being hit.",1
+gesture_after_every_flask,Gesture after every flask,Finish a gesture after each flask you drink.,1
+r1_only,R1 only,The only attack input allowed is R1.,1
+r2_only,R2 only,The only attack input allowed is R2.,1
+charged_r2_only,Charged R2 only,Every attack must be a fully charged R2.,1
+l1_only_can_swap_hands,L1 only (can swap hands),The only attack input allowed is L1. You may swap your hands' gear so the one you want is on L1.,1
+l2_spam,L2 spam,Kill the boss using only the skill (L2).,1
+jump_attacks_only,Jump attacks only,Every attack must be a jump attack.,1
+rolling_crouch_attacks_only,Rolling / crouch attacks only,Every attack must come out of a roll or a crouch.,1
+parry_only,Parry only,Every attack must be a parry. No other attack input is allowed.,1
+no_ripostes,No ripostes,"Never riposte the boss, even when its stance breaks.",1
+no_lock_on,No lock-on,Never lock on to the boss.,1
+no_healing_flasks,No healing flasks,"Do not drink Flasks of Crimson Tears. Healing items, healing spells and blocking are allowed.",1
+no_armor,No armor,Fight with no armor on. The rolled armor set stays on the card; ignore it.,1
+no_talismans,No talismans,Fight with no talismans on. The rolled talismans stay on the card; ignore them.,1
+no_rolling,No rolling,Never roll. Backsteps and jumps are allowed.,1
+heavy_rolling,Heavy rolling,"Keep your equip load at 70% or more but under 100%, so every roll is a heavy roll.",1
+overloaded,Overloaded,"Keep your equip load at 100% or more, so you can only walk slowly.",1
+deflecting_hardtear,Deflecting Hardtear,Mix the Deflecting Hardtear into your Flask of Wondrous Physick and drink it during the fight.,0
+crimson_sapping_cracked_tear,Crimson-Sapping Cracked Tear,Mix the Crimson-Sapping Cracked Tear into your Flask of Wondrous Physick and drink it during the fight.,0
+bloodsucking_cracked_tear,Bloodsucking Cracked Tear,Mix the Bloodsucking Cracked Tear into your Flask of Wondrous Physick and drink it during the fight.,0
+stonebarb_cracked_tear,Stonebarb Cracked Tear,Mix the Stonebarb Cracked Tear into your Flask of Wondrous Physick and drink it during the fight.,1
+ruptured_crystal_tear,Ruptured Crystal Tear,Mix the Ruptured Crystal Tear into your Flask of Wondrous Physick and drink it during the fight.,1

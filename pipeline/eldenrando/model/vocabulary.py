@@ -1,4 +1,4 @@
-"""The subcategories each category may hold (`prd.md` §6.3).
+"""The categories, subcategories, builds and slots (`prd.md` §6.1 to §6.3).
 
 These are build-time constants, because a shipped vocabulary table would mean a join for a label.
 """
@@ -6,7 +6,42 @@ These are build-time constants, because a shipped vocabulary table would mean a 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Final
+from typing import Final, get_args
+
+from eldenrando.model.item import Category
+
+CATEGORIES: Final[frozenset[str]] = frozenset(get_args(Category))
+BUILDS: Final[tuple[str, ...]] = (
+    "knight",
+    "warrior_2h",
+    "warrior_dw",
+    "ranger",
+    "mage",
+    "spellblade",
+    "jester",
+)
+ASH_SLOTS: Final[frozenset[str]] = frozenset({"rh_ash", "lh_ash"})
+SLOTS: Final[tuple[str, ...]] = (
+    "rh",
+    "rh_ash",
+    "lh",
+    "lh_ash",
+    "spell",
+    "item",
+    "talisman_1",
+    "talisman_2",
+    "rule_1",
+    "rule_2",
+)
+BUILD_ASH_SLOTS: Final[Mapping[str, frozenset[str]]] = {
+    "knight": ASH_SLOTS,
+    "warrior_2h": frozenset({"rh_ash"}),
+    "warrior_dw": ASH_SLOTS,
+    "ranger": frozenset({"rh_ash"}),
+    "mage": frozenset(),
+    "spellblade": frozenset({"rh_ash"}),
+    "jester": frozenset({"rh_ash"}),
+}
 
 MELEE: Final[frozenset[str]] = frozenset(
     {
@@ -41,6 +76,11 @@ MELEE: Final[frozenset[str]] = frozenset(
         "throwing_blade",
     }
 )
+# These classes need no second weapon: two-handing one draws its pair.
+PAIRED: Final[frozenset[str]] = frozenset(
+    {"fist", "claw", "beast_claw", "hand_to_hand", "backhand_blade", "throwing_blade"}
+)
+UNPAIRED: Final[frozenset[str]] = MELEE - PAIRED
 RANGED: Final[frozenset[str]] = frozenset({"light_bow", "bow", "greatbow", "crossbow", "ballista"})
 CATALYST: Final[frozenset[str]] = frozenset({"glintstone_staff", "sacred_seal"})
 SHIELD: Final[frozenset[str]] = frozenset({"small_shield", "medium_shield", "greatshield"})
@@ -67,4 +107,12 @@ SUBCATEGORIES: Final[Mapping[str, frozenset[str]]] = {
     "shield": SHIELD,
     "armor": frozenset(ARMOR_SLOTS),
     "consumable": CONSUMABLE,
+}
+SUBCATEGORY_GROUPS: Final[Mapping[str, frozenset[str]]] = {
+    "melee": MELEE,
+    "paired": PAIRED,
+    "unpaired": UNPAIRED,
+    "ranged": RANGED,
+    "catalyst": CATALYST,
+    "shield": SHIELD,
 }

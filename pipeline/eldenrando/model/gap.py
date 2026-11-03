@@ -31,7 +31,10 @@ AREAS: Final[tuple[str, ...]] = (
     "paired_weapons",
     "armor_sets",
     "blue_dancer",
+    "rot_poison_triggers",
     "rule_descriptions",
+    "rule_conflicts",
+    "aliases",
     "images",
 )
 ORIGINS: Final[tuple[Origin, ...]] = ("base", "tarnished", "dlc", "mixed")

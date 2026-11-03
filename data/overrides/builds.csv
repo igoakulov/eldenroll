@@ -1,0 +1,8 @@
+id,name,odds
+knight,Knight,1
+warrior_2h,2H Warrior,1
+warrior_dw,Dual-Wield Warrior,1
+ranger,Ranger,0.5
+mage,Mage,1
+spellblade,Spellblade,1
+jester,Jester,0.25

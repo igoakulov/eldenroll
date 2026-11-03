@@ -1,0 +1,8 @@
+id,label,members
+any_staff_seal,Any staff / seal,subcategory:catalyst
+any_parry_ash,Any parry ash,item:parry carian_retaliation golden_parry storm_wall thopss_barrier
+any_crucible_talisman,Any Crucible talisman,item:crucible_scale_talisman crucible_feather_talisman crucible_knot_talisman fine_crucible_feather_talisman talisman_of_all_crucibles
+any_scorpion_charm,Any Scorpion Charm,item:magic_scorpion_charm lightning_scorpion_charm fire_scorpion_charm sacred_scorpion_charm
+any_scarseal_soreseal,Any Scarseal / Soreseal,item:radagons_soreseal marikas_soreseal radagons_scarseal marikas_scarseal
+any_pots_perfumes,Any pots / perfumes,subcategory:pots perfumes
+other_throwables_not_pots_perfumes,Other throwables (not pots / perfumes),subcategory:throwables
