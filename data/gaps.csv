@@ -270,6 +270,7 @@ remembrance_boss,Remembrance of the Saint of the Bud,dlc,"which boss gives it? E
 remembrance_boss,Remembrance of the Shadow Sunflower,dlc,"which boss gives it? Enia sells Land of Shadow, Shadow Sunflower Blossom for it",check,2.8.3,both,applied,Scadutree Avatar,"Fextralife remembrance page, from the sweep"
 remembrance_boss,Remembrance of the Twin Moon Knight,dlc,"which boss gives it? Enia sells Rellana's Twin Blades, Rellana's Twin Moons for it",check,2.8.3,both,applied,Rellana,"Fextralife remembrance page, from the sweep"
 remembrance_boss,Remembrance of the Wild Boar Rider,dlc,"which boss gives it? Enia sells Blades of Stone, Sword Lance for it",check,2.8.3,both,applied,Commander Gaius,"Fextralife remembrance page, from the sweep"
+boss_names,Spelling against the mod,mixed,"the boss CSV writes Bayle The Dread, Maliketh, The Black Blade, Mohg, The Omen and Sir Gideon Ofnir, the All Knowing, while the mod's slot lines write the Dread, the Black Blade, the Omen and the All-Knowing",manual,2.7.2,owner,open,use the mod's spelling on all four,agent
 armor_slot,Broken Gold Mask,tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,head,"owner, from the game id"
 armor_slot,Gold Tattoo (Arm),tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,arms,"owner, from the game id"
 armor_slot,Gold Tattoo (Chest),tarnished,armors.json has no record and the wiki's Armor Sets page does not list it,manual,2.4.3,owner,applied,body,"owner, from the game id"

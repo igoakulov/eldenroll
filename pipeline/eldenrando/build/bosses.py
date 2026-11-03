@@ -1,0 +1,137 @@
+"""Boss instances from the `[Boss]` rows of the boss CSV (`data.md` §6.1).
+
+One row per variant or phase collapses to one pair of identity and label. `boss_merges.csv` then
+joins the pairs that are one fight, `boss_names.csv` corrects the names of the rest, and
+`boss_additions.csv` adds the bosses the CSV leaves untagged. Every override row must apply, so a
+source change that orphans one stops the build instead of quietly changing the pool.
+"""
+
+from __future__ import annotations
+
+import re
+from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass
+
+from eldenrando.build.location_labels import resolve_boss_location
+from eldenrando.errors import BuildError
+from eldenrando.model.boss_instance import BossInstance
+from eldenrando.normalize.slug import slugify
+
+BOSS_TAG = "[Boss]"
+DLC_TAG = "[DLC] "
+_PARENTHETICAL = re.compile(r"\([^)]*\)")
+_BROKEN = re.compile(r"\s*-\s*Broken\s*$")
+_SPACES = re.compile(r"\s+")
+
+
+@dataclass(frozen=True, slots=True)
+class BossOverrides:
+    """The authored corrections to the CSV's boss rows, and the tables that place them."""
+
+    merges: Mapping[tuple[str, str], str]
+    names: Mapping[tuple[str, str], str]
+    additions: Sequence[tuple[str, str]]
+    aliases: Mapping[str, str]
+    locations: Mapping[tuple[str, str], str]
+
+
+def boss_identity(name: str) -> str:
+    """Return a CSV name without its tag, every parenthetical and a trailing `- Broken`."""
+    plain = _PARENTHETICAL.sub("", name.replace(BOSS_TAG, ""))
+    return _SPACES.sub(" ", _BROKEN.sub("", plain.strip())).strip()
+
+
+def boss_pairs(rows: Iterable[tuple[str, str]]) -> tuple[tuple[str, str], ...]:
+    """Return the distinct `(label, identity)` of the `[Boss]` rows, in CSV order."""
+    pairs = ((label, boss_identity(name)) for label, name in rows if BOSS_TAG in name)
+    return tuple(dict.fromkeys(pairs))
+
+
+def build_boss_instances(
+    rows: Iterable[tuple[str, str]], overrides: BossOverrides
+) -> tuple[BossInstance, ...]:
+    """Return one row per fight from `(label, name)` CSV rows, or raise `BuildError`."""
+    source = tuple(rows)
+    pairs = boss_pairs(source)
+    _check_merges(pairs, overrides.merges)
+    _check_names(pairs, overrides)
+    _check_additions(source, pairs, overrides.additions)
+    # A fight is keyed on its final name, so the rows of one merge land on one entry, located by
+    # the first of them.
+    fights: dict[tuple[str, str], str] = {}
+    for label, identity in pairs:
+        name = overrides.merges.get((label, identity)) or _corrected(identity, label, overrides)
+        fights.setdefault(
+            (label, name),
+            resolve_boss_location(identity, label, overrides.aliases, overrides.locations),
+        )
+    for name, label in overrides.additions:
+        fights[(label, name)] = resolve_boss_location(
+            name, label, overrides.aliases, overrides.locations
+        )
+    return _instances(fights)
+
+
+def _corrected(identity: str, label: str, overrides: BossOverrides) -> str:
+    """Return the owner's name for an unmerged pair, else the CSV's identity."""
+    names = overrides.names
+    return names.get((identity, label)) or names.get((identity, "")) or identity
+
+
+def _instances(fights: Mapping[tuple[str, str], str]) -> tuple[BossInstance, ...]:
+    """Return the fights as rows, or raise `BuildError` when two share an id."""
+    seen: set[str] = set()
+    out: list[BossInstance] = []
+    for (label, name), location_id in fights.items():
+        location_label = label.removeprefix(DLC_TAG)
+        instance_id = f"{slugify(name)}_{slugify(location_label)}"
+        if instance_id in seen:
+            raise BuildError(f"two boss instances share the id {instance_id!r}")
+        seen.add(instance_id)
+        out.append(
+            BossInstance(
+                id=instance_id, name=name, location_id=location_id, location_label=location_label
+            )
+        )
+    return tuple(out)
+
+
+def _check_merges(
+    pairs: tuple[tuple[str, str], ...], merges: Mapping[tuple[str, str], str]
+) -> None:
+    """Raise `BuildError` when a merge row matches no pair or a fight has only one row."""
+    unknown = sorted(f"{name} on {label}" for label, name in set(merges) - set(pairs))
+    if unknown:
+        raise BuildError(f"boss_merges names no CSV boss: {', '.join(unknown)}")
+    fights: dict[tuple[str, str], int] = {}
+    for (label, _), instance in merges.items():
+        fights[(label, instance)] = fights.get((label, instance), 0) + 1
+    single = sorted(f"{name} on {label}" for (label, name), count in fights.items() if count < 2)
+    if single:
+        raise BuildError(f"boss_merges joins nothing for: {', '.join(single)}")
+
+
+def _check_names(pairs: tuple[tuple[str, str], ...], overrides: BossOverrides) -> None:
+    """Raise `BuildError` when a name row corrects no unmerged pair."""
+    unmerged = [pair for pair in pairs if pair not in overrides.merges]
+    identities = {identity for _, identity in unmerged}
+    unused = sorted(
+        f"{name} on {label or 'every label'}"
+        for name, label in overrides.names
+        if (name not in identities if not label else (label, name) not in unmerged)
+    )
+    if unused:
+        raise BuildError(f"boss_names corrects no CSV boss: {', '.join(unused)}")
+
+
+def _check_additions(
+    rows: tuple[tuple[str, str], ...],
+    pairs: tuple[tuple[str, str], ...],
+    additions: Sequence[tuple[str, str]],
+) -> None:
+    """Raise `BuildError` when an added boss is not in the CSV, or the CSV already tags it."""
+    for name, label in additions:
+        if (label, name) not in rows:
+            raise BuildError(f"boss_additions: the CSV has no {name!r} on {label!r}")
+        if (label, name) in pairs:
+            raise BuildError(f"boss_additions: the CSV already tags {name!r} on {label!r}")
