@@ -26,6 +26,7 @@ AREAS: Final[tuple[str, ...]] = (
     "boss_names",
     "boss_pool",
     "placement",
+    "odds",
     "armor_slot",
     "paired_weapons",
     "armor_sets",
