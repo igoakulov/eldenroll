@@ -63,11 +63,11 @@ def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -
 
     assert sum("[Boss]" in name for _, name in rows) == 254
     assert len(pairs) == 222
-    assert len(fights) == 15
-    assert savings == 16
+    assert len(fights) == 17
+    assert savings == 18
     assert len(overrides.additions) == 25
-    assert len(instances) == len(pairs) - savings + len(overrides.additions) == 231
-    assert sum(row.odds > 0 for row in instances) == 220
+    assert len(instances) == len(pairs) - savings + len(overrides.additions) == 229
+    assert sum(row.odds > 0 for row in instances) == 218
 
 
 def test_the_base_game_and_dlc_split(instances: tuple[BossInstance, ...]) -> None:
@@ -78,7 +78,7 @@ def test_the_base_game_and_dlc_split(instances: tuple[BossInstance, ...]) -> Non
     dlc = {row.id for row in regions if row.is_dlc}
     rollable = [row for row in instances if row.odds > 0]
     assert sum(region_of_area[row.location_id] in dlc for row in rollable) == 52
-    assert sum(region_of_area[row.location_id] not in dlc for row in rollable) == 168
+    assert sum(region_of_area[row.location_id] not in dlc for row in rollable) == 166
 
 
 def test_the_fights_the_csv_leaves_untagged(instances: tuple[BossInstance, ...]) -> None:

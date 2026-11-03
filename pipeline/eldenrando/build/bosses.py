@@ -57,16 +57,18 @@ def build_boss_instances(
     _check_merges(pairs, overrides.merges)
     _check_names(pairs, overrides)
     # A fight is keyed on its final name, so the rows of one merge land on one entry, located by
-    # the first of them.
+    # the row that holds the instance's label, else by the first of them.
     fights: dict[tuple[str, str], str] = {}
     for label, identity in pairs:
         name, instance_label = overrides.merges.get(
             (label, identity), (_corrected(identity, label, overrides), "")
         )
-        fights.setdefault(
-            (instance_label or label, name),
-            resolve_boss_location(identity, label, overrides.aliases, overrides.locations),
-        )
+        location = resolve_boss_location(identity, label, overrides.aliases, overrides.locations)
+        fight = (instance_label or label, name)
+        if label == instance_label:
+            fights[fight] = location
+        else:
+            fights.setdefault(fight, location)
     for name, label, location_id in overrides.additions:
         if (label, name) in fights:
             raise BuildError(f"boss_additions: {name!r} on {label!r} is already in the pool")

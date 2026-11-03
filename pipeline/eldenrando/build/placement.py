@@ -8,9 +8,6 @@ row of it must apply, so a source change that orphans one stops the build.
 
 The drop CSVs add every regular enemy's farm spots. Last, an ash the mod has only on a weapon takes
 that weapon's rows, boss-tied ones included.
-
-A `Placement` also says what kind of source gave its row, for the coverage report only: the kind
-never reaches a table (`data.md` §5.2).
 """
 
 from __future__ import annotations
@@ -18,7 +15,6 @@ from __future__ import annotations
 import re
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Literal
 
 from eldenrando.build.bosses import BOSS_TAG, DLC_TAG
 from eldenrando.build.location_labels import NON_PLACE_LABELS
@@ -31,8 +27,6 @@ from eldenrando.model.item import Item
 from eldenrando.model.item_location import ItemLocation
 from eldenrando.model.item_slot import ItemSlot
 from eldenrando.normalize.placement_names import PlacementNames
-
-PlacementKind = Literal["boss", "enemy", "direct"]
 
 # The slots a fight fills. The mod's two boss shop tags are Enia's, whose lines name their boss.
 BOSS_SLOT_TAGS = frozenset(
@@ -62,7 +56,6 @@ _ROUNDTABLE_LOCATION = "limgrave"
 _AFTER_DEFEATING = re.compile(r" - after defeating (.+)$")
 _LABEL = re.compile(r" in m\d\d_\d\d_\d\d_\d\d \((.*?)\)(?:,|\])")
 _ENEMY_NAMES = re.compile(r"enemy \w+ \((.*?) - id[^\[\]]*?(?:- \[(.*?)\])?\)")
-_ORIGIN = re.compile(r"lot \d+\[(?:event )?(\w+)")
 _DROP_CELL = re.compile(r"^(.*?) - \{\d+\} \(")
 _UPGRADE = re.compile(r" \+\d+$")
 _DROP_LOCATION = "Location"
@@ -79,7 +72,6 @@ class Placement:
     """One row with what gave it: `source_name` as the source wrote the item's name."""
 
     row: ItemLocation
-    kind: PlacementKind
     source_name: str
 
 
@@ -145,10 +137,10 @@ def _slot_placements(sources: PlacementSources) -> Iterator[Placement]:
             if place is not None:
                 yield _boss_placement(item, _boss_at(place, places), source_name)
             elif BOSS_SLOT_TAGS.intersection(slot.tags):
-                for boss in _bosses_of_slot(slot, line, by_label, sources.merged_labels):
-                    yield _boss_placement(item, boss, source_name)
+                boss = _boss_of_slot(slot, line, by_label, sources.merged_labels)
+                yield _boss_placement(item, boss, source_name)
             else:
-                yield _location_placement(item, slot.area, _line_kind(line), source_name)
+                yield _location_placement(item, slot.area, source_name)
     unused = sorted(f"{item} at {area}" for item, area in set(sources.slot_links) - linked)
     if unused:
         raise BuildError(f"boss_slot_links names no slot line: {', '.join(unused)}")
@@ -179,50 +171,41 @@ def _boss_at(place: BossPlace, places: Mapping[tuple[str, str], BossInstance]) -
     return boss
 
 
-def _bosses_of_slot(
+def _boss_of_slot(
     slot: ItemSlot,
     line: str,
     by_label: Mapping[str, Sequence[BossInstance]],
     merged: Mapping[str, str],
-) -> Sequence[BossInstance]:
-    """Return the fights a boss-tagged slot line belongs to, or raise `BuildError`.
+) -> BossInstance:
+    """Return the fight a boss-tagged slot line belongs to, or raise `BuildError`.
 
-    A line with two labels can name one boss on both, and then it drops from either instance.
+    A label a merge moved still holds its other fights, so it offers both sets of bosses.
     """
-    labels = {merged.get(label, label) for label in _LABEL.findall(line)}
+    written = _LABEL.findall(line)
+    labels = {*written, *(merged[label] for label in written if label in merged)}
     bosses = [boss for label in sorted(labels) for boss in by_label.get(label, ())]
     if len(bosses) == 1:
-        return bosses
+        return bosses[0]
     enemies = {name for match in _ENEMY_NAMES.findall(line) for name in match if name}
     text = slot.text.casefold()
     named = [boss for boss in bosses if boss.name in enemies or boss.name.casefold() in text]
-    if len({boss.name for boss in named}) == 1:
-        return named
+    if len(named) == 1:
+        return named[0]
     choices = ", ".join(boss.name for boss in named or bosses) or "no boss"
     raise BuildError(f"{slot.text!r} at {slot.area}: label has {choices}, for {line!r}")
-
-
-def _line_kind(line: str) -> PlacementKind:
-    """Return `enemy` when only enemies give a line's item, else `direct`."""
-    origins = _ORIGIN.findall(line)
-    if " - enemy lot " in line or (origins and all(origin == "enemy" for origin in origins)):
-        return "enemy"
-    return "direct"
 
 
 def _boss_placement(item: Item, boss: BossInstance, source_name: str) -> Placement:
     """Return a boss-tied placement."""
     row = ItemLocation(item_id=item.id, boss_instance_id=boss.id)
-    return Placement(row=row, kind="boss", source_name=source_name)
+    return Placement(row=row, source_name=source_name)
 
 
-def _location_placement(
-    item: Item, area: str, kind: PlacementKind, source_name: str
-) -> Placement:
+def _location_placement(item: Item, area: str, source_name: str) -> Placement:
     """Return a placement at a location; the Roundtable counts as Limgrave (`data.md` §5.2)."""
     location_id = _ROUNDTABLE_LOCATION if area == _ROUNDTABLE else area
     row = ItemLocation(item_id=item.id, location_id=location_id)
-    return Placement(row=row, kind=kind, source_name=source_name)
+    return Placement(row=row, source_name=source_name)
 
 
 def _drop_placements(sources: PlacementSources) -> Iterator[Placement]:
@@ -290,7 +273,7 @@ def _cell_placements(
             area = sources.aliases.get(label)
             if area is None:
                 raise BuildError(f"{item.name!r} drops on {label!r}, which has no alias")
-            yield _location_placement(item, area, "enemy", source_name)
+            yield _location_placement(item, area, source_name)
 
 
 def _ash_placements(
@@ -309,7 +292,7 @@ def _ash_placements(
                     location_id=placement.row.location_id,
                     boss_instance_id=placement.row.boss_instance_id,
                 )
-                yield Placement(row=row, kind=placement.kind, source_name=weapon)
+                yield Placement(row=row, source_name=weapon)
 
 
 def _weapon_placements(

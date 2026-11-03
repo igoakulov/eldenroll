@@ -24,21 +24,23 @@ from eldenrando.model.boss_instance import BossInstance
 from eldenrando.model.item import Item
 from eldenrando.model.item_location import ItemLocation
 from eldenrando.model.item_slot import ItemSlot
+from eldenrando.model.region import ASHEN_CAPITAL, ROYAL_CAPITAL, SHUNNING_GROUNDS
 from eldenrando.normalize.placement_names import PlacementNames, placement_names
 from eldenrando.validate.gaps import GapSources, load_sources
 from eldenrando.validate.placement import (
     PlacementData,
-    effective_regions,
     eligible_items,
     eligible_sets,
-    kinds_by_item,
     load_placement_data,
     needs_location,
     row_counts,
+    selected_locations,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
 ENSIS = "Gravesite Plain - East Castle Ensis"
+RAMPARTSIDE = "Altus Plateau - Rampartside Path, Altus Tunnel Entrance"
+MOONFOLK = "Moonlight Altar - Moonfolk Ruins"
 
 
 @pytest.fixture(scope="module")
@@ -217,6 +219,14 @@ def test_ash_takes_its_weapons_rows_boss_tied_ones_too(data: PlacementData) -> N
     assert _bosses_of(data, "Palm Blast") == {"Leda and Allies", "Dryleaf Dane"}
 
 
+def test_a_fleeing_dragon_is_at_its_final_location_only(data: PlacementData) -> None:
+    assert _places(data, "Lansseax's Glaive") == {f"Ancient Dragon Lansseax @ {RAMPARTSIDE}"}
+    assert _places(data, "Adula's Moonblade") == {f"Glintstone Dragon Adula @ {MOONFOLK}"}
+    locations = {boss.name: boss.location_id for boss in data.bosses}
+    assert data.region_of_location[locations["Ancient Dragon Lansseax"]] == "altus"
+    assert data.region_of_location[locations["Glintstone Dragon Adula"]] == "ainsel"
+
+
 def test_only_the_upgraded_copy_gives_its_ash(data: PlacementData) -> None:
     ash = _places(data, "Spinning Strikes")
 
@@ -249,14 +259,6 @@ def test_every_tool_is_placed(data: PlacementData) -> None:
     assert all(tool.id in placed for tool in tools)
 
 
-def test_the_sources_split_covers_every_kind(data: PlacementData) -> None:
-    kinds = kinds_by_item(data.placements)
-
-    assert kinds[_item(data, "Morgott's Cursed Sword").id] == {"boss"}
-    assert kinds[_item(data, "Guardian Garb (Full Bloom)").id] == {"enemy"}
-    assert kinds[_item(data, "Mushroom Crown").id] == {"direct"}
-
-
 def test_a_staff_and_a_seal_are_reachable_at_every_cumulative_selection(
     data: PlacementData,
 ) -> None:
@@ -278,7 +280,7 @@ def test_every_armor_set_can_roll_under_some_selection(data: PlacementData) -> N
     regions = [region.id for region in data.regions]
     with_ashen = eligible_items(rows, regions, dead, bosses, data.region_of_location)
     without = eligible_items(
-        rows, set(regions) - {"leyndell_ashen"}, dead, bosses, data.region_of_location
+        rows, set(regions) - {ASHEN_CAPITAL}, dead, bosses, data.region_of_location
     )
 
     reachable = {*eligible_sets(data.armor_sets, with_ashen)}
@@ -298,36 +300,56 @@ BOSSES = {
     "dead": BossInstance("dead", "Dead", "tile", "Tile"),
     "zero": BossInstance("zero", "Zero", "tile", "Tile", odds=0),
 }
-REGION_OF = {"tile": "here", "spot": "here"}
+HERE = {"tile", "spot"}
+NOWHERE: set[str] = set()
 
 
 @pytest.mark.parametrize(
-    ("row", "selected", "on", "off"),
+    ("row", "locations", "on", "off"),
     [
-        (ItemLocation("i", location_id="spot"), {"here"}, True, True),
-        (ItemLocation("i", location_id="spot"), {"there"}, False, False),
-        (ItemLocation("i", boss_instance_id="alive"), {"here"}, False, True),
-        (ItemLocation("i", boss_instance_id="alive"), {"there"}, False, False),
-        (ItemLocation("i", boss_instance_id="dead"), {"here"}, True, True),
-        (ItemLocation("i", boss_instance_id="dead"), {"there"}, True, False),
-        (ItemLocation("i", boss_instance_id="zero"), {"here"}, True, True),
-        (ItemLocation("i", boss_instance_id="zero"), {"there"}, False, False),
+        (ItemLocation("i", location_id="spot"), HERE, True, True),
+        (ItemLocation("i", location_id="spot"), NOWHERE, False, False),
+        (ItemLocation("i", boss_instance_id="alive"), HERE, False, True),
+        (ItemLocation("i", boss_instance_id="alive"), NOWHERE, False, False),
+        (ItemLocation("i", boss_instance_id="dead"), HERE, True, True),
+        (ItemLocation("i", boss_instance_id="dead"), NOWHERE, True, False),
+        (ItemLocation("i", boss_instance_id="zero"), HERE, True, True),
+        (ItemLocation("i", boss_instance_id="zero"), NOWHERE, False, False),
     ],
 )
 def test_row_eligibility_follows_the_prd_table(
-    row: ItemLocation, selected: set[str], on: bool, off: bool
+    row: ItemLocation, locations: set[str], on: bool, off: bool
 ) -> None:
     dead = {"dead", "zero"}
 
-    assert row_counts(row, selected, dead, BOSSES, REGION_OF) is on
-    assert (
-        row_counts(row, selected, dead, BOSSES, REGION_OF, boss_items_only_from_dead=False) is off
-    )
+    assert row_counts(row, locations, dead, BOSSES) is on
+    assert row_counts(row, locations, dead, BOSSES, boss_items_only_from_dead=False) is off
 
 
-def test_the_ashen_capital_replaces_the_royal_one() -> None:
-    assert effective_regions({"leyndell", "leyndell_ashen"}) == {"leyndell_ashen"}
-    assert effective_regions({"leyndell"}) == {"leyndell"}
+def test_the_ashen_capital_replaces_the_royal_one_but_not_the_shunning_grounds(
+    data: PlacementData,
+) -> None:
+    regions = data.region_of_location
+    royal = selected_locations({ROYAL_CAPITAL}, regions)
+    ashen = selected_locations({ASHEN_CAPITAL}, regions)
+    both = selected_locations({ROYAL_CAPITAL, ASHEN_CAPITAL}, regions)
+
+    assert royal > SHUNNING_GROUNDS
+    assert ashen > SHUNNING_GROUNDS
+    assert "leyndell" in royal
+    assert "leyndell" not in ashen
+    assert both == ashen
+    assert {regions[location] for location in SHUNNING_GROUNDS} == {ROYAL_CAPITAL}
+
+
+def test_the_shunning_grounds_keep_their_items_in_the_ashen_capital(data: PlacementData) -> None:
+    bosses = {boss.id: boss for boss in data.bosses}
+    rows = item_locations(data.placements)
+    found = eligible_items(rows, {ASHEN_CAPITAL}, (), bosses, data.region_of_location)
+
+    assert _item(data, "Frenzied Flame Seal").id in found
+    assert _item(data, "Omen Armor").id in found
+    assert _item(data, "Coded Sword").id not in found
 
 
 def _item_row(name: str) -> Item:
@@ -395,7 +417,6 @@ def test_a_label_with_one_boss_needs_no_name(sources: GapSources) -> None:
     built = _built(_fake_sources(sources, _slot(_line("Lone"), tags=("altboss",))))
 
     assert [placement.row.boss_instance_id for placement in built] == ["c"]
-    assert built[0].kind == "boss"
 
 
 def test_the_slot_text_picks_among_a_labels_bosses(sources: GapSources) -> None:
@@ -404,6 +425,16 @@ def test_the_slot_text_picks_among_a_labels_bosses(sources: GapSources) -> None:
     built = _built(_fake_sources(sources, slot))
 
     assert [placement.row.boss_instance_id for placement in built] == ["b"]
+
+
+def test_a_merged_label_offers_its_own_fights_and_the_moved_one(sources: GapSources) -> None:
+    fake = _fake_sources(sources, _slot(_line("Tile"), tags=("boss",), text="Dropped by Other"))
+
+    assert _built(replace(fake, merged_labels={"Tile": "Lone"}))[0].row.boss_instance_id == "c"
+
+    fake = _fake_sources(sources, _slot(_line("Tile"), tags=("boss",), text="Dropped by First"))
+
+    assert _built(replace(fake, merged_labels={"Tile": "Lone"}))[0].row.boss_instance_id == "a"
 
 
 def test_a_boss_slot_nothing_joins_stops_the_build(sources: GapSources) -> None:
@@ -417,15 +448,6 @@ def test_a_slot_with_no_boss_tag_gives_a_location(sources: GapSources) -> None:
     built = _built(_fake_sources(sources, _slot(_line("Tile"))))
 
     assert [placement.row.location_id for placement in built] == ["here"]
-    assert built[0].kind == "enemy"
-
-
-def test_a_pickup_is_direct(sources: GapSources) -> None:
-    line = "Sword - lot 1[asset AEG (Corpse) in m10_00_00_00 (Tile)] Sword"
-
-    built = _built(_fake_sources(sources, _slot(line)))
-
-    assert built[0].kind == "direct"
 
 
 def test_an_unused_slot_link_stops_the_build(sources: GapSources) -> None:
