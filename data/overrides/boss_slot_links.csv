@@ -1,0 +1,42 @@
+item,area,boss,location_label,reason,reviewer
+Royal Greatsword,liurnia_postmanor,Blaidd the Half-Wolf,"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise","not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Blaidd's Armor,liurnia_postmanor,Blaidd the Half-Wolf,"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise","not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Blaidd's Gauntlets,liurnia_postmanor,Blaidd the Half-Wolf,"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise","not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Blaidd's Greaves,liurnia_postmanor,Blaidd the Half-Wolf,"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise","not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Flame Spear,storehouse_back,Fire Knight Kood,Specimen Storehouse - Shadow Tower,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Winged Serpent Helm,storehouse_back,Fire Knight Kood,Specimen Storehouse - Shadow Tower,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Rain of Fire,westrampart,Fire Knight Salza,Shadow Keep - West Rampart,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Salza's Hood,westrampart,Fire Knight Salza,Shadow Keep - West Rampart,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Death Mask Helm,shadowkeep_church_lower,Fire Knight Wego,Shadow Keep - Drained Church District,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Horned Warrior's Sword,belurat_swamp,Divine Bird Warrior,"Belurat, Tower Settlement Swamp","not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Horned Warrior's Greatsword,enirilim,Divine Bird Warrior,Enir-Ilim,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Clinging Bone,roundtable,Ensha of the Royal Remains,Roundtable Hold,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Staff of the Avatar,deeproot,Erdtree Avatar,Deeproot Depths,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Prelate's Inferno Crozier,gelmir,Fire Prelate,Mt. Gelmir - Fort Laiedd,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Rotten Staff,haligtree_elphael,Putrid Avatar,Miquella's Haligtree - Elphael,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Horned Bairn,ellac,Shadow Tree Spirit,Gravesite Plain - Ellac River Cave,"not an objective, kept for its drops, which the mod's slot leaves without a boss tag",owner
+Leda's Sword,enirilim,Leda and Allies,Enir-Ilim,the slot's text ties it to Leda's fight,agent
+Leda's Armor,enirilim,Leda and Allies,Enir-Ilim,the slot's text ties it to Leda's fight,agent
+Dane's Footwork,enirilim,Leda and Allies,Enir-Ilim,the slot's text ties it to Leda's fight,agent
+Dane's Hat,scadualtus,Dryleaf Dane,"Scadu Altus - Moorth Ruins, Bonny Village West Entrance",on the ground after his duel at Moorth Ruins,agent
+Dryleaf Arts,scadualtus,Dryleaf Dane,"Scadu Altus - Moorth Ruins, Bonny Village West Entrance",on the ground after his duel at Moorth Ruins,agent
+Divine Beast Head,belurat,Divine Beast Dancing Lion,"Belurat, Tower Settlement",the slot says it is there only after the fight,agent
+Circlet of Light,enirilim,Promised Consort Radahn,Enir-Ilim,the slot says it is there only after the fight,agent
+St. Trina's Blossom,fissure,Promised Consort Radahn,Enir-Ilim,the slot says it is there only after the fight,agent
+Spear,limgrave_murkwatercave,Patches,Murkwater Cave,the slot says he drops it when killed,agent
+Leather Armor,limgrave_murkwatercave,Patches,Murkwater Cave,the slot says he drops it when killed,agent
+Leather Gloves,limgrave_murkwatercave,Patches,Murkwater Cave,the slot says he drops it when killed,agent
+Leather Boots,limgrave_murkwatercave,Patches,Murkwater Cave,the slot says he drops it when killed,agent
+Smarag's Glintstone Breath,caelid,Glintstone Dragon Smarag,"Liurnia of the Lakes - Meeting Place, Academy Crystal Cave Entrance","sold at the Cathedral of Dragon Communion only after this dragon is dead, like Enia's items",agent
+Magma Breath,caelid,Magma Wyrm,Mt. Gelmir - Seethewater Terminus,"sold at the Cathedral of Dragon Communion only after this dragon is dead, like Enia's items",agent
+Agheel's Flame,caelid,Flying Dragon Agheel,"Limgrave - Agheel Lake, Dragon-Burnt Ruins","sold at the Cathedral of Dragon Communion only after this dragon is dead, like Enia's items",agent
+Ekzykes's Decay,caelid,Decaying Ekzykes,Caelid - Caelid Highway South,"sold at the Cathedral of Dragon Communion only after this dragon is dead, like Enia's items",agent
+Theodorix's Magma,caelid,Great Wyrm Theodorix,"Mountaintops of the Giants - Shack of the Lofty; Consecrated Snowfield - Minor Erdtree, Albinauric Rise, Cave of the Forlorn Entrance","sold at the Cathedral of Dragon Communion only after this dragon is dead, like Enia's items",agent
+Borealis's Mist,caelid,Borealis the Freezing Fog,Northeast Mountaintops,"sold at the Cathedral of Dragon Communion only after this dragon is dead, like Enia's items",agent
+Bayle's Tyranny,jaggedpeak_foot,Bayle the Dread,"Jagged Peak - Jagged Peak Summit, Bayle Arena","exchanged for the Heart of Bayle, which this fight drops",agent
+Bayle's Flame Lightning,jaggedpeak_foot,Bayle the Dread,"Jagged Peak - Jagged Peak Summit, Bayle Arena","exchanged for the Heart of Bayle, which this fight drops",agent
+Night's Cavalry Helm,snowfield,Night's Cavalry,Southwest Mountaintops,"the slot's text names the Night's Cavalry duo, whose instance has another label",agent
+Night's Cavalry Armor,snowfield,Night's Cavalry,Southwest Mountaintops,"the slot's text names the Night's Cavalry duo, whose instance has another label",agent
+Night's Cavalry Gauntlets,snowfield,Night's Cavalry,Southwest Mountaintops,"the slot's text names the Night's Cavalry duo, whose instance has another label",agent
+Night's Cavalry Greaves,snowfield,Night's Cavalry,Southwest Mountaintops,"the slot's text names the Night's Cavalry duo, whose instance has another label",agent
+Nox Flowing Sword,caelid,Nox Swordstress & Nox Monk,"Caelid - West Sellia, Sellia Crystal Tunnel Entrance","the slot's text names this fight, and the mod says Nox Priest where the instance says Nox Monk",agent

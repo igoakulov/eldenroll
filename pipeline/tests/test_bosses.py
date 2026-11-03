@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from eldenrando.build.boss_table import load_boss_overrides, load_boss_rows
 from eldenrando.build.bosses import (
     DLC_TAG,
     BossOverrides,
@@ -23,16 +24,11 @@ from eldenrando.loaders.boss_overrides import (
     load_boss_names,
     load_boss_odds,
 )
-from eldenrando.loaders.bosses import load_boss_creature_locations
-from eldenrando.loaders.location_aliases import (
-    load_boss_location_overrides,
-    load_location_aliases,
-)
 from eldenrando.loaders.region_areas import load_region_areas
 from eldenrando.loaders.regions import load_regions
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.model.boss_instance import BossInstance
-from eldenrando.paths import AREAS, ENEMY_LOCATIONS
+from eldenrando.paths import AREAS
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
@@ -45,33 +41,9 @@ SELLIA = "Caelid - West Sellia, Sellia Crystal Tunnel Entrance"
 DARRIWIL_ID = "bloodhound_knight_darriwil_limgrave_agheel_lake_south_forlorn_hound_evergaol"
 
 
-def _rows() -> tuple[tuple[str, str], ...]:
-    table = load_boss_creature_locations(ENEMY_LOCATIONS)
-    label = table.column("Location")
-    name = table.column("Name")
-    return tuple((row[label], row[name]) for row in table.rows)
-
-
-def _overrides() -> BossOverrides:
-    location_ids = {area.name for area in load_annotations(AREAS).areas}
-    aliases = load_location_aliases(OVERRIDES / "location_aliases.csv", location_ids=location_ids)
-    return BossOverrides(
-        merges=load_boss_merges(OVERRIDES / "boss_merges.csv"),
-        names=load_boss_names(OVERRIDES / "boss_names.csv"),
-        additions=load_boss_additions(
-            OVERRIDES / "boss_additions.csv", location_ids=location_ids
-        ),
-        aliases=aliases,
-        locations=load_boss_location_overrides(
-            OVERRIDES / "boss_location_overrides.csv", labels=aliases, location_ids=location_ids
-        ),
-        odds=load_boss_odds(OVERRIDES / "boss_odds.csv"),
-    )
-
-
 @pytest.fixture(scope="module")
 def instances() -> tuple[BossInstance, ...]:
-    return build_boss_instances(_rows(), _overrides())
+    return build_boss_instances(load_boss_rows(), load_boss_overrides(OVERRIDES))
 
 
 @pytest.fixture(scope="module")
@@ -80,8 +52,8 @@ def by_place(instances: tuple[BossInstance, ...]) -> dict[tuple[str, str], BossI
 
 
 def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -> None:
-    rows = _rows()
-    overrides = _overrides()
+    rows = load_boss_rows()
+    overrides = load_boss_overrides(OVERRIDES)
     pairs = boss_pairs(rows)
     fights = Counter(
         (instance_label or label, name)
@@ -144,9 +116,9 @@ def test_dryleaf_dane_has_only_his_own_fight(instances: tuple[BossInstance, ...]
 
 
 def test_every_pair_of_the_csv_has_an_instance(instances: tuple[BossInstance, ...]) -> None:
-    overrides = _overrides()
+    overrides = load_boss_overrides(OVERRIDES)
     placed = {(row.location_label, row.name) for row in instances}
-    for label, identity in boss_pairs(_rows()):
+    for label, identity in boss_pairs(load_boss_rows()):
         name = overrides.names.get((identity, label)) or overrides.names.get(
             (identity, ""), identity
         )

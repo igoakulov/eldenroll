@@ -20,6 +20,7 @@ from eldenrando.build.ash_compatibility import build_ash_compatibility
 from eldenrando.build.ashes import build_ashes
 from eldenrando.build.consumables import build_consumables
 from eldenrando.build.items import build_item_table, none_item
+from eldenrando.build.placement import ENIA, REMEMBRANCE
 from eldenrando.build.spells import build_incantations, build_sorceries
 from eldenrando.build.talismans import build_talismans
 from eldenrando.build.tools import build_tools
@@ -79,8 +80,6 @@ _JOINED_SHEET_NAMES: Mapping[str, tuple[str, ...]] = {
 _NEVER_ASKED_CLASSES = frozenset({"glintstone_staff", "sacred_seal", "perfume_bottle"})
 _SKILL_SUFFIX = re.compile(r"\s*(\[.*|#.*|\(.*|R1.*|R2.*|- .*)$")
 _UPGRADE = re.compile(r" \+\d+$")
-_ENIA = "Finger Reader Enia"
-_REMEMBRANCE = re.compile(r"for ((?:Elden )?Remembrance.*?)(?:, \d+ runes)? - flag")
 _BASE_WITHOUT_AN_ID = frozenset({"Serpent-Hunter"})
 _KINDS: Mapping[str, str] = {
     "weapon": "weapon",
@@ -286,8 +285,8 @@ def remembrance_gaps(sources: GapSources, names: PlacementNames) -> tuple[Gap, .
         if not slot.is_randomizable:
             continue
         for line in slot.debug_lines:
-            match = _REMEMBRANCE.search(line)
-            item = names.resolve_slot_line(line) if _ENIA in line else None
+            match = REMEMBRANCE.search(line)
+            item = names.resolve_slot_line(line) if ENIA in line else None
             if match is not None and item is not None:
                 sold.setdefault(match[1], set()).add(item)
     out: list[Gap] = []
