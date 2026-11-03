@@ -1,8 +1,7 @@
 """Tests for the four source loaders.
 
 The expected numbers are the ones measured in `PARSER_SURVEY.md`; they double as a
-regression suite for the raw sources. When `raw/` is absent (a public checkout) the data
-tests skip instead of failing.
+regression suite for the committed sources.
 """
 
 from __future__ import annotations
@@ -12,28 +11,23 @@ from pathlib import Path
 import pytest
 
 from eldenrando.loaders.annotations import load_annotations
-from eldenrando.loaders.hintmarks import load_hintmarks
 from eldenrando.loaders.iteminfo import load_item_catalog
 from eldenrando.loaders.itemslots import extract_items, load_slots
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.loaders.yaml_source import load_mapping
-
-DATA_DIR = Path(__file__).resolve().parents[2] / "raw" / "pc_mod_data"
-needs_data = pytest.mark.skipif(not DATA_DIR.is_dir(), reason="raw source data not present")
+from eldenrando.paths import AREAS, ITEM_INFO, ITEM_SLOTS
 
 
-@needs_data
 def test_annotations_counts() -> None:
-    config = load_annotations(DATA_DIR / "annotations_stable.txt")
+    config = load_annotations(AREAS)
     assert len(config.areas) == 174
     assert len({area.name for area in config.areas}) == 174
     assert len(config.events) == 46
     assert len({event.name for event in config.events}) == 46
 
 
-@needs_data
 def test_annotations_specific_records() -> None:
-    config = load_annotations(DATA_DIR / "annotations_stable.txt")
+    config = load_annotations(AREAS)
     areas = config.area_by_name()
 
     assert areas["chapel_start"].req is None
@@ -45,9 +39,8 @@ def test_annotations_specific_records() -> None:
     assert areas["graveyard"].tags == ("minidungeon", "cave")
 
 
-@needs_data
 def test_slot_counts() -> None:
-    slots = load_slots(DATA_DIR / "itemslots_stable.txt")
+    slots = load_slots(ITEM_SLOTS)
 
     assert len(slots) == 4379
     assert len({slot.key for slot in slots}) == 4379
@@ -59,9 +52,8 @@ def test_slot_counts() -> None:
     assert len(randomizable) == 4257
 
 
-@needs_data
 def test_slot_item_extraction() -> None:
-    slots = load_slots(DATA_DIR / "itemslots_stable.txt")
+    slots = load_slots(ITEM_SLOTS)
 
     assert sum(len(slot.items) for slot in slots) == 5363
     assert len({name for slot in slots for name in slot.items}) == 2262
@@ -89,10 +81,9 @@ def test_extract_items_ignores_prose() -> None:
     assert extract_items(lines) == ("Golden Rune [1]", "Ash of War: Spinning Weapon")
 
 
-@needs_data
 def test_slot_areas_are_known() -> None:
-    config = load_annotations(DATA_DIR / "annotations_stable.txt")
-    slots = load_slots(DATA_DIR / "itemslots_stable.txt")
+    config = load_annotations(AREAS)
+    slots = load_slots(ITEM_SLOTS)
     known = {area.name for area in config.areas}
 
     used = {slot.area for slot in slots if slot.is_randomizable}
@@ -100,19 +91,17 @@ def test_slot_areas_are_known() -> None:
     assert {slot.area for slot in slots} - known == {"unknown"}
 
 
-@needs_data
 def test_slot_events_are_known() -> None:
-    config = load_annotations(DATA_DIR / "annotations_stable.txt")
-    slots = load_slots(DATA_DIR / "itemslots_stable.txt")
+    config = load_annotations(AREAS)
+    slots = load_slots(ITEM_SLOTS)
     known = {event.name for event in config.events}
 
     used = {slot.event for slot in slots if slot.event is not None}
     assert used <= known
 
 
-@needs_data
 def test_catalog_counts() -> None:
-    catalog = load_item_catalog(DATA_DIR / "iteminfo.txt")
+    catalog = load_item_catalog(ITEM_INFO)
     names = [name for entries in catalog.names.values() for name in entries.values()]
 
     assert len(names) == 2448
@@ -123,20 +112,6 @@ def test_catalog_counts() -> None:
     assert catalog.find("Godrick's Great Rune") == ("goods", 8148)
     assert catalog.find("Not An Item") is None
     assert catalog.groups["weapons"].item_count > 0
-
-
-@needs_data
-def test_hintmarks_counts() -> None:
-    hintmarks = load_hintmarks(DATA_DIR / "hintmarks.txt")
-
-    assert len(hintmarks.debug_info) == 324
-    assert len(hintmarks.groups) == 129
-    assert len(hintmarks.items) == 20
-    assert len(hintmarks.upgrades) == 10
-    assert hintmarks.enable_flag > 0
-    assert hintmarks.groups[0].includes == ("graveyard", "graveyard_cave")
-    assert hintmarks.groups[0].main_bonfire == "Stranded Graveyard"
-    assert hintmarks.items[0].name == "academyglintstonekey"
 
 
 def test_missing_file_is_a_loader_error(tmp_path: Path) -> None:

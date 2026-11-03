@@ -32,12 +32,10 @@ from eldenrando.loaders.region_areas import load_region_areas
 from eldenrando.loaders.regions import load_regions
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.model.boss_instance import BossInstance
+from eldenrando.paths import AREAS, ENEMY_LOCATIONS
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ANNOTATIONS = RAW / "pc_mod_data" / "annotations_stable.txt"
-needs_files = pytest.mark.skipif(not ANNOTATIONS.is_file(), reason="raw data not present")
 
 ASHEN = "Leyndell, Ashen Capital"
 ROYAL = "Leyndell, Royal Capital"
@@ -48,14 +46,14 @@ DARRIWIL_ID = "bloodhound_knight_darriwil_limgrave_agheel_lake_south_forlorn_hou
 
 
 def _rows() -> tuple[tuple[str, str], ...]:
-    table = load_boss_creature_locations(RAW / "csv" / "boss_creature_locations.csv")
+    table = load_boss_creature_locations(ENEMY_LOCATIONS)
     label = table.column("Location")
     name = table.column("Name")
     return tuple((row[label], row[name]) for row in table.rows)
 
 
 def _overrides() -> BossOverrides:
-    location_ids = {area.name for area in load_annotations(ANNOTATIONS).areas}
+    location_ids = {area.name for area in load_annotations(AREAS).areas}
     aliases = load_location_aliases(OVERRIDES / "location_aliases.csv", location_ids=location_ids)
     return BossOverrides(
         merges=load_boss_merges(OVERRIDES / "boss_merges.csv"),
@@ -81,7 +79,6 @@ def by_place(instances: tuple[BossInstance, ...]) -> dict[tuple[str, str], BossI
     return {(row.location_label, row.name): row for row in instances}
 
 
-@needs_files
 def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -> None:
     rows = _rows()
     overrides = _overrides()
@@ -101,7 +98,6 @@ def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -
     assert sum(row.odds > 0 for row in instances) == 220
 
 
-@needs_files
 def test_the_base_game_and_dlc_split(instances: tuple[BossInstance, ...]) -> None:
     regions = load_regions(OVERRIDES / "regions.csv")
     region_of_area = load_region_areas(
@@ -113,7 +109,6 @@ def test_the_base_game_and_dlc_split(instances: tuple[BossInstance, ...]) -> Non
     assert sum(region_of_area[row.location_id] not in dlc for row in rollable) == 168
 
 
-@needs_files
 def test_the_fights_the_csv_leaves_untagged(instances: tuple[BossInstance, ...]) -> None:
     names = Counter(row.name for row in instances)
     assert names["Furnace Golem"] == 8
@@ -123,7 +118,6 @@ def test_the_fights_the_csv_leaves_untagged(instances: tuple[BossInstance, ...])
     assert names["Baleful Shadow"] == 1
 
 
-@needs_files
 def test_the_fights_at_odds_zero_are_kept_for_their_drops(
     instances: tuple[BossInstance, ...],
 ) -> None:
@@ -143,14 +137,12 @@ def test_the_fights_at_odds_zero_are_kept_for_their_drops(
     assert {row.odds for row in instances} == {0, 1}
 
 
-@needs_files
 def test_dryleaf_dane_has_only_his_own_fight(instances: tuple[BossInstance, ...]) -> None:
     assert [row.location_label for row in instances if row.name == "Dryleaf Dane"] == [
         "Scadu Altus - Moorth Ruins, Bonny Village West Entrance"
     ]
 
 
-@needs_files
 def test_every_pair_of_the_csv_has_an_instance(instances: tuple[BossInstance, ...]) -> None:
     overrides = _overrides()
     placed = {(row.location_label, row.name) for row in instances}
@@ -162,7 +154,6 @@ def test_every_pair_of_the_csv_has_an_instance(instances: tuple[BossInstance, ..
         assert ((instance_label or label).removeprefix(DLC_TAG), name) in placed, (label, identity)
 
 
-@needs_files
 def test_no_source_markup_reaches_a_row(instances: tuple[BossInstance, ...]) -> None:
     for row in instances:
         assert not any(mark in row.name for mark in ("[", "(", " - Broken", "EB - ", "PCR - "))
@@ -170,13 +161,11 @@ def test_no_source_markup_reaches_a_row(instances: tuple[BossInstance, ...]) -> 
     assert len({row.id for row in instances}) == len(instances)
 
 
-@needs_files
 def test_the_docs_ids_are_built_as_written(instances: tuple[BossInstance, ...]) -> None:
     ids = {row.id for row in instances}
     assert {DARRIWIL_ID, "cleanrot_knight_abandoned_cave"} <= ids
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("label", "instance", "gone"),
     [
@@ -208,7 +197,6 @@ def test_one_fight_is_one_instance(
     assert (label, gone) not in by_place
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("label", "name"),
     [
@@ -244,15 +232,13 @@ def test_the_owner_names_are_applied(
     assert (label, name) in by_place
 
 
-@needs_files
 def test_every_instance_resolves_to_a_location_and_region(
     instances: tuple[BossInstance, ...],
 ) -> None:
-    locations = {area.name for area in load_annotations(ANNOTATIONS).areas}
+    locations = {area.name for area in load_annotations(AREAS).areas}
     assert {row.location_id for row in instances} <= locations
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("label", "name", "region"),
     [

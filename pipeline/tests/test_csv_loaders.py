@@ -1,7 +1,7 @@
-"""Tests for the ten CSV loaders.
+"""Tests for the seven CSV loaders.
 
 Row counts are the ones recorded in `data.md` §7.2; they double as a regression suite for
-the raw sources. When `raw/` is absent (a public checkout) the data tests skip.
+the committed sources.
 """
 
 from __future__ import annotations
@@ -11,51 +11,50 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.loaders.bosses import load_boss_creature_locations, load_boss_summary
+from eldenrando.loaders.bosses import load_boss_creature_locations
 from eldenrando.loaders.consumables import load_consumable_categories
 from eldenrando.loaders.csv_source import CsvTable, read_table
 from eldenrando.loaders.drops import load_drop_locations, load_item_drops
 from eldenrando.loaders.schema import LoaderError
-from eldenrando.loaders.spells import load_spell_table
 from eldenrando.loaders.weapons import (
     load_ash_compatibility,
     load_somber_weapons,
     load_weapon_categories,
 )
+from eldenrando.paths import (
+    ASH_WEAPON_MATRIX,
+    ENEMY_DROPS,
+    ENEMY_ITEM_LOTS,
+    ENEMY_LOCATIONS,
+    TOOL_CONSUMABLE_CLASSES,
+    WEAPON_SHIELD_CLASSES,
+    WEAPON_SKILLS,
+)
 
-CSV_DIR = Path(__file__).resolve().parents[2] / "raw" / "csv"
-needs_data = pytest.mark.skipif(not CSV_DIR.is_dir(), reason="raw source data not present")
-
-TABLES: list[tuple[Callable[[Path], CsvTable], str, int]] = [
-    (load_drop_locations, "item_drop_locations.csv", 3254),
-    (load_item_drops, "item_drops.csv", 4896),
-    (load_boss_creature_locations, "boss_creature_locations.csv", 3254),
-    (load_weapon_categories, "weapons_shields_categories.csv", 530),
-    (load_consumable_categories, "tools_consumables_categories.csv", 90),
-    (load_ash_compatibility, "ashes_compatibility_no_DLC.csv", 91),
-    (load_somber_weapons, "ashes_somber_weapons.csv", 2654),
-    (load_spell_table, "spells.csv", 523),
-    (load_boss_summary, "bosses_with_locations_levels_runes_item_drops.csv", 158),
-    (load_boss_summary, "bosses_with_locations_levels_runes_item_drops_2.csv", 20),
+TABLES: list[tuple[Callable[[Path], CsvTable], Path, int]] = [
+    (load_drop_locations, ENEMY_DROPS, 3254),
+    (load_item_drops, ENEMY_ITEM_LOTS, 4896),
+    (load_boss_creature_locations, ENEMY_LOCATIONS, 3254),
+    (load_weapon_categories, WEAPON_SHIELD_CLASSES, 530),
+    (load_consumable_categories, TOOL_CONSUMABLE_CLASSES, 90),
+    (load_ash_compatibility, ASH_WEAPON_MATRIX, 91),
+    (load_somber_weapons, WEAPON_SKILLS, 2654),
 ]
 
 
-@needs_data
-@pytest.mark.parametrize(("loader", "filename", "expected"), TABLES)
-def test_csv_row_count(loader: Callable[[Path], CsvTable], filename: str, expected: int) -> None:
-    assert loader(CSV_DIR / filename).row_count == expected
+@pytest.mark.parametrize(("loader", "path", "expected"), TABLES)
+def test_csv_row_count(loader: Callable[[Path], CsvTable], path: Path, expected: int) -> None:
+    assert loader(path).row_count == expected
 
 
-@needs_data
 def test_every_row_matches_the_header_width() -> None:
-    for loader, filename, _ in TABLES:
-        table = loader(CSV_DIR / filename)
-        assert all(len(row) == len(table.header) for row in table.rows), filename
+    for loader, path, _ in TABLES:
+        table = loader(path)
+        assert all(len(row) == len(table.header) for row in table.rows), path
 
 
-@needs_data
 def test_boss_table_starts_after_the_legend_line() -> None:
-    table = load_boss_creature_locations(CSV_DIR / "boss_creature_locations.csv")
+    table = load_boss_creature_locations(ENEMY_LOCATIONS)
 
     assert table.header_row == 1
     assert table.column("Location") == 0
@@ -63,9 +62,8 @@ def test_boss_table_starts_after_the_legend_line() -> None:
     assert table.rows[0][:2] == ("Abandoned Cave", "Cleanrot Knight [Boss] (Sickle)")
 
 
-@needs_data
 def test_weapon_table_keeps_class_separators() -> None:
-    table = load_weapon_categories(CSV_DIR / "weapons_shields_categories.csv")
+    table = load_weapon_categories(WEAPON_SHIELD_CLASSES)
     class_column = table.column("Weapon Class")
     classes = {row[class_column] for row in table.rows if any(row)}
 

@@ -18,18 +18,15 @@ from eldenrando.loaders.name_variants import load_name_variants
 from eldenrando.loaders.weapons import load_weapon_categories
 from eldenrando.model.item import Item
 from eldenrando.model.item_catalog import ItemCatalog
+from eldenrando.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ITEMINFO = RAW / "pc_mod_data" / "iteminfo.txt"
-WEAPON_SHEET = RAW / "csv" / "weapons_shields_categories.csv"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 
 @pytest.fixture(scope="module")
 def catalog() -> ItemCatalog:
-    return load_item_catalog(ITEMINFO)
+    return load_item_catalog(ITEM_INFO)
 
 
 @pytest.fixture(scope="module")
@@ -42,14 +39,12 @@ def test_shortlist_holds_41_distinct_names() -> None:
     assert len(set(SHORTLIST)) == 41
 
 
-@needs_files
 def test_rows_are_exactly_the_shortlist(talismans: tuple[Item, ...]) -> None:
     assert [row.name for row in talismans] == list(SHORTLIST)
     assert {row.category for row in talismans} == {"talisman"}
     assert len({row.id for row in talismans}) == 41
 
 
-@needs_files
 def test_shortlist_rows_hold_no_stray_field(talismans: tuple[Item, ...]) -> None:
     for row in talismans:
         assert row.subcategory is None
@@ -58,17 +53,15 @@ def test_shortlist_rows_hold_no_stray_field(talismans: tuple[Item, ...]) -> None
         assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
 
 
-@needs_files
 def test_json_talismans_are_all_known_to_the_mod_but_one(catalog: ItemCatalog) -> None:
     known = {name.lower() for name in catalog.names["accessory"].values()}
-    records = load_document(RAW / "json-no-dlc", "talismans").records
+    records = load_document(ITEMS_DIR, "talismans").records
 
     assert {str(r["name"]) for r in records if str(r["name"]).lower() not in known} == {
         "Entwining Umbilical Cord"
     }
 
 
-@needs_files
 def test_pools_so_far_join_without_a_collision(
     catalog: ItemCatalog, talismans: tuple[Item, ...]
 ) -> None:
@@ -77,7 +70,7 @@ def test_pools_so_far_join_without_a_collision(
         catalog,
         variants,
         load_added_items(OVERRIDES / "items.csv"),
-        load_weapon_categories(WEAPON_SHEET),
+        load_weapon_categories(WEAPON_SHIELD_CLASSES),
     )
     armor = build_armor(catalog, variants)
 

@@ -17,13 +17,12 @@ from eldenrando.model.item import Item
 from eldenrando.model.name_variant import NameVariant
 from eldenrando.model.vocabulary import ARMOR_SLOTS
 from eldenrando.normalize.armor_slots import assign_armor_slots
+from eldenrando.paths import ITEM_INFO
 from eldenrando.validate.gaps import GapSources, load_sources
 from eldenrando.validate.subcategories import validate_subcategories
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-ITEMINFO = ROOT / "raw" / "pc_mod_data" / "iteminfo.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 # armors.json lists these as chests, though their game ids read as head pieces.
 ID_MISLEADS = {"Commoner's Simple Garb", "Lazuli Robe"}
@@ -40,25 +39,21 @@ def slots(sources: GapSources) -> dict[str, str | None]:
     return {row.name: row.subcategory for row in sources.table if row.category == "armor"}
 
 
-@needs_files
 def test_every_row_has_a_known_subcategory(sources: GapSources) -> None:
     validate_subcategories(sources.table)
 
 
-@needs_files
 def test_every_piece_has_exactly_one_slot(slots: dict[str, str | None]) -> None:
     assert len(slots) == 631
     assert set(slots.values()) == set(ARMOR_SLOTS)
 
 
-@needs_files
 def test_overrides_hold_the_pieces_the_json_lacks() -> None:
     assert len(load_armor_slots(OVERRIDES / "armor_slots.csv")) == 155
 
 
-@needs_files
 def test_slots_agree_with_the_game_ids_but_for_two_pieces(slots: dict[str, str | None]) -> None:
-    catalog = load_item_catalog(ITEMINFO)
+    catalog = load_item_catalog(ITEM_INFO)
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     by_id = {
         variants[str(item_id)].canonical_name if str(item_id) in variants else name: item_id
@@ -72,7 +67,6 @@ def test_slots_agree_with_the_game_ids_but_for_two_pieces(slots: dict[str, str |
     assert disagree == ID_MISLEADS
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "slot"),
     [
@@ -97,7 +91,6 @@ def test_piece_has_its_slot(slots: dict[str, str | None], name: str, slot: str) 
     assert slots[name] == slot
 
 
-@needs_files
 def test_slot_counts(slots: dict[str, str | None]) -> None:
     assert Counter(slots.values()) == {"head": 198, "body": 173, "arms": 123, "legs": 137}
 

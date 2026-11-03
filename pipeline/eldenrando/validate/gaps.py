@@ -58,6 +58,16 @@ from eldenrando.normalize.requirements import (
     assign_requirements,
 )
 from eldenrando.normalize.str_bonus import assign_str_bonus
+from eldenrando.paths import (
+    ARMOR_DIR,
+    ASH_WEAPON_MATRIX,
+    ITEM_INFO,
+    ITEM_SLOTS,
+    ITEMS_DIR,
+    TOOL_CONSUMABLE_CLASSES,
+    WEAPON_SHIELD_CLASSES,
+    WEAPON_SKILLS,
+)
 
 _ASH_SHEET_CLASSES: Mapping[str, str] = {"Staff": "glintstone_staff", "Seal": "sacred_seal"}
 _ASH_SHEET_FIRST_CLASS = "Dagger"
@@ -355,20 +365,19 @@ def load_overrides(overrides_dir: Path) -> dict[str, frozenset[str]]:
 
 
 def load_sources(root: Path) -> GapSources:
-    """Return what the checks read, from a checkout's `raw/` and `data/overrides/`."""
-    raw = root / "raw"
+    """Return what the checks read, from `data/sources/` and a checkout's `data/overrides/`."""
     overrides = root / "data" / "overrides"
-    catalog = load_item_catalog(raw / "pc_mod_data" / "iteminfo.txt")
+    catalog = load_item_catalog(ITEM_INFO)
     variants = load_name_variants(overrides / "name_variants.csv")
     ash_sources = load_ash_sources(overrides / "ash_sources.csv")
-    sheet = load_consumable_categories(raw / "csv" / "tools_consumables_categories.csv")
+    sheet = load_consumable_categories(TOOL_CONSUMABLE_CLASSES)
     weapons = build_weapons(
         catalog,
         variants,
         load_added_items(overrides / "items.csv"),
-        load_weapon_categories(raw / "csv" / "weapons_shields_categories.csv"),
+        load_weapon_categories(WEAPON_SHIELD_CLASSES),
     )
-    unique_skills = _unique_skills(load_somber_weapons(raw / "csv" / "ashes_somber_weapons.csv"))
+    unique_skills = _unique_skills(load_somber_weapons(WEAPON_SKILLS))
     weapons = assign_infusable(
         assign_str_bonus(weapons, load_str_bonus(overrides / "str_bonus_2h.csv")),
         set(unique_skills),
@@ -379,7 +388,7 @@ def load_sources(root: Path) -> GapSources:
             *weapons,
             *assign_armor_slots(
                 build_armor(catalog, variants),
-                load_document(raw / "json-no-dlc", "armors").records,
+                load_document(ARMOR_DIR, "armors").records,
                 variants,
                 load_armor_slots(overrides / "armor_slots.csv"),
             ),
@@ -392,10 +401,10 @@ def load_sources(root: Path) -> GapSources:
             none_item(),
         )
     )
-    ash_sheet = load_ash_compatibility(raw / "csv" / "ashes_compatibility_no_DLC.csv")
-    json_dir = raw / "json-no-dlc"
+    ash_sheet = load_ash_compatibility(ASH_WEAPON_MATRIX)
     requirement_records = {
-        document: load_document(json_dir, document).records for document, _, _ in REQUIREMENT_FIELDS
+        document: load_document(ITEMS_DIR, document).records
+        for document, _, _ in REQUIREMENT_FIELDS
     }
     return GapSources(
         table=assign_requirements(
@@ -413,7 +422,7 @@ def load_sources(root: Path) -> GapSources:
         ),
         unique_skills=unique_skills,
         requirement_records=requirement_records,
-        slots=load_slots(raw / "pc_mod_data" / "itemslots_stable.txt"),
+        slots=load_slots(ITEM_SLOTS),
     )
 
 

@@ -18,8 +18,6 @@ from eldenrando.validate.ash_compatibility import infusable_without_ashes
 from eldenrando.validate.gaps import GapSources, load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
-ITEMINFO = ROOT / "raw" / "pc_mod_data" / "iteminfo.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 
 @pytest.fixture(scope="module")
@@ -58,7 +56,6 @@ def _ash(name: str) -> Item:
     return new_item(name, "ash")
 
 
-@needs_files
 def test_parry_fits_what_the_docs_say(rows: dict[str, set[tuple[str, str | None]]]) -> None:
     assert rows["Parry"] == {
         ("weapon", "dagger"),
@@ -72,7 +69,6 @@ def test_parry_fits_what_the_docs_say(rows: dict[str, set[tuple[str, str | None]
     }
 
 
-@needs_files
 @pytest.mark.parametrize(
     "name", ["Carian Retaliation", "Golden Parry", "Storm Wall", "Thops's Barrier"]
 )
@@ -82,7 +78,6 @@ def test_shield_parry_ash_fits_small_and_medium_shields_only(
     assert rows[name] == {("shield", "small_shield"), ("shield", "medium_shield")}
 
 
-@needs_files
 def test_only_spinning_weapon_fits_staves_and_nothing_fits_seals(
     rows: dict[str, set[tuple[str, str | None]]],
 ) -> None:
@@ -91,7 +86,6 @@ def test_only_spinning_weapon_fits_staves_and_nothing_fits_seals(
     assert not any(("weapon", "sacred_seal") in fits for fits in rows.values())
 
 
-@needs_files
 @pytest.mark.parametrize("subcategory", ["crossbow", "ballista"])
 def test_nothing_fits_the_classes_that_never_hold_an_ash(
     rows: dict[str, set[tuple[str, str | None]]], subcategory: str
@@ -99,12 +93,10 @@ def test_nothing_fits_the_classes_that_never_hold_an_ash(
     assert not any(("weapon", subcategory) in fits for fits in rows.values())
 
 
-@needs_files
 def test_raging_beast_fits_the_class(rows: dict[str, set[tuple[str, str | None]]]) -> None:
     assert rows["Raging Beast"] == {("weapon", "beast_claw")}
 
 
-@needs_files
 def test_no_row_is_covered_by_a_broader_one(sources: GapSources) -> None:
     whole = {(row.ash_id, row.category) for row in sources.ash_compatibility if not row.subcategory}
     assert whole
@@ -115,17 +107,14 @@ def test_no_row_is_covered_by_a_broader_one(sources: GapSources) -> None:
     ]
 
 
-@needs_files
 def test_excluded_ashes_have_no_rows(rows: dict[str, set[tuple[str, str | None]]]) -> None:
     assert not {"Kick", "Lifesteal Fist", "White Shadow's Lure", "Assassin's Gambit"} & set(rows)
 
 
-@needs_files
 def test_every_weapon_that_can_hold_an_ash_has_one(sources: GapSources) -> None:
     assert infusable_without_ashes(sources.table, sources.ash_compatibility) == ()
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("ash", "fit"),
     [
@@ -145,14 +134,12 @@ def test_dlc_ash_fits_its_classes(
     assert rows[ash] == fit
 
 
-@needs_files
 def test_lightning_slash_does_not_fit_halberds(
     rows: dict[str, set[tuple[str, str | None]]],
 ) -> None:
     assert ("weapon", "halberd") not in rows["Lightning Slash"]
 
 
-@needs_files
 def test_no_weapon_that_cannot_hold_an_ash_is_reported_missing(sources: GapSources) -> None:
     missing = infusable_without_ashes(sources.table, sources.ash_compatibility)
     assert all(item.infusable for item in missing)

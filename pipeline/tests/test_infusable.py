@@ -15,8 +15,6 @@ from eldenrando.normalize.infusable import assign_infusable
 from eldenrando.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
-ITEMINFO = ROOT / "raw" / "pc_mod_data" / "iteminfo.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 
 @pytest.fixture(scope="module")
@@ -24,7 +22,6 @@ def table() -> tuple[Item, ...]:
     return load_sources(ROOT).table
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "expected"),
     [
@@ -64,7 +61,6 @@ def test_weapon_has_its_flag(table: tuple[Item, ...], name: str, expected: bool)
     assert next(row for row in table if row.name == name).infusable is expected
 
 
-@needs_files
 def test_of_the_smithscript_weapons_only_the_shield_cannot_hold_an_ash(
     table: tuple[Item, ...],
 ) -> None:
@@ -73,7 +69,6 @@ def test_of_the_smithscript_weapons_only_the_shield_cannot_hold_an_ash(
     assert [row.name for row in smithscript if not row.infusable] == ["Smithscript Shield"]
 
 
-@needs_files
 def test_catalysts_follow_the_owners_decision(table: tuple[Item, ...]) -> None:
     staves = {row.name for row in table if row.subcategory == "glintstone_staff" and row.infusable}
     seals = [row for row in table if row.subcategory == "sacred_seal"]
@@ -83,7 +78,6 @@ def test_catalysts_follow_the_owners_decision(table: tuple[Item, ...]) -> None:
     assert not any(row.infusable for row in seals)
 
 
-@needs_files
 @pytest.mark.parametrize("subcategory", ["crossbow", "ballista"])
 def test_class_that_never_holds_an_ash(table: tuple[Item, ...], subcategory: str) -> None:
     rows = [row for row in table if row.subcategory == subcategory]
@@ -91,7 +85,6 @@ def test_class_that_never_holds_an_ash(table: tuple[Item, ...], subcategory: str
     assert not any(row.infusable for row in rows)
 
 
-@needs_files
 def test_other_categories_stay_null(table: tuple[Item, ...]) -> None:
     others = [row for row in table if row.category not in ("weapon", "shield")]
     assert others

@@ -11,10 +11,9 @@ from eldenrando.build.items import build_item_table, new_item, none_item
 from eldenrando.errors import BuildError
 from eldenrando.loaders.iteminfo import load_item_catalog
 from eldenrando.normalize.slug import slugify
+from eldenrando.paths import ITEM_INFO
 
 ROOT = Path(__file__).resolve().parents[2]
-ITEMINFO = ROOT / "raw" / "pc_mod_data" / "iteminfo.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 SECTION_2_FIELDS = [
     "id",
@@ -49,9 +48,8 @@ def test_slug_of_a_name(name: str, slug: str) -> None:
     assert slugify(name) == slug
 
 
-@needs_files
 def test_every_catalog_name_has_a_clean_slug() -> None:
-    names = load_item_catalog(ITEMINFO).names
+    names = load_item_catalog(ITEM_INFO).names
 
     slugs = [slugify(name) for entries in names.values() for name in entries.values()]
 

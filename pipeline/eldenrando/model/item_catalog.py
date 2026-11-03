@@ -1,4 +1,4 @@
-"""The item lookup built from `iteminfo.txt`.
+"""The item lookup built from `item_info.yaml`.
 
 `iteminfo` is a **lookup, not the catalog**. It names 2,448 items across five categories,
 most of which (runes, keys, cookbooks, crafting materials) can never be rolled. The `item`
@@ -36,7 +36,7 @@ class CatalogLocation:
 
 @dataclass(frozen=True, slots=True)
 class ItemCatalog:
-    """Ids, names, counts, groups and locations from `iteminfo.txt`."""
+    """Ids, names, counts, groups and locations from `item_info.yaml`."""
 
     names: dict[str, dict[int, str]]
     counts: dict[str, dict[int, int]]

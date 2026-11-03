@@ -1,8 +1,8 @@
 """Read a YAML source document from disk.
 
-Every file under `raw/pc_mod_data/` is YAML despite the `.txt` extension, so one reader
-serves all of them. Parse and I/O failures become `LoaderError` with the file path so the
-build can report what broke without a traceback.
+The mod's files under `data/sources/` are YAML, so one reader serves all of them. Parse and I/O
+failures become `LoaderError` with the file path so the build can report what broke without a
+traceback.
 """
 
 from __future__ import annotations

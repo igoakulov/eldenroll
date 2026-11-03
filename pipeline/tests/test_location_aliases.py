@@ -34,14 +34,20 @@ from eldenrando.loaders.schema import (
 )
 from eldenrando.loaders.yaml_source import load_mapping
 from eldenrando.model.annotations import Area
+from eldenrando.paths import (
+    AREAS,
+    ENEMY_DROPS,
+    ENEMY_ITEM_LOTS,
+    ENEMY_LOCATIONS,
+    ITEM_SLOTS,
+    LOCATIONS_DIR,
+    SUBMAPS,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
 ALIASES_CSV = OVERRIDES / "location_aliases.csv"
 BOSS_OVERRIDES_CSV = OVERRIDES / "boss_location_overrides.csv"
-RAW = ROOT / "raw"
-MOD_DATA = RAW / "pc_mod_data"
-needs_files = pytest.mark.skipif(not MOD_DATA.is_dir(), reason="raw data not present")
 
 DLC_TAG = "[DLC] "
 SLOT_LABEL = re.compile(r" in m\d\d_\d\d_\d\d_\d\d \((.*?)\)(?:,|\])")
@@ -57,7 +63,7 @@ JORI_LABEL = "[DLC] Abyssal Woods - Forsaken Graveyard, Darklight Catacombs Exit
 
 
 def _areas() -> tuple[Area, ...]:
-    return load_annotations(MOD_DATA / "annotations_stable.txt").areas
+    return load_annotations(AREAS).areas
 
 
 def _aliases() -> dict[str, str]:
@@ -80,13 +86,13 @@ def _region_of_area() -> dict[str, str]:
 
 
 def _drop_labels() -> set[str]:
-    table = load_drop_locations(RAW / "csv" / "item_drop_locations.csv")
+    table = load_drop_locations(ENEMY_DROPS)
     column = table.column("Location")
     return {row[column] for row in table.rows}
 
 
 def _item_drop_labels() -> set[str]:
-    table = load_item_drops(RAW / "csv" / "item_drops.csv")
+    table = load_item_drops(ENEMY_ITEM_LOTS)
     column = table.column("Location #1")
     return {row[column] for row in table.rows}
 
@@ -97,7 +103,7 @@ def _boss_identity(name: str) -> str:
 
 
 def _boss_pairs() -> set[tuple[str, str]]:
-    table = load_boss_creature_locations(RAW / "csv" / "boss_creature_locations.csv")
+    table = load_boss_creature_locations(ENEMY_LOCATIONS)
     label = table.column("Location")
     name = table.column("Name")
     return {
@@ -106,8 +112,8 @@ def _boss_pairs() -> set[tuple[str, str]]:
 
 
 def _submap_areas() -> dict[str, set[str]]:
-    """Return each label `submaps.txt` names with the areas it assigns that label."""
-    document = load_mapping(MOD_DATA / "submaps.txt")
+    """Return each label `submaps.yaml` names with the areas it assigns that label."""
+    document = load_mapping(SUBMAPS)
     named: dict[str, set[str]] = {}
     for index, entry in enumerate(require_sequence(document.get("MapAreas"), "MapAreas")):
         where = f"MapAreas[{index}]"
@@ -124,7 +130,7 @@ def _submap_areas() -> dict[str, set[str]]:
 def _slot_lines_by_label() -> dict[str, list[tuple[str, str]]]:
     """Return `{label: [(slot area, lowercase placement line)]}` for randomizable slots."""
     lines: dict[str, list[tuple[str, str]]] = defaultdict(list)
-    for slot in load_slots(MOD_DATA / "itemslots_stable.txt"):
+    for slot in load_slots(ITEM_SLOTS):
         if not slot.is_randomizable:
             continue
         for line in slot.debug_lines:
@@ -134,7 +140,6 @@ def _slot_lines_by_label() -> dict[str, list[tuple[str, str]]]:
     return lines
 
 
-@needs_files
 def test_every_label_from_all_three_sources_resolves() -> None:
     aliases = _aliases()
     drop_labels = _drop_labels()
@@ -153,7 +158,6 @@ def test_every_label_from_all_three_sources_resolves() -> None:
     assert resolution.resolved == aliases
 
 
-@needs_files
 def test_labels_agree_with_the_mod_submaps() -> None:
     aliases = _aliases()
     submaps = _submap_areas()
@@ -168,7 +172,6 @@ def test_labels_agree_with_the_mod_submaps() -> None:
     assert disagreeing == set()
 
 
-@needs_files
 def test_dlc_tag_matches_the_area_dlc_flag() -> None:
     dlc_areas = {area.name for area in _areas() if area.is_dlc}
 
@@ -180,11 +183,10 @@ def test_dlc_tag_matches_the_area_dlc_flag() -> None:
     assert mismatched == set()
 
 
-@needs_files
 def test_boss_label_coverage_matches_the_document() -> None:
     boss_labels = {label.removeprefix(DLC_TAG) for _, label in _boss_pairs()}
     area_texts = {area.text for area in _areas()}
-    records = load_document(RAW / "json-no-dlc", "locations").records
+    records = load_document(LOCATIONS_DIR, "location_names").records
     json_names = {str(record["name"]).casefold() for record in records}
 
     verbatim = {label for label in boss_labels if label in area_texts}
@@ -194,7 +196,6 @@ def test_boss_label_coverage_matches_the_document() -> None:
     assert len(boss_labels - verbatim - in_json) == 125
 
 
-@needs_files
 def test_every_boss_is_in_the_region_of_its_own_drop_slot() -> None:
     aliases = _aliases()
     overrides = _boss_overrides(aliases)
@@ -220,14 +221,12 @@ def test_every_boss_is_in_the_region_of_its_own_drop_slot() -> None:
     assert wrong == []
 
 
-@needs_files
 def test_every_boss_override_names_a_real_boss_on_that_label() -> None:
     aliases = _aliases()
 
     assert set(_boss_overrides(aliases)) <= _boss_pairs()
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("boss", "label", "region"),
     [

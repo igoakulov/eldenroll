@@ -15,8 +15,6 @@ from eldenrando.normalize.requirements import assign_requirements, readable_stat
 from eldenrando.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
-ITEMINFO = ROOT / "raw" / "pc_mod_data" / "iteminfo.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 BEARS_STATS = ("weapon", "shield", "sorcery", "incantation")
 
 
@@ -47,24 +45,20 @@ def _assign(
     return assign_requirements([row], records, variants or {}, overrides or {})[0]
 
 
-@needs_files
 def test_requirements_are_five_integers_on_every_row(table: tuple[Item, ...]) -> None:
     for row in table:
         assert all(isinstance(stat, int) and stat >= 0 for stat in _stats(row)), row.name
 
 
-@needs_files
 def test_only_items_that_bear_stats_have_any(table: tuple[Item, ...]) -> None:
     assert not [row.name for row in table if row.category not in BEARS_STATS and any(_stats(row))]
 
 
-@needs_files
 def test_only_serpent_hunter_has_no_requirements(table: tuple[Item, ...]) -> None:
     zeros = {row.name for row in table if row.category in BEARS_STATS and not any(_stats(row))}
     assert zeros == {"Serpent-Hunter"}
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "stats"),
     [

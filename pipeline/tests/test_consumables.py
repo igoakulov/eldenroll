@@ -24,14 +24,10 @@ from eldenrando.loaders.iteminfo import load_item_catalog
 from eldenrando.loaders.name_variants import load_name_variants
 from eldenrando.loaders.weapons import load_weapon_categories
 from eldenrando.model.item import Item
+from eldenrando.paths import ITEM_INFO, TOOL_CONSUMABLE_CLASSES, WEAPON_SHIELD_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ITEMINFO = RAW / "pc_mod_data" / "iteminfo.txt"
-WEAPON_SHEET = RAW / "csv" / "weapons_shields_categories.csv"
-SHEET = RAW / "csv" / "tools_consumables_categories.csv"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 
 def _sheet(*rows: tuple[str, str, str]) -> CsvTable:
@@ -46,7 +42,7 @@ def _sheet(*rows: tuple[str, str, str]) -> CsvTable:
 
 @pytest.fixture(scope="module")
 def consumables() -> tuple[Item, ...]:
-    return build_consumables(load_consumable_categories(SHEET))
+    return build_consumables(load_consumable_categories(TOOL_CONSUMABLE_CLASSES))
 
 
 @pytest.fixture(scope="module")
@@ -58,7 +54,6 @@ def test_named_throwables_are_18() -> None:
     assert len(NAMED_THROWABLES) == 18
 
 
-@needs_files
 def test_rows_names_and_slugs_are_all_81(consumables: tuple[Item, ...]) -> None:
     assert len(consumables) == 81
     assert len({row.name for row in consumables}) == 81
@@ -66,7 +61,6 @@ def test_rows_names_and_slugs_are_all_81(consumables: tuple[Item, ...]) -> None:
     assert {row.category for row in consumables} == {"consumable"}
 
 
-@needs_files
 def test_class_split_is_50_6_25(consumables: tuple[Item, ...]) -> None:
     assert Counter(row.subcategory for row in consumables) == {
         "pots": 50,
@@ -75,13 +69,11 @@ def test_class_split_is_50_6_25(consumables: tuple[Item, ...]) -> None:
     }
 
 
-@needs_files
 @pytest.mark.parametrize("name", [NOT_AN_ITEM, *TOOLS, *TRANSFORMS])
 def test_name_outside_the_pool_is_absent(names: set[str], name: str) -> None:
     assert name not in names
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "subcategory"),
     [
@@ -102,7 +94,6 @@ def test_consumable_has_its_class(
     assert {row.name: row.subcategory for row in consumables}[name] == subcategory
 
 
-@needs_files
 def test_later_steps_own_the_remaining_fields(consumables: tuple[Item, ...]) -> None:
     for row in consumables:
         assert row.infusable is None
@@ -112,23 +103,22 @@ def test_later_steps_own_the_remaining_fields(consumables: tuple[Item, ...]) -> 
         assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
 
 
-@needs_files
 def test_the_whole_catalog_joins_into_1514_rows(consumables: tuple[Item, ...]) -> None:
-    catalog = load_item_catalog(ITEMINFO)
+    catalog = load_item_catalog(ITEM_INFO)
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     pools = {
         "weapons": build_weapons(
             catalog,
             variants,
             load_added_items(OVERRIDES / "items.csv"),
-            load_weapon_categories(WEAPON_SHEET),
+            load_weapon_categories(WEAPON_SHIELD_CLASSES),
         ),
         "armor": build_armor(catalog, variants),
         "talismans": build_talismans(catalog),
         "ashes": build_ashes(catalog, variants, load_ash_sources(OVERRIDES / "ash_sources.csv")),
         "sorceries": build_sorceries(catalog, variants),
         "incantations": build_incantations(catalog, variants),
-        "tools": build_tools(catalog, load_consumable_categories(SHEET)),
+        "tools": build_tools(catalog, load_consumable_categories(TOOL_CONSUMABLE_CLASSES)),
         "consumables": consumables,
     }
     rows = (*(row for pool in pools.values() for row in pool), none_item())

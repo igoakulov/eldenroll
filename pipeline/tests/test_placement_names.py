@@ -29,13 +29,17 @@ from eldenrando.model.item import Item
 from eldenrando.model.item_catalog import ItemCatalog
 from eldenrando.model.name_variant import NameVariant
 from eldenrando.normalize.placement_names import PlacementNames, placement_names
+from eldenrando.paths import (
+    ENEMY_DROPS,
+    ENEMY_ITEM_LOTS,
+    ITEM_INFO,
+    ITEM_SLOTS,
+    TOOL_CONSUMABLE_CLASSES,
+    WEAPON_SHIELD_CLASSES,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ITEMINFO = RAW / "pc_mod_data" / "iteminfo.txt"
-SLOTS = RAW / "pc_mod_data" / "itemslots_stable.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 _DROP_CELL = re.compile(r"^(.*) - \{\d+\} \(.*?\) \[.*?\]$")
 _EMPTY_CATALOG = ItemCatalog(
@@ -71,7 +75,7 @@ SECTION_8_4: tuple[tuple[str, str], ...] = (
 
 @pytest.fixture(scope="module")
 def catalog() -> ItemCatalog:
-    return load_item_catalog(ITEMINFO)
+    return load_item_catalog(ITEM_INFO)
 
 
 @pytest.fixture(scope="module")
@@ -81,14 +85,14 @@ def variants() -> dict[str, NameVariant]:
 
 @pytest.fixture(scope="module")
 def table(catalog: ItemCatalog, variants: dict[str, NameVariant]) -> tuple[Item, ...]:
-    sheet = load_consumable_categories(RAW / "csv" / "tools_consumables_categories.csv")
+    sheet = load_consumable_categories(TOOL_CONSUMABLE_CLASSES)
     return build_item_table(
         (
             *build_weapons(
                 catalog,
                 variants,
                 load_added_items(OVERRIDES / "items.csv"),
-                load_weapon_categories(RAW / "csv" / "weapons_shields_categories.csv"),
+                load_weapon_categories(WEAPON_SHIELD_CLASSES),
             ),
             *build_armor(catalog, variants),
             *build_talismans(catalog),
@@ -111,28 +115,28 @@ def names(
 
 def _slot_lines() -> Iterator[tuple[str, str]]:
     """Yield `(area, line)` for every line of a randomizable slot."""
-    for slot in load_slots(SLOTS):
+    for slot in load_slots(ITEM_SLOTS):
         if slot.is_randomizable:
             for line in slot.debug_lines:
                 yield slot.area, line
 
 
-def _rows(file_name: str) -> list[list[str]]:
-    with (RAW / "csv" / file_name).open(encoding="utf-8-sig", newline="") as handle:
+def _rows(path: Path) -> list[list[str]]:
+    with path.open(encoding="utf-8-sig", newline="") as handle:
         return list(csv.reader(handle))
 
 
 def _drop_names() -> set[str]:
     """Return every item name of both drop CSVs, leaving out rows that are not places."""
     out: set[str] = set()
-    header, *rows = _rows("item_drop_locations.csv")
+    header, *rows = _rows(ENEMY_DROPS)
     columns = [index for index, title in enumerate(header) if title.startswith("Drop ")]
     for row in rows:
         for column in columns:
             matched = _DROP_CELL.match(row[column])
             if matched:
                 out.add(matched[1].strip())
-    header, *rows = _rows("item_drops.csv")
+    header, *rows = _rows(ENEMY_ITEM_LOTS)
     place = header.index("Location #1")
     columns = [index for index, title in enumerate(header) if re.match(r"Items? Drop \d+", title)]
     for row in rows:
@@ -154,7 +158,6 @@ def _small_names(*variants: NameVariant) -> PlacementNames:
     return placement_names(rows, _EMPTY_CATALOG, {row.source_id: row for row in variants})
 
 
-@needs_files
 @pytest.mark.parametrize(("source_name", "canonical_name"), SECTION_8_4)
 def test_section_8_4_row_is_in_the_table(
     variants: dict[str, NameVariant], source_name: str, canonical_name: str
@@ -163,12 +166,10 @@ def test_section_8_4_row_is_in_the_table(
     assert [row.canonical_name for row in rows] == [canonical_name]
 
 
-@needs_files
 def test_the_table_holds_nothing_beyond_section_8_4(variants: dict[str, NameVariant]) -> None:
     assert {(row.source_name, row.canonical_name) for row in variants.values()} == set(SECTION_8_4)
 
 
-@needs_files
 def test_only_names_with_no_other_meaning_apply_by_name(variants: dict[str, NameVariant]) -> None:
     assert {row.source_name for row in variants.values() if row.by_name} == {
         "Sacred Butchering Knife",
@@ -177,7 +178,6 @@ def test_only_names_with_no_other_meaning_apply_by_name(variants: dict[str, Name
     }
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("source_name", "name", "category"),
     [
@@ -215,7 +215,6 @@ def test_source_name_resolves(
     assert (item.name, item.category) == (name, category)
 
 
-@needs_files
 @pytest.mark.parametrize(
     "source_name",
     [
@@ -233,7 +232,6 @@ def test_name_outside_the_pool_resolves_to_nothing(names: PlacementNames, source
     assert names.resolve(source_name) is None
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("needle", "area", "item_id"),
     [
@@ -251,19 +249,16 @@ def test_slot_line_id_tells_the_two_beast_claws_apart(
     assert item.id == item_id
 
 
-@needs_files
 def test_golden_vow_slot_lines_never_reach_the_ash(names: PlacementNames) -> None:
     lines = [line for _, line in _slot_lines() if line.startswith("Golden Vow - ")]
     assert len(lines) == 4
     assert [names.resolve_slot_line(line) for line in lines] == [None] * 4
 
 
-@needs_files
 def test_prose_line_resolves_to_nothing(names: PlacementNames) -> None:
     assert names.resolve_slot_line("By Sellia (m60) - 1 away, 3 o'clock, 2 height offset") is None
 
 
-@needs_files
 def test_every_rollable_item_but_the_weapon_only_ashes_is_named(
     table: tuple[Item, ...], names: PlacementNames
 ) -> None:
@@ -277,7 +272,6 @@ def test_every_rollable_item_but_the_weapon_only_ashes_is_named(
     assert unnamed == set(load_ash_sources(OVERRIDES / "ash_sources.csv"))
 
 
-@needs_files
 def test_nox_pieces_come_only_from_the_drop_sheet(names: PlacementNames) -> None:
     slot_ids = {item.id for _, line in _slot_lines() if (item := names.resolve_slot_line(line))}
     assert not {"nox_bracelets", "nox_greaves"} & slot_ids
@@ -285,10 +279,10 @@ def test_nox_pieces_come_only_from_the_drop_sheet(names: PlacementNames) -> None
     assert {"nox_bracelets", "nox_greaves"} <= drop_ids
 
 
-@needs_files
 def test_new_unmatched_placement_name_fails(catalog: ItemCatalog, names: PlacementNames) -> None:
     known = {name for entries in catalog.names.values() for name in entries.values()}
-    slot_names = {name for slot in load_slots(SLOTS) if slot.is_randomizable for name in slot.items}
+    slots = load_slots(ITEM_SLOTS)
+    slot_names = {name for slot in slots if slot.is_randomizable for name in slot.items}
     unknown = {
         name
         for name in slot_names | _drop_names()

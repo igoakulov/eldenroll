@@ -1,4 +1,4 @@
-"""Load `annotations_stable.txt` into `AnnotationConfig`."""
+"""Load `areas.yaml` into `AnnotationConfig`."""
 
 from __future__ import annotations
 

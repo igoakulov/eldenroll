@@ -1,4 +1,4 @@
-"""Load `iteminfo.txt` into an `ItemCatalog` lookup."""
+"""Load `item_info.yaml` into an `ItemCatalog` lookup."""
 
 from __future__ import annotations
 

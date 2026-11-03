@@ -22,14 +22,16 @@ from eldenrando.loaders.schema import LoaderError
 from eldenrando.loaders.weapons import load_ash_compatibility, load_weapon_categories
 from eldenrando.model.item import Item
 from eldenrando.model.item_catalog import CatalogGroup, ItemCatalog
+from eldenrando.paths import (
+    ASH_WEAPON_MATRIX,
+    ITEM_INFO,
+    ITEM_SLOTS,
+    ITEMS_DIR,
+    WEAPON_SHIELD_CLASSES,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ITEMINFO = RAW / "pc_mod_data" / "iteminfo.txt"
-WEAPON_SHEET = RAW / "csv" / "weapons_shields_categories.csv"
-COMPATIBILITY = RAW / "csv" / "ashes_compatibility_no_DLC.csv"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 ASH_SOURCES = OVERRIDES / "ash_sources.csv"
 NOT_IN_THE_COMPATIBILITY_SHEET = {
@@ -79,7 +81,7 @@ def _catalog(names: dict[int, str]) -> ItemCatalog:
 
 @pytest.fixture(scope="module")
 def catalog() -> ItemCatalog:
-    return load_item_catalog(ITEMINFO)
+    return load_item_catalog(ITEM_INFO)
 
 
 @pytest.fixture(scope="module")
@@ -96,7 +98,6 @@ def names(ashes: tuple[Item, ...]) -> set[str]:
     return {row.name for row in ashes}
 
 
-@needs_files
 def test_rows_names_and_slugs_are_all_111(ashes: tuple[Item, ...]) -> None:
     assert len(ashes) == 111
     assert len({row.name for row in ashes}) == 111
@@ -104,7 +105,6 @@ def test_rows_names_and_slugs_are_all_111(ashes: tuple[Item, ...]) -> None:
     assert {row.category for row in ashes} == {"ash"}
 
 
-@needs_files
 @pytest.mark.parametrize("name", [*sorted(EXCLUDED), "Savage Claws"])
 def test_ash_is_absent(names: set[str], name: str) -> None:
     assert name not in names
@@ -125,13 +125,12 @@ def test_ash_sources_file_lists_every_weapon() -> None:
     }
 
 
-@needs_files
 def test_every_source_weapon_is_in_the_weapon_pool(catalog: ItemCatalog) -> None:
     weapons = build_weapons(
         catalog,
         load_name_variants(OVERRIDES / "name_variants.csv"),
         load_added_items(OVERRIDES / "items.csv"),
-        load_weapon_categories(WEAPON_SHEET),
+        load_weapon_categories(WEAPON_SHIELD_CLASSES),
     )
     pool = {row.name for row in weapons}
     sources = load_ash_sources(ASH_SOURCES)
@@ -141,12 +140,11 @@ def test_every_source_weapon_is_in_the_weapon_pool(catalog: ItemCatalog) -> None
     assert {re.sub(r" \+\d+$", "", weapon) for weapon in named} <= pool
 
 
-@needs_files
 @pytest.mark.parametrize(
     "weapon", ["Banished Knight's Halberd +8", "Rogier's Rapier +8", "Igon's Greatbow"]
 )
 def test_upgraded_source_is_named_as_the_slot_lines_name_it(weapon: str) -> None:
-    text = (RAW / "pc_mod_data" / "itemslots_stable.txt").read_text(encoding="utf-8")
+    text = (ITEM_SLOTS).read_text(encoding="utf-8")
 
     assert f"{weapon} - lot " in text or f"{weapon} - enemy lot " in text
 
@@ -175,7 +173,6 @@ def test_repeated_ash_source_stops_the_load(tmp_path: Path) -> None:
         load_ash_sources(path)
 
 
-@needs_files
 @pytest.mark.parametrize(
     "name",
     [
@@ -194,12 +191,10 @@ def test_ash_is_present(names: set[str], name: str) -> None:
     assert name in names
 
 
-@needs_files
 def test_no_name_keeps_the_prefix(names: set[str]) -> None:
     assert not [name for name in names if "ash of war" in name.lower()]
 
 
-@needs_files
 def test_later_steps_own_the_remaining_fields(ashes: tuple[Item, ...]) -> None:
     for row in ashes:
         assert row.subcategory is None
@@ -208,9 +203,8 @@ def test_later_steps_own_the_remaining_fields(ashes: tuple[Item, ...]) -> None:
         assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
 
 
-@needs_files
 def test_compatibility_sheet_differs_from_the_pool_only_as_known(names: set[str]) -> None:
-    table = load_ash_compatibility(COMPATIBILITY)
+    table = load_ash_compatibility(ASH_WEAPON_MATRIX)
     column = table.column("Name")
     sheet = {row[column] for row in table.rows if row[column]}
 
@@ -218,11 +212,10 @@ def test_compatibility_sheet_differs_from_the_pool_only_as_known(names: set[str]
     assert names - sheet == NOT_IN_THE_COMPATIBILITY_SHEET
 
 
-@needs_files
 def test_every_json_ash_maps_to_the_pool_or_is_known(names: set[str]) -> None:
     pool = {name.lower() for name in names}
     unmatched: set[str] = set()
-    for record in load_document(RAW / "json-no-dlc", "ashes").records:
+    for record in load_document(ITEMS_DIR, "ashes").records:
         name = re.sub(r"^Ash(es)? Of War: ", "", str(record["name"]))
         if name.lower() not in pool:
             unmatched.add(name)
@@ -230,7 +223,6 @@ def test_every_json_ash_maps_to_the_pool_or_is_known(names: set[str]) -> None:
     assert unmatched == EXCLUDED | {"Lost Ashes Of War"}
 
 
-@needs_files
 def test_pools_so_far_join_without_a_collision(
     catalog: ItemCatalog, ashes: tuple[Item, ...]
 ) -> None:
@@ -239,7 +231,7 @@ def test_pools_so_far_join_without_a_collision(
         catalog,
         variants,
         load_added_items(OVERRIDES / "items.csv"),
-        load_weapon_categories(WEAPON_SHEET),
+        load_weapon_categories(WEAPON_SHIELD_CLASSES),
     )
     rows = (*weapons, *build_armor(catalog, variants), *build_talismans(catalog), *ashes)
 

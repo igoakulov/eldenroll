@@ -1,4 +1,4 @@
-"""One placement slot from `itemslots_stable.txt`.
+"""One placement slot from `item_slots.yaml`.
 
 A slot is a place in the world that holds items in the unrandomized game. The randomizer
 adds one more slot per place (`Area: unknown`, `Key` starting `999999`) which is a mod test

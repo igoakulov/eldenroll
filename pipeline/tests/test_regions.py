@@ -13,7 +13,6 @@ from eldenrando.loaders.regions import load_regions
 from eldenrando.loaders.schema import LoaderError
 
 REGIONS_CSV = Path(__file__).resolve().parents[2] / "data" / "overrides" / "regions.csv"
-needs_data = pytest.mark.skipif(not REGIONS_CSV.is_file(), reason="region seed not present")
 
 EXPECTED: list[tuple[str, str, int]] = [
     ("limgrave", "Limgrave, Weeping Peninsula & Siofra", 1),
@@ -36,14 +35,12 @@ EXPECTED: list[tuple[str, str, int]] = [
 ]
 
 
-@needs_data
 def test_region_seed_matches_the_documented_rows() -> None:
     regions = load_regions(REGIONS_CSV)
 
     assert [(region.id, region.name, region.region_level) for region in regions] == EXPECTED
 
 
-@needs_data
 def test_region_levels_are_unique_and_ascending() -> None:
     levels = [region.region_level for region in load_regions(REGIONS_CSV)]
 
@@ -51,7 +48,6 @@ def test_region_levels_are_unique_and_ascending() -> None:
     assert len(set(levels)) == len(levels)
 
 
-@needs_data
 def test_dlc_split_is_twelve_and_five() -> None:
     regions = load_regions(REGIONS_CSV)
     base = [region for region in regions if not region.is_dlc]

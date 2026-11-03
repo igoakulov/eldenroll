@@ -1,4 +1,4 @@
-"""Areas and events from `annotations_stable.txt`.
+"""Areas and events from `areas.yaml`.
 
 The file is the randomizer's whole configuration. Only two sections are modelled here:
 `Areas` (the 174 canonical areas) and `Events` (46 named progression events, 42 of which
@@ -44,7 +44,7 @@ class GameEvent:
 
 @dataclass(frozen=True, slots=True)
 class AnnotationConfig:
-    """The modelled sections of `annotations_stable.txt`."""
+    """The modelled sections of `areas.yaml`."""
 
     areas: tuple[Area, ...]
     events: tuple[GameEvent, ...]

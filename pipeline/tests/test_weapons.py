@@ -20,13 +20,10 @@ from eldenrando.loaders.weapons import load_weapon_categories
 from eldenrando.model.item import Item
 from eldenrando.model.item_catalog import CatalogGroup, ItemCatalog
 from eldenrando.model.name_variant import NameVariant
+from eldenrando.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ITEMINFO = RAW / "pc_mod_data" / "iteminfo.txt"
-WEAPON_SHEET = RAW / "csv" / "weapons_shields_categories.csv"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 PRD_CLASSES = {
     "dagger",
@@ -114,10 +111,10 @@ def _sheet(*rows: tuple[str, str]) -> CsvTable:
 @pytest.fixture(scope="module")
 def weapons() -> tuple[Item, ...]:
     return build_weapons(
-        load_item_catalog(ITEMINFO),
+        load_item_catalog(ITEM_INFO),
         load_name_variants(OVERRIDES / "name_variants.csv"),
         load_added_items(OVERRIDES / "items.csv"),
-        load_weapon_categories(WEAPON_SHEET),
+        load_weapon_categories(WEAPON_SHIELD_CLASSES),
     )
 
 
@@ -126,7 +123,6 @@ def by_name(weapons: tuple[Item, ...]) -> dict[str, Item]:
     return {row.name: row for row in weapons}
 
 
-@needs_files
 def test_rows_names_and_slugs_are_all_487(weapons: tuple[Item, ...]) -> None:
     assert len(weapons) == 487
     assert len({row.name for row in weapons}) == 487
@@ -134,24 +130,20 @@ def test_rows_names_and_slugs_are_all_487(weapons: tuple[Item, ...]) -> None:
     assert build_item_table(weapons) == weapons
 
 
-@needs_files
 def test_category_split_is_409_weapons_and_78_shields(weapons: tuple[Item, ...]) -> None:
     assert Counter(row.category for row in weapons) == {"weapon": 409, "shield": 78}
 
 
-@needs_files
 def test_every_shield_class_and_only_those_are_shields(weapons: tuple[Item, ...]) -> None:
     shield_classes = {"small_shield", "medium_shield", "greatshield"}
 
     assert all((row.category == "shield") == (row.subcategory in shield_classes) for row in weapons)
 
 
-@needs_files
 def test_classes_are_exactly_the_42_in_the_prd(weapons: tuple[Item, ...]) -> None:
     assert {row.subcategory for row in weapons} == PRD_CLASSES
 
 
-@needs_files
 def test_catalyst_and_odd_weapon_counts(weapons: tuple[Item, ...]) -> None:
     counts = Counter(row.subcategory for row in weapons)
 
@@ -161,7 +153,6 @@ def test_catalyst_and_odd_weapon_counts(weapons: tuple[Item, ...]) -> None:
     assert counts["perfume_bottle"] == 5
 
 
-@needs_files
 def test_thrusting_shields_are_weapons(weapons: tuple[Item, ...]) -> None:
     rows = [row for row in weapons if row.subcategory == "thrusting_shield"]
 
@@ -173,7 +164,6 @@ def test_thrusting_shields_are_weapons(weapons: tuple[Item, ...]) -> None:
     assert {row.category for row in rows} == {"weapon"}
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "subcategory"),
     [
@@ -191,19 +181,16 @@ def test_class_comes_from_the_weapon_sheet(
     assert by_name[name].subcategory == subcategory
 
 
-@needs_files
 @pytest.mark.parametrize("name", ["Unarmed", "Sacred Butchering Knife"])
 def test_name_is_absent(by_name: dict[str, Item], name: str) -> None:
     assert name not in by_name
 
 
-@needs_files
 @pytest.mark.parametrize("name", ["Serpent-Hunter", "Sword of Light", "Sword of Darkness"])
 def test_added_weapons_are_present(by_name: dict[str, Item], name: str) -> None:
     assert by_name[name].category == "weapon"
 
 
-@needs_files
 @pytest.mark.parametrize("name", TARNISHED_TAGGED)
 def test_weapons_the_mod_tags_tarnished_stay_in_the_pool(
     by_name: dict[str, Item], name: str
@@ -211,7 +198,6 @@ def test_weapons_the_mod_tags_tarnished_stay_in_the_pool(
     assert name in by_name
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "item_id"),
     [("Great Épée", "great_epee"), ("Miséricorde", "misericorde")],
@@ -222,7 +208,6 @@ def test_accented_names_keep_their_spelling(
     assert by_name[name].id == item_id
 
 
-@needs_files
 def test_every_json_weapon_maps_to_the_pool_or_is_not_in_the_game(
     by_name: dict[str, Item],
 ) -> None:
@@ -230,7 +215,7 @@ def test_every_json_weapon_maps_to_the_pool_or_is_not_in_the_game(
     pool = {name.lower() for name in by_name}
     unmatched: set[str] = set()
     for document in ("weapons", "shields"):
-        for record in load_document(RAW / "json-no-dlc", document).records:
+        for record in load_document(ITEMS_DIR, document).records:
             variant = variants.get(str(record["id"]))
             name = variant.canonical_name if variant else str(record["name"])
             if name.lower() not in pool:
@@ -240,7 +225,6 @@ def test_every_json_weapon_maps_to_the_pool_or_is_not_in_the_game(
     assert not NOT_OBTAINABLE & set(by_name)
 
 
-@needs_files
 def test_later_steps_own_the_remaining_fields(weapons: tuple[Item, ...]) -> None:
     for row in weapons:
         assert row.infusable is None

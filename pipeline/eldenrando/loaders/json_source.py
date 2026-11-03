@@ -1,8 +1,8 @@
-"""Read the fifteen base-game JSON documents from `raw/json-no-dlc/`.
+"""Read the eight base-game JSON documents from `data/sources/`.
 
 Each file is a JSON array whose records carry a unique `id`. Every record also has a `name`,
-but names repeat (`items` holds 15 duplicate names), so the id is the identity and the name a
-label. Presence is validated; types are not, because the sources mix numbers, numeric
+but names repeat (`location_names` holds 3 duplicate names), so the id is the identity and the
+name a label. Presence is validated; types are not, because the sources mix numbers, numeric
 strings and `null`, and each consumer knows its own shape.
 """
 
@@ -19,19 +19,12 @@ from eldenrando.loaders.schema import LoaderError, require_mapping
 # Logical name -> the only fields the build reads beyond `id` and `name`. An empty tuple
 # means the file is parsed for its record count and identity, nothing else.
 JSON_FILES: dict[str, tuple[str, ...]] = {
-    "ammos": (),
     "armors": ("category",),
     "ashes": (),
-    "bosses": (),
-    "classes": (),
-    "creatures": (),
     "incantations": ("requires",),
-    "items": (),
-    "locations": (),
-    "npcs": (),
+    "location_names": (),
     "shields": ("requiredAttributes",),
     "sorceries": ("requires",),
-    "spirits": (),
     "talismans": (),
     "weapons": ("requiredAttributes",),
 }
@@ -119,7 +112,3 @@ def load_document(directory: Path, name: str) -> JsonDocument:
     path = directory / f"{name}.json"
     return JsonDocument(name=name, path=path, records=read_records(path, required_fields=fields))
 
-
-def load_all_documents(directory: Path) -> dict[str, JsonDocument]:
-    """Return all fifteen documents, keyed by logical name."""
-    return {name: load_document(directory, name) for name in JSON_FILES}

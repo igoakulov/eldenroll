@@ -1,4 +1,4 @@
-"""Load `itemslots_stable.txt` into `ItemSlot` records.
+"""Load `item_slots.yaml` into `ItemSlot` records.
 
 Each slot documents what the vanilla game puts in one place, as a list of human-readable
 lines. Only five line shapes carry an item name; the rest are prose hints. The name is

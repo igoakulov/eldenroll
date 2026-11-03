@@ -13,12 +13,11 @@ from eldenrando.errors import BuildError
 from eldenrando.loaders.armor_sets import load_armor_sets
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.model.vocabulary import ARMOR_SLOTS
+from eldenrando.paths import ARMOR_SETS_PAGE
 from eldenrando.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 SETS = ROOT / "data" / "overrides" / "armor_sets.csv"
-PAGE = ROOT / "raw" / "wiki" / "armor_sets_transcribed.txt"
-needs_files = pytest.mark.skipif(not PAGE.is_file(), reason="raw data not present")
 
 # What the table leaves out of the page's sets: the owner's variant picks (tasklist O48).
 LEFT_OUT = {
@@ -73,7 +72,7 @@ OFF_PAGE = {
 def _page_sets() -> dict[str, set[str]]:
     """Return the page's sets, with `(Altered)` removed and `Chain Gauntlets` under its name."""
     out: dict[str, set[str]] = {}
-    for line in PAGE.read_text(encoding="utf-8").splitlines():
+    for line in ARMOR_SETS_PAGE.read_text(encoding="utf-8").splitlines():
         if line.startswith("## "):
             break
         name, _, pieces = line.partition(": ")
@@ -90,8 +89,6 @@ def sets() -> dict[str, tuple[str, ...]]:
 
 
 def test_every_set_of_the_page_has_its_pieces(sets: dict[str, tuple[str, ...]]) -> None:
-    if not PAGE.is_file():
-        pytest.skip("raw data not present")
     expected = {name: pieces - LEFT_OUT.get(name, set()) for name, pieces in _page_sets().items()}
     del expected["Highland Warrior Set"]
     assert {name: set(pieces) for name, pieces in sets.items()} == {
@@ -106,7 +103,6 @@ def test_the_highland_warrior_set_is_split_in_two(sets: dict[str, tuple[str, ...
     assert {name: set(sets[name]) for name in HIGHLAND} == HIGHLAND
 
 
-@needs_files
 def test_every_piece_is_in_the_pool_and_a_set_holds_one_per_slot(
     sets: dict[str, tuple[str, ...]],
 ) -> None:
@@ -118,7 +114,6 @@ def test_every_piece_is_in_the_pool_and_a_set_holds_one_per_slot(
         assert max(Counter(slots[piece] for piece in pieces).values(), default=0) <= 1, name
 
 
-@needs_files
 def test_every_piece_links_to_an_armor_row(sets: dict[str, tuple[str, ...]]) -> None:
     table = load_sources(ROOT).table
     linked = build_armor_sets(sets, table)
@@ -130,7 +125,6 @@ def test_every_piece_links_to_an_armor_row(sets: dict[str, tuple[str, ...]]) -> 
         assert held == [slot for slot in ARMOR_SLOTS if slot in held]
 
 
-@needs_files
 def test_the_docs_examples_link_as_written(sets: dict[str, tuple[str, ...]]) -> None:
     linked = {row.id: row for row in build_armor_sets(sets, load_sources(ROOT).table)}
     assert linked["raptors_set"].pieces == (

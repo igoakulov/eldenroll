@@ -18,13 +18,10 @@ from eldenrando.loaders.weapons import load_weapon_categories
 from eldenrando.model.item import Item
 from eldenrando.model.item_catalog import CatalogGroup, ItemCatalog
 from eldenrando.model.name_variant import NameVariant
+from eldenrando.paths import ARMOR_DIR, ITEM_INFO, WEAPON_SHIELD_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ITEMINFO = RAW / "pc_mod_data" / "iteminfo.txt"
-WEAPON_SHEET = RAW / "csv" / "weapons_shields_categories.csv"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 MERGED = [
     "Banished Knight Helm",
@@ -72,7 +69,7 @@ def _catalog(names: dict[int, str]) -> ItemCatalog:
 
 @pytest.fixture(scope="module")
 def catalog() -> ItemCatalog:
-    return load_item_catalog(ITEMINFO)
+    return load_item_catalog(ITEM_INFO)
 
 
 @pytest.fixture(scope="module")
@@ -85,7 +82,6 @@ def names(armor: tuple[Item, ...]) -> set[str]:
     return {row.name for row in armor}
 
 
-@needs_files
 def test_rows_names_and_slugs_are_all_631(armor: tuple[Item, ...]) -> None:
     assert len(armor) == 631
     assert len({row.name for row in armor}) == 631
@@ -93,18 +89,15 @@ def test_rows_names_and_slugs_are_all_631(armor: tuple[Item, ...]) -> None:
     assert {row.category for row in armor} == {"armor"}
 
 
-@needs_files
 def test_no_name_carries_altered(names: set[str]) -> None:
     assert not [name for name in names if "altered" in name.lower()]
 
 
-@needs_files
 @pytest.mark.parametrize("name", MERGED + RENAMED)
 def test_altered_piece_survives_under_its_plain_name(names: set[str], name: str) -> None:
     assert name in names
 
 
-@needs_files
 def test_exactly_six_altered_pieces_merge(catalog: ItemCatalog) -> None:
     source = catalog.names["protector"].values()
     altered = {name.removesuffix(" (Altered)") for name in source if name.endswith(" (Altered)")}
@@ -113,7 +106,6 @@ def test_exactly_six_altered_pieces_merge(catalog: ItemCatalog) -> None:
     assert altered & set(source) == set(MERGED)
 
 
-@needs_files
 def test_pieces_in_the_mods_tarnished_group_stay_in_the_pool(
     catalog: ItemCatalog, names: set[str]
 ) -> None:
@@ -124,12 +116,11 @@ def test_pieces_in_the_mods_tarnished_group_stay_in_the_pool(
     assert pieces <= names
 
 
-@needs_files
 def test_every_json_piece_maps_to_the_pool_or_is_not_in_the_game(names: set[str]) -> None:
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     pool = {name.lower() for name in names}
     unmatched: set[str] = set()
-    for record in load_document(RAW / "json-no-dlc", "armors").records:
+    for record in load_document(ARMOR_DIR, "armors").records:
         variant = variants.get(str(record["id"]))
         name = variant.canonical_name if variant else str(record["name"])
         if name.lower().removesuffix(" (altered)") not in pool:
@@ -138,18 +129,15 @@ def test_every_json_piece_maps_to_the_pool_or_is_not_in_the_game(names: set[str]
     assert unmatched == NOT_OBTAINABLE
 
 
-@needs_files
 def test_pieces_not_in_the_game_never_become_rows(names: set[str]) -> None:
     assert not NOT_OBTAINABLE & names
 
 
-@needs_files
 @pytest.mark.parametrize("name", ["Nox Bracelets", "Nox Greaves", "Gauntlets", "Champion Bracers"])
 def test_piece_keeps_the_mods_name(names: set[str], name: str) -> None:
     assert name in names
 
 
-@needs_files
 @pytest.mark.parametrize(
     "name",
     ["Nox Monk Bracelets", "Nox Monk Greaves", "Chain Gauntlets", "Champion Gauntlets"],
@@ -158,7 +146,6 @@ def test_other_sources_spelling_is_not_a_row(names: set[str], name: str) -> None
     assert name not in names
 
 
-@needs_files
 def test_later_steps_own_the_remaining_fields(armor: tuple[Item, ...]) -> None:
     for row in armor:
         assert row.subcategory is None
@@ -169,7 +156,6 @@ def test_later_steps_own_the_remaining_fields(armor: tuple[Item, ...]) -> None:
         assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
 
 
-@needs_files
 def test_armor_and_weapons_join_without_a_collision(
     catalog: ItemCatalog, armor: tuple[Item, ...]
 ) -> None:
@@ -178,7 +164,7 @@ def test_armor_and_weapons_join_without_a_collision(
         catalog,
         variants,
         load_added_items(OVERRIDES / "items.csv"),
-        load_weapon_categories(WEAPON_SHEET),
+        load_weapon_categories(WEAPON_SHIELD_CLASSES),
     )
 
     table = build_item_table((*weapons, *armor))

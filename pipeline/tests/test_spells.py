@@ -26,13 +26,10 @@ from eldenrando.loaders.name_variants import load_name_variants
 from eldenrando.loaders.weapons import load_weapon_categories
 from eldenrando.model.item import Item
 from eldenrando.model.item_catalog import CatalogGroup, ItemCatalog
+from eldenrando.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-RAW = ROOT / "raw"
-ITEMINFO = RAW / "pc_mod_data" / "iteminfo.txt"
-WEAPON_SHEET = RAW / "csv" / "weapons_shields_categories.csv"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 
 def _catalog(names: dict[int, str]) -> ItemCatalog:
@@ -54,7 +51,7 @@ def _catalog(names: dict[int, str]) -> ItemCatalog:
 
 @pytest.fixture(scope="module")
 def catalog() -> ItemCatalog:
-    return load_item_catalog(ITEMINFO)
+    return load_item_catalog(ITEM_INFO)
 
 
 @pytest.fixture(scope="module")
@@ -82,7 +79,6 @@ def test_exclusion_lists_hold_17_and_43_names() -> None:
     assert len(EXCLUDED_INCANTATIONS) == 43
 
 
-@needs_files
 def test_incantation_rows_names_and_slugs_are_all_86(incantations: tuple[Item, ...]) -> None:
     assert len(incantations) == 86
     assert len({row.name for row in incantations}) == 86
@@ -90,20 +86,18 @@ def test_incantation_rows_names_and_slugs_are_all_86(incantations: tuple[Item, .
     assert {row.category for row in incantations} == {"incantation"}
 
 
-@needs_files
 @pytest.mark.parametrize("name", sorted(EXCLUDED_INCANTATIONS))
 def test_incantation_exclusion_is_absent(incantation_names: set[str], name: str) -> None:
     assert name not in incantation_names
 
 
-@needs_files
 def test_every_json_incantation_maps_to_the_pool_or_is_excluded(
     incantation_names: set[str],
 ) -> None:
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     pool = {name.lower() for name in incantation_names}
     unmatched: set[str] = set()
-    for record in load_document(RAW / "json-no-dlc", "incantations").records:
+    for record in load_document(ITEMS_DIR, "incantations").records:
         variant = variants.get(str(record["id"]))
         name = variant.canonical_name if variant else str(record["name"])
         if name.lower() not in pool:
@@ -114,7 +108,6 @@ def test_every_json_incantation_maps_to_the_pool_or_is_excluded(
     assert {name for name in unmatched if name.lower() not in excluded} == {"Golden Vow (spell)"}
 
 
-@needs_files
 def test_beast_claw_incantation_keeps_the_suffix_that_splits_it_from_the_weapon(
     incantations: tuple[Item, ...],
 ) -> None:
@@ -124,7 +117,6 @@ def test_beast_claw_incantation_keeps_the_suffix_that_splits_it_from_the_weapon(
     assert "Beast Claw" not in by_name
 
 
-@needs_files
 def test_rows_names_and_slugs_are_all_67(sorceries: tuple[Item, ...]) -> None:
     assert len(sorceries) == 67
     assert len({row.name for row in sorceries}) == 67
@@ -132,18 +124,16 @@ def test_rows_names_and_slugs_are_all_67(sorceries: tuple[Item, ...]) -> None:
     assert {row.category for row in sorceries} == {"sorcery"}
 
 
-@needs_files
 @pytest.mark.parametrize("name", sorted(EXCLUDED_SORCERIES))
 def test_exclusion_is_absent(names: set[str], name: str) -> None:
     assert name not in names
 
 
-@needs_files
 def test_every_json_sorcery_maps_to_the_pool_or_is_excluded(names: set[str]) -> None:
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     pool = {name.lower() for name in names}
     unmatched: set[str] = set()
-    for record in load_document(RAW / "json-no-dlc", "sorceries").records:
+    for record in load_document(ITEMS_DIR, "sorceries").records:
         variant = variants.get(str(record["id"]))
         name = variant.canonical_name if variant else str(record["name"])
         if name.lower() not in pool:
@@ -152,7 +142,6 @@ def test_every_json_sorcery_maps_to_the_pool_or_is_excluded(names: set[str]) -> 
     assert unmatched - EXCLUDED_SORCERIES == {"Terra Magicus"}
 
 
-@needs_files
 def test_later_steps_own_the_remaining_fields(sorceries: tuple[Item, ...]) -> None:
     for row in sorceries:
         assert row.subcategory is None
@@ -161,7 +150,6 @@ def test_later_steps_own_the_remaining_fields(sorceries: tuple[Item, ...]) -> No
         assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
 
 
-@needs_files
 def test_names_shared_with_ashes_take_a_category_suffix(
     catalog: ItemCatalog, sorceries: tuple[Item, ...], incantations: tuple[Item, ...]
 ) -> None:
@@ -170,7 +158,7 @@ def test_names_shared_with_ashes_take_a_category_suffix(
         catalog,
         variants,
         load_added_items(OVERRIDES / "items.csv"),
-        load_weapon_categories(WEAPON_SHEET),
+        load_weapon_categories(WEAPON_SHIELD_CLASSES),
     )
     ashes = build_ashes(catalog, variants, load_ash_sources(OVERRIDES / "ash_sources.csv"))
     armor = build_armor(catalog, variants)

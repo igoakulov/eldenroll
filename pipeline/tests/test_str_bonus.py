@@ -16,8 +16,6 @@ from eldenrando.normalize.str_bonus import assign_str_bonus
 from eldenrando.validate.gaps import GapSources, load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
-ITEMINFO = ROOT / "raw" / "pc_mod_data" / "iteminfo.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 PAIRED = {
     "Ornamental Straight Sword",
@@ -37,13 +35,11 @@ def table() -> tuple[Item, ...]:
     return sources.table
 
 
-@needs_files
 def test_every_exception_class_item_is_false_but_grafted_dragon(table: tuple[Item, ...]) -> None:
     keeps_it = {row.name for row in table if row.subcategory in NO_STR_BONUS and row.str_bonus_2h}
     assert keeps_it == {"Grafted Dragon"}
 
 
-@needs_files
 def test_false_outside_the_classes_is_only_the_paired_list(table: tuple[Item, ...]) -> None:
     false = {
         row.name
@@ -55,7 +51,6 @@ def test_false_outside_the_classes_is_only_the_paired_list(table: tuple[Item, ..
     assert false == PAIRED
 
 
-@needs_files
 def test_counts(table: tuple[Item, ...]) -> None:
     weapons = [row for row in table if row.category in ("weapon", "shield")]
     assert len(weapons) == 487
@@ -63,7 +58,6 @@ def test_counts(table: tuple[Item, ...]) -> None:
     assert sum(row.str_bonus_2h is True for row in weapons) == 439
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "expected"),
     [
@@ -83,7 +77,6 @@ def test_weapon_has_its_bonus(table: tuple[Item, ...], name: str, expected: bool
     assert next(row for row in table if row.name == name).str_bonus_2h is expected
 
 
-@needs_files
 def test_other_categories_stay_null(table: tuple[Item, ...]) -> None:
     others = [row for row in table if row.category not in ("weapon", "shield", "none")]
     assert others

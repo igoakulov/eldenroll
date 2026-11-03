@@ -15,13 +15,12 @@ from eldenrando.loaders.regions import load_regions
 from eldenrando.model.annotations import Area
 from eldenrando.model.location import Location
 from eldenrando.model.region import Region
+from eldenrando.paths import AREAS
 from eldenrando.validate.regions import validate_region_dlc_prefix, validate_region_membership
 
 ROOT = Path(__file__).resolve().parents[2]
 REGIONS_CSV = ROOT / "data" / "overrides" / "regions.csv"
 AREAS_CSV = ROOT / "data" / "overrides" / "region_areas.csv"
-ANNOTATIONS = ROOT / "raw" / "pc_mod_data" / "annotations_stable.txt"
-needs_files = pytest.mark.skipif(not ANNOTATIONS.is_file(), reason="raw data not present")
 
 BASE = Region(id="base", name="Base", region_level=1)
 DLC = Region(id="dlc", name="DLC: Land", region_level=2)
@@ -48,12 +47,11 @@ def _location(location_id: str, region_id: str) -> Location:
 def _real_rows() -> tuple[tuple[Region, ...], tuple[Location, ...], set[str]]:
     regions = load_regions(REGIONS_CSV)
     region_areas = load_region_areas(AREAS_CSV, region_ids={region.id for region in regions})
-    areas = load_annotations(ANNOTATIONS).areas
+    areas = load_annotations(AREAS).areas
     dlc_ids = {area.name for area in areas if area.is_dlc}
     return regions, build_locations(areas, region_areas), dlc_ids
 
 
-@needs_files
 def test_location_table_has_one_row_per_area_in_one_region() -> None:
     regions, locations, _ = _real_rows()
     region_ids = {region.id for region in regions}
@@ -65,7 +63,6 @@ def test_location_table_has_one_row_per_area_in_one_region() -> None:
     validate_region_membership(regions, locations)
 
 
-@needs_files
 def test_location_rows_match_the_documented_instances() -> None:
     _, locations, _ = _real_rows()
     by_id = {location.id: location for location in locations}
@@ -76,7 +73,6 @@ def test_location_rows_match_the_documented_instances() -> None:
     assert Counter(location.name for location in locations)["Academy of Raya Lucaria"] == 4
 
 
-@needs_files
 def test_real_dlc_prefix_matches_the_annotation_tags() -> None:
     regions, locations, dlc_ids = _real_rows()
 

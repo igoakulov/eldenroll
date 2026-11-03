@@ -1,0 +1,91 @@
+Name,AtkId,AtkPhys,AtkMag,AtkFire,AtkLtng,AtkHoly,AtkStam,AtkSuperArmor,StaminaCost,PhysAtkAttribute,Shield Chip,disableGuard,DamageLevel,dmgLevel_vsPlayer,IsArrowAtk,subCategory1,subCategory2,PvP Dmg Mult,PvP Stam Dmg Mult,PvP Poise Dmg Mult,weakA_DamageRate,weakB_DamageRate,weakC_DamageRate,weakD_DamageRate,Status,Buildup,Status Effect
+Fire Pot,10030001,0,0,230,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Redmane Fire Pot,10030101,0,0,326,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Giantsflame Fire Pot,10030201,0,0,344,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Hefty Fire Pot,210030001,0,0,360,0,0,50,10,#N/A,Standard,0,FALSE,7,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Hefty Furnace Pot,210068000,0,0,370,0,0,50,10,#N/A,Standard,0,FALSE,9,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Oil Pot,10038001,0,0,0,0,0,5,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Hefty Oil Pot,210038000,105,0,0,0,0,50,5,#N/A,Standard,0,FALSE,2,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Magic Pot,10066001,0,322,0,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Academy Magic Pot,10066101,0,405,0,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Hefty Magic Pot,210066000,0,360,0,0,0,50,10,#N/A,Standard,0,FALSE,7,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Lightning Pot,10032000,0,0,0,260,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Ancient Dragonbolt Pot,10032100,0,0,0,340,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Hefty Lightning Pot,210032000,0,0,0,370,0,50,10,#N/A,Standard,0,FALSE,7,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Red Lightning Pot,210070002,0,0,0,260,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Hefty Red Lightning Pot,210069002,0,0,0,310,0,50,10,#N/A,Standard,0,FALSE,2,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Holy Water Pot,10035001,0,0,0,0,167,20,3,#N/A,Standard,0,FALSE,1,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,4,1,1,,,
+Sacred Order Pot,10035101,0,0,0,0,312,20,3,#N/A,Standard,0,FALSE,1,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1.9,1,1,,,
+Poison Pot,10037001,0,0,0,0,0,5,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Poison,200,Target loses ⌊MaxHP * 0.0007⌋ + 7 HP/s for 90 seconds
+Hefty Poison Pot,210037000,105,0,0,0,0,50,5,#N/A,Standard,0,FALSE,2,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,Poison,400,Target loses ⌊MaxHP * 0.0007⌋ + 7 HP/s for 90 seconds
+Fetid Pot,10033001,0,0,0,0,0,5,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Poison,250,Target loses ⌊MaxHP * 0.0014⌋ + 12 HP/s for 30 seconds
+Hefty Fetid Pot,210033000,105,0,0,0,0,50,5,#N/A,Standard,0,FALSE,2,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,Poison,500,Target loses ⌊MaxHP * 0.0014⌋ + 12 HP/s for 30 seconds
+Rot Pot,10067001,0,0,0,0,0,20,3,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Rot,300,Target loses ⌊MaxHP * 0.0018⌋ + 15 HP/s for 90 seconds
+Hefty Rot Pot,210067000,105,0,0,0,0,50,5,#N/A,Standard,0,FALSE,2,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,Rot,400,Target loses ⌊MaxHP * 0.0033⌋ + 13 HP/s for 90 seconds
+Swarm Pot,10034001,116,0,0,0,0,5,1,#N/A,Standard,0,FALSE,8,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Bleed,70,Target loses ⌊MaxHP * 0.15⌋ + 100 HP on proc
+Hefty Fly Pot,210034000,105,0,0,0,0,50,5,#N/A,Standard,0,FALSE,2,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,Bleed,70,Target loses ⌊MaxHP * 0.15⌋ + 100 HP on proc
+Freezing Pot,10036001,0,119,0,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Frost,380,Target loses ⌊MaxHP * 0.1⌋ + 30 HP on proc; target damage negation decreased by -20% for 30 seconds
+Hefty Freezing Pot,210036001,0,200,0,0,0,50,10,#N/A,Standard,0,FALSE,7,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,Frost,400,Target loses ⌊MaxHP * 0.1⌋ + 30 HP on proc; target damage negation decreased by -20% for 30 seconds
+Sleep Pot,10064000,1,0,0,0,0,5,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Sleep,29,Target loses ⌊MaxFP * 0.1⌋ + 30 FP on proc
+Eternal Sleep Pot,210074000,1,0,0,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Eternal Sleep,29,Target loses ⌊MaxFP * 0.15⌋ + 50 FP on proc
+Frenzied Flame Pot,210071000,0,0,240,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Madness,90,Target loses ⌊MaxHP * 0.15⌋ + 100 HP and ⌊MaxFP * 0.1⌋ + 30 FP on proc
+Hefty Frenzied Flame Pot,210062000,0,0,326,0,0,50,10,#N/A,Standard,0,FALSE,7,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,Madness,130,Target loses ⌊MaxHP * 0.15⌋ + 100 HP and ⌊MaxFP * 0.1⌋ + 30 FP on proc
+Hefty Rock Pot,210031001,370,0,0,0,0,70,15,#N/A,Strike,0,FALSE,7,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Volcano Pot,10060001,0,0,82,0,0,3,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Hefty Volcano Pot,210060000,0,0,105,0,0,50,5,#N/A,Standard,0,FALSE,2,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Rancor Pot,10065001,0,139,0,0,0,5,1,#N/A,Standard,0,FALSE,8,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Hefty Rancor Pot,210065001,0,139,0,0,0,5,1,#N/A,Standard,0,FALSE,8,0,FALSE,-,Hefty Cracked Pot,1,1,1,1,1,1,1,,,
+Cursed-Blood Pot,10063001,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Alluring Pot,10039001,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Beastlure Pot,10039100,1,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Albinauric Pot,10061001,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Roped Fire Pot,10040001,0,0,230,0,0,10,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Roped Oil Pot,10045001,1,0,0,0,0,5,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Roped Magic Pot,10046001,0,322,0,0,0,10,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Roped Lightning Pot,10042000,0,0,0,260,0,10,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Roped Holy Water Pot,10051001,0,0,0,0,150,10,3,#N/A,Standard,0,FALSE,1,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,4,1,1,,,
+Roped Poison Pot,10044001,1,0,0,0,0,5,3,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Poison,200,Target loses ⌊MaxHP * 0.0007⌋ + 7 HP/s for 90 seconds
+Roped Fetid Pot,10043001,1,0,0,0,0,5,3,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Poison,250,Target loses ⌊MaxHP * 0.0014⌋ + 14 HP/s for 30 seconds
+Roped Fly Pot,10047001,116,0,0,0,0,5,0,#N/A,Standard,0,FALSE,8,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Bleed,70,Target loses ⌊MaxHP * 0.15⌋ + 100 HP on proc
+Roped Frenzied Flame Pot,210071000,0,0,240,0,0,20,3,#N/A,Standard,0,FALSE,2,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,Madness,90,Target loses ⌊MaxHP * 0.15⌋ + 100 HP and ⌊MaxFP * 0.1⌋ + 30 FP on proc
+Roped Volcano Pot,10049001,0,0,82,0,0,3,0,#N/A,Standard,0,FALSE,0,0,FALSE,Cracked / Ritual Pot,-,1,1,1,1,1,1,1,,,
+Spark Aromatic,10351000,0,0,352,0,0,20,5,#N/A,Standard,0,FALSE,2,0,FALSE,Perfume Bottle,-,1,1,1,1,1,1,1,,,
+Uplifting Aromatic,10350000,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Perfume Bottle,-,1,1,1,1,1,1,1,,,
+Poison Spraymist,10358000,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Perfume Bottle,-,1,1,1,1,1,1,1,Poison,26,Target loses ⌊MaxHP * 0.0021⌋ + 21 HP/s for 30 seconds
+Acid Spraymist,10361000,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Perfume Bottle,-,1,1,1,1,1,1,1,,,
+Bloodboil Aromatic,10355000,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Perfume Bottle,-,1,1,1,1,1,1,1,,,
+Ironjar Aromatic,10352000,0,0,0,0,0,0,0,#N/A,Standard,0,FALSE,0,0,FALSE,Perfume Bottle,-,1,1,1,1,1,1,1,,,
+Bone Dart,10171000,57,0,0,0,0,5,1,#N/A,Pierce,0,FALSE,8,0,TRUE,Weapon-Throwing Attack,-,1,1,1,1,1,1,1,,,
+Poisonbone Dart,10172000,50,0,0,0,0,5,1,#N/A,Pierce,0,FALSE,8,0,TRUE,Weapon-Throwing Attack,-,1,1,1,1,1,1,1,Poison,58,Target loses ⌊MaxHP * 0.0007⌋ + 7 HP/s for 90 seconds
+Crystal Dart,10174000,66,44,0,0,0,10,1,#N/A,Pierce,0,FALSE,8,0,TRUE,Weapon-Throwing Attack,-,1,1,1,1,1,1,1,,,
+Throwing Dagger,10170000,67,0,0,0,0,5,1,#N/A,Pierce,0,FALSE,8,0,TRUE,Weapon-Throwing Attack,-,1,1,1,1,1,1,1,,,
+Kukri,10173000,87,0,0,0,0,10,3,#N/A,Pierce,0,FALSE,1,0,TRUE,Weapon-Throwing Attack,-,1,1,1,1,1,1,1,Bleed,70,Target loses ⌊MaxHP * 0.15⌋ + 100 HP on proc
+Fan Daggers,10175000,37,0,0,0,0,2,0.5,#N/A,Pierce,0,FALSE,8,0,TRUE,Weapon-Throwing Attack,-,1,1,1,1,1,1,1,,,
+Dragon Communion Harpoon,210171000,330,0,0,0,0,50,7,#N/A,Pierce,0,FALSE,2,0,FALSE,Weapon-Throwing Attack,-,1,1,1,1,1,1.2,1.5,,,
+Ruin Fragment,10176000,1,0,0,0,0,5,0,#N/A,Strike,0,FALSE,0,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Roundrock,210172000,200,0,0,0,0,20,4,#N/A,Strike,0,FALSE,3,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Poisoned Stone,10184000,50,0,0,0,0,5,3,#N/A,Strike,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,Poison,100,Target loses ⌊MaxHP * 0.0007⌋ + 7 HP/s for 90 seconds
+Poisoned Stone Clump,10184100,32,0,0,0,0,1,1,#N/A,Strike,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,Poison,45,Target loses ⌊MaxHP * 0.0007⌋ + 7 HP/s for 90 seconds
+Explosive Stone,10183000,0,0,108,0,0,20,3,#N/A,Strike,0,FALSE,2,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Explosive Stone Clump,10183100,0,0,54,0,0,5,1,#N/A,Strike,0,FALSE,2,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Glintstone Scrap,10305000,0,82,0,0,0,15,2,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Large Glintstone Scrap,10305100,0,65,0,0,0,15,2,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Cuckoo Glintstone,10303002,0,92,0,0,0,15,2,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Glinting Nail,210320000,0,210,0,0,0,0,3,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Gravity Stone Fan,10306001,160,50,0,0,0,60,10,#N/A,Strike,0,FALSE,2,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Gravity Stone Chunk,10307001,247,50,0,0,0,60,10,#N/A,Strike,0,FALSE,3,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Fire Spritestone,210319000,0,0,192,0,0,20,3,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Spritestone,210300100,360,0,0,0,0,70,10,#N/A,Standard,0,FALSE,7,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Fire Coil,210318000,0,0,125,0,0,15,2,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Surging Frenzied Flame,210316000,0,0,165,0,0,20,3,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,Madness,40,Target loses ⌊MaxHP * 0.15⌋ + 100 HP and ⌊MaxFP * 0.1⌋ + 30 FP on proc
+Innard Meat,210170000,120,120,0,0,0,30,3,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Call of Tibia,210315001,0,200,0,0,0,15,3,#N/A,Standard,0,FALSE,2,0,FALSE,-,-,1,1.25,1.35,1,1,1,1,,,
+Wraith Calling Bell,10308000,0,120,0,0,0,20,3,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1,1,1,1,1,1,,,
+Ancestral Infant's Head,10300001,0,55,0,0,0,5,0,#N/A,Standard,0,FALSE,0,0,FALSE,Ancestral Infant's Head,-,1,1,1,1,1,1,1,,,
+Omen Bairn 1,10301001,0,0,0,0,105,90,15,#N/A,Standard,0,FALSE,7,0,FALSE,(Regal) Omen Bairn,-,1,1,1,1,1,1,1,,,
+Omen Bairn 2,10301002,0,0,0,0,70,10,1,#N/A,Standard,0,FALSE,1,0,FALSE,(Regal) Omen Bairn,-,1,1,1,1,1,1,1,,,
+Regal Omen Bairn 1,10301101,0,0,0,0,115,90,15,#N/A,Standard,0,FALSE,7,0,FALSE,(Regal) Omen Bairn,-,1,1,1,1,1,1,1,,,
+Regal Omen Bairn 2,10301102,0,0,0,0,60,10,1,#N/A,Standard,0,FALSE,1,0,FALSE,(Regal) Omen Bairn,-,1,1,1,1,1,1,1,,,
+Horned Bairn,210313000,0,0,0,0,105,5,1,#N/A,Standard,0,FALSE,1,0,FALSE,Watchful / Vengeful Spirits,-,1,1,1,1,1,1,1,,,
+Perfumed Oil of Ranah,210314000,0,0,300,0,0,20,3,#N/A,Standard,0,FALSE,1,0,FALSE,-,-,1,1.25,1.35,1,1,1,1,,,
+Lamenter's Mask - Attack,210203000,260,0,0,0,0,70,10,#N/A,Strike,0,FALSE,5,0,FALSE,-,-,1,1,1,1,1,1,1,,,

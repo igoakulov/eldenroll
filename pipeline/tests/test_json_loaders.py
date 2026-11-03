@@ -1,7 +1,6 @@
-"""Tests for the fifteen base-game JSON loaders.
+"""Tests for the eight base-game JSON loaders.
 
-Record counts are the ones recorded in `data.md` §7.3. When `raw/` is absent (a public
-checkout) the data tests skip instead of failing.
+Record counts are the ones recorded in `data.md` §7.3.
 """
 
 from __future__ import annotations
@@ -13,93 +12,70 @@ import pytest
 
 from eldenrando.loaders.json_source import (
     JSON_FILES,
-    load_all_documents,
+    JsonDocument,
     load_document,
     read_records,
 )
 from eldenrando.loaders.schema import LoaderError
+from eldenrando.paths import ARMOR_DIR, ITEMS_DIR, LOCATIONS_DIR
 
-JSON_DIR = Path(__file__).resolve().parents[2] / "raw" / "json-no-dlc"
-needs_data = pytest.mark.skipif(not JSON_DIR.is_dir(), reason="raw source data not present")
-
-REPEATED_NAMES: dict[str, int] = {
-    "ammos": 1,
-    "armors": 2,
-    "bosses": 2,
-    "classes": 1,
-    "creatures": 3,
-    "items": 15,
-    "locations": 3,
-    "npcs": 1,
-    "weapons": 1,
-}
+REPEATED_NAMES: dict[str, int] = {"armors": 2, "location_names": 3, "weapons": 1}
 
 EXPECTED_COUNTS: dict[str, int] = {
-    "ammos": 53,
     "armors": 568,
     "ashes": 90,
-    "bosses": 106,
-    "classes": 14,
-    "creatures": 115,
     "incantations": 98,
-    "items": 462,
-    "locations": 177,
-    "npcs": 55,
+    "location_names": 177,
     "shields": 69,
     "sorceries": 71,
-    "spirits": 64,
     "talismans": 87,
     "weapons": 307,
 }
+DIRECTORIES: dict[str, Path] = {"armors": ARMOR_DIR, "location_names": LOCATIONS_DIR}
 
 
-@needs_data
-def test_all_fifteen_documents_parse() -> None:
-    documents = load_all_documents(JSON_DIR)
-
-    assert set(documents) == set(EXPECTED_COUNTS) == set(JSON_FILES)
-    assert sum(document.count for document in documents.values()) == 2336
+def _load(name: str) -> JsonDocument:
+    return load_document(DIRECTORIES.get(name, ITEMS_DIR), name)
 
 
-@needs_data
+def test_all_eight_documents_parse() -> None:
+    documents = [_load(name) for name in JSON_FILES]
+
+    assert set(EXPECTED_COUNTS) == set(JSON_FILES)
+    assert sum(document.count for document in documents) == sum(EXPECTED_COUNTS.values())
+
+
 @pytest.mark.parametrize(("name", "expected"), sorted(EXPECTED_COUNTS.items()))
 def test_record_counts(name: str, expected: int) -> None:
-    document = load_document(JSON_DIR, name)
+    document = _load(name)
 
     assert document.count == expected
     assert len(set(document.ids)) == expected
 
 
-@needs_data
 def test_every_record_has_a_string_name() -> None:
-    for document in load_all_documents(JSON_DIR).values():
+    for name in JSON_FILES:
+        document = _load(name)
         assert all(isinstance(record["name"], str) for record in document.records), document.name
 
 
-@needs_data
 def test_names_repeat_across_records() -> None:
-    documents = load_all_documents(JSON_DIR)
-
     for name, expected in REPEATED_NAMES.items():
-        names = [cast("str", record["name"]) for record in documents[name].records]
+        names = [cast("str", record["name"]) for record in _load(name).records]
         assert len(names) - len(set(names)) == expected, name
 
 
-@needs_data
 def test_duplicate_armor_name_carries_two_categories() -> None:
-    armors = load_document(JSON_DIR, "armors").records
+    armors = _load("armors").records
     redmane = [record for record in armors if record["name"] == "Redmane Knight Helm"]
 
     assert len(redmane) == 2
     assert {record["category"] for record in redmane} == {"Gauntlets", "Helm"}
 
 
-@needs_data
 def test_weapon_and_shield_records_carry_requirements() -> None:
-    documents = load_all_documents(JSON_DIR)
-
     for name in ("weapons", "shields"):
-        attributes = [record["requiredAttributes"] for record in documents[name].records]
+        attributes = [record["requiredAttributes"] for record in _load(name).records]
         assert all(isinstance(entry, list) and cast("list[object]", entry) for entry in attributes)
 
 

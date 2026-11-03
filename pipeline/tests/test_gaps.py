@@ -25,8 +25,6 @@ from eldenrando.validate.gaps import (
 
 ROOT = Path(__file__).resolve().parents[2]
 GAPS = ROOT / "data" / "gaps.csv"
-ITEMINFO = ROOT / "raw" / "pc_mod_data" / "iteminfo.txt"
-needs_files = pytest.mark.skipif(not ITEMINFO.is_file(), reason="raw data not present")
 
 GAP = Gap(
     area="requirements",
@@ -53,7 +51,6 @@ def _item(sources: GapSources, name: str) -> Item:
     return next(item for item in sources.table if item.name == name)
 
 
-@needs_files
 def test_the_list_agrees_with_the_checks_and_overrides(found: tuple[Gap, ...]) -> None:
     tracked = load_gaps(GAPS)
     assert reconcile(found, tracked, load_overrides(ROOT / "data" / "overrides")) == ()
@@ -65,7 +62,6 @@ def test_the_file_is_written_the_way_the_writer_writes_it(tmp_path: Path) -> Non
     assert written.read_text(encoding="utf-8") == GAPS.read_text(encoding="utf-8")
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("area", "count"),
     [
@@ -82,7 +78,6 @@ def test_area_holds_the_gaps_found_at_the_audit(
     assert sum(gap.area == area for gap in found) == count
 
 
-@needs_files
 @pytest.mark.parametrize(
     ("name", "origin"),
     [
@@ -103,7 +98,6 @@ def test_item_origin(sources: GapSources, name: str, origin: str) -> None:
     assert item_origin(_item(sources, name), sources.catalog, sources.variants) == origin
 
 
-@needs_files
 def test_every_weapon_in_the_base_game_files_reads_as_base_or_tarnished(
     sources: GapSources,
 ) -> None:
@@ -121,7 +115,6 @@ def test_every_weapon_in_the_base_game_files_reads_as_base_or_tarnished(
     assert [name for name, origin in origins.items() if origin == "dlc"] == []
 
 
-@needs_files
 @pytest.mark.parametrize(
     "name",
     [
@@ -136,19 +129,16 @@ def test_broken_stat_record_is_a_gap(found: tuple[Gap, ...], name: str) -> None:
     assert ("requirements", name) in {gap.key for gap in found}
 
 
-@needs_files
 def test_base_game_weapon_off_the_sheet_is_not_asked_about(found: tuple[Gap, ...]) -> None:
     asked = {gap.item for gap in found if gap.area == "holds_ash"}
     assert not asked & {"Bandit's Curved Sword", "Inseparable Sword", "Dragon Halberd"}
 
 
-@needs_files
 def test_every_enia_remembrance_is_a_gap(found: tuple[Gap, ...]) -> None:
     asked = {gap.item for gap in found if gap.area == "remembrance_boss"}
     assert {"Remembrance of the Omen King", "Elden Remembrance"} <= asked
 
 
-@needs_files
 def test_stat_records_of_one_item_may_repeat_if_they_agree(sources: GapSources) -> None:
     assert ("requirements", "Ekzykes's Decay") not in {gap.key for gap in requirement_gaps(sources)}
 

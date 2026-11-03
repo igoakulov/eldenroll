@@ -1,7 +1,7 @@
 """Read a CSV source table from disk.
 
-The ten files under `raw/csv/` are hand-kept spreadsheets, not machine exports: one starts
-with a section legend, several have blank or repeated header cells, and one uses blank rows
+The seven CSV files under `data/sources/` are hand-kept spreadsheets, not machine exports: one
+starts with a section legend, several have blank or repeated header cells, and one uses blank rows
 as class separators. So the reader keeps every row positionally, checks each width against
 the header, and reports the file and row instead of guessing a value.
 """

@@ -1,7 +1,7 @@
 """Tests for the authored area → region map.
 
-Area names come from `annotations_stable.txt`; per-region slot counts are the ones recorded
-in `data.md` §3.2 and are recomputed from `itemslots_stable.txt`.
+Area names come from `areas.yaml`; per-region slot counts are the ones recorded
+in `data.md` §3.2 and are recomputed from `item_slots.yaml`.
 """
 
 from __future__ import annotations
@@ -16,15 +16,11 @@ from eldenrando.loaders.itemslots import load_slots
 from eldenrando.loaders.region_areas import load_region_areas
 from eldenrando.loaders.regions import load_regions
 from eldenrando.loaders.schema import LoaderError
+from eldenrando.paths import AREAS, ITEM_SLOTS
 
 ROOT = Path(__file__).resolve().parents[2]
 REGIONS_CSV = ROOT / "data" / "overrides" / "regions.csv"
 AREAS_CSV = ROOT / "data" / "overrides" / "region_areas.csv"
-DATA_DIR = ROOT / "raw" / "pc_mod_data"
-needs_files = pytest.mark.skipif(
-    not (REGIONS_CSV.is_file() and AREAS_CSV.is_file() and DATA_DIR.is_dir()),
-    reason="seed or raw data not present",
-)
 
 EXPECTED_AREAS: dict[int, int] = {
     1: 27,
@@ -70,18 +66,16 @@ def _region_ids() -> dict[str, int]:
     return {region.id: region.region_level for region in load_regions(REGIONS_CSV)}
 
 
-@needs_files
 def test_every_annotation_area_is_mapped_once() -> None:
     region_ids = _region_ids()
     areas = load_region_areas(AREAS_CSV, region_ids=region_ids)
-    known = {area.name for area in load_annotations(DATA_DIR / "annotations_stable.txt").areas}
+    known = {area.name for area in load_annotations(AREAS).areas}
 
     assert len(areas) == 174
     assert set(areas) == known
     assert set(areas.values()) == set(region_ids)
 
 
-@needs_files
 def test_area_counts_per_region_match_the_document() -> None:
     region_ids = _region_ids()
     areas = load_region_areas(AREAS_CSV, region_ids=region_ids)
@@ -90,11 +84,10 @@ def test_area_counts_per_region_match_the_document() -> None:
     assert {level: counts[region_id] for region_id, level in region_ids.items()} == EXPECTED_AREAS
 
 
-@needs_files
 def test_slot_counts_per_region_match_the_document() -> None:
     region_ids = _region_ids()
     areas = load_region_areas(AREAS_CSV, region_ids=region_ids)
-    slots = load_slots(DATA_DIR / "itemslots_stable.txt")
+    slots = load_slots(ITEM_SLOTS)
     per_area = Counter(slot.area for slot in slots if slot.is_randomizable)
 
     assert all(area in per_area for area in areas)
@@ -106,7 +99,6 @@ def test_slot_counts_per_region_match_the_document() -> None:
     assert sum(per_region.values()) == 4257
 
 
-@needs_files
 @pytest.mark.parametrize("area", ["chapel", "siofra_limited", "farumazula_limited", "mohgwyn"])
 def test_places_reached_only_from_liurnia_are_in_liurnia(area: str) -> None:
     areas = load_region_areas(AREAS_CSV, region_ids=_region_ids())
