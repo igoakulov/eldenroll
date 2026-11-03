@@ -1,3 +1,15 @@
-name,label,reason,reviewer
-"Count Ymir, Mother of Fingers",[DLC] Scadu Altus - Cathedral of Manus Metyr,a boss the CSV leaves untagged,owner
-Dryleaf Dane,"[DLC] Scadu Altus - Moorth Ruins, Bonny Village West Entrance",a boss the CSV leaves untagged,owner
+name,location_label,location_id,reason,reviewer
+"Count Ymir, Mother of Fingers",Scadu Altus - Cathedral of Manus Metyr,scadualtus,a boss the CSV leaves untagged,owner
+Dryleaf Dane,"Scadu Altus - Moorth Ruins, Bonny Village West Entrance",scadualtus,a boss the CSV leaves untagged; his part in Leda's fight gives him no second instance,owner
+Tibia Mariner,Charo's Hidden Grave - Southeast Mariner Area,charo,both wikis list it and the mod tags it miniboss; the CSV leaves it untagged,owner
+Leda and Allies,Enir-Ilim,enirilim,Fextralife's name for the fight; the CSV leaves it untagged,owner
+Crucible Knight Devonia,"Ancient Ruins of Rauh - West Ruins Northeast Cliffside, East Ruins Cave Exit",rauhruins,Fandom lists it and the mod tags it miniboss; the CSV leaves it untagged,owner
+Furnace Golem,Gravesite Plain - Three-Path Cross,gravesite,"one of 8 separate fights by both wikis and the mod, north of Scorched Ruins",owner
+Furnace Golem,Gravesite Plain - Ellac River End,ellac,"one of 8 separate fights by both wikis and the mod, past Ellac River Downstream",owner
+Furnace Golem,Scadu Altus - Furnace Golem Area,scadualtus,"one of 8 separate fights by both wikis and the mod, in the camp south of Shadow Keep",owner
+Furnace Golem,Scadu Altus - Second Furnace Golem Area,scadualtus,"one of 8 separate fights by both wikis and the mod, east of Manus Metyr, with armored legs",owner
+Furnace Golem,Scadu Altus - Castle Watering Hole Southeast,scadualtus_recluse,"one of 8 separate fights by both wikis and the mod, the active one by Ruins of Unte",owner
+Furnace Golem,Scadu Altus - South Ruins of Unte (inactive),scadualtus_recluse,"one of 8 separate fights by both wikis and the mod, the one a thrown pot wakes",owner
+Furnace Golem,Ancient Ruins of Rauh - Furnace Golem Area,rauhbase,"one of 8 separate fights by both wikis and the mod, in the West Ruins",owner
+Furnace Golem,Charo's Hidden Grave - Southwest Furnace Golem Area,charo,"one of 8 separate fights by both wikis and the mod, with armored legs",owner
+Baleful Shadow,Ainsel River Main,ainsel,"owner decision: it forces Ranni's quest, which leads to a lot of other content",owner

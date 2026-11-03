@@ -2,8 +2,8 @@
 
 One row per variant or phase collapses to one pair of identity and label. `boss_merges.csv` then
 joins the pairs that are one fight, `boss_names.csv` corrects the names of the rest, and
-`boss_additions.csv` adds the bosses the CSV leaves untagged. Every override row must apply, so a
-source change that orphans one stops the build instead of quietly changing the pool.
+`boss_additions.csv` adds the fights the CSV leaves untagged. Every merge and name row must apply,
+so a source change that orphans one stops the build instead of quietly changing the pool.
 """
 
 from __future__ import annotations
@@ -28,9 +28,9 @@ _SPACES = re.compile(r"\s+")
 class BossOverrides:
     """The authored corrections to the CSV's boss rows, and the tables that place them."""
 
-    merges: Mapping[tuple[str, str], str]
+    merges: Mapping[tuple[str, str], tuple[str, str]]
     names: Mapping[tuple[str, str], str]
-    additions: Sequence[tuple[str, str]]
+    additions: Sequence[tuple[str, str, str]]
     aliases: Mapping[str, str]
     locations: Mapping[tuple[str, str], str]
 
@@ -51,24 +51,24 @@ def build_boss_instances(
     rows: Iterable[tuple[str, str]], overrides: BossOverrides
 ) -> tuple[BossInstance, ...]:
     """Return one row per fight from `(label, name)` CSV rows, or raise `BuildError`."""
-    source = tuple(rows)
-    pairs = boss_pairs(source)
+    pairs = boss_pairs(rows)
     _check_merges(pairs, overrides.merges)
     _check_names(pairs, overrides)
-    _check_additions(source, pairs, overrides.additions)
     # A fight is keyed on its final name, so the rows of one merge land on one entry, located by
     # the first of them.
     fights: dict[tuple[str, str], str] = {}
     for label, identity in pairs:
-        name = overrides.merges.get((label, identity)) or _corrected(identity, label, overrides)
+        name, instance_label = overrides.merges.get(
+            (label, identity), (_corrected(identity, label, overrides), "")
+        )
         fights.setdefault(
-            (label, name),
+            (instance_label or label, name),
             resolve_boss_location(identity, label, overrides.aliases, overrides.locations),
         )
-    for name, label in overrides.additions:
-        fights[(label, name)] = resolve_boss_location(
-            name, label, overrides.aliases, overrides.locations
-        )
+    for name, label, location_id in overrides.additions:
+        if (label, name) in fights:
+            raise BuildError(f"boss_additions: {name!r} on {label!r} is already in the pool")
+        fights[(label, name)] = location_id
     return _instances(fights)
 
 
@@ -97,15 +97,16 @@ def _instances(fights: Mapping[tuple[str, str], str]) -> tuple[BossInstance, ...
 
 
 def _check_merges(
-    pairs: tuple[tuple[str, str], ...], merges: Mapping[tuple[str, str], str]
+    pairs: tuple[tuple[str, str], ...], merges: Mapping[tuple[str, str], tuple[str, str]]
 ) -> None:
     """Raise `BuildError` when a merge row matches no pair or a fight has only one row."""
     unknown = sorted(f"{name} on {label}" for label, name in set(merges) - set(pairs))
     if unknown:
         raise BuildError(f"boss_merges names no CSV boss: {', '.join(unknown)}")
     fights: dict[tuple[str, str], int] = {}
-    for (label, _), instance in merges.items():
-        fights[(label, instance)] = fights.get((label, instance), 0) + 1
+    for (label, _), (instance, instance_label) in merges.items():
+        fight = (instance_label or label, instance)
+        fights[fight] = fights.get(fight, 0) + 1
     single = sorted(f"{name} on {label}" for (label, name), count in fights.items() if count < 2)
     if single:
         raise BuildError(f"boss_merges joins nothing for: {', '.join(single)}")
@@ -122,16 +123,3 @@ def _check_names(pairs: tuple[tuple[str, str], ...], overrides: BossOverrides) -
     )
     if unused:
         raise BuildError(f"boss_names corrects no CSV boss: {', '.join(unused)}")
-
-
-def _check_additions(
-    rows: tuple[tuple[str, str], ...],
-    pairs: tuple[tuple[str, str], ...],
-    additions: Sequence[tuple[str, str]],
-) -> None:
-    """Raise `BuildError` when an added boss is not in the CSV, or the CSV already tags it."""
-    for name, label in additions:
-        if (label, name) not in rows:
-            raise BuildError(f"boss_additions: the CSV has no {name!r} on {label!r}")
-        if (label, name) in pairs:
-            raise BuildError(f"boss_additions: the CSV already tags {name!r} on {label!r}")

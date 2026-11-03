@@ -59,7 +59,9 @@ def _overrides() -> BossOverrides:
     return BossOverrides(
         merges=load_boss_merges(OVERRIDES / "boss_merges.csv"),
         names=load_boss_names(OVERRIDES / "boss_names.csv"),
-        additions=load_boss_additions(OVERRIDES / "boss_additions.csv"),
+        additions=load_boss_additions(
+            OVERRIDES / "boss_additions.csv", location_ids=location_ids
+        ),
         aliases=aliases,
         locations=load_boss_location_overrides(
             OVERRIDES / "boss_location_overrides.csv", labels=aliases, location_ids=location_ids
@@ -82,21 +84,46 @@ def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -
     rows = _rows()
     overrides = _overrides()
     pairs = boss_pairs(rows)
-    fights = Counter((label, name) for (label, _), name in overrides.merges.items())
+    fights = Counter(
+        (instance_label or label, name)
+        for (label, _), (name, instance_label) in overrides.merges.items()
+    )
     savings = sum(count - 1 for count in fights.values())
 
     assert sum("[Boss]" in name for _, name in rows) == 254
     assert len(pairs) == 222
-    assert len(fights) == 14
-    assert savings == 15
-    assert len(instances) == len(pairs) - savings + len(overrides.additions) == 209
+    assert len(fights) == 15
+    assert savings == 16
+    assert len(overrides.additions) == 14
+    assert len(instances) == len(pairs) - savings + len(overrides.additions) == 220
 
 
 @needs_files
 def test_the_base_game_and_dlc_split(instances: tuple[BossInstance, ...]) -> None:
-    dlc = {label.removeprefix(DLC_TAG) for label, _ in _rows() if label.startswith(DLC_TAG)}
-    assert sum(row.location_label in dlc for row in instances) == 42
-    assert sum(row.location_label not in dlc for row in instances) == 167
+    regions = load_regions(OVERRIDES / "regions.csv")
+    region_of_area = load_region_areas(
+        OVERRIDES / "region_areas.csv", region_ids={row.id for row in regions}
+    )
+    dlc = {row.id for row in regions if row.is_dlc}
+    assert sum(region_of_area[row.location_id] in dlc for row in instances) == 52
+    assert sum(region_of_area[row.location_id] not in dlc for row in instances) == 168
+
+
+@needs_files
+def test_the_fights_the_csv_leaves_untagged(instances: tuple[BossInstance, ...]) -> None:
+    names = Counter(row.name for row in instances)
+    assert names["Furnace Golem"] == 8
+    assert names["Leda and Allies"] == 1
+    assert names["Crucible Knight Devonia"] == 1
+    assert names["Tibia Mariner"] == 4
+    assert names["Baleful Shadow"] == 1
+
+
+@needs_files
+def test_dryleaf_dane_has_only_his_own_fight(instances: tuple[BossInstance, ...]) -> None:
+    assert [row.location_label for row in instances if row.name == "Dryleaf Dane"] == [
+        "Scadu Altus - Moorth Ruins, Bonny Village West Entrance"
+    ]
 
 
 @needs_files
@@ -104,12 +131,11 @@ def test_every_pair_of_the_csv_has_an_instance(instances: tuple[BossInstance, ..
     overrides = _overrides()
     placed = {(row.location_label, row.name) for row in instances}
     for label, identity in boss_pairs(_rows()):
-        name = overrides.merges.get((label, identity)) or (
-            overrides.names.get((identity, label))
-            or overrides.names.get((identity, ""))
-            or identity
+        name = overrides.names.get((identity, label)) or overrides.names.get(
+            (identity, ""), identity
         )
-        assert (label.removeprefix(DLC_TAG), name) in placed, (label, identity)
+        name, instance_label = overrides.merges.get((label, identity), (name, ""))
+        assert ((instance_label or label).removeprefix(DLC_TAG), name) in placed, (label, identity)
 
 
 @needs_files
@@ -139,7 +165,7 @@ def test_the_docs_ids_are_built_as_written(instances: tuple[BossInstance, ...]) 
             "Messmer the Impaler",
             "Messmer - Base Serpent Messmer",
         ),
-        (FARUM, "Maliketh, The Black Blade", "Beast Clergyman"),
+        (FARUM, "Maliketh, the Black Blade", "Beast Clergyman"),
         ("Volcano Manor", "Rykard, Lord of Blasphemy", "God-Devouring Serpent"),
         ("Auriza Hero's Grave", "Crucible Knight Ordovis", "Crucible Knight"),
         ("Caelid - Redmane Castle", "Misbegotten Warrior / Crucible Knight", "Crucible Knight"),
@@ -148,6 +174,7 @@ def test_the_docs_ids_are_built_as_written(instances: tuple[BossInstance, ...]) 
         (SELLIA, "Nox Swordstress & Nox Monk", "Nox Priest"),
         ("Perfumer's Grotto", "Omenkiller & Miranda the Blighted Bloom", "Omenkiller"),
         ("Unsightly Catacombs", "Perfumer Tricia & Misbegotten Warrior", "Misbegotten Warrior"),
+        ("Scaduview - Hinterland", "Tree Sentinel", "Tree Sentinel (Torch)"),
     ],
 )
 def test_one_fight_is_one_instance(
@@ -182,6 +209,9 @@ def test_one_fight_is_one_instance(
         ("Altus Plateau - Woodfolk Ruins, Minor Erdtree", "Wormface"),
         ("Limgrave - Agheel Lake South, Forlorn Hound Evergaol", "Bloodhound Knight Darriwil"),
         (ROYAL, "Godfrey, First Elden Lord"),
+        ("Jagged Peak - Jagged Peak Summit, Bayle Arena", "Bayle the Dread"),
+        ("Subterranean Shunning-Grounds", "Mohg, the Omen"),
+        (ASHEN, "Sir Gideon Ofnir, the All-Knowing"),
     ],
 )
 def test_the_owner_names_are_applied(
@@ -216,6 +246,12 @@ def test_every_instance_resolves_to_a_location_and_region(
             "Dryleaf Dane",
             "dlc_gravesite",
         ),
+        ("Enir-Ilim", "Leda and Allies", "dlc_enirilim"),
+        ("Ainsel River Main", "Baleful Shadow", "ainsel"),
+        ("Scaduview - Hinterland", "Tree Sentinel", "dlc_shadowkeep"),
+        ("Charo's Hidden Grave - Southeast Mariner Area", "Tibia Mariner", "dlc_jaggedpeak"),
+        ("Ancient Ruins of Rauh - Furnace Golem Area", "Furnace Golem", "dlc_gravesite"),
+        ("Scadu Altus - South Ruins of Unte (inactive)", "Furnace Golem", "dlc_shadowkeep"),
         (
             "Mountaintops of the Giants - West of Castle Sol; Consecrated Snowfield - North of "
             "Minor Erdtree",
@@ -260,9 +296,9 @@ def test_identity_strips_the_variants(name: str, identity: str) -> None:
 
 def _fixture(
     *,
-    merges: dict[tuple[str, str], str] | None = None,
+    merges: dict[tuple[str, str], tuple[str, str]] | None = None,
     names: dict[tuple[str, str], str] | None = None,
-    additions: tuple[tuple[str, str], ...] = (),
+    additions: tuple[tuple[str, str, str], ...] = (),
 ) -> BossOverrides:
     return BossOverrides(
         merges=merges or {},
@@ -292,7 +328,7 @@ def test_variants_collapse_and_a_label_loses_its_tag() -> None:
 
 def test_a_merge_makes_one_instance_and_a_name_can_cover_every_label() -> None:
     overrides = _fixture(
-        merges={("Cave", "Rat"): "Rat & Bat", ("Cave", "Bat"): "Rat & Bat"},
+        merges={("Cave", "Rat"): ("Rat & Bat", ""), ("Cave", "Bat"): ("Rat & Bat", "")},
         names={("Rat", ""): "Giant Rat"},
     )
     assert [row.id for row in build_boss_instances(ROWS, overrides)] == [
@@ -301,19 +337,33 @@ def test_a_merge_makes_one_instance_and_a_name_can_cover_every_label() -> None:
     ]
 
 
-def test_an_addition_needs_its_untagged_row() -> None:
-    overrides = _fixture(additions=(("Dane", "[DLC] Keep"),))
-    assert build_boss_instances(ROWS, overrides)[-1].id == "dane_keep"
+def test_a_merge_may_join_two_labels_under_its_own() -> None:
+    overrides = _fixture(
+        merges={("Cave", "Rat"): ("Rat", "Far Side"), ("[DLC] Keep", "Rat"): ("Rat", "Far Side")}
+    )
+    assert build_boss_instances(ROWS, overrides) == (
+        BossInstance("rat_far_side", "Rat", "cave", "Far Side"),
+        BossInstance("bat_cave", "Bat", "cave", "Cave"),
+    )
+
+
+def test_an_addition_brings_its_own_label_and_location() -> None:
+    overrides = _fixture(additions=(("Dane", "Far Keep", "elsewhere"),))
+    assert build_boss_instances(ROWS, overrides)[-1] == BossInstance(
+        "dane_far_keep", "Dane", "elsewhere", "Far Keep"
+    )
 
 
 @pytest.mark.parametrize(
     ("overrides", "message"),
     [
-        (_fixture(merges={("Cave", "Cat"): "A", ("Cave", "Rat"): "A"}), "boss_merges names no"),
-        (_fixture(merges={("Cave", "Rat"): "A"}), "boss_merges joins nothing"),
+        (
+            _fixture(merges={("Cave", "Cat"): ("A", ""), ("Cave", "Rat"): ("A", "")}),
+            "boss_merges names no",
+        ),
+        (_fixture(merges={("Cave", "Rat"): ("A", "")}), "boss_merges joins nothing"),
         (_fixture(names={("Cat", ""): "A"}), "boss_names corrects no"),
         (_fixture(names={("Rat", "Elsewhere"): "A"}), "boss_names corrects no"),
-        (_fixture(additions=(("Cat", "Cave"),)), "the CSV has no"),
     ],
 )
 def test_a_bad_override_stops_the_build(overrides: BossOverrides, message: str) -> None:
@@ -326,11 +376,9 @@ def test_two_instances_with_one_id_stop_the_build() -> None:
         build_boss_instances((("Cave", "R-at [Boss]"), ("Cave", "R at [Boss]")), _fixture())
 
 
-def test_a_tagged_addition_stops_the_build() -> None:
-    with pytest.raises(BuildError, match="already tags"):
-        build_boss_instances(
-            (("Cave", "Rat"), ("Cave", "Rat [Boss]")), _fixture(additions=(("Rat", "Cave"),))
-        )
+def test_an_addition_of_a_tagged_boss_stops_the_build() -> None:
+    with pytest.raises(BuildError, match="already in the pool"):
+        build_boss_instances(ROWS, _fixture(additions=(("Bat", "Cave", "cave"),)))
 
 
 def test_a_boss_with_no_alias_stops_the_build() -> None:
@@ -338,18 +386,29 @@ def test_a_boss_with_no_alias_stops_the_build() -> None:
         build_boss_instances((("Nowhere", "Rat [Boss]"),), _fixture())
 
 
-MERGE_HEADER = "label,csv_name,instance,reason,reviewer\n"
+MERGE_HEADER = "label,csv_name,instance,instance_label,reason,reviewer\n"
+ADDITION_HEADER = "name,location_label,location_id,reason,reviewer\n"
+
+
+def _load_additions(path: Path) -> object:
+    return load_boss_additions(path, location_ids={"cave"})
 
 
 @pytest.mark.parametrize(
     ("loader", "text", "message"),
     [
-        (load_boss_merges, f"{MERGE_HEADER}A,B,,why,owner\n", "empty instance"),
-        (load_boss_merges, f"{MERGE_HEADER}A,B,C,,owner\n", "empty reason"),
-        (load_boss_merges, f"{MERGE_HEADER}A,B,C,why,owner\nA,B,D,why,owner\n", "duplicate row"),
+        (load_boss_merges, f"{MERGE_HEADER}A,B,,,why,owner\n", "empty instance"),
+        (load_boss_merges, f"{MERGE_HEADER}A,B,C,,,owner\n", "empty reason"),
+        (load_boss_merges, f"{MERGE_HEADER}A,B,C,,why,owner\nA,B,D,,why,owner\n", "duplicate row"),
         (load_boss_names, "csv_name,label,name,reason,reviewer\nA,,,why,owner\n", "empty name"),
-        (load_boss_additions, "name,label,reason,reviewer\nA,,why,owner\n", "empty label"),
-        (load_boss_additions, "name,label,reason,reviewer\n", "no rows"),
+        (_load_additions, f"{ADDITION_HEADER}A,,cave,why,owner\n", "empty location_label"),
+        (_load_additions, f"{ADDITION_HEADER}A,B,nowhere,why,owner\n", "unknown location_id"),
+        (
+            _load_additions,
+            f"{ADDITION_HEADER}A,B,cave,why,owner\nA,B,cave,why,owner\n",
+            "duplicate",
+        ),
+        (_load_additions, ADDITION_HEADER, "no rows"),
     ],
 )
 def test_a_bad_row_stops_the_load(
