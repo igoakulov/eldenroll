@@ -287,8 +287,10 @@ armor_sets,Bleed custom sets,base,"owner to compose, with White Mask (was taskli
 armor_sets,Rot and Poison custom sets,base,"owner to compose, with Mushroom Crown (was tasklist O9)",manual,2.6.3,owner,open,,
 armor_sets,Finger Robe,dlc,"the wiki lists it in the High Priest Set, but the mod has no item or slot with this name, so it is not in the pool",manual,2.3.3,owner,applied,"not a separate piece: it is the altered form of High Priest Robe, which is already a row, so it gets no row of its own",owner
 armor_sets,Blue Dancer custom sets,mixed,"owner to compose, naked or low weight (was tasklist O9)",manual,2.6.3,owner,open,,
-armor_sets,Per-set choices,mixed,"sets with extra variants need a choice, such as Raya Lucaria's 4 crowns and Gravebird's 2 chests",manual,2.6.1,both,open,,
-armor_sets,Set table,mixed,about 150 sets to vendor from https://eldenring.wiki.gg/wiki/Armor_Sets,manual,2.6.1,agent,open,,
+armor_sets,Per-set choices,mixed,"sets with extra variants need a choice, such as Raya Lucaria's 4 crowns and Gravebird's 2 chests",manual,2.6.1,both,applied,"one variant per slot, by owner's pick, and Highland Warrior split in two; data.md 4.3 lists them, and armor_sets.csv holds them",owner
+armor_sets,Pieces in no set,mixed,"53 armor pieces belong to no set, so they cannot roll until one names them. They stay rows on purpose (data.md 1.1); docs/armor_set_worklist.md lists them",manual,2.6.3,owner,open,,
+armor_sets,Set table,mixed,about 150 sets to vendor from https://eldenring.wiki.gg/wiki/Armor_Sets,manual,2.6.1,agent,applied,"161 sets in armor_sets.csv, memberships checked against the page, 2 of them named by the owner",agent
+armor_sets,Sets missing a piece,mixed,"32 sets have an empty slot, which shows any until a set is completed; docs/armor_set_worklist.md lists them",manual,2.6.3,owner,open,,
 blue_dancer,Heavy weapon classes,mixed,"prd.md section 7 sets heavy weapon classes to zero with Blue Dancer Charm, but no document lists them",manual,2.9.5,owner,open,,
 blue_dancer,Light armor sets,mixed,"prd.md section 7 boosts light and no-piece sets with Blue Dancer Charm, but no document lists them",manual,2.9.5,owner,open,,
 rule_descriptions,28 combat rules,base,"prd.md section 7 has only their names, and each row needs a description",manual,2.9.3,both,open,,
