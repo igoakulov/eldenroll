@@ -10,8 +10,12 @@ import pytest
 from eldenrando.build.items import build_item_table, new_item, none_item
 from eldenrando.errors import BuildError
 from eldenrando.loaders.iteminfo import load_item_catalog
+from eldenrando.loaders.odds import load_odds
+from eldenrando.loaders.schema import LoaderError
+from eldenrando.normalize.item_odds import assign_item_odds
 from eldenrando.normalize.slug import slugify
 from eldenrando.paths import ITEM_INFO
+from eldenrando.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -29,6 +33,7 @@ SECTION_2_FIELDS = [
     "int",
     "fth",
     "arc",
+    "odds",
 ]
 
 
@@ -91,6 +96,7 @@ def test_new_item_defaults_are_the_non_weapon_row() -> None:
         "int": 0,
         "fth": 0,
         "arc": 0,
+        "odds": 1,
     }
 
 
@@ -193,9 +199,58 @@ def test_the_none_row_holds_exactly_the_documented_values() -> None:
         "int": 0,
         "fth": 0,
         "arc": 0,
+        "odds": 1,
     }
 
 
 def test_a_second_none_row_stops_the_build() -> None:
     with pytest.raises(BuildError, match="2 none rows"):
         build_item_table([none_item(), new_item("empty", "none")])
+
+
+def test_an_item_starts_at_odds_one() -> None:
+    assert new_item("Hat", "armor").odds == 1
+    assert none_item().odds == 1
+
+
+def test_odds_overrides_replace_only_the_named_items() -> None:
+    rows = (new_item("Hat", "armor"), new_item("Mask", "armor"))
+
+    set_rows = assign_item_odds(rows, {"mask": 0})
+
+    assert [row.odds for row in set_rows] == [1, 0]
+
+
+def test_an_odds_override_for_no_item_stops_the_build() -> None:
+    with pytest.raises(BuildError, match="item_odds names no item: ghost"):
+        assign_item_odds((new_item("Hat", "armor"),), {"ghost": 0})
+
+
+def test_only_the_items_that_never_roll_sit_at_odds_zero() -> None:
+    table = load_sources(ROOT).table
+
+    assert {row.name for row in table if row.odds == 0} == {
+        "Igon's Drake Hunt",
+        "Lamenter's Mask",
+        "Priestess Heart",
+        "Rock Heart",
+    }
+    assert {row.odds for row in table} == {0, 1}
+
+
+@pytest.mark.parametrize(
+    ("body", "message"),
+    [
+        ("mask,-1,why,owner\n", "has odds"),
+        ("mask,many,why,owner\n", "has odds"),
+        ("mask,,why,owner\n", "empty odds"),
+        ("mask,0,,owner\n", "empty reason"),
+        ("mask,0,why,owner\nmask,1,why,owner\n", "duplicate item"),
+    ],
+)
+def test_a_bad_odds_row_is_a_loader_error(tmp_path: Path, body: str, message: str) -> None:
+    path = tmp_path / "item_odds.csv"
+    path.write_text(f"item,odds,reason,reviewer\n{body}", encoding="utf-8")
+
+    with pytest.raises(LoaderError, match=message):
+        load_odds(path, "item")

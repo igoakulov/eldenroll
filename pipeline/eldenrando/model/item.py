@@ -41,6 +41,7 @@ class Item:
     req_int: int
     req_fth: int
     req_arc: int
+    odds: float = 1
 
     def to_row(self) -> dict[str, object]:
         """Return the row as stored in `db.json`, in `data.md` §2 field order."""
@@ -58,4 +59,5 @@ class Item:
             "int": self.req_int,
             "fth": self.req_fth,
             "arc": self.req_arc,
+            "odds": self.odds,
         }

@@ -37,6 +37,7 @@ from eldenrando.loaders.iteminfo import load_item_catalog
 from eldenrando.loaders.itemslots import load_slots
 from eldenrando.loaders.json_source import load_document
 from eldenrando.loaders.name_variants import load_name_variants
+from eldenrando.loaders.odds import load_odds
 from eldenrando.loaders.requirements import load_requirements
 from eldenrando.loaders.str_bonus import load_str_bonus
 from eldenrando.loaders.weapons import (
@@ -52,6 +53,7 @@ from eldenrando.model.item_slot import ItemSlot
 from eldenrando.model.name_variant import NameVariant
 from eldenrando.normalize.armor_slots import assign_armor_slots
 from eldenrando.normalize.infusable import assign_infusable
+from eldenrando.normalize.item_odds import assign_item_odds
 from eldenrando.normalize.placement_names import PlacementNames, placement_names
 from eldenrando.normalize.requirements import (
     REQUIREMENT_FIELDS,
@@ -406,11 +408,14 @@ def load_sources(root: Path) -> GapSources:
         for document, _, _ in REQUIREMENT_FIELDS
     }
     return GapSources(
-        table=assign_requirements(
-            table,
-            requirement_records,
-            variants,
-            load_requirements(overrides / "requirements.csv"),
+        table=assign_item_odds(
+            assign_requirements(
+                table,
+                requirement_records,
+                variants,
+                load_requirements(overrides / "requirements.csv"),
+            ),
+            load_odds(overrides / "item_odds.csv", "item"),
         ),
         catalog=catalog,
         variants=variants,

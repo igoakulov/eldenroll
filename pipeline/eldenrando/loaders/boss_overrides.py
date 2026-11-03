@@ -7,11 +7,11 @@ because the CSV has no usable row for most of them: one row there can cover seve
 
 from __future__ import annotations
 
-import math
 from collections.abc import Collection
 from pathlib import Path
 
 from eldenrando.loaders.csv_source import CsvTable, read_table
+from eldenrando.loaders.odds import load_odds
 from eldenrando.loaders.schema import LoaderError
 
 MERGE_COLUMNS: tuple[str, ...] = (
@@ -23,7 +23,6 @@ MERGE_COLUMNS: tuple[str, ...] = (
     "reviewer",
 )
 NAME_COLUMNS: tuple[str, ...] = ("csv_name", "label", "name", "reason", "reviewer")
-ODDS_COLUMNS: tuple[str, ...] = ("boss", "odds", "reason", "reviewer")
 ADDITION_COLUMNS: tuple[str, ...] = (
     "name",
     "location_label",
@@ -73,19 +72,7 @@ def load_boss_additions(
 
 def load_boss_odds(path: Path) -> dict[str, float]:
     """Return `{boss instance id: odds}` for the bosses whose odds are not 1."""
-    table = read_table(path, required_columns=ODDS_COLUMNS)
-    out: dict[str, float] = {}
-    for boss, text in _rows(path, table, required=ODDS_COLUMNS, wanted=ODDS_COLUMNS[:2]):
-        if boss in out:
-            raise LoaderError(f"{path}: duplicate boss {boss!r}")
-        try:
-            odds = float(text)
-        except ValueError as error:
-            raise LoaderError(f"{path}: {boss!r} has odds {text!r}") from error
-        if not math.isfinite(odds) or odds < 0:
-            raise LoaderError(f"{path}: {boss!r} has odds {text!r}")
-        out[boss] = odds
-    return out
+    return load_odds(path, "boss")
 
 
 def _rows(
