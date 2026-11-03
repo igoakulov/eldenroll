@@ -21,6 +21,7 @@ from eldenrando.loaders.boss_overrides import (
     load_boss_additions,
     load_boss_merges,
     load_boss_names,
+    load_boss_odds,
 )
 from eldenrando.loaders.bosses import load_boss_creature_locations
 from eldenrando.loaders.location_aliases import (
@@ -66,6 +67,7 @@ def _overrides() -> BossOverrides:
         locations=load_boss_location_overrides(
             OVERRIDES / "boss_location_overrides.csv", labels=aliases, location_ids=location_ids
         ),
+        odds=load_boss_odds(OVERRIDES / "boss_odds.csv"),
     )
 
 
@@ -94,8 +96,9 @@ def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -
     assert len(pairs) == 222
     assert len(fights) == 15
     assert savings == 16
-    assert len(overrides.additions) == 14
-    assert len(instances) == len(pairs) - savings + len(overrides.additions) == 220
+    assert len(overrides.additions) == 25
+    assert len(instances) == len(pairs) - savings + len(overrides.additions) == 231
+    assert sum(row.odds > 0 for row in instances) == 220
 
 
 @needs_files
@@ -105,8 +108,9 @@ def test_the_base_game_and_dlc_split(instances: tuple[BossInstance, ...]) -> Non
         OVERRIDES / "region_areas.csv", region_ids={row.id for row in regions}
     )
     dlc = {row.id for row in regions if row.is_dlc}
-    assert sum(region_of_area[row.location_id] in dlc for row in instances) == 52
-    assert sum(region_of_area[row.location_id] not in dlc for row in instances) == 168
+    rollable = [row for row in instances if row.odds > 0]
+    assert sum(region_of_area[row.location_id] in dlc for row in rollable) == 52
+    assert sum(region_of_area[row.location_id] not in dlc for row in rollable) == 168
 
 
 @needs_files
@@ -117,6 +121,26 @@ def test_the_fights_the_csv_leaves_untagged(instances: tuple[BossInstance, ...])
     assert names["Crucible Knight Devonia"] == 1
     assert names["Tibia Mariner"] == 4
     assert names["Baleful Shadow"] == 1
+
+
+@needs_files
+def test_the_fights_at_odds_zero_are_kept_for_their_drops(
+    instances: tuple[BossInstance, ...],
+) -> None:
+    assert {(row.name, row.location_label) for row in instances if row.odds == 0} == {
+        ("Blaidd the Half-Wolf", "Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise"),
+        ("Fire Knight Kood", "Specimen Storehouse - Shadow Tower"),
+        ("Fire Knight Salza", "Shadow Keep - West Rampart"),
+        ("Fire Knight Wego", "Shadow Keep - Drained Church District"),
+        ("Divine Bird Warrior", "Belurat, Tower Settlement Swamp"),
+        ("Divine Bird Warrior", "Enir-Ilim"),
+        ("Ensha of the Royal Remains", "Roundtable Hold"),
+        ("Erdtree Avatar", "Deeproot Depths"),
+        ("Fire Prelate", "Mt. Gelmir - Fort Laiedd"),
+        ("Putrid Avatar", "Miquella's Haligtree - Elphael"),
+        ("Shadow Tree Spirit", "Gravesite Plain - Ellac River Cave"),
+    }
+    assert {row.odds for row in instances} == {0, 1}
 
 
 @needs_files
@@ -299,6 +323,7 @@ def _fixture(
     merges: dict[tuple[str, str], tuple[str, str]] | None = None,
     names: dict[tuple[str, str], str] | None = None,
     additions: tuple[tuple[str, str, str], ...] = (),
+    odds: dict[str, float] | None = None,
 ) -> BossOverrides:
     return BossOverrides(
         merges=merges or {},
@@ -306,6 +331,7 @@ def _fixture(
         additions=additions,
         aliases={"Cave": "cave", "[DLC] Keep": "keep"},
         locations={},
+        odds=odds or {},
     )
 
 
@@ -345,6 +371,16 @@ def test_a_merge_may_join_two_labels_under_its_own() -> None:
         BossInstance("rat_far_side", "Rat", "cave", "Far Side"),
         BossInstance("bat_cave", "Bat", "cave", "Cave"),
     )
+
+
+def test_odds_default_to_one_and_a_row_can_set_them() -> None:
+    linked = build_boss_instances(ROWS, _fixture(odds={"bat_cave": 0, "rat_keep": 2.5}))
+    assert {row.id: row.odds for row in linked} == {"rat_cave": 1, "bat_cave": 0, "rat_keep": 2.5}
+
+
+def test_an_odds_row_for_no_boss_stops_the_build() -> None:
+    with pytest.raises(BuildError, match="boss_odds names no boss: cat_cave"):
+        build_boss_instances(ROWS, _fixture(odds={"cat_cave": 0}))
 
 
 def test_an_addition_brings_its_own_label_and_location() -> None:
@@ -388,6 +424,7 @@ def test_a_boss_with_no_alias_stops_the_build() -> None:
 
 MERGE_HEADER = "label,csv_name,instance,instance_label,reason,reviewer\n"
 ADDITION_HEADER = "name,location_label,location_id,reason,reviewer\n"
+ODDS_HEADER = "boss,odds,reason,reviewer\n"
 
 
 def _load_additions(path: Path) -> object:
@@ -409,6 +446,12 @@ def _load_additions(path: Path) -> object:
             "duplicate",
         ),
         (_load_additions, ADDITION_HEADER, "no rows"),
+        (load_boss_odds, f"{ODDS_HEADER}a,-1,why,owner\n", "has odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,many,why,owner\n", "has odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,nan,why,owner\n", "has odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,,why,owner\n", "empty odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,1,,owner\n", "empty reason"),
+        (load_boss_odds, f"{ODDS_HEADER}a,1,why,owner\na,2,why,owner\n", "duplicate boss"),
     ],
 )
 def test_a_bad_row_stops_the_load(

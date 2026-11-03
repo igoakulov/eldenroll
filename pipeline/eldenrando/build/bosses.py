@@ -2,8 +2,9 @@
 
 One row per variant or phase collapses to one pair of identity and label. `boss_merges.csv` then
 joins the pairs that are one fight, `boss_names.csv` corrects the names of the rest, and
-`boss_additions.csv` adds the fights the CSV leaves untagged. Every merge and name row must apply,
-so a source change that orphans one stops the build instead of quietly changing the pool.
+`boss_additions.csv` adds the fights the CSV leaves untagged, and `boss_odds.csv` sets the odds that
+are not 1. Every merge, name and odds row must apply, so a source change that orphans one stops the
+build instead of quietly changing the pool.
 """
 
 from __future__ import annotations
@@ -33,6 +34,7 @@ class BossOverrides:
     additions: Sequence[tuple[str, str, str]]
     aliases: Mapping[str, str]
     locations: Mapping[tuple[str, str], str]
+    odds: Mapping[str, float]
 
 
 def boss_identity(name: str) -> str:
@@ -69,7 +71,7 @@ def build_boss_instances(
         if (label, name) in fights:
             raise BuildError(f"boss_additions: {name!r} on {label!r} is already in the pool")
         fights[(label, name)] = location_id
-    return _instances(fights)
+    return _instances(fights, overrides.odds)
 
 
 def _corrected(identity: str, label: str, overrides: BossOverrides) -> str:
@@ -78,8 +80,10 @@ def _corrected(identity: str, label: str, overrides: BossOverrides) -> str:
     return names.get((identity, label)) or names.get((identity, "")) or identity
 
 
-def _instances(fights: Mapping[tuple[str, str], str]) -> tuple[BossInstance, ...]:
-    """Return the fights as rows, or raise `BuildError` when two share an id."""
+def _instances(
+    fights: Mapping[tuple[str, str], str], odds: Mapping[str, float]
+) -> tuple[BossInstance, ...]:
+    """Return the fights as rows, or raise `BuildError` on a shared id or an unknown odds row."""
     seen: set[str] = set()
     out: list[BossInstance] = []
     for (label, name), location_id in fights.items():
@@ -90,9 +94,16 @@ def _instances(fights: Mapping[tuple[str, str], str]) -> tuple[BossInstance, ...
         seen.add(instance_id)
         out.append(
             BossInstance(
-                id=instance_id, name=name, location_id=location_id, location_label=location_label
+                id=instance_id,
+                name=name,
+                location_id=location_id,
+                location_label=location_label,
+                odds=odds.get(instance_id, 1),
             )
         )
+    unknown = sorted(set(odds) - seen)
+    if unknown:
+        raise BuildError(f"boss_odds names no boss: {', '.join(unknown)}")
     return tuple(out)
 
 
