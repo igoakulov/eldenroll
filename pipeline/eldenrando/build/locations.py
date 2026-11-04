@@ -1,10 +1,3 @@
-"""Location rows built from the annotations and the area → region map.
-
-Every annotation area becomes exactly one location. The join is strict: an area without a
-region, a region row for an area the annotations do not define, or a repeated area name all
-stop the build instead of dropping or duplicating a row.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
@@ -17,7 +10,6 @@ from eldenrando.model.location import Location
 def build_locations(
     areas: Sequence[Area], region_areas: Mapping[str, str]
 ) -> tuple[Location, ...]:
-    """Return one location per area, in annotation order, or raise `BuildError`."""
     known = {area.name for area in areas}
     unknown = sorted(set(region_areas) - known)
     if unknown:

@@ -1,12 +1,9 @@
-"""Armor rows, from the mod's armor group.
-
-Altering is left to the player, so no name carries `(Altered)`. The pieces `iteminfo` holds only
+"""Altering is left to the player, so no name carries `(Altered)`. The pieces `iteminfo` holds only
 in altered form are renamed by `name_variants.csv`; every other altered piece merges into its
 unaltered row, and placement unions their locations. An altered piece with neither stops the
 build instead of dropping a row.
 
-`image` stays at its default here, and `normalize/armor_slots.py` sets `subcategory`; validation
-enforces both.
+`image` is left at its default; `normalize/armor_slots.py` sets `subcategory`.
 """
 
 from __future__ import annotations
@@ -23,7 +20,6 @@ _ALTERED_SUFFIX = " (Altered)"
 
 
 def build_armor(catalog: ItemCatalog, variants: Mapping[str, NameVariant]) -> tuple[Item, ...]:
-    """Return one row per armor piece, in group order, or raise `BuildError`."""
     names = canonical_names(catalog, "protectors", "protector", variants)
     known = set(names)
     orphans = sorted(

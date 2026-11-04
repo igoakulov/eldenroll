@@ -1,12 +1,8 @@
-"""Weapon and shield rows, from the mod's weapon group and the weapon class sheet.
-
-Membership starts from the group, never from the sheet, because the sheet also lists `Unarmed`.
-The sheet's class decides `category` and `subcategory`, including where the JSON disagrees
-(owner decision). The join is strict: a weapon without a class, a sheet name that is no weapon,
-or a name with two classes all stop the build instead of dropping a row.
+"""Membership starts from the group, never from the sheet, because the sheet also lists `Unarmed`.
+The sheet's class decides `category` and `subcategory`, including where the JSON disagrees.
 
 `infusable`, `str_bonus_2h`, the requirements and `image` stay at their defaults here; later
-steps fill them in and validation enforces them.
+steps fill them in.
 """
 
 from __future__ import annotations
@@ -31,7 +27,6 @@ def build_weapons(
     added_names: Iterable[str],
     classes: CsvTable,
 ) -> tuple[Item, ...]:
-    """Return one row per weapon and shield, group order first, or raise `BuildError`."""
     names = (*canonical_names(catalog, "weapons", "weapon", variants), *added_names)
     subcategories = _subcategories(classes)
     unknown = sorted(set(subcategories) - set(names) - _NOT_A_ROW)
@@ -62,6 +57,5 @@ def _subcategories(classes: CsvTable) -> dict[str, str]:
 
 
 def _row(name: str, subcategory: str) -> Item:
-    """Return the row for one weapon or shield."""
     category: Category = "shield" if subcategory in _SHIELD_CLASSES else "weapon"
     return new_item(name, category, subcategory=subcategory)

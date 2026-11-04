@@ -1,7 +1,4 @@
-"""Where the committed source files live (`data/sources/README.md`).
-
-Sources are grouped by what they are used for, so this is the one place that knows the layout.
-"""
+"""Sources are grouped by what they are used for, so this is the one place that knows the layout."""
 
 from __future__ import annotations
 

@@ -1,8 +1,5 @@
-"""Load the 174 area → region rows from `data/overrides/region_areas.csv`.
-
-The map is authored: the randomizer groups areas that share an access path and a level band,
-and that grouping is not derivable from the annotations. The loader checks what the build
-relies on — one row per area, and a region that exists in the seed.
+"""The map is authored: the randomizer groups areas that share an access path and a level band, and
+that grouping is not derivable from the annotations.
 """
 
 from __future__ import annotations
@@ -17,7 +14,6 @@ AREA_COLUMNS: tuple[str, ...] = ("area", "region_id")
 
 
 def load_region_areas(path: Path, *, region_ids: Collection[str]) -> dict[str, str]:
-    """Return `{area: region_id}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=AREA_COLUMNS)
     area_column = table.column("area")
     region_column = table.column("region_id")

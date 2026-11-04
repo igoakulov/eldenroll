@@ -11,8 +11,6 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class AshCompatibility:
-    """An ash and the class or category it fits."""
-
     ash_id: str
     category: str
     subcategory: str | None

@@ -1,8 +1,5 @@
-"""One placement slot from `item_slots.yaml`.
-
-A slot is a place in the world that holds items in the unrandomized game. The randomizer
-adds one more slot per place (`Area: unknown`, `Key` starting `999999`) which is a mod test
-fixture rather than a location; those are marked with the `ignore` tag and must never
+"""The randomizer adds one more slot per place (`Area: unknown`, `Key` starting `999999`) which is a
+mod test fixture rather than a location; those are marked with the `ignore` tag and must never
 become a `location` row.
 """
 
@@ -13,8 +10,6 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class ItemSlot:
-    """A single slot and the items the vanilla game places there."""
-
     key: str
     area: str
     text: str
@@ -29,10 +24,7 @@ class ItemSlot:
 
     @property
     def is_randomizable(self) -> bool:
-        """Return whether the slot is a real location the randomizer may place into.
-
-        `ignore` marks the mod's own fixture slots and two unused-item slots. They carry
-        placeholder text (`aaaaaaaaaaaaaaaaa`), unused entity ids, or `[ERROR]` names, and
-        none of them holds the only copy of a pool item.
+        """`ignore` marks the mod's own fixture slots and two unused-item slots. None of them holds
+        the only copy of a pool item.
         """
         return "ignore" not in self.tags

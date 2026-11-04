@@ -1,10 +1,4 @@
-"""Areas and events from `areas.yaml`.
-
-The file is the randomizer's whole configuration. Only two sections are modelled here:
-`Areas` (the 174 canonical areas) and `Events` (46 named progression events, 42 of which
-are bosses). The rest is read by later stages.
-
-`Area.req` is a boolean expression over areas, events, key items and switches. It is kept
+"""`Area.req` is a boolean expression over areas, events, key items and switches. It is kept
 verbatim and never evaluated: the database stores where a thing is, not how it is reached.
 """
 
@@ -15,8 +9,6 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class Area:
-    """One canonical area: the unit that drives region grouping."""
-
     name: str
     text: str
     req: str | None
@@ -29,14 +21,11 @@ class Area:
 
     @property
     def is_dlc(self) -> bool:
-        """Return whether the area belongs to the Shadow of the Erdtree map set."""
         return "dlc" in self.tags
 
 
 @dataclass(frozen=True, slots=True)
 class GameEvent:
-    """One named progression event; the boss events name a boss and the area it is fought in."""
-
     name: str
     req: str
     text: str | None
@@ -44,15 +33,11 @@ class GameEvent:
 
 @dataclass(frozen=True, slots=True)
 class AnnotationConfig:
-    """The modelled sections of `areas.yaml`."""
-
     areas: tuple[Area, ...]
     events: tuple[GameEvent, ...]
 
     def area_by_name(self) -> dict[str, Area]:
-        """Return areas keyed by canonical name."""
         return {area.name: area for area in self.areas}
 
     def event_by_name(self) -> dict[str, GameEvent]:
-        """Return events keyed by name."""
         return {event.name: event for event in self.events}

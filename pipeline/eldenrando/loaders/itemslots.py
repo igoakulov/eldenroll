@@ -1,9 +1,6 @@
-"""Load `item_slots.yaml` into `ItemSlot` records.
-
-Each slot documents what the vanilla game puts in one place, as a list of human-readable
-lines. Only five line shapes carry an item name; the rest are prose hints. The name is
-everything before the first `" - "`, and only when the remainder starts with `lot `,
-`shop ` or `enemy lot `.
+"""Each slot documents what the vanilla game puts in one place, as a list of human-readable lines.
+Only five line shapes carry an item name; the rest are prose hints. The name is everything before
+the first " - ", and only when the remainder starts with `lot `, `shop ` or `enemy lot `.
 """
 
 from __future__ import annotations
@@ -51,7 +48,6 @@ def load_slots(path: Path) -> tuple[ItemSlot, ...]:
 
 
 def _parse_slot(entry: object, where: str) -> ItemSlot:
-    """Return one slot record."""
     mapping = require_mapping(entry, where)
     check_keys(mapping, _SLOT_FIELDS, where)
     debug_lines = get_string_list(mapping, "DebugText", where)
@@ -71,13 +67,11 @@ def _parse_slot(entry: object, where: str) -> ItemSlot:
 
 
 def extract_items(debug_lines: tuple[str, ...]) -> tuple[str, ...]:
-    """Return the item names carried by a list of `DebugText` lines."""
     names = [name for line in debug_lines for name in _item_of(line)]
     return tuple(names)
 
 
 def _item_of(line: str) -> tuple[str, ...]:
-    """Return zero or one item name for a single `DebugText` line."""
     head, separator, rest = line.partition(" - ")
     if not separator or not rest.startswith(_ITEM_SOURCES):
         return ()

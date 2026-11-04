@@ -1,8 +1,3 @@
-"""Load `data/overrides/str_bonus_2h.csv`, weapons whose two-handed bonus differs from their class.
-
-Each row is a correction, so it carries a reason and a reviewer.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,7 +10,6 @@ _VALUES: dict[str, bool] = {"true": True, "false": False}
 
 
 def load_str_bonus(path: Path) -> dict[str, bool]:
-    """Return `{item: has the bonus}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: dict[str, bool] = {}

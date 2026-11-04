@@ -1,6 +1,4 @@
-"""Load `data/overrides/aliases.csv`, an authored seed.
-
-`members` holds selectors in the `slot_pools.csv` form, because a name-based rule could catch the
+"""`members` holds selectors in the `slot_pools.csv` form, because a name-based rule could catch the
 wrong item. An item is named by id, or a class is named when the alias is the whole class.
 """
 
@@ -17,15 +15,12 @@ from eldenrando.normalize.slug import slugify
 
 @dataclass(frozen=True, slots=True)
 class AliasRow:
-    """One row of the file, with its selectors split but not yet normalized."""
-
     id: str
     label: str
     members: tuple[tuple[str, tuple[str, ...]], ...]
 
 
 def load_aliases(path: Path) -> tuple[AliasRow, ...]:
-    """Return the rows in file order, or raise `LoaderError` on an empty cell or a bad id."""
     table = read_table(path, required_columns=("id", "label", "members"))
     rows: list[AliasRow] = []
     seen: set[str] = set()

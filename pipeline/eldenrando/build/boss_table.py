@@ -1,5 +1,3 @@
-"""Load the boss CSV and its corrections and build the boss table from them (`data.md` §6)."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -22,7 +20,6 @@ from eldenrando.paths import AREAS, ENEMY_LOCATIONS
 
 
 def load_boss_rows() -> tuple[tuple[str, str], ...]:
-    """Return `(label, name)` of every row of the boss CSV."""
     table = load_boss_creature_locations(ENEMY_LOCATIONS)
     label = table.column("Location")
     name = table.column("Name")
@@ -30,7 +27,6 @@ def load_boss_rows() -> tuple[tuple[str, str], ...]:
 
 
 def load_boss_overrides(overrides: Path) -> BossOverrides:
-    """Return the corrections to the boss CSV, from a checkout's `data/overrides/`."""
     location_ids = {area.name for area in load_annotations(AREAS).areas}
     aliases = load_location_aliases(overrides / "location_aliases.csv", location_ids=location_ids)
     return BossOverrides(
@@ -46,5 +42,4 @@ def load_boss_overrides(overrides: Path) -> BossOverrides:
 
 
 def load_boss_instances(overrides: Path) -> tuple[BossInstance, ...]:
-    """Return the boss table, or raise `BuildError`."""
     return build_boss_instances(load_boss_rows(), load_boss_overrides(overrides))

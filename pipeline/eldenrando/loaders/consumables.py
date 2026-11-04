@@ -1,8 +1,5 @@
-"""Load the tool and consumable catalog from `data/sources/`.
-
-`tool_consumable_classes.csv` has one row per tool or consumable entry, with the
-category carried in `subCategory1`/`subCategory2`. The two fields hold `FALSE` or `-` on the
-rows the classification cannot reach, so they stay raw strings here.
+"""The two fields hold `FALSE` or `-` on the rows the classification cannot reach, so they stay raw
+strings here.
 """
 
 from __future__ import annotations
@@ -15,5 +12,4 @@ CONSUMABLE_COLUMNS: tuple[str, ...] = ("Name", "subCategory1", "subCategory2")
 
 
 def load_consumable_categories(path: Path) -> CsvTable:
-    """Return `tool_consumable_classes.csv`."""
     return read_table(path, required_columns=CONSUMABLE_COLUMNS)

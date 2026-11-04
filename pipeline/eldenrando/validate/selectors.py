@@ -1,5 +1,3 @@
-"""Every selector uses known ids and matches something (`prd.md` §8.4, §9.2)."""
-
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
@@ -35,7 +33,6 @@ def known_ids(
 def validate_selectors(
     selectors: Iterable[Selector], known: Mapping[SelectorKind, AbstractSet[str]]
 ) -> None:
-    """Raise unless every selector matches at least one option, naming the ids that fail."""
     bad = sorted({entry for selector in selectors for entry in _unmatched(selector, known)})
     if bad:
         raise BuildError(f"selector matches nothing: {', '.join(bad)}")
@@ -68,7 +65,6 @@ def _matches(selector: Selector, item: Item) -> bool:
 def _unmatched(
     selector: Selector, known: Mapping[SelectorKind, AbstractSet[str]]
 ) -> tuple[str, ...]:
-    """Return each id of a selector that matches nothing, as `kind: id`."""
     options = known[selector.kind]
     if selector.ids is None:
         return () if options else (f"{selector.kind}: every option",)

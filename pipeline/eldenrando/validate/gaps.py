@@ -1,8 +1,6 @@
-"""Find the data problems a check can see and hold `data/gaps.csv` to them (`data.md` §10).
-
-Every gap a check finds must have a row, and a row whose gap has gone away must be closed, so
-the list cannot drift from the sources. A problem no check can see, such as a wrong value that
-looks normal, is a row a person added, and nothing here touches it.
+"""Every gap a check finds must have a row, and a row whose gap has gone away must be closed, so the
+list cannot drift from the sources. A problem no check can see, such as a wrong value that looks
+normal, is a row a person added, and nothing here touches it.
 
 Run `python -m eldenrando.validate.gaps` from `pipeline/` to add a row for every new gap.
 """
@@ -105,8 +103,6 @@ _OVERRIDE_FILES: Mapping[str, str] = {
 
 @dataclass(frozen=True, slots=True)
 class GapSources:
-    """What the checks read, already loaded."""
-
     table: tuple[Item, ...]
     catalog: ItemCatalog
     variants: Mapping[str, NameVariant]
@@ -119,7 +115,6 @@ class GapSources:
 
 
 def item_origin(item: Item, catalog: ItemCatalog, variants: Mapping[str, NameVariant]) -> Origin:
-    """Return where an item comes from, by its group in the mod and its game id."""
     kind = _KINDS.get(item.category)
     if kind is None:
         return "base"
@@ -147,7 +142,6 @@ def _game_id(
 
 
 def requirement_gaps(sources: GapSources) -> tuple[Gap, ...]:
-    """Return a gap per item whose stat records are absent, unusable or in conflict."""
     names = {
         (item.category, item.name.casefold()): item
         for item in sources.table
@@ -202,15 +196,12 @@ def _stats(field: object) -> dict[str, int] | None:
 
 
 def _format(stats: Mapping[str, int]) -> str:
-    """Return stats the way the game shows them, such as `INT 19, ARC 15`."""
     return ", ".join(f"{stat.upper()} {amount}" for stat, amount in stats.items())
 
 
 def holds_ash_gaps(sources: GapSources) -> tuple[Gap, ...]:
-    """Return a gap per DLC or Tarnished weapon the unique-skill sheet cannot settle.
-
-    The sheet settles the base game (`tasklist.md` O35). Beyond it, the sheet misses weapons and
-    names skills that are real ashes, so being on or off it says nothing for sure.
+    """The sheet settles the base game. Beyond it, the sheet misses weapons and names skills that
+    are real ashes, so being on or off it says nothing for sure.
     """
     carriers = {
         _UPGRADE.sub("", weapon) for names in sources.ash_sources.values() for weapon in names
@@ -239,7 +230,6 @@ def holds_ash_gaps(sources: GapSources) -> tuple[Gap, ...]:
 
 
 def ash_gaps(sources: GapSources) -> tuple[Gap, ...]:
-    """Return a gap per pool ash the ash sheet has no row for."""
     rows = _ash_sheet_rows(sources.ash_sheet)
     return tuple(
         _gap(
@@ -256,7 +246,6 @@ def ash_gaps(sources: GapSources) -> tuple[Gap, ...]:
 
 
 def class_gaps(sources: GapSources) -> tuple[Gap, ...]:
-    """Return a gap per weapon class the ash sheet has no column for."""
     start = sources.ash_sheet.header.index(_ASH_SHEET_FIRST_CLASS)
     columns = {
         _ASH_SHEET_CLASSES.get(name, name.casefold().replace(" ", "_"))
@@ -312,7 +301,6 @@ def remembrance_gaps(sources: GapSources, names: PlacementNames) -> tuple[Gap, .
 
 
 def find_gaps(sources: GapSources) -> tuple[Gap, ...]:
-    """Return every gap the checks can see."""
     names = placement_names(sources.table, sources.catalog, sources.variants)
     return (
         *requirement_gaps(sources),
@@ -326,7 +314,6 @@ def find_gaps(sources: GapSources) -> tuple[Gap, ...]:
 def reconcile(
     found: Iterable[Gap], tracked: Iterable[Gap], overrides: Mapping[str, frozenset[str]]
 ) -> tuple[str, ...]:
-    """Return why the list disagrees with the checks and the override files, if it does."""
     gaps = {gap.key: gap for gap in found}
     rows = {gap.key: gap for gap in tracked}
     out: list[str] = []
@@ -350,7 +337,6 @@ def reconcile(
 
 
 def add_missing(found: Iterable[Gap], tracked: Iterable[Gap]) -> tuple[Gap, ...]:
-    """Return the rows plus one for every gap that has none, leaving the rest untouched."""
     rows = {gap.key: gap for gap in tracked}
     for gap in found:
         rows.setdefault(gap.key, gap)
@@ -368,7 +354,6 @@ def load_overrides(overrides_dir: Path) -> dict[str, frozenset[str]]:
 
 
 def load_sources(root: Path) -> GapSources:
-    """Return what the checks read, from `data/sources/` and a checkout's `data/overrides/`."""
     overrides = root / "data" / "overrides"
     catalog = load_item_catalog(ITEM_INFO)
     variants = load_name_variants(overrides / "name_variants.csv")
@@ -449,13 +434,11 @@ def _unique_skills(sheet: CsvTable) -> dict[str, tuple[str, ...]]:
 
 
 def _ash_sheet_rows(sheet: CsvTable) -> frozenset[str]:
-    """Return the ashes the ash sheet has a row for."""
     name = sheet.column("Name")
     return frozenset(row[name].strip() for row in sheet.rows)
 
 
 def _gap(area: str, item: Item, sources: GapSources, problem: str, step: str, owner: Owner) -> Gap:
-    """Return a gap a check found on one item."""
     return Gap(
         area=area,
         item=item.name,
@@ -468,7 +451,6 @@ def _gap(area: str, item: Item, sources: GapSources, problem: str, step: str, ow
 
 
 def main() -> None:
-    """Add a row to `data/gaps.csv` for every gap that has none, and say what disagrees."""
     root = Path(__file__).resolve().parents[3]
     path = root / "data" / "gaps.csv"
     tracked = load_gaps(path)

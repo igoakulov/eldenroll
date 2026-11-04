@@ -1,8 +1,6 @@
-"""Load the boss corrections from `data/overrides/` (`data.md` §6.1, §6.1a).
-
-Each row is a correction, so it carries a reason and a reviewer. Merge and name labels are written
-as the boss CSV writes them, `[DLC] ` included. An addition names its own label and location,
-because the CSV has no usable row for most of them: one row there can cover several golems.
+"""Merge and name labels are written as the boss CSV writes them, `[DLC] ` included. An addition
+names its own label and location, because the CSV has no usable row for most of them: one row
+there can cover several golems.
 """
 
 from __future__ import annotations
@@ -33,9 +31,7 @@ ADDITION_COLUMNS: tuple[str, ...] = (
 
 
 def load_boss_merges(path: Path) -> dict[tuple[str, str], tuple[str, str]]:
-    """Return `{(label, csv_name): (instance, instance_label)}`, or raise `LoaderError`.
-
-    An empty `instance_label` keeps the row's own label; a fight the CSV splits across two labels
+    """An empty `instance_label` keeps the row's own label; a fight the CSV splits across two labels
     names one here.
     """
     table = read_table(path, required_columns=MERGE_COLUMNS)
@@ -58,7 +54,6 @@ def load_boss_names(path: Path) -> dict[tuple[str, str], str]:
 def load_boss_additions(
     path: Path, *, location_ids: Collection[str]
 ) -> tuple[tuple[str, str, str], ...]:
-    """Return `(name, location_label, location_id)` of the fights the CSV does not tag."""
     table = read_table(path, required_columns=ADDITION_COLUMNS)
     rows = _rows(path, table, required=ADDITION_COLUMNS, wanted=ADDITION_COLUMNS[:3])
     known = set(location_ids)
@@ -71,7 +66,6 @@ def load_boss_additions(
 
 
 def load_boss_odds(path: Path) -> dict[str, float]:
-    """Return `{boss instance id: odds}` for the bosses whose odds are not 1."""
     return load_odds(path, "boss")
 
 

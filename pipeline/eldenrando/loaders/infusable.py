@@ -1,8 +1,3 @@
-"""Load `data/overrides/infusable.csv`, the weapons the unique-skill sheet cannot settle.
-
-Each row is a correction, so it carries a reason and a reviewer.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,7 +10,6 @@ _VALUES: dict[str, bool] = {"true": True, "false": False}
 
 
 def load_infusable(path: Path) -> dict[str, bool]:
-    """Return `{item: can hold an ash}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: dict[str, bool] = {}

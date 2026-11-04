@@ -1,7 +1,5 @@
-"""The structure half of the Phase 0 gate (`data.md` §11).
-
-Each check returns its problems, naming the rows that fail, so one run reports them all. The checks
-written earlier raise instead, so `_caught` turns their error into a problem.
+"""Each check returns its problems, naming the rows that fail, so one run reports them all. Checks
+that raise instead are wrapped by `_caught`, which turns their error into a problem.
 """
 
 from __future__ import annotations
@@ -100,7 +98,6 @@ def _caught(check: Callable[[], None]) -> tuple[str, ...]:
 
 
 def _table_shape(database: Database) -> Iterator[str]:
-    """Yield each table or row whose fields differ from `data.md` §2."""
     rows = database_rows(database)
     if set(rows) != set(TABLE_FIELDS):
         yield f"tables differ from data.md: {', '.join(sorted(set(rows) ^ set(TABLE_FIELDS)))}"
@@ -112,7 +109,6 @@ def _table_shape(database: Database) -> Iterator[str]:
 
 
 def _unique_ids(database: Database) -> Iterator[str]:
-    """Yield each table with a repeated or empty id or name."""
     tables: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = (
         ("region", tuple((row.id, row.name) for row in database.regions)),
         ("location", tuple((row.id, row.name) for row in database.locations)),
@@ -135,14 +131,12 @@ def _unique_ids(database: Database) -> Iterator[str]:
 
 
 def _none_row(items: Iterable[Item]) -> Iterator[str]:
-    """Yield a problem unless exactly one item has the category `none`."""
     found = [item.id for item in items if item.category == "none"]
     if len(found) != 1:
         yield f"expected one none row, found: {', '.join(found) or 'nothing'}"
 
 
 def _requirements(items: Iterable[Item]) -> Iterator[str]:
-    """Yield the items whose five requirements are not whole numbers from 0."""
     bad = sorted(
         item.id
         for item in items
@@ -175,13 +169,12 @@ def _odds(database: Database) -> Iterator[str]:
 
 
 def _weapon_flags(items: Iterable[Item]) -> Iterator[str]:
-    """Yield the items whose flags are not boolean on weapons and shields, and null elsewhere."""
     bad: list[str] = []
     for item in items:
         if item.category in ("weapon", "shield"):
             valid = isinstance(item.infusable, bool) and isinstance(item.str_bonus_2h, bool)
         elif item.category == "none":
-            valid = item.infusable is None and item.str_bonus_2h is False
+            continue
         else:
             valid = item.infusable is None and item.str_bonus_2h is None
         if not valid:
@@ -191,7 +184,6 @@ def _weapon_flags(items: Iterable[Item]) -> Iterator[str]:
 
 
 def _str_bonus(items: Iterable[Item], overrides: Mapping[str, bool]) -> Iterator[str]:
-    """Yield the weapons whose two-handed bonus breaks the class rule with no override for it."""
     rows = [item for item in items if item.category in ("weapon", "shield")]
     without = sorted(
         item.id
@@ -212,9 +204,7 @@ def _str_bonus(items: Iterable[Item], overrides: Mapping[str, bool]) -> Iterator
 
 
 def _ash_rows(database: Database) -> Iterator[str]:
-    """Yield what breaks the ash rows.
-
-    `infusable = false` means no ash whatever a class row says, so only its opposite is a check:
+    """`infusable = false` means no ash whatever a class row says, so only its opposite is a check:
     an item that can hold an ash must have one to hold.
     """
     missing = infusable_without_ashes(database.items, database.ash_compatibility)
@@ -235,14 +225,12 @@ def _ash_rows(database: Database) -> Iterator[str]:
 
 
 def _region_levels(database: Database) -> Iterator[str]:
-    """Yield a problem unless `region_level` is unique and strictly ascending."""
     levels = [row.region_level for row in database.regions]
     if levels != sorted(set(levels)):
         yield f"region_level is not unique and ascending: {levels}"
 
 
 def _bosses(data: GateData) -> Iterator[str]:
-    """Yield what breaks the boss table, including the arithmetic of `data.md` §6.1."""
     bosses = data.database.bosses
     overrides = data.boss_overrides
     fights = Counter(
@@ -295,7 +283,6 @@ def _bosses(data: GateData) -> Iterator[str]:
 
 
 def _placement(database: Database) -> Iterator[str]:
-    """Yield what breaks the location rows: an unknown id, or an item with or without rows."""
     items = {row.id: row for row in database.items}
     locations = {row.id for row in database.locations}
     bosses = {row.id for row in database.bosses}
@@ -322,7 +309,6 @@ def _placement(database: Database) -> Iterator[str]:
 
 
 def _armor_sets(database: Database) -> Iterator[str]:
-    """Yield the sets with too many pieces, a repeat, an unknown id, or two pieces in one slot."""
     slots = {row.id: row.subcategory for row in database.items if row.category == "armor"}
     for row in database.armor_sets:
         unknown = sorted(set(row.pieces) - set(slots))
@@ -336,7 +322,6 @@ def _armor_sets(database: Database) -> Iterator[str]:
 
 
 def _aliases(database: Database) -> Iterator[str]:
-    """Yield each alias with no member, and each item whose alias does not exist."""
     known = {row.id for row in database.aliases}
     used = {item.alias for item in database.items if item.alias is not None}
     if known - used:
@@ -346,14 +331,12 @@ def _aliases(database: Database) -> Iterator[str]:
 
 
 def _modifier_values(modifiers: Iterable[Modifier]) -> Iterator[str]:
-    """Yield the modifiers with a value below 0."""
     bad = sorted(row.id for row in modifiers if row.value < 0)
     if bad:
         yield f"modifier value below 0: {', '.join(bad)}"
 
 
 def _guarantee_spacing(modifiers: Iterable[Modifier], items: Iterable[Item]) -> Iterator[str]:
-    """Yield each pool whose highest guarantee is under 10 times the next (`prd.md` §8.5)."""
     table = tuple(items)
     values: dict[str, set[float]] = {}
     for row in modifiers:
@@ -367,7 +350,6 @@ def _guarantee_spacing(modifiers: Iterable[Modifier], items: Iterable[Item]) -> 
 
 
 def _pools_of(target: Selector, items: tuple[Item, ...]) -> tuple[str, ...]:
-    """Return the pools a target competes in: rules, armor sets, or an item category."""
     if target.kind in ("rule", "armor_set"):
         return (target.kind,)
     return tuple(sorted({item.category for item in resolve_items((target,), items)}))

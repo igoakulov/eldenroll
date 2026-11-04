@@ -1,8 +1,3 @@
-"""Load `data/overrides/armor_slots.csv`, the slots of the pieces `armors.json` does not hold.
-
-Each row is a correction, so it carries a reason and a reviewer.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,7 +10,6 @@ COLUMNS: tuple[str, ...] = ("piece", "slot", "reason", "reviewer")
 
 
 def load_armor_slots(path: Path) -> dict[str, str]:
-    """Return `{piece: slot}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: dict[str, str] = {}

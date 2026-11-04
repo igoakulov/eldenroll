@@ -1,6 +1,4 @@
-"""Ash compatibility rows, from the ash sheet and `ash_compatibility.csv` (`data.md` §4.5).
-
-The sheet is base-game data: a `TRUE` cell says an ash fits a class, and its affinity columns say
+"""The sheet is base-game data: a `TRUE` cell says an ash fits a class, and its affinity columns say
 nothing here. It has no row for the DLC ashes and no column for the DLC classes, so
 `data/gaps.csv` tracks those until the overrides hold them. An ash fitting every shield class
 becomes one whole-category row, so no row is ever covered by a broader one. Weapons have no such
@@ -28,7 +26,6 @@ _CELLS = {"TRUE": True, "FALSE": False}
 def build_ash_compatibility(
     table: Iterable[Item], sheet: CsvTable, overrides: Iterable[AshOverride]
 ) -> tuple[AshCompatibility, ...]:
-    """Return one row per ash and class or category, or raise `BuildError`."""
     ids = {row.name: row.id for row in table if row.category == "ash"}
     found: dict[str, set[tuple[str, str | None]]] = {}
     for ash, category, subcategory in _sheet_rows(sheet, ids):
@@ -45,7 +42,6 @@ def build_ash_compatibility(
 
 
 def _sheet_rows(sheet: CsvTable, ids: Iterable[str]) -> list[tuple[str, str, str]]:
-    """Return `(ash, category, class)` for every `TRUE` cell of a pool ash, or raise."""
     known = set(ids)
     name_column = sheet.column("Name")
     start = sheet.header.index(_FIRST_CLASS_COLUMN)
@@ -69,7 +65,6 @@ def _sheet_rows(sheet: CsvTable, ids: Iterable[str]) -> list[tuple[str, str, str
 
 
 def _broadest(rows: set[tuple[str, str | None]]) -> set[tuple[str, str | None]]:
-    """Return the rows with anything a whole-category row covers removed."""
     out = set(rows)
     if {subcategory for category, subcategory in rows if category == "shield"} >= SHIELD:
         out.add(("shield", None))

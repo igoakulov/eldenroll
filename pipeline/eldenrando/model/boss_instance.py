@@ -1,6 +1,4 @@
-"""One boss instance: one fight at one place, killed independently of any other (`data.md` §6).
-
-The region comes through `location_id`, and the display is derived from the name and the label,
+"""The region comes through `location_id`, and the display is derived from the name and the label,
 so neither is stored.
 """
 

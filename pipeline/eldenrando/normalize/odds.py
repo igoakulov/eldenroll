@@ -1,8 +1,7 @@
-"""Set base odds on the rows that roll, 1 unless an override file says otherwise.
-
-Odds are for balancing, and 0 keeps a row that never rolls, such as a transform that conflicts with
-armor. Modifiers apply on top, and only under their conditions (`prd.md` §8.2, §8.4). An armor piece
-rolls only through its set, so odds on a piece would do nothing, and the build refuses them.
+"""Odds are for balancing, and 0 keeps a row that never rolls, such as a transform that conflicts
+with armor. Modifiers apply on top, and only under their conditions (`prd.md` §8.2, §8.4). An
+armor piece rolls only through its set, so odds on a piece would do nothing, and the build
+refuses them.
 """
 
 from __future__ import annotations
@@ -16,7 +15,6 @@ from eldenrando.model.item import Item
 
 
 def assign_item_odds(items: Iterable[Item], overrides: Mapping[str, float]) -> tuple[Item, ...]:
-    """Return the rows with their base odds, or raise `BuildError`."""
     rows = tuple(items)
     unknown = sorted(set(overrides) - {row.id for row in rows})
     if unknown:
@@ -32,7 +30,6 @@ def assign_item_odds(items: Iterable[Item], overrides: Mapping[str, float]) -> t
 def assign_armor_set_odds(
     sets: Iterable[ArmorSet], overrides: Mapping[str, float]
 ) -> tuple[ArmorSet, ...]:
-    """Return the sets with their base odds, or raise `BuildError` on an unknown id."""
     rows = tuple(sets)
     unknown = sorted(set(overrides) - {row.id for row in rows})
     if unknown:

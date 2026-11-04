@@ -1,8 +1,4 @@
-"""Load `data/overrides/ash_compatibility.csv`, what the base-game ash sheet cannot say.
-
-A blank `subcategory` means the whole category. Each row is a correction, so it carries a reason
-and a reviewer.
-"""
+"""A blank `subcategory` means the whole category."""
 
 from __future__ import annotations
 
@@ -19,15 +15,12 @@ _REQUIRED: tuple[str, ...] = ("ash", "category", "reason", "reviewer")
 
 @dataclass(frozen=True, slots=True)
 class AshOverride:
-    """One hand-written row: an ash's name and the class or category it fits."""
-
     ash: str
     category: str
     subcategory: str | None
 
 
 def load_ash_overrides(path: Path) -> tuple[AshOverride, ...]:
-    """Return the rows in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: list[AshOverride] = []

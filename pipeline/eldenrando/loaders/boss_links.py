@@ -1,8 +1,5 @@
-"""Load the files that tie an item to the boss it comes from (`data.md` §5.2, §9).
-
-Each row names a boss instance by its name and label, because a name can repeat across labels. A
-label may keep the boss CSV's `[DLC] ` prefix. Each row is a correction, so it carries a reason and
-a reviewer.
+"""Each row names a boss instance by its name and label, because a name can repeat across labels. A
+label may keep the boss CSV's `[DLC] ` prefix.
 """
 
 from __future__ import annotations
@@ -19,7 +16,6 @@ BossPlace = tuple[str, str]
 
 
 def load_remembrance_bosses(path: Path) -> dict[str, BossPlace]:
-    """Return `{remembrance: (boss, label)}`, or raise `LoaderError`."""
     return {key[0]: place for key, place in _load(path, ("remembrance",)).items()}
 
 
@@ -29,7 +25,7 @@ def load_armor_shop_bosses(path: Path) -> dict[str, BossPlace]:
 
 
 def load_slot_links(path: Path) -> dict[tuple[str, str], tuple[BossPlace, ...]]:
-    """Return `{(item, area): each (boss, label) that opens it}`, or raise `LoaderError`."""
+    """Return `{(item, area): each (boss, label) that opens it}`."""
     links: dict[tuple[str, str], tuple[BossPlace, ...]] = {}
     for key, place in _load(path, ("item", "area", "boss", "location_label")).items():
         links[key[0], key[1]] = (*links.get((key[0], key[1]), ()), place)
@@ -37,7 +33,6 @@ def load_slot_links(path: Path) -> dict[tuple[str, str], tuple[BossPlace, ...]]:
 
 
 def _load(path: Path, key_columns: tuple[str, ...]) -> dict[tuple[str, ...], BossPlace]:
-    """Return each row's key cells with its boss and label, or raise `LoaderError`."""
     columns = tuple(dict.fromkeys((*key_columns, *_BOSS_COLUMNS)))
     table = read_table(path, required_columns=columns)
     out: dict[tuple[str, ...], BossPlace] = {}

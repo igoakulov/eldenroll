@@ -1,8 +1,6 @@
-"""Resolve a name from a placement source to its item row (`data.md` §8.4).
-
-Slot lines and drop cells name items in forms no row carries: `Ash of War: Parry`,
-`Rogier's Rapier +8`, `Festive Garb (Altered)`, `[Sorcery] Gravity Well`, `Kukri x5`. A name
-outside the pool resolves to nothing, because most of what these sources list can never roll.
+"""Slot lines and drop cells name items in forms no row carries: `Ash of War: Parry`, `Rogier's
+Rapier +8`, `Festive Garb (Altered)`, `[Sorcery] Gravity Well`, `Kukri x5`. A name outside the
+pool resolves to nothing, because most of what these sources list can never roll.
 
 A bare name is never an ash. An ash's canonical name drops the source's prefix, so it can equal
 another item's name: a bare `Glintstone Pebble` is the sorcery, and a bare `Thops's Barrier` is
@@ -42,8 +40,6 @@ _CATALOG_KINDS: Mapping[str, str] = {
 
 @dataclass(frozen=True, slots=True)
 class PlacementNames:
-    """The lookups that turn a placement source's name into an item row."""
-
     items: Mapping[str, Item]
     ashes: Mapping[str, Item]
     renames: Mapping[str, str]
@@ -86,7 +82,6 @@ class PlacementNames:
 def placement_names(
     table: Iterable[Item], catalog: ItemCatalog, variants: Mapping[str, NameVariant]
 ) -> PlacementNames:
-    """Return the lookups over the item table, or raise `BuildError`."""
     rows = tuple(row for row in table if row.category != "none")
     ashes = {row.name: row for row in rows if row.category == "ash"}
     items: dict[str, Item] = {}
@@ -106,7 +101,6 @@ def placement_names(
 
 
 def _renames(variants: Mapping[str, NameVariant], items: Mapping[str, Item]) -> dict[str, str]:
-    """Return `{source name: canonical name}` for the rows marked `by_name`."""
     out: dict[str, str] = {}
     for variant in variants.values():
         if not variant.by_name:

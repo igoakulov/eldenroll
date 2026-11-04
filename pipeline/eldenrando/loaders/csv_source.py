@@ -1,9 +1,7 @@
-"""Read a CSV source table from disk.
-
-The seven CSV files under `data/sources/` are hand-kept spreadsheets, not machine exports: one
-starts with a section legend, several have blank or repeated header cells, and one uses blank rows
-as class separators. So the reader keeps every row positionally, checks each width against
-the header, and reports the file and row instead of guessing a value.
+"""The files under `data/sources/` are hand-kept spreadsheets, not machine exports: one starts with
+a section legend, several have blank or repeated header cells, and one uses blank rows as class
+separators. So the reader keeps every row positionally, checks each width against the header, and
+reports the file and row instead of guessing a value.
 """
 
 from __future__ import annotations
@@ -19,8 +17,6 @@ from eldenrando.loaders.schema import LoaderError
 
 @dataclass(frozen=True, slots=True)
 class CsvTable:
-    """A parsed CSV table: one header row and the data rows that follow it."""
-
     path: Path
     header_row: int
     header: tuple[str, ...]
@@ -28,12 +24,11 @@ class CsvTable:
 
     @property
     def row_count(self) -> int:
-        """Return the number of data rows, blank rows included."""
+        """Blank rows are included in the count."""
         return len(self.rows)
 
     @property
     def blank_row_count(self) -> int:
-        """Return the number of rows whose every cell is empty."""
         return sum(1 for row in self.rows if all(cell == "" for cell in row))
 
     def column(self, name: str) -> int:
@@ -47,7 +42,6 @@ def read_table(
     header_row: int = 0,
     required_columns: Sequence[str] = (),
 ) -> CsvTable:
-    """Return the table at `path`, or raise `LoaderError`."""
     rows = _read_rows(path)
     if len(rows) <= header_row:
         raise LoaderError(f"{path}: missing header row {header_row + 1}")
@@ -69,7 +63,6 @@ def read_table(
 
 
 def _column_index(header: Sequence[str], name: str, path: str) -> int:
-    """Return the one index where `name` appears, or raise."""
     matches = [index for index, cell in enumerate(header) if cell == name]
     if not matches:
         raise LoaderError(f"{path}: missing column {name!r}")
@@ -79,7 +72,6 @@ def _column_index(header: Sequence[str], name: str, path: str) -> int:
 
 
 def _read_rows(path: Path) -> list[list[str]]:
-    """Return every CSV line as a list of cells, header rows included."""
     try:
         text = path.read_text(encoding="utf-8-sig")
     except OSError as exc:

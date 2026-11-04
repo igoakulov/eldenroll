@@ -1,8 +1,6 @@
-"""Give every armor piece its slot (`data.md` §4.3).
-
-`armors.json` names the slot of the 476 pieces it holds. It is base-game data, so the other 155
-come from `armor_slots.csv`. A piece named by both, or by neither, stops the build, so the two
-sources can never quietly disagree.
+"""`armors.json` names the slot of the pieces it holds. It is base-game data, so the rest come from
+`armor_slots.csv`. A piece named by both, or by neither, stops the build, so the two sources can
+never quietly disagree.
 """
 
 from __future__ import annotations
@@ -30,7 +28,6 @@ def assign_armor_slots(
     variants: Mapping[str, NameVariant],
     overrides: Mapping[str, str],
 ) -> tuple[Item, ...]:
-    """Return the rows with `subcategory` set to their slot, or raise `BuildError`."""
     rows = tuple(armor)
     recorded = _recorded_slots(records, variants)
     names = {row.name for row in rows}
@@ -52,7 +49,7 @@ def assign_armor_slots(
 def _recorded_slots(
     records: Iterable[Mapping[str, object]], variants: Mapping[str, NameVariant]
 ) -> dict[str, str]:
-    """Return `{casefolded piece name: slot}` from `armors.json`, or raise `BuildError`."""
+    """Return `{casefolded piece name: slot}`."""
     out: dict[str, str] = {}
     for record in records:
         variant = variants.get(str(record["id"]))

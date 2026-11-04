@@ -1,6 +1,4 @@
-"""Armor set rows, with each piece's name linked to its item id (`data.md` §4.3).
-
-The join is strict: a name that is no armor piece, a second piece in one slot or two sets with
+"""The join is strict: a name that is no armor piece, a second piece in one slot or two sets with
 one id all stop the build. An armor piece no set names is fine, because it stays a row that
 cannot roll (`data.md` §1.1).
 """
@@ -19,7 +17,6 @@ from eldenrando.normalize.slug import slugify
 def build_armor_sets(
     sets: Mapping[str, Sequence[str]], table: Iterable[Item]
 ) -> tuple[ArmorSet, ...]:
-    """Return one row per set, in the given order, or raise `BuildError`."""
     armor = {row.name: row for row in table if row.category == "armor"}
     seen: dict[str, str] = {}
     out: list[ArmorSet] = []
@@ -35,7 +32,6 @@ def build_armor_sets(
 def _link_pieces(
     name: str, pieces: Sequence[str], armor: Mapping[str, Item]
 ) -> tuple[str, ...]:
-    """Return the set's item ids in slot order, or raise `BuildError`."""
     unknown = sorted(piece for piece in pieces if piece not in armor)
     if unknown:
         raise BuildError(f"{name!r} names no armor piece called: {', '.join(unknown)}")

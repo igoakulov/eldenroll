@@ -1,5 +1,3 @@
-"""Turn a display name into the slug that becomes its id."""
-
 from __future__ import annotations
 
 import re

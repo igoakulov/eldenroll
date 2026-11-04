@@ -1,9 +1,7 @@
-"""Set the five stat requirements on weapons, shields and spells (`data.md` §2).
-
-The base-game JSON supplies them, under stat names that vary in case and form. `requirements.csv`
+"""The base-game JSON supplies them, under stat names that vary in case and form. `requirements.csv`
 wins over it. A value with no usable stat name is left out, so a broken record keeps whatever it
-can still say, and `data/gaps.csv` tracks it until an override corrects it. An item with no record
-stays at zero the same way.
+can still say, and `data/gaps.csv` tracks it until an override corrects it. An item with no
+record stays at zero the same way.
 """
 
 from __future__ import annotations
@@ -56,7 +54,7 @@ def assign_requirements(
     variants: Mapping[str, NameVariant],
     overrides: Mapping[str, Mapping[str, int]],
 ) -> tuple[Item, ...]:
-    """Return the rows with their requirements set; the first record of an item counts."""
+    """The first record of an item counts."""
     rows = tuple(items)
     found: dict[tuple[str, str], dict[str, int]] = {}
     for document, field, categories in REQUIREMENT_FIELDS:
@@ -73,7 +71,6 @@ def _with_stats(
     found: Mapping[tuple[str, str], Mapping[str, int]],
     overrides: Mapping[str, Mapping[str, int]],
 ) -> Item:
-    """Return one row with its requirements, or unchanged when it bears none."""
     stats = overrides.get(row.name, found.get((row.category, row.name.casefold())))
     if stats is None:
         return row

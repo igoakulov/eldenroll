@@ -1,5 +1,3 @@
-"""The data-quality half of the Phase 0 gate (`data.md` §11); failures name what is wrong."""
-
 from __future__ import annotations
 
 from collections import Counter
@@ -60,7 +58,6 @@ def quality_problems(data: GateData) -> tuple[str, ...]:
 
 
 def _repeated_names(items: Iterable[Item]) -> Iterator[str]:
-    """Yield each name that repeats within one category."""
     counts = Counter((item.category, item.name) for item in items)
     repeated = sorted(f"{name} ({category})" for (category, name), n in counts.items() if n > 1)
     if repeated:
@@ -68,7 +65,6 @@ def _repeated_names(items: Iterable[Item]) -> Iterator[str]:
 
 
 def _pool_counts(items: Iterable[Item]) -> Iterator[str]:
-    """Yield each category whose row count differs from `data.md` §4.1."""
     counts = Counter(item.category for item in items)
     for category in sorted(set(POOL_COUNTS) | set(counts)):
         if counts[category] != POOL_COUNTS.get(category, 0):
@@ -76,7 +72,6 @@ def _pool_counts(items: Iterable[Item]) -> Iterator[str]:
 
 
 def _slot_counts(database: Database, slots: Iterable[ItemSlot]) -> Iterator[str]:
-    """Yield what differs from the 174 locations, 4,379 slots and 122 ignored slots."""
     rows = tuple(slots)
     ignored = sum(1 for slot in rows if not slot.is_randomizable)
     if len(database.locations) != LOCATION_COUNT:
@@ -86,7 +81,6 @@ def _slot_counts(database: Database, slots: Iterable[ItemSlot]) -> Iterator[str]
 
 
 def _excluded(items: Iterable[Item]) -> Iterator[str]:
-    """Yield each excluded name that has a row in the category it is excluded from."""
     found = sorted(
         f"{item.name} ({item.category})"
         for item in items
@@ -97,7 +91,6 @@ def _excluded(items: Iterable[Item]) -> Iterator[str]:
 
 
 def _listed(items: Iterable[Item], added: Iterable[str]) -> Iterator[str]:
-    """Yield each name a list in `data.md` §4 holds that has no row in its category."""
     names: dict[str, set[str]] = {}
     for item in items:
         names.setdefault(item.category, set()).add(item.name)
@@ -127,7 +120,6 @@ def _alias_members(rows: Iterable[AliasRow]) -> Iterator[str]:
 
 
 def _never_a_row(items: Iterable[Item]) -> Iterator[str]:
-    """Yield the rows that are a placeholder, an `any` state or an alias label."""
     found = never_a_row(items)
     if found:
         yield f"name may never be a row: {', '.join(found)}"

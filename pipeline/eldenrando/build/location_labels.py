@@ -1,8 +1,5 @@
-"""Resolve CSV micro-location labels to locations through the alias table.
-
-A label names a map tile, and one tile can hold several areas. So an alias row says where
-most of what carries that label physically is, and a boss elsewhere on the tile gets its own
-override row. A label with no alias row is reported, never guessed or silently dropped.
+"""A label names a map tile, and one tile can hold several areas. A label with no alias row is
+reported, never guessed or silently dropped.
 """
 
 from __future__ import annotations
@@ -17,15 +14,12 @@ NON_PLACE_LABELS: frozenset[str] = frozenset({"Spirit Summon", "Unused"})
 
 @dataclass(frozen=True, slots=True)
 class LabelResolution:
-    """The labels that resolved to a location, and the ones to report."""
-
     resolved: dict[str, str]
     unresolved: tuple[str, ...]
     non_places: tuple[str, ...]
 
 
 def resolve_labels(labels: Iterable[str], aliases: Mapping[str, str]) -> LabelResolution:
-    """Return each distinct label's location, with the rest sorted for the report."""
     distinct = set(labels)
     places = distinct - NON_PLACE_LABELS
     return LabelResolution(
@@ -41,7 +35,6 @@ def resolve_boss_location(
     aliases: Mapping[str, str],
     overrides: Mapping[tuple[str, str], str],
 ) -> str:
-    """Return the location of one boss on one label, or raise `BuildError`."""
     override = overrides.get((boss, label))
     if override is not None:
         return override

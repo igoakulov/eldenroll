@@ -1,5 +1,3 @@
-"""Load `item_info.yaml` into an `ItemCatalog` lookup."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -25,7 +23,6 @@ _LOCATION_FIELDS = frozenset({"Tags", "Count", "Locations", "RealCount"})
 
 
 def load_item_catalog(path: Path) -> ItemCatalog:
-    """Return the catalog described by an iteminfo document."""
     document = load_mapping(path)
     return ItemCatalog(
         names=get_id_name_maps(document, "ItemNames", "iteminfo"),
@@ -37,7 +34,6 @@ def load_item_catalog(path: Path) -> ItemCatalog:
 
 
 def _parse_groups(document: dict[object, object]) -> dict[str, CatalogGroup]:
-    """Return the item groups keyed by group name."""
     entries = require_mapping(document.get("ItemGroups"), "ItemGroups")
     out: dict[str, CatalogGroup] = {}
     for raw_name, raw_group in entries.items():
@@ -62,7 +58,6 @@ def _parse_groups(document: dict[object, object]) -> dict[str, CatalogGroup]:
 
 
 def _parse_ids(value: object, where: str) -> tuple[int, ...]:
-    """Return a list of integer ids."""
     return tuple(
         require_integer(entry, f"{where}[{index}]")
         for index, entry in enumerate(require_sequence(value, where))
@@ -70,7 +65,6 @@ def _parse_ids(value: object, where: str) -> tuple[int, ...]:
 
 
 def _parse_locations(document: dict[object, object]) -> tuple[CatalogLocation, ...]:
-    """Return the prose location entries."""
     out: list[CatalogLocation] = []
     for index, raw_entry in enumerate(require_sequence(document.get("Locations"), "Locations")):
         where = f"Locations[{index}]"

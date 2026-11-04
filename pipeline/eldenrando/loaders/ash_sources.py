@@ -1,9 +1,6 @@
-"""Load `data/overrides/ash_sources.csv`, the ashes the mod has only attached to a weapon.
-
-The mod's ash group has no item for these, so the file adds them to the pool and says which
+"""The mod's ash group has no item for these, so the file adds them to the pool and says which
 weapons give each one. A weapon is written as the slot lines name it, because only some copies
-carry the ash: `Banished Knight's Halberd +8` does and the plain halberd does not. Each row is
-a correction, so it carries a reason and a reviewer.
+carry the ash: `Banished Knight's Halberd +8` does and the plain halberd does not.
 """
 
 from __future__ import annotations
@@ -17,7 +14,6 @@ COLUMNS: tuple[str, ...] = ("ash", "weapon", "reason", "reviewer")
 
 
 def load_ash_sources(path: Path) -> dict[str, tuple[str, ...]]:
-    """Return `{ash: weapons}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: dict[str, list[str]] = {}

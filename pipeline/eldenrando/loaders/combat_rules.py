@@ -1,5 +1,3 @@
-"""Load the combat rules from `data/overrides/combat_rules.csv`, an authored seed."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,7 +12,6 @@ COLUMNS: tuple[str, ...] = ("id", "name", "description", "odds")
 
 
 def load_combat_rules(path: Path) -> tuple[CombatRule, ...]:
-    """Return the rules in file order, or raise `LoaderError` on an empty field or a bad id."""
     table = read_table(path, required_columns=COLUMNS)
     rules: list[CombatRule] = []
     seen: set[str] = set()

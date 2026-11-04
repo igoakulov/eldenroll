@@ -1,8 +1,6 @@
-"""The item table: pool rows joined into one list with unique ids.
-
-Each pool prunes its own category before it gets here (`data.md` §8.6), because the same name
-can be excluded in one category and kept in another: `Carian Retaliation` is out as a sorcery
-and in as an ash. This table only rejects the names that may never be a row in any category.
+"""Pools prune their own category first, because the same name can be excluded in one category and
+kept in another: `Carian Retaliation` is out as a sorcery and in as an ash. This table only
+rejects names that may never be a row in any category.
 
 A name may repeat across categories, but an id may not, because references carry no category.
 Items whose slugs collide all take a category suffix; a unique slug takes none.
@@ -41,7 +39,6 @@ def new_item(
     req_fth: int = 0,
     req_arc: int = 0,
 ) -> Item:
-    """Return an item whose id is the slug of its name, or raise `BuildError`."""
     item_id = slugify(name)
     if not item_id:
         raise BuildError(f"item name {name!r} has no slug")
@@ -70,7 +67,6 @@ def none_item() -> Item:
 def canonical_names(
     catalog: ItemCatalog, group: str, kind: str, variants: Mapping[str, NameVariant]
 ) -> tuple[str, ...]:
-    """Return the canonical name of every `kind` id in a catalog group, or raise `BuildError`."""
     source_names = catalog.names[kind]
     out: list[str] = []
     for item_id in catalog.groups[group].items[kind]:
@@ -91,7 +87,6 @@ def canonical_names(
 
 
 def build_item_table(items: Iterable[Item]) -> tuple[Item, ...]:
-    """Return the rows in input order with final ids, or raise `BuildError`."""
     rows = tuple(items)
     _reject_excluded(rows)
     empties = sorted(row.name for row in rows if row.category == "none")
@@ -109,7 +104,6 @@ def build_item_table(items: Iterable[Item]) -> tuple[Item, ...]:
 
 
 def never_a_row(rows: Iterable[Item]) -> tuple[str, ...]:
-    """Return the names that are a placeholder, an `any` state or an alias label."""
     return tuple(
         sorted(
             row.name
@@ -123,14 +117,12 @@ def never_a_row(rows: Iterable[Item]) -> tuple[str, ...]:
 
 
 def _reject_excluded(rows: Iterable[Item]) -> None:
-    """Raise when a row may never exist in any category."""
     excluded = never_a_row(rows)
     if excluded:
         raise BuildError(f"item table holds excluded name(s): {', '.join(excluded)}")
 
 
 def _reject_repeats(keys: Iterable[str]) -> None:
-    """Raise when a key appears more than once, naming every repeated key."""
     repeated = sorted(key for key, count in Counter(keys).items() if count > 1)
     if repeated:
         raise BuildError(f"item table repeats: {', '.join(repeated)}")

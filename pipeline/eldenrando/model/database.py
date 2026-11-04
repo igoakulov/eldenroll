@@ -1,5 +1,3 @@
-"""The twelve tables of `db.json`, already built (`data.md` §2)."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -19,8 +17,6 @@ from eldenrando.model.region import Region
 
 @dataclass(frozen=True, slots=True)
 class Database:
-    """Every row the app reads; nothing else exists."""
-
     regions: tuple[Region, ...]
     locations: tuple[Location, ...]
     bosses: tuple[BossInstance, ...]

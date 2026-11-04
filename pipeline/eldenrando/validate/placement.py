@@ -38,8 +38,6 @@ from eldenrando.validate.gaps import GapSources, load_sources
 
 @dataclass(frozen=True, slots=True)
 class PlacementData:
-    """The tables placement is checked against, already built."""
-
     table: tuple[Item, ...]
     placements: tuple[Placement, ...]
     bosses: tuple[BossInstance, ...]
@@ -56,9 +54,7 @@ def needs_location(item: Item) -> bool:
 def selected_locations(
     regions: Collection[str], region_of_location: Mapping[str, str]
 ) -> frozenset[str]:
-    """Return the locations a selection reaches.
-
-    The Ashen Capital replaces the Royal one, except for the Shunning-Grounds, which it reaches
+    """The Ashen Capital replaces the Royal one, except for the Shunning-Grounds, which it reaches
     whether or not the Royal Capital is selected.
     """
     selected = {
@@ -94,7 +90,6 @@ def eligible_items(
     bosses: Mapping[str, BossInstance],
     region_of_location: Mapping[str, str],
 ) -> frozenset[str]:
-    """Return the ids of the items with at least one row that counts."""
     locations = selected_locations(regions, region_of_location)
     return frozenset(row.item_id for row in rows if row_counts(row, locations, dead, bosses))
 
@@ -105,7 +100,6 @@ def eligible_sets(sets: Iterable[ArmorSet], items: Collection[str]) -> tuple[Arm
 
 
 def load_placement_sources(root: Path, loaded: GapSources) -> PlacementSources:
-    """Return what placement reads, from `data/sources/` and a checkout's `data/overrides/`."""
     overrides = root / "data" / "overrides"
     boss_overrides = load_boss_overrides(overrides)
     return PlacementSources(
@@ -124,7 +118,6 @@ def load_placement_sources(root: Path, loaded: GapSources) -> PlacementSources:
 
 
 def load_placement_data(root: Path, sources: GapSources | None = None) -> PlacementData:
-    """Return the placement tables, from `data/sources/` and a checkout's `data/overrides/`."""
     overrides = root / "data" / "overrides"
     loaded = load_sources(root) if sources is None else sources
     placement_sources = load_placement_sources(root, loaded)

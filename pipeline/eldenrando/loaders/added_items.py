@@ -1,7 +1,5 @@
-"""Load `data/overrides/items.csv`, the real items `iteminfo` does not name.
-
-Only the name is authored; a builder takes everything else from the same source as the rest
-of its pool. Each row is a correction, so it carries a reason and a reviewer.
+"""Only the name is authored; a builder takes everything else from the same source as the rest of
+its pool.
 """
 
 from __future__ import annotations
@@ -15,7 +13,6 @@ COLUMNS: tuple[str, ...] = ("name", "reason", "reviewer")
 
 
 def load_added_items(path: Path) -> tuple[str, ...]:
-    """Return the added names in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: list[str] = []

@@ -1,8 +1,6 @@
-"""Load `data/overrides/modifiers.csv`, whose rows and ids are written by hand.
-
-`when` holds conditions split by `;`: `rule_1=rule:parry_only` when a slot rolled a match,
-`rh!=subcategory:melee` when it did not, and `build=mage jester` for the rolled build. `target` is
-one selector in the `slot_pools.csv` form.
+"""`when` holds conditions split by `;`: `rule_1=rule:parry_only` when a slot rolled a match,
+`rh!=subcategory:melee` when it did not, and `build=mage jester` for the rolled build. `target`
+is one selector in the `slot_pools.csv` form.
 """
 
 from __future__ import annotations
@@ -30,8 +28,6 @@ class ConditionRow:
 
 @dataclass(frozen=True, slots=True)
 class ModifierRow:
-    """One row of the file."""
-
     id: str
     when: tuple[ConditionRow, ...]
     target: tuple[str, tuple[str, ...]]
@@ -39,7 +35,6 @@ class ModifierRow:
 
 
 def load_modifiers(path: Path) -> tuple[ModifierRow, ...]:
-    """Return the rows in file order, or raise `LoaderError` on a bad cell."""
     table = read_table(path, required_columns=("id", "when", "target", "value"))
     rows: list[ModifierRow] = []
     for index, row in enumerate(table.rows, start=1):
@@ -66,7 +61,6 @@ def _conditions(cell: str, where: str) -> tuple[ConditionRow, ...]:
 
 
 def _condition(part: str, where: str) -> ConditionRow:
-    """Return one condition, or raise `LoaderError` on one that has no operator."""
     negated = "!=" in part
     subject, equals, rest = part.partition("!=" if negated else "=")
     if not equals:

@@ -1,5 +1,3 @@
-"""Build the `alias` rows and set `item.alias` on their members (`prd.md` §6.7)."""
-
 from __future__ import annotations
 
 from collections import Counter
@@ -15,12 +13,10 @@ from eldenrando.validate.selectors import known_ids, resolve_items, validate_sel
 
 
 def build_aliases(rows: Iterable[AliasRow]) -> tuple[Alias, ...]:
-    """Return the alias rows; their members go on the items through `assign_aliases`."""
     return tuple(Alias(row.id, row.label) for row in rows)
 
 
 def assign_aliases(items: Iterable[Item], rows: Iterable[AliasRow]) -> tuple[Item, ...]:
-    """Return the items with their alias, or raise `BuildError` on an unknown or shared member."""
     table = tuple(items)
     known = known_ids(table, (), (), ())
     member_of: dict[str, str] = {}

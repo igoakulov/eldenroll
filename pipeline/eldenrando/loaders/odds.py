@@ -1,7 +1,5 @@
-"""Load an override file of base odds: the rows whose odds are not the default 1.
-
-Each row is a correction, so it carries a reason and a reviewer. An id is the key, because a name
-can repeat across categories or labels. A file with no rows means every row keeps odds 1.
+"""An id is the key, because a name can repeat across categories or labels. A file with no rows
+means every row keeps odds 1.
 """
 
 from __future__ import annotations
@@ -14,7 +12,6 @@ from eldenrando.loaders.schema import LoaderError
 
 
 def load_odds(path: Path, key_column: str) -> dict[str, float]:
-    """Return `{id: odds}`, or raise `LoaderError`."""
     columns = (key_column, "odds", "reason", "reviewer")
     table = read_table(path, required_columns=columns)
     out: dict[str, float] = {}
@@ -31,7 +28,6 @@ def load_odds(path: Path, key_column: str) -> dict[str, float]:
 
 
 def parse_odds(path: Path, key: str, text: str) -> float:
-    """Return a finite number at or above 0, or raise `LoaderError`."""
     try:
         odds = float(text)
     except ValueError as error:

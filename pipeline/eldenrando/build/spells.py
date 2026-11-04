@@ -1,10 +1,6 @@
-"""Spell rows, from the mod's spell groups: offensive only (`data.md` §4.6, §4.7).
+"""Offensive spells only (`data.md` §4.6, §4.7).
 
-The exclusions are checked against the group, so a misspelled one stops the build instead of
-leaving a buff or heal in the pool.
-
-`alias`, `image` and the requirements stay at their defaults here; later steps fill them in and
-validation enforces them.
+`alias`, `image` and the requirements stay at their defaults here; later steps fill them in.
 """
 
 from __future__ import annotations
@@ -90,14 +86,12 @@ EXCLUDED_INCANTATIONS: frozenset[str] = frozenset(
 
 
 def build_sorceries(catalog: ItemCatalog, variants: Mapping[str, NameVariant]) -> tuple[Item, ...]:
-    """Return one row per offensive sorcery, in group order, or raise `BuildError`."""
     return _spells(catalog, "sorceries", "sorcery", EXCLUDED_SORCERIES, variants)
 
 
 def build_incantations(
     catalog: ItemCatalog, variants: Mapping[str, NameVariant]
 ) -> tuple[Item, ...]:
-    """Return one row per offensive incantation, in group order, or raise `BuildError`."""
     return _spells(catalog, "incantations", "incantation", EXCLUDED_INCANTATIONS, variants)
 
 
@@ -108,7 +102,6 @@ def _spells(
     excluded: frozenset[str],
     variants: Mapping[str, NameVariant],
 ) -> tuple[Item, ...]:
-    """Return one row per name in a spell group, less its exclusions."""
     names = canonical_names(catalog, group, "goods", variants)
     unknown = sorted(excluded - set(names))
     if unknown:

@@ -1,7 +1,5 @@
-"""Load and write `data/gaps.csv`, the single list of open data problems.
-
-The file is edited by hand and by `eldenrando.validate.gaps`, so the writer sorts it the same
-way every time: by area, then base game before DLC, then by name.
+"""The file is edited by hand and by `eldenrando.validate.gaps`, so the writer sorts it the same way
+every time: by area, then base game before DLC, then by name.
 """
 
 from __future__ import annotations
@@ -49,7 +47,6 @@ _ALLOWED: dict[str, Sequence[str]] = {
 
 
 def load_gaps(path: Path) -> tuple[Gap, ...]:
-    """Return the rows in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: list[Gap] = []
@@ -84,7 +81,6 @@ def load_gaps(path: Path) -> tuple[Gap, ...]:
 
 
 def write_gaps(path: Path, gaps: Iterable[Gap]) -> None:
-    """Write the rows to `path`, sorted."""
     rows = sorted(
         gaps, key=lambda gap: (AREAS.index(gap.area), ORIGINS.index(gap.origin), gap.item)
     )

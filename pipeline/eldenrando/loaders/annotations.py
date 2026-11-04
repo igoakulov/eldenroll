@@ -1,5 +1,3 @@
-"""Load `areas.yaml` into `AnnotationConfig`."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -23,7 +21,6 @@ _EVENT_FIELDS = frozenset({"Name", "Text", "Req"})
 
 
 def load_annotations(path: Path) -> AnnotationConfig:
-    """Return the areas and events of an annotations document."""
     document = load_mapping(path)
     areas = tuple(
         _parse_area(entry, f"Areas[{index}]")
@@ -37,7 +34,6 @@ def load_annotations(path: Path) -> AnnotationConfig:
 
 
 def _parse_area(entry: object, where: str) -> Area:
-    """Return one area record."""
     mapping = require_mapping(entry, where)
     check_keys(mapping, _AREA_FIELDS, where)
     return Area(
@@ -54,7 +50,6 @@ def _parse_area(entry: object, where: str) -> Area:
 
 
 def _parse_event(entry: object, where: str) -> GameEvent:
-    """Return one event record."""
     mapping = require_mapping(entry, where)
     check_keys(mapping, _EVENT_FIELDS, where)
     return GameEvent(

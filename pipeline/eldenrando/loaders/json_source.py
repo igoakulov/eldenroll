@@ -1,9 +1,7 @@
-"""Read the eight base-game JSON documents from `data/sources/`.
-
-Each file is a JSON array whose records carry a unique `id`. Every record also has a `name`,
-but names repeat (`location_names` holds 3 duplicate names), so the id is the identity and the
-name a label. Presence is validated; types are not, because the sources mix numbers, numeric
-strings and `null`, and each consumer knows its own shape.
+"""Each file is a JSON array whose records carry a unique `id`. Every record also has a `name`, but
+names repeat, so the id is the identity and the name a label. Presence is validated; types are
+not, because the sources mix numbers, numeric strings and `null`, and each consumer knows its own
+shape.
 """
 
 from __future__ import annotations
@@ -32,20 +30,16 @@ JSON_FILES: dict[str, tuple[str, ...]] = {
 
 @dataclass(frozen=True, slots=True)
 class JsonDocument:
-    """One parsed JSON document: its logical name, its file, and its records."""
-
     name: str
     path: Path
     records: tuple[dict[str, object], ...]
 
     @property
     def count(self) -> int:
-        """Return the number of records."""
         return len(self.records)
 
     @property
     def ids(self) -> tuple[str, ...]:
-        """Return every record id, in file order."""
         return tuple(cast("str", record["id"]) for record in self.records)
 
 
@@ -54,7 +48,6 @@ def read_records(
     *,
     required_fields: Sequence[str] = (),
 ) -> tuple[dict[str, object], ...]:
-    """Return the records at `path`, or raise `LoaderError`."""
     try:
         text = path.read_text(encoding="utf-8")
     except OSError as exc:
@@ -86,7 +79,6 @@ def read_records(
 
 
 def _string_field(record: dict[str, object], key: str, where: str) -> str:
-    """Return a required string field of a record."""
     value = record.get(key)
     if not isinstance(value, str):
         raise LoaderError(f"{where}.{key}: expected a string, got {type(value).__name__}")
@@ -94,7 +86,6 @@ def _string_field(record: dict[str, object], key: str, where: str) -> str:
 
 
 def _record(entry: object, where: str) -> dict[str, object]:
-    """Return one JSON object with string field names."""
     mapping = require_mapping(entry, where)
     out: dict[str, object] = {}
     for key, value in mapping.items():
@@ -105,7 +96,6 @@ def _record(entry: object, where: str) -> dict[str, object]:
 
 
 def load_document(directory: Path, name: str) -> JsonDocument:
-    """Return one known document from `directory`, or raise `LoaderError`."""
     fields = JSON_FILES.get(name)
     if fields is None:
         raise LoaderError(f"{directory}: unknown JSON document {name!r}")

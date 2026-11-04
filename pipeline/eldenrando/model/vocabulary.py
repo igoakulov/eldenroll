@@ -1,6 +1,4 @@
-"""The categories, subcategories, builds and slots (`prd.md` §6.1 to §6.3).
-
-These are build-time constants, because a shipped vocabulary table would mean a join for a label.
+"""These are build-time constants, because a shipped vocabulary table would mean a join for a label.
 """
 
 from __future__ import annotations

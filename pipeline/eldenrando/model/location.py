@@ -1,6 +1,4 @@
-"""One location row: an annotation area placed inside a region.
-
-`id` is the annotation area name, because that is the unit the randomizer's slot data uses.
+"""`id` is the annotation area name, because that is the unit the randomizer's slot data uses.
 `name` is the area's display text and may repeat; ids never do.
 """
 

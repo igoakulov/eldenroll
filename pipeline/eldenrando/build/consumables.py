@@ -1,12 +1,7 @@
-"""Consumable rows, classified from the tool and consumable sheet (`data.md` §4.9).
+"""The throwables the sheet leaves blank are an explicit list, not a heuristic. A name that fits no
+class stops the build instead of dropping a row.
 
-The sheet is the source: most pots and perfumes have no name in `iteminfo`, because the mod does
-not place crafted items. `subCategory1` and `subCategory2` carry the class where they can; the
-throwables they leave blank are an explicit list, not a heuristic. A name that fits no class
-stops the build instead of dropping a row.
-
-`alias` and `image` stay at their defaults here; later steps fill them in and validation
-enforces them.
+`alias` and `image` stay at their defaults here; later steps fill them in.
 """
 
 from __future__ import annotations
@@ -47,7 +42,6 @@ _THROWABLES_1 = "Weapon-Throwing Attack"
 
 
 def build_consumables(sheet: CsvTable) -> tuple[Item, ...]:
-    """Return one row per consumable, in sheet order, or raise `BuildError`."""
     name_column = sheet.column("Name")
     first_column = sheet.column("subCategory1")
     second_column = sheet.column("subCategory2")
@@ -65,7 +59,6 @@ def build_consumables(sheet: CsvTable) -> tuple[Item, ...]:
 
 
 def _subcategory(name: str, first: str, second: str) -> str:
-    """Return the class of one consumable, or raise `BuildError`."""
     if first == _POTS_1 or second == _POTS_2:
         return "pots"
     if first == _PERFUMES_1:

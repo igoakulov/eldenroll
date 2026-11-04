@@ -1,5 +1,3 @@
-"""Find the weapons that can hold an ash but have none to hold (`data.md` §11)."""
-
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -11,7 +9,6 @@ from eldenrando.model.item import Item
 def infusable_without_ashes(
     table: Iterable[Item], rows: Iterable[AshCompatibility]
 ) -> tuple[Item, ...]:
-    """Return every infusable weapon or shield whose class no compatibility row reaches."""
     fits = {(row.category, row.subcategory) for row in rows}
     return tuple(
         item

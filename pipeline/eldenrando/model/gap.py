@@ -1,6 +1,4 @@
-"""One open data problem in `data/gaps.csv`, the single list of them.
-
-A check finds some gaps and a person adds the rest, because a wrong value that looks normal is
+"""A check finds some gaps and a person adds the rest, because a wrong value that looks normal is
 something no check can see. `answer` may hold a proposal while the row is open. An answered row
 says who settled it in `source`, and an applied row's value is in the override files, which are
 all the build reads.
@@ -45,8 +43,6 @@ STATUSES: Final[tuple[Status, ...]] = ("open", "answered", "applied")
 
 @dataclass(frozen=True, slots=True)
 class Gap:
-    """A problem, who it waits on, and its answer once there is one."""
-
     area: str
     item: str
     origin: Origin

@@ -1,6 +1,4 @@
-"""Turn a selector as written in a source into the stored form (`prd.md` §6.3, §8.4).
-
-A source may name a subcategory group such as `melee`, and the stored selector is the expanded id
+"""A source may name a subcategory group such as `melee`, and the stored selector is the expanded id
 list, so nothing downstream knows the groups. An empty list means every option, the same as null.
 """
 
@@ -17,7 +15,6 @@ _KINDS: Final[Mapping[str, SelectorKind]] = {kind: kind for kind in SELECTOR_KIN
 
 
 def new_selector(kind: str, ids: Iterable[str] | None) -> Selector:
-    """Return the selector with sorted, unique ids, or raise `BuildError` on an unknown kind."""
     known = _KINDS.get(kind)
     if known is None:
         raise BuildError(f"unknown selector kind: {kind}")

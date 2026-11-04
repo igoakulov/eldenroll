@@ -1,9 +1,7 @@
-"""Load the CSV label tables from `data/overrides/`.
-
-The enemy-drop and boss CSVs name places in a finer vocabulary than the 174 annotation
-areas, so every label is resolved by the explicit `location_aliases.csv`, never by matching
-substrings. `boss_location_overrides.csv` holds the bosses that are not where their label's
-other contents are; each row is a correction, so it carries a reason and a reviewer.
+"""The enemy-drop and boss CSVs name places in a finer vocabulary than the annotation areas, so
+every label is resolved by the explicit `location_aliases.csv`, never by matching substrings.
+`boss_location_overrides.csv` holds the bosses that are not where their label's other contents
+are.
 """
 
 from __future__ import annotations
@@ -19,7 +17,6 @@ BOSS_OVERRIDE_COLUMNS: tuple[str, ...] = ("boss", "label", "location_id", "reaso
 
 
 def load_location_aliases(path: Path, *, location_ids: Collection[str]) -> dict[str, str]:
-    """Return `{label: location_id}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=ALIAS_COLUMNS)
     label_column = table.column("label")
     location_column = table.column("location_id")
@@ -46,7 +43,6 @@ def load_location_aliases(path: Path, *, location_ids: Collection[str]) -> dict[
 def load_boss_location_overrides(
     path: Path, *, labels: Collection[str], location_ids: Collection[str]
 ) -> dict[tuple[str, str], str]:
-    """Return `{(boss, label): location_id}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=BOSS_OVERRIDE_COLUMNS)
     columns = {name: table.column(name) for name in BOSS_OVERRIDE_COLUMNS}
     known_labels = set(labels)

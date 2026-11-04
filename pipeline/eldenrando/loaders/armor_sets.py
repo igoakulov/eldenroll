@@ -1,8 +1,4 @@
-"""Load `data/overrides/armor_sets.csv`, which pieces each armor set holds (`data.md` §4.3).
-
-One row per set and piece, in the set's order, each with a reason and a reviewer. A set with no
-pieces is one row with an empty `piece`.
-"""
+"""A set with no pieces is one row with an empty `piece`."""
 
 from __future__ import annotations
 
@@ -17,7 +13,6 @@ _MOST_PIECES = 4
 
 
 def load_armor_sets(path: Path) -> dict[str, tuple[str, ...]]:
-    """Return `{set: piece names}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: dict[str, list[str]] = {}

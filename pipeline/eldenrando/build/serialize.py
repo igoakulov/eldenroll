@@ -1,8 +1,6 @@
-"""Turn the tables into the rows of `db.json` (`data.md` §2).
-
-A row is written field by field, so a field the model lacks cannot ship. Tables built through sets
-are sorted, so that two runs give the same bytes. One row sits on one line, so a data change shows
-as a small diff.
+"""A row is written field by field, so a field the model lacks cannot ship. Tables built through
+sets are sorted, so that two runs give the same bytes. One row sits on one line, so a data change
+shows as a small diff.
 """
 
 from __future__ import annotations
@@ -49,7 +47,6 @@ TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
 
 
 def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
-    """Return each table's rows, under its `data.md` §2 name."""
     return {
         "region": [
             {"id": row.id, "name": row.name, "region_level": row.region_level}
@@ -119,13 +116,11 @@ def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
 
 
 def render(tables: Mapping[str, object]) -> str:
-    """Return the tables as JSON text, with one row of a list on one line."""
     parts = [f"{json.dumps(name)}: {_render_value(value)}" for name, value in tables.items()]
     return "{\n" + ",\n".join(parts) + "\n}\n"
 
 
 def _render_value(value: object) -> str:
-    """Return a table's text; a list breaks by row, and anything else stays on one line."""
     if isinstance(value, Sequence) and not isinstance(value, str):
         rows = [_dumps(row) for row in cast("Sequence[object]", value)]
         return "[\n" + ",\n".join(rows) + "\n]" if rows else "[]"
@@ -143,12 +138,10 @@ def _number(value: float) -> int | float:
 
 
 def _selector(selector: Selector) -> Row:
-    """Return a selector; `ids` stays null where it means every option."""
     return {"kind": selector.kind, "ids": None if selector.ids is None else list(selector.ids)}
 
 
 def _condition(condition: Condition) -> Row:
-    """Return a condition, either on the build or on what one slot rolled (`data.md` §2.1)."""
     if isinstance(condition, BuildCondition):
         return {"kind": "build", "ids": list(condition.builds)}
     return {
@@ -160,7 +153,6 @@ def _condition(condition: Condition) -> Row:
 
 
 def _modifier(row: Modifier) -> Row:
-    """Return a modifier row."""
     return {
         "id": row.id,
         "when": [_condition(one) for one in row.when],

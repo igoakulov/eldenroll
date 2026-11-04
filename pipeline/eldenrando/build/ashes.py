@@ -1,12 +1,8 @@
-"""Ash of War rows, from the mod's ash group.
+"""An ash only ever rolls as part of a weapon slot, so the canonical name drops the source's `Ash of
+War: ` prefix (`data.md` §4.5). The ashes the mod has only attached to a weapon are added by
+name.
 
-An ash only ever rolls as part of a weapon slot, so the canonical name drops the source's
-`Ash of War: ` prefix (`data.md` §4.5). The exclusions are checked against the group, so a
-misspelled one stops the build instead of leaving the ash in the pool. The ashes the mod has
-only attached to a weapon are added by name, and one the group already holds stops the build.
-
-`alias` and `image` stay at their defaults here; later steps fill them in and validation
-enforces them.
+`alias` and `image` stay at their defaults here; later steps fill them in.
 """
 
 from __future__ import annotations
@@ -28,7 +24,6 @@ EXCLUDED: frozenset[str] = frozenset(
 def build_ashes(
     catalog: ItemCatalog, variants: Mapping[str, NameVariant], added_names: Iterable[str]
 ) -> tuple[Item, ...]:
-    """Return one row per ash, group order first, or raise `BuildError`."""
     source = canonical_names(catalog, "gems", "gem", variants)
     unprefixed = sorted(name for name in source if not name.startswith(_PREFIX))
     if unprefixed:

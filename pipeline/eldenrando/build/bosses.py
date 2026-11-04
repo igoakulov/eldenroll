@@ -1,10 +1,7 @@
-"""Boss instances from the `[Boss]` rows of the boss CSV (`data.md` §6.1).
-
-One row per variant or phase collapses to one pair of identity and label. `boss_merges.csv` then
-joins the pairs that are one fight, `boss_names.csv` corrects the names of the rest, and
-`boss_additions.csv` adds the fights the CSV leaves untagged, and `boss_odds.csv` sets the odds that
-are not 1. Every merge, name and odds row must apply, so a source change that orphans one stops the
-build instead of quietly changing the pool.
+"""`boss_merges.csv` joins the pairs that are one fight, `boss_names.csv` corrects the names of the
+rest, `boss_additions.csv` adds the fights the CSV leaves untagged, and `boss_odds.csv` sets the
+odds that are not 1. Every merge, name and odds row must apply, so a source change that orphans
+one stops the build instead of quietly changing the pool.
 """
 
 from __future__ import annotations
@@ -27,8 +24,6 @@ _SPACES = re.compile(r"\s+")
 
 @dataclass(frozen=True, slots=True)
 class BossOverrides:
-    """The authored corrections to the CSV's boss rows, and the tables that place them."""
-
     merges: Mapping[tuple[str, str], tuple[str, str]]
     names: Mapping[tuple[str, str], str]
     additions: Sequence[tuple[str, str, str]]
@@ -44,7 +39,6 @@ def boss_identity(name: str) -> str:
 
 
 def boss_pairs(rows: Iterable[tuple[str, str]]) -> tuple[tuple[str, str], ...]:
-    """Return the distinct `(label, identity)` of the `[Boss]` rows, in CSV order."""
     pairs = ((label, boss_identity(name)) for label, name in rows if BOSS_TAG in name)
     return tuple(dict.fromkeys(pairs))
 
@@ -52,7 +46,6 @@ def boss_pairs(rows: Iterable[tuple[str, str]]) -> tuple[tuple[str, str], ...]:
 def build_boss_instances(
     rows: Iterable[tuple[str, str]], overrides: BossOverrides
 ) -> tuple[BossInstance, ...]:
-    """Return one row per fight from `(label, name)` CSV rows, or raise `BuildError`."""
     pairs = boss_pairs(rows)
     _check_merges(pairs, overrides.merges)
     _check_names(pairs, overrides)
@@ -85,7 +78,6 @@ def _corrected(identity: str, label: str, overrides: BossOverrides) -> str:
 def _instances(
     fights: Mapping[tuple[str, str], str], odds: Mapping[str, float]
 ) -> tuple[BossInstance, ...]:
-    """Return the fights as rows, or raise `BuildError` on a shared id or an unknown odds row."""
     seen: set[str] = set()
     out: list[BossInstance] = []
     for (label, name), location_id in fights.items():
@@ -112,7 +104,6 @@ def _instances(
 def _check_merges(
     pairs: tuple[tuple[str, str], ...], merges: Mapping[tuple[str, str], tuple[str, str]]
 ) -> None:
-    """Raise `BuildError` when a merge row matches no pair or a fight has only one row."""
     unknown = sorted(f"{name} on {label}" for label, name in set(merges) - set(pairs))
     if unknown:
         raise BuildError(f"boss_merges names no CSV boss: {', '.join(unknown)}")
@@ -126,7 +117,6 @@ def _check_merges(
 
 
 def _check_names(pairs: tuple[tuple[str, str], ...], overrides: BossOverrides) -> None:
-    """Raise `BuildError` when a name row corrects no unmerged pair."""
     unmerged = [pair for pair in pairs if pair not in overrides.merges]
     identities = {identity for _, identity in unmerged}
     unused = sorted(

@@ -1,8 +1,4 @@
-"""Load `data/overrides/requirements.csv`, stat requirements the base-game JSON lacks or gets wrong.
-
-A row states all five stats, so it replaces a record whole. Each row is a correction, so it
-carries a reason and a reviewer.
-"""
+"""A row states all five stats, so it replaces a record whole."""
 
 from __future__ import annotations
 
@@ -16,7 +12,6 @@ COLUMNS: tuple[str, ...] = ("item", *STATS, "reason", "reviewer")
 
 
 def load_requirements(path: Path) -> dict[str, dict[str, int]]:
-    """Return `{item: {stat: requirement}}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: dict[str, dict[str, int]] = {}

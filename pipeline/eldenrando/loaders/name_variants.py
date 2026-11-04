@@ -1,9 +1,6 @@
-"""Load `data/overrides/name_variants.csv`.
-
-A `source_id` is whatever identifies the record in its own source: an `iteminfo` number or a
-JSON hash. So ids stay text here, and a builder checks `source_name` before applying a row.
-Each row is a correction, so it carries a reason and a reviewer. `by_name` is `true` only on a
-row placement may apply where a source gives no id.
+"""A `source_id` is whatever identifies the record in its own source: an `iteminfo` number or a JSON
+hash. So ids stay text here, and a builder checks `source_name` before applying a row. `by_name`
+is `true` only on a row placement may apply where a source gives no id.
 """
 
 from __future__ import annotations
@@ -26,7 +23,6 @@ _BY_NAME: dict[str, bool] = {"true": True, "false": False}
 
 
 def load_name_variants(path: Path) -> dict[str, NameVariant]:
-    """Return `{source_id: variant}` in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=COLUMNS)
     columns = {name: table.column(name) for name in COLUMNS}
     out: dict[str, NameVariant] = {}

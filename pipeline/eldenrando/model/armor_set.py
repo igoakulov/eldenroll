@@ -1,7 +1,4 @@
-"""One armor set row: a name and the item ids of its pieces, inline (`data.md` §2.1).
-
-A piece's slot comes from its `item.subcategory`, so the set does not store it.
-"""
+"""A piece's slot comes from its `item.subcategory`, so the set does not store it."""
 
 from __future__ import annotations
 

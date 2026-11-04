@@ -1,8 +1,4 @@
-"""Load the weapon and ash CSVs from `data/sources/`.
-
-`weapon_shield_classes.csv` holds one row per weapon name, grouped by class; the 42
-class separators are blank rows and are kept so the row count stays 530.
-`ash_weapon_matrix.csv` is the ash by weapon-class matrix of `TRUE`/`FALSE` cells.
+"""The class separators are blank rows and are kept so the row count matches the sheet.
 `weapon_skills.csv` holds one row per skill attack, not one per weapon.
 """
 
@@ -18,15 +14,12 @@ SOMBER_WEAPON_COLUMNS: tuple[str, ...] = ("Name",)
 
 
 def load_weapon_categories(path: Path) -> CsvTable:
-    """Return `weapon_shield_classes.csv`."""
     return read_table(path, required_columns=WEAPON_CATEGORY_COLUMNS)
 
 
 def load_ash_compatibility(path: Path) -> CsvTable:
-    """Return `ash_weapon_matrix.csv`."""
     return read_table(path, required_columns=ASH_COMPATIBILITY_COLUMNS)
 
 
 def load_somber_weapons(path: Path) -> CsvTable:
-    """Return `weapon_skills.csv`."""
     return read_table(path, required_columns=SOMBER_WEAPON_COLUMNS)

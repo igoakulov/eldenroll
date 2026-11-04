@@ -1,8 +1,5 @@
-"""Read a YAML source document from disk.
-
-The mod's files under `data/sources/` are YAML, so one reader serves all of them. Parse and I/O
-failures become `LoaderError` with the file path so the build can report what broke without a
-traceback.
+"""Parse and I/O failures become `LoaderError` with the file path, so the build reports them without
+a traceback.
 """
 
 from __future__ import annotations
@@ -15,7 +12,6 @@ from eldenrando.loaders.schema import LoaderError, require_mapping
 
 
 def load_mapping(path: Path) -> dict[object, object]:
-    """Return the document at `path` as a mapping, or raise `LoaderError`."""
     try:
         text = path.read_text(encoding="utf-8")
     except OSError as exc:

@@ -1,6 +1,4 @@
-"""One place an item can be found (`data.md` §5.2).
-
-The null pattern says which case a row is, so no `source` column exists: a location for a pickup,
+"""The null pattern says which case a row is, so no `source` column exists: a location for a pickup,
 a shop or a regular enemy, and a boss instance for what comes from a fight.
 """
 

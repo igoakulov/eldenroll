@@ -1,7 +1,5 @@
-"""Load `data/overrides/builds.csv` and `slot_pools.csv`, both authored seeds.
-
-`selectors` holds `kind:id id` parts split by `;`, because the ids are slugs and a cell stays free
-of quoting. A part with no ids, such as `rule:`, means every option of that kind.
+"""`selectors` holds `kind:id id` parts split by `;`, because the ids are slugs and a cell stays
+free of quoting. A part with no ids, such as `rule:`, means every option of that kind.
 """
 
 from __future__ import annotations
@@ -18,15 +16,12 @@ from eldenrando.model.vocabulary import BUILDS, SLOTS
 
 @dataclass(frozen=True, slots=True)
 class SlotPoolRow:
-    """One row of the file, with its selectors split but not yet normalized."""
-
     build_id: str
     slot: str
     selectors: tuple[tuple[str, tuple[str, ...]], ...]
 
 
 def load_builds(path: Path) -> tuple[Build, ...]:
-    """Return the builds in file order, or raise `LoaderError` unless they are the known ones."""
     table = read_table(path, required_columns=("id", "name", "odds"))
     builds = tuple(
         Build(
@@ -45,7 +40,6 @@ def load_builds(path: Path) -> tuple[Build, ...]:
 
 
 def load_slot_pools(path: Path) -> tuple[SlotPoolRow, ...]:
-    """Return the rows in file order, or raise `LoaderError` on an unknown build, slot or form."""
     table = read_table(path, required_columns=("build_id", "slot", "selectors"))
     rows: list[SlotPoolRow] = []
     for index, row in enumerate(table.rows, start=1):
@@ -63,7 +57,6 @@ def load_slot_pools(path: Path) -> tuple[SlotPoolRow, ...]:
 
 
 def parse_selectors(cell: str, where: str) -> tuple[tuple[str, tuple[str, ...]], ...]:
-    """Return a cell's `(kind, ids)` parts; an empty cell has none."""
     out: list[tuple[str, tuple[str, ...]]] = []
     for part in filter(None, (text.strip() for text in cell.split(";"))):
         out.append(parse_selector(part, where))
@@ -71,7 +64,6 @@ def parse_selectors(cell: str, where: str) -> tuple[tuple[str, tuple[str, ...]],
 
 
 def parse_selector(part: str, where: str) -> tuple[str, tuple[str, ...]]:
-    """Return one `kind:id id` part as `(kind, ids)`, or raise `LoaderError`."""
     kind, colon, ids = part.partition(":")
     if not colon:
         raise LoaderError(f"{where}: selector {part!r} has no kind")

@@ -1,7 +1,5 @@
-"""Every modifier has a condition, known ids and a condition rolled first (`prd.md` §8.4, §9.2).
-
-Rule exclusions must also run both ways, because either rule of a pair can land in `rule_1`. A pair
-written one way would still roll in the other order.
+"""Rule exclusions must also run both ways, because either rule of a pair can land in `rule_1`. A
+pair written one way would still roll in the other order.
 """
 
 from __future__ import annotations
@@ -30,7 +28,6 @@ ITEM_KINDS: frozenset[SelectorKind] = frozenset({"item", "subcategory", "categor
 def validate_modifiers(
     modifiers: Iterable[Modifier], known: Mapping[SelectorKind, AbstractSet[str]]
 ) -> None:
-    """Raise unless the rows are valid, naming every row that fails."""
     rows = tuple(modifiers)
     counts = Counter(row.id for row in rows)
     problems = [f"{name} repeats" for name, count in counts.items() if count > 1]
@@ -47,7 +44,6 @@ def validate_modifiers(
 def validate_rolling_order(
     modifiers: Iterable[Modifier], pools: Iterable[SlotPool], items: Iterable[Item]
 ) -> None:
-    """Raise unless each item target can still roll after the slots its conditions read."""
     table = tuple(items)
     resolved = {
         (pool.build_id, pool.slot): {one.id for one in resolve_items(pool.selectors, table)}
@@ -62,7 +58,6 @@ def validate_rolling_order(
 def _rolls_after_conditions(
     row: Modifier, resolved: Mapping[tuple[str, str], AbstractSet[str]], table: tuple[Item, ...]
 ) -> bool:
-    """Return whether a target is in a pool of a matching build that rolls after the conditions."""
     slots = [SLOTS.index(one.slot) for one in row.when if isinstance(one, RolledCondition)]
     if row.target.kind not in ITEM_KINDS or not slots:
         return True
@@ -118,7 +113,6 @@ def _exclusions(row: Modifier) -> Iterator[tuple[str, str]]:
 
 
 def _selectors(rows: tuple[Modifier, ...]) -> Iterator[Selector]:
-    """Yield every selector of the rows."""
     for row in rows:
         yield row.target
         for one in row.when:

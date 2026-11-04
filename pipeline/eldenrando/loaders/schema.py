@@ -16,40 +16,34 @@ class LoaderError(Exception):
 
 
 def _describe(path: str) -> str:
-    """Return a printable location, using a placeholder for the document root."""
     return path or "<root>"
 
 
 def require_mapping(value: object, path: str) -> Mapping[object, object]:
-    """Return `value` as a mapping, or raise if it is not one."""
     if not isinstance(value, Mapping):
         raise LoaderError(f"{_describe(path)}: expected a mapping, got {type(value).__name__}")
     return dict(cast("Mapping[object, object]", value))
 
 
 def require_sequence(value: object, path: str) -> list[object]:
-    """Return `value` as a list, or raise if it is not one."""
     if not isinstance(value, list):
         raise LoaderError(f"{_describe(path)}: expected a list, got {type(value).__name__}")
     return list(cast("list[object]", value))
 
 
 def require_string(value: object, path: str) -> str:
-    """Return `value` as a string, or raise if it is not one."""
     if not isinstance(value, str):
         raise LoaderError(f"{_describe(path)}: expected a string, got {type(value).__name__}")
     return value
 
 
 def require_integer(value: object, path: str) -> int:
-    """Return `value` as an integer, or raise if it is not one."""
     if not isinstance(value, int) or isinstance(value, bool):
         raise LoaderError(f"{_describe(path)}: expected an integer, got {type(value).__name__}")
     return value
 
 
 def check_keys(mapping: Mapping[object, object], allowed: Collection[str], path: str) -> None:
-    """Raise if `mapping` holds a key outside `allowed`."""
     permitted = set(allowed)
     unknown = sorted(str(key) for key in mapping if key not in permitted)
     if unknown:
@@ -62,23 +56,19 @@ def _key(mapping: Mapping[object, object], key: str, path: str) -> object | None
 
 
 def get_string(mapping: Mapping[object, object], key: str, path: str) -> str:
-    """Return a required string field."""
     return require_string(_key(mapping, key, path), f"{path}.{key}")
 
 
 def get_optional_string(mapping: Mapping[object, object], key: str, path: str) -> str | None:
-    """Return an optional string field, or None when absent."""
     value = _key(mapping, key, path)
     return None if value is None else require_string(value, f"{path}.{key}")
 
 
 def get_integer(mapping: Mapping[object, object], key: str, path: str) -> int:
-    """Return a required integer field."""
     return require_integer(_key(mapping, key, path), f"{path}.{key}")
 
 
 def get_optional_integer(mapping: Mapping[object, object], key: str, path: str) -> int | None:
-    """Return an optional integer field, or None when absent."""
     value = _key(mapping, key, path)
     return None if value is None else require_integer(value, f"{path}.{key}")
 
@@ -86,7 +76,6 @@ def get_optional_integer(mapping: Mapping[object, object], key: str, path: str) 
 def get_optional_scalar(
     mapping: Mapping[object, object], key: str, path: str
 ) -> int | str | None:
-    """Return an optional field that is either an integer id or a name string."""
     value = _key(mapping, key, path)
     where = f"{path}.{key}"
     if value is None:
@@ -101,7 +90,6 @@ def get_optional_scalar(
 def get_scalar_maps(
     mapping: Mapping[object, object], key: str, path: str
 ) -> tuple[dict[str, str | int], ...]:
-    """Return an optional list of flat mappings with string keys and scalar values."""
     value = _key(mapping, key, path)
     if value is None:
         return ()
@@ -140,7 +128,6 @@ def get_string_list(mapping: Mapping[object, object], key: str, path: str) -> tu
 
 
 def get_int_map(mapping: Mapping[object, object], key: str, path: str) -> dict[int, int]:
-    """Return a mapping of integer ids to integers."""
     value = require_mapping(_key(mapping, key, path), f"{path}.{key}")
     return {
         _require_int_key(entry_key, f"{path}.{key}"): require_integer(
@@ -151,7 +138,6 @@ def get_int_map(mapping: Mapping[object, object], key: str, path: str) -> dict[i
 
 
 def get_str_int_map(mapping: Mapping[object, object], key: str, path: str) -> dict[str, int]:
-    """Return a mapping of string keys to integers."""
     value = require_mapping(_key(mapping, key, path), f"{path}.{key}")
     out: dict[str, int] = {}
     for entry_key, entry in value.items():
@@ -179,14 +165,12 @@ def get_optional_int_map(
 
 
 def _require_int_key(value: object, path: str) -> int:
-    """Return a mapping key as an integer id."""
     return require_integer(value, f"{path} key")
 
 
 def get_id_name_maps(
     mapping: Mapping[object, object], key: str, path: str
 ) -> dict[str, dict[int, str]]:
-    """Return a category -> {id: name} mapping."""
     categories = require_mapping(_key(mapping, key, path), f"{path}.{key}")
     out: dict[str, dict[int, str]] = {}
     for category, entries in categories.items():
@@ -204,7 +188,6 @@ def get_id_name_maps(
 def get_category_int_maps(
     mapping: Mapping[object, object], key: str, path: str
 ) -> dict[str, dict[int, int]]:
-    """Return a category -> {id: count} mapping."""
     categories = require_mapping(_key(mapping, key, path), f"{path}.{key}")
     out: dict[str, dict[int, int]] = {}
     for category, entries in categories.items():

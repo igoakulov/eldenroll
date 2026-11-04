@@ -1,5 +1,3 @@
-"""Build the `modifier` rows, with each selector in its stored form (`data.md` §2.1)."""
-
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -12,7 +10,6 @@ from eldenrando.normalize.selectors import new_selector
 
 
 def build_modifiers(rows: Iterable[ModifierRow]) -> tuple[Modifier, ...]:
-    """Return the modifiers in source order, or raise `BuildError` on an unknown name."""
     return tuple(
         Modifier(
             id=row.id,
@@ -25,7 +22,6 @@ def build_modifiers(rows: Iterable[ModifierRow]) -> tuple[Modifier, ...]:
 
 
 def _condition(row: ConditionRow, modifier_id: str) -> Condition:
-    """Return one condition, or raise `BuildError` on an unknown build or slot."""
     if row.subject == BUILD_SUBJECT:
         unknown = sorted(set(row.ids) - set(BUILDS))
         if unknown or not row.ids:

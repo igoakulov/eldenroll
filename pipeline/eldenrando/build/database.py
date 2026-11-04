@@ -1,7 +1,4 @@
-"""The build: run the gate, then write `db.json` and `import-report.json` (`data.md` §11, §12).
-
-`python -m eldenrando.build.database` exits non-zero and writes nothing when any check fails.
-"""
+"""`python -m eldenrando.build.database` exits non-zero and writes nothing when any check fails."""
 
 from __future__ import annotations
 
@@ -26,7 +23,6 @@ REPORT_FILE = "import-report.json"
 
 
 def gate_problems(data: GateData) -> tuple[str, ...]:
-    """Return every failure of the Phase 0 gate."""
     return (*structure_problems(data), *quality_problems(data))
 
 
@@ -48,7 +44,6 @@ def import_report(data: GateData) -> Mapping[str, object]:
 
 
 def write_artifacts(data: GateData, folder: Path) -> None:
-    """Write both files, as text with fixed line endings."""
     folder.mkdir(parents=True, exist_ok=True)
     (folder / DB_FILE).write_text(
         render(database_rows(data.database)), encoding="utf-8", newline="\n"
@@ -57,7 +52,6 @@ def write_artifacts(data: GateData, folder: Path) -> None:
 
 
 def main(arguments: list[str] | None = None) -> int:
-    """Return 0 after writing the files, or 1 after printing what failed."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=ROOT / "data" / "build")
     folder: Path = parser.parse_args(arguments).out
@@ -78,12 +72,10 @@ def main(arguments: list[str] | None = None) -> int:
 
 
 def _table_counts(database: Database) -> Mapping[str, int]:
-    """Return the row count of each table."""
     return {table: len(rows) for table, rows in database_rows(database).items()}
 
 
 def _coverage(database: Database) -> Mapping[str, Mapping[str, int]]:
-    """Return how many items of each category have a row in the base game and in the DLC."""
     regions = {row.id: row.region_id for row in database.locations}
     dlc = {row.id for row in database.regions if row.is_dlc}
     bosses = {row.id: row.location_id for row in database.bosses}
@@ -98,7 +90,6 @@ def _coverage(database: Database) -> Mapping[str, Mapping[str, int]]:
 
 
 def _guarantee_targets_off_base_odds(database: Database) -> list[str]:
-    """Return the targets of a guarantee whose base odds are not 1 (`prd.md` §8.5)."""
     odds = {
         **{row.id: row.odds for row in database.items},
         **{row.id: row.odds for row in database.rules},
@@ -116,7 +107,6 @@ def _guarantee_targets_off_base_odds(database: Database) -> list[str]:
 
 
 def _dropped_rows(values: Iterable[DroppedValue]) -> list[Mapping[str, object]]:
-    """Return one row per dropped value and file, with where it was first seen and how often."""
     first: dict[tuple[str, str], str] = {}
     counts: Counter[tuple[str, str]] = Counter()
     for value in values:

@@ -1,5 +1,3 @@
-"""Every build has its slots, and each pool holds only what that slot may roll (`prd.md` §6)."""
-
 from __future__ import annotations
 
 from collections import Counter
@@ -32,7 +30,6 @@ def validate_slot_pools(
     items: Iterable[Item],
     known: Mapping[SelectorKind, AbstractSet[str]],
 ) -> None:
-    """Raise unless the pools are complete and in scope, naming every row that fails."""
     rows = tuple(pools)
     table = tuple(items)
     problems = [*_shape(rows), *_kinds(rows), *_scope(rows, table)]
@@ -42,7 +39,6 @@ def validate_slot_pools(
 
 
 def _shape(rows: tuple[SlotPool, ...]) -> list[str]:
-    """Return each repeated, missing or extra row, and each row with no selector."""
     counts = Counter((row.build_id, row.slot) for row in rows)
     problems = [f"{build} {slot} repeats" for (build, slot), n in counts.items() if n > 1]
     for build in BUILDS:
@@ -55,7 +51,6 @@ def _shape(rows: tuple[SlotPool, ...]) -> list[str]:
 
 
 def _kinds(rows: tuple[SlotPool, ...]) -> list[str]:
-    """Return each selector whose kind cannot fill its slot."""
     return [
         f"{row.build_id} {row.slot} selects by {one.kind}"
         for row in rows

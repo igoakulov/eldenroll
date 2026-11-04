@@ -1,5 +1,3 @@
-"""One modifier row: when its conditions hold, multiply its target's odds (`prd.md` §8.4)."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass

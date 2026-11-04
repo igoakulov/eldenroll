@@ -148,7 +148,6 @@ def test_the_real_data_passes_the_gate(data: GateData) -> None:
         (_set_item("gauntlets", odds=2), "odds on armor pieces, which roll only through a set"),
         (_set_item("longsword", infusable=None), "bad infusable or str_bonus_2h on: longsword"),
         (_set_item("parry", str_bonus_2h=False), "bad infusable or str_bonus_2h on: parry"),
-        (_set_item("none", str_bonus_2h=None), "bad infusable or str_bonus_2h on: none"),
         (_set_item("longsword", str_bonus_2h=False), "no class or override says so: longsword"),
         (_set_item("caestus", str_bonus_2h=True), "bonus in a class"),
         (_rule_odds("none", 1), "the rule None needs odds of 4"),

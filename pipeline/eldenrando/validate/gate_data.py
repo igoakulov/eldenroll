@@ -1,5 +1,3 @@
-"""Everything the Phase 0 gate reads, loaded once (`data.md` §11)."""
-
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -30,8 +28,6 @@ from eldenrando.validate.placement import load_placement_data, load_placement_so
 
 @dataclass(frozen=True, slots=True)
 class GateData:
-    """The tables, and the sources and overrides they are checked against."""
-
     database: Database
     sources: GapSources
     boss_overrides: BossOverrides
@@ -46,7 +42,6 @@ class GateData:
 
 
 def load_gate_data(root: Path) -> GateData:
-    """Return what the gate reads, from `data/sources/` and a checkout's `data/` folder."""
     overrides = root / "data" / "overrides"
     sources = load_sources(root)
     placement = load_placement_data(root, sources)

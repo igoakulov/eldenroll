@@ -1,10 +1,3 @@
-"""Region invariants that hold across the whole seed and location table.
-
-The region rows are authored and the locations are joined from annotations, so the checks
-here are the ones a bad edit would break: an orphan location, an empty region, or a DLC
-prefix that disagrees with the areas it contains.
-"""
-
 from __future__ import annotations
 
 from collections import Counter
@@ -20,7 +13,6 @@ MAX_REGION_LOCATIONS: int = 29
 def validate_region_membership(
     regions: Sequence[Region], locations: Sequence[Location]
 ) -> None:
-    """Raise unless every location has a region and every region holds 1 to 29 locations."""
     region_ids = {region.id for region in regions}
     unknown = sorted({location.region_id for location in locations} - region_ids)
     if unknown:
@@ -42,7 +34,6 @@ def validate_region_dlc_prefix(
     *,
     dlc_location_ids: Collection[str],
 ) -> None:
-    """Raise unless `DLC: ` in the region name matches its locations exactly."""
     dlc_ids = set(dlc_location_ids)
     members: dict[str, list[Location]] = {region.id: [] for region in regions}
     for location in locations:

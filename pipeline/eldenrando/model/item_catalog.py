@@ -1,9 +1,6 @@
-"""The item lookup built from `item_info.yaml`.
-
-`iteminfo` is a **lookup, not the catalog**. It names 2,448 items across five categories,
-most of which (runes, keys, cookbooks, crafting materials) can never be rolled. The `item`
-table is built from the pool sources and holds only rollable items; this lookup is used to
-resolve a name to a source id and to detect naming drift.
+"""`iteminfo` is a **lookup, not the catalog**: most of what it names can never be rolled, so the
+`item` table is built from the pool sources and holds only rollable items. This lookup resolves a
+name to a source id and detects naming drift.
 
 Names are unique across all categories, so a name alone identifies an entry.
 """
@@ -15,8 +12,6 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class CatalogGroup:
-    """One of the 29 item groups the randomizer randomizes together."""
-
     name: str
     items: dict[str, tuple[int, ...]]
     item_count: int
@@ -26,8 +21,6 @@ class CatalogGroup:
 
 @dataclass(frozen=True, slots=True)
 class CatalogLocation:
-    """One prose location entry: tags, how many items sit there, and descriptions."""
-
     tags: tuple[str, ...]
     count: int
     real_count: int | None
@@ -36,8 +29,6 @@ class CatalogLocation:
 
 @dataclass(frozen=True, slots=True)
 class ItemCatalog:
-    """Ids, names, counts, groups and locations from `item_info.yaml`."""
-
     names: dict[str, dict[int, str]]
     counts: dict[str, dict[int, int]]
     unique_counts: dict[str, dict[int, int]]

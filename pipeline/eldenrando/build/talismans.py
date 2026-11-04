@@ -1,10 +1,6 @@
-"""Talisman rows: the fixed 41-item shortlist, by exact mod name (`data.md` §4.4).
+"""The families below are documentation only; no tag is stored.
 
-The shortlist is the membership, so a name the mod's lists do not hold stops the build instead
-of dropping a row. The families below are documentation only; no tag is stored.
-
-`alias` and `image` stay at their defaults here; later steps fill them in and validation
-enforces them.
+`alias` and `image` stay at their defaults here; later steps fill them in.
 """
 
 from __future__ import annotations
@@ -70,7 +66,6 @@ SHORTLIST: tuple[str, ...] = (
 
 
 def build_talismans(catalog: ItemCatalog) -> tuple[Item, ...]:
-    """Return one row per shortlisted talisman, in shortlist order, or raise `BuildError`."""
     known = set(catalog.names["accessory"].values())
     unknown = sorted(name for name in SHORTLIST if name not in known)
     if unknown:

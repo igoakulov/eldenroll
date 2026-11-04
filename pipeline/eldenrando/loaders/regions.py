@@ -1,8 +1,5 @@
-"""Load the 17 region rows from `data/overrides/regions.csv`.
-
-The seed is authored, not derived, so the loader only checks the shape a reader relies on:
-no empty id or name, a unique id, and `region_level` strictly ascending down the file. A row
-out of order is a mistake in the seed, not something to sort away.
+"""`region_level` must ascend down the file: a row out of order is a mistake in the seed, not
+something to sort away.
 """
 
 from __future__ import annotations
@@ -18,7 +15,6 @@ REGION_COLUMNS: tuple[str, ...] = ("id", "name", "region_level")
 
 
 def load_regions(path: Path) -> tuple[Region, ...]:
-    """Return the region seed rows in file order, or raise `LoaderError`."""
     table = read_table(path, required_columns=REGION_COLUMNS)
     id_column = table.column("id")
     name_column = table.column("name")
@@ -44,7 +40,6 @@ def load_regions(path: Path) -> tuple[Region, ...]:
 
 
 def _parse_level(value: str, where: str) -> int:
-    """Return `region_level` as an integer, or raise."""
     try:
         return int(value)
     except ValueError as exc:
@@ -52,7 +47,6 @@ def _parse_level(value: str, where: str) -> int:
 
 
 def _check_ids_and_levels(regions: list[Region], path: str) -> None:
-    """Raise unless ids are unique and levels are unique and ascending."""
     seen_ids: set[str] = set()
     levels: dict[int, str] = {}
     for region in regions:

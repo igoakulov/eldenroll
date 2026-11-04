@@ -1,13 +1,11 @@
-"""Where each item is found: `item_location` rows from the slots and drop CSVs (`data.md` §5).
+"""A slot line places its item at the slot's `Area`, unless the item comes from a fight. A
+boss-tagged slot joins on its map label, because the mod often names an enemy by its model: the
+name decides only where a label holds several bosses. Enia's items take the boss their
+remembrance or unlock names. `boss_slot_links.csv` ties what no tag shows, such as the fights at
+`odds = 0`, and every row of it must apply, so a source change that orphans one stops the build.
 
-A slot line places its item at the slot's `Area`, unless the item comes from a fight. A boss-tagged
-slot joins on its map label, because the mod often names an enemy by its model: the name decides
-only where a label holds several bosses. Enia's items take the boss their remembrance or unlock
-names. `boss_slot_links.csv` ties what no tag shows, such as the fights at `odds = 0`, and every
-row of it must apply, so a source change that orphans one stops the build.
-
-The drop CSVs add every regular enemy's farm spots. Last, an ash the mod has only on a weapon takes
-that weapon's rows, boss-tied ones included.
+The drop CSVs add every regular enemy's farm spots. Last, an ash the mod has only on a weapon
+takes that weapon's rows, boss-tied ones included.
 """
 
 from __future__ import annotations
@@ -80,8 +78,6 @@ class Placement:
 
 @dataclass(frozen=True, slots=True)
 class DroppedValue:
-    """A name a source holds that gives no row, and where it was found."""
-
     file: str
     key: str
     value: str
@@ -89,8 +85,6 @@ class DroppedValue:
 
 @dataclass(frozen=True, slots=True)
 class PlacementSources:
-    """What placement reads, already loaded."""
-
     names: PlacementNames
     slots: Sequence[ItemSlot]
     drops: CsvTable
@@ -105,7 +99,6 @@ class PlacementSources:
 
 
 def merged_labels(merges: Mapping[tuple[str, str], tuple[str, str]]) -> dict[str, str]:
-    """Return `{slot label: instance label}` for the fights a merge moved to a new label."""
     return {
         label.removeprefix(DLC_TAG): instance_label.removeprefix(DLC_TAG)
         for (label, _), (_, instance_label) in merges.items()
@@ -114,22 +107,17 @@ def merged_labels(merges: Mapping[tuple[str, str], tuple[str, str]]) -> dict[str
 
 
 def build_placements(sources: PlacementSources) -> tuple[Placement, ...]:
-    """Return every placement once, or raise `BuildError`."""
     placements = [*_slot_placements(sources), *_drop_placements(sources)]
     placements.extend(_ash_placements(sources, placements))
     return tuple(dict.fromkeys(placements))
 
 
 def item_locations(placements: Iterable[Placement]) -> tuple[ItemLocation, ...]:
-    """Return the distinct rows of the placements, in their order."""
     return tuple(dict.fromkeys(placement.row for placement in placements))
 
 
 def dropped_values(sources: PlacementSources) -> Iterator[DroppedValue]:
-    """Yield each item name a source holds that gives no row (`data.md` §11).
-
-    A consumable is not dropped, because it has no rows by design.
-    """
+    """A consumable is not dropped, because it has no rows by design."""
     for slot in sources.slots:
         for line in slot.debug_lines:
             found = extract_items((line,))
@@ -165,7 +153,6 @@ def _dropped_cells(
 
 
 def _slot_placements(sources: PlacementSources) -> Iterator[Placement]:
-    """Yield a placement per slot line that names a pool item."""
     places = {(boss.name, boss.location_label): boss for boss in sources.bosses}
     by_label: dict[str, list[BossInstance]] = {}
     for boss in sources.bosses:
@@ -199,7 +186,6 @@ def _slot_placements(sources: PlacementSources) -> Iterator[Placement]:
 
 
 def _enia_boss(line: str, sources: PlacementSources) -> BossPlace:
-    """Return the boss of an item Enia sells, or raise `BuildError`."""
     remembrance = REMEMBRANCE.search(line)
     if remembrance is not None:
         place = sources.remembrances.get(remembrance[1])
@@ -216,7 +202,6 @@ def _enia_boss(line: str, sources: PlacementSources) -> BossPlace:
 
 
 def _boss_at(place: BossPlace, places: Mapping[tuple[str, str], BossInstance]) -> BossInstance:
-    """Return the instance a link names, or raise `BuildError`."""
     boss = places.get(place)
     if boss is None:
         raise BuildError(f"no boss instance {place[0]!r} on {place[1]!r}")
@@ -229,10 +214,7 @@ def _boss_of_slot(
     by_label: Mapping[str, Sequence[BossInstance]],
     merged: Mapping[str, str],
 ) -> BossInstance:
-    """Return the fight a boss-tagged slot line belongs to, or raise `BuildError`.
-
-    A label a merge moved still holds its other fights, so it offers both sets of bosses.
-    """
+    """A label a merge moved still holds its other fights, so it offers both sets of bosses."""
     written = _LABEL.findall(line)
     labels = {*written, *(merged[label] for label in written if label in merged)}
     bosses = [boss for label in sorted(labels) for boss in by_label.get(label, ())]
@@ -248,20 +230,18 @@ def _boss_of_slot(
 
 
 def _boss_placement(item: Item, boss: BossInstance, source_name: str) -> Placement:
-    """Return a boss-tied placement."""
     row = ItemLocation(item_id=item.id, boss_instance_id=boss.id)
     return Placement(row=row, source_name=source_name)
 
 
 def _location_placement(item: Item, area: str, source_name: str) -> Placement:
-    """Return a placement at a location; the Roundtable counts as Limgrave (`data.md` §5.2)."""
+    """The Roundtable counts as Limgrave (`data.md` §5.2)."""
     location_id = _ROUNDTABLE_LOCATION if area == _ROUNDTABLE else area
     row = ItemLocation(item_id=item.id, location_id=location_id)
     return Placement(row=row, source_name=source_name)
 
 
 def _drop_placements(sources: PlacementSources) -> Iterator[Placement]:
-    """Yield a placement per pool item a regular enemy drops, from both CSVs."""
     yield from _cell_placements(
         sources,
         sources.drops,
@@ -281,14 +261,13 @@ def _drop_placements(sources: PlacementSources) -> Iterator[Placement]:
 
 
 def _columns(table: CsvTable, prefixes: tuple[str, ...]) -> tuple[int, ...]:
-    """Return the indexes of the columns that hold an item."""
     return tuple(
         index for index, name in enumerate(table.header) if name.startswith(prefixes)
     )
 
 
 def _drop_cell_name(cell: str) -> str:
-    """Return the name in a cell like `Kukri - {5} (10%) [True]`, or raise `BuildError`."""
+    """Return the name in a cell like `Kukri - {5} (10%) [True]`."""
     match = _DROP_CELL.match(cell)
     if match is None:
         raise BuildError(f"enemy_drops cell has no name: {cell!r}")
@@ -308,7 +287,6 @@ def _cell_placements(
     cells: tuple[int, ...],
     cell_name: Callable[[str], str],
 ) -> Iterator[Placement]:
-    """Yield a placement per pool item in one drop table, or raise `BuildError`."""
     location = table.column(location_column)
     enemy = table.column(name_column)
     for row in table.rows:
@@ -331,7 +309,6 @@ def _cell_placements(
 def _ash_placements(
     sources: PlacementSources, placements: Sequence[Placement]
 ) -> Iterator[Placement]:
-    """Yield the weapons' placements again for each ash that comes on them, or raise."""
     for ash_name, weapons in sources.ash_sources.items():
         ash = sources.names.ashes[ash_name]
         for weapon in weapons:

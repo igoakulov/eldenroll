@@ -1,9 +1,7 @@
-"""Set `str_bonus_2h`: whether two-handing a weapon or shield eases its STR requirement.
-
-The bonus is on by default and off for the classes in `prd.md` §6.4. `str_bonus_2h.csv` names the
-weapons that differ from their class: paired weapons outside those classes, and the two exceptions
-`Grafted Dragon` and `Starscourge Greatsword`. Every other category keeps its null, and `none` keeps
-its `false`.
+"""The bonus is on by default and off for the classes in `prd.md` §6.4. `str_bonus_2h.csv` names the
+weapons that differ from their class: paired weapons outside those classes, and the two
+exceptions `Grafted Dragon` and `Starscourge Greatsword`. Every other category keeps its null,
+and `none` keeps its `false`.
 """
 
 from __future__ import annotations
@@ -17,7 +15,6 @@ from eldenrando.model.vocabulary import NO_STR_BONUS
 
 
 def assign_str_bonus(items: Iterable[Item], overrides: Mapping[str, bool]) -> tuple[Item, ...]:
-    """Return the rows with `str_bonus_2h` set, or raise `BuildError`."""
     rows = tuple(items)
     weapons = {row.name for row in rows if row.category in ("weapon", "shield")}
     unknown = sorted(set(overrides) - weapons)
