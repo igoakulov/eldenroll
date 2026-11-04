@@ -108,16 +108,23 @@ def build_item_table(items: Iterable[Item]) -> tuple[Item, ...]:
     return final
 
 
-def _reject_excluded(rows: Iterable[Item]) -> None:
-    """Raise when a row is a placeholder, an `any` state or an alias label."""
-    excluded = sorted(
-        row.name
-        for row in rows
-        if row.name in _NEVER_A_ROW
-        or row.name.lower() == _ANY
-        or row.name.startswith(_ALIAS_PREFIX)
-        or any(marker in row.name for marker in _NEVER_IN_A_NAME)
+def never_a_row(rows: Iterable[Item]) -> tuple[str, ...]:
+    """Return the names that are a placeholder, an `any` state or an alias label."""
+    return tuple(
+        sorted(
+            row.name
+            for row in rows
+            if row.name in _NEVER_A_ROW
+            or row.name.lower() == _ANY
+            or row.name.startswith(_ALIAS_PREFIX)
+            or any(marker in row.name for marker in _NEVER_IN_A_NAME)
+        )
     )
+
+
+def _reject_excluded(rows: Iterable[Item]) -> None:
+    """Raise when a row may never exist in any category."""
+    excluded = never_a_row(rows)
     if excluded:
         raise BuildError(f"item table holds excluded name(s): {', '.join(excluded)}")
 

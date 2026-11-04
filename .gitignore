@@ -3,6 +3,9 @@ raw/
 docs/
 .claude/
 
+# ---- build output; rebuilt with python -m eldenrando.build.database ----
+data/build/
+
 # ---- python ----
 __pycache__/
 *.py[cod]

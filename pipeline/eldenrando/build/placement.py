@@ -65,6 +65,9 @@ _LOT_LOCATION = "Location #1"
 _LOT_NAME = "Name"
 _LOT_CELLS = ("Items Drop ", "Item Drop ")
 _NO_ITEM = "None"
+_SLOTS_FILE = "placement/item_slots.yaml"
+_DROPS_FILE = "placement/enemy_drops.csv"
+_LOTS_FILE = "placement/enemy_item_lots.csv"
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,6 +76,15 @@ class Placement:
 
     row: ItemLocation
     source_name: str
+
+
+@dataclass(frozen=True, slots=True)
+class DroppedValue:
+    """A name a source holds that gives no row, and where it was found."""
+
+    file: str
+    key: str
+    value: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -88,7 +100,7 @@ class PlacementSources:
     aliases: Mapping[str, str]
     remembrances: Mapping[str, BossPlace]
     armor_shops: Mapping[str, BossPlace]
-    slot_links: Mapping[tuple[str, str], BossPlace]
+    slot_links: Mapping[tuple[str, str], tuple[BossPlace, ...]]
     ash_sources: Mapping[str, Sequence[str]]
 
 
@@ -113,6 +125,45 @@ def item_locations(placements: Iterable[Placement]) -> tuple[ItemLocation, ...]:
     return tuple(dict.fromkeys(placement.row for placement in placements))
 
 
+def dropped_values(sources: PlacementSources) -> Iterator[DroppedValue]:
+    """Yield each item name a source holds that gives no row (`data.md` §11).
+
+    A consumable is not dropped, because it has no rows by design.
+    """
+    for slot in sources.slots:
+        for line in slot.debug_lines:
+            found = extract_items((line,))
+            if found and not (slot.is_randomizable and sources.names.resolve_slot_line(line)):
+                yield DroppedValue(_SLOTS_FILE, f"Slots[{slot.key}].DebugText", found[0])
+    yield from _dropped_cells(
+        sources, sources.drops, _DROPS_FILE, _DROP_LOCATION, (_DROP_CELLS,), _drop_cell_name
+    )
+    yield from _dropped_cells(
+        sources, sources.lots, _LOTS_FILE, _LOT_LOCATION, _LOT_CELLS, _lot_cell_name
+    )
+
+
+def _dropped_cells(
+    sources: PlacementSources,
+    table: CsvTable,
+    file: str,
+    location_column: str,
+    prefixes: tuple[str, ...],
+    cell_name: Callable[[str], str],
+) -> Iterator[DroppedValue]:
+    """Yield each cell of a drop table that names nothing in the pool, or no real place."""
+    location = table.column(location_column)
+    for number, row in enumerate(table.rows, start=1):
+        for index in _columns(table, prefixes):
+            if not row[index] or row[index] == _NO_ITEM:
+                continue
+            name = cell_name(row[index])
+            item = sources.names.resolve(name)
+            no_place = row[location] in NON_PLACE_LABELS
+            if item is None or (no_place and item.category != "consumable"):
+                yield DroppedValue(file, f"row {number}, {table.header[index]}", name)
+
+
 def _slot_placements(sources: PlacementSources) -> Iterator[Placement]:
     """Yield a placement per slot line that names a pool item."""
     places = {(boss.name, boss.location_label): boss for boss in sources.bosses}
@@ -128,14 +179,15 @@ def _slot_placements(sources: PlacementSources) -> Iterator[Placement]:
             if item is None or item.category == "consumable":
                 continue
             key = (item.name, slot.area)
-            place = sources.slot_links.get(key)
-            if place is not None:
+            links = sources.slot_links.get(key, ())
+            if links:
                 linked.add(key)
             elif ENIA in line:
-                place = _enia_boss(line, sources)
+                links = (_enia_boss(line, sources),)
             source_name = extract_items((line,))[0]
-            if place is not None:
-                yield _boss_placement(item, _boss_at(place, places), source_name)
+            if links:
+                for place in links:
+                    yield _boss_placement(item, _boss_at(place, places), source_name)
             elif BOSS_SLOT_TAGS.intersection(slot.tags):
                 boss = _boss_of_slot(slot, line, by_label, sources.merged_labels)
                 yield _boss_placement(item, boss, source_name)

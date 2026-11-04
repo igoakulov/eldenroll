@@ -104,28 +104,33 @@ def eligible_sets(sets: Iterable[ArmorSet], items: Collection[str]) -> tuple[Arm
     return tuple(row for row in sets if all(piece in items for piece in row.pieces))
 
 
+def load_placement_sources(root: Path, loaded: GapSources) -> PlacementSources:
+    """Return what placement reads, from `data/sources/` and a checkout's `data/overrides/`."""
+    overrides = root / "data" / "overrides"
+    boss_overrides = load_boss_overrides(overrides)
+    return PlacementSources(
+        names=placement_names(loaded.table, loaded.catalog, loaded.variants),
+        slots=loaded.slots,
+        drops=load_drop_locations(ENEMY_DROPS),
+        lots=load_item_drops(ENEMY_ITEM_LOTS),
+        bosses=build_boss_instances(load_boss_rows(), boss_overrides),
+        merged_labels=merged_labels(boss_overrides.merges),
+        aliases=boss_overrides.aliases,
+        remembrances=load_remembrance_bosses(overrides / "remembrance_bosses.csv"),
+        armor_shops=load_armor_shop_bosses(overrides / "boss_armor_shops.csv"),
+        slot_links=load_slot_links(overrides / "boss_slot_links.csv"),
+        ash_sources=loaded.ash_sources,
+    )
+
+
 def load_placement_data(root: Path, sources: GapSources | None = None) -> PlacementData:
     """Return the placement tables, from `data/sources/` and a checkout's `data/overrides/`."""
     overrides = root / "data" / "overrides"
     loaded = load_sources(root) if sources is None else sources
-    boss_overrides = load_boss_overrides(overrides)
-    bosses = build_boss_instances(load_boss_rows(), boss_overrides)
+    placement_sources = load_placement_sources(root, loaded)
+    bosses = tuple(placement_sources.bosses)
     regions = load_regions(overrides / "regions.csv")
-    placements = build_placements(
-        PlacementSources(
-            names=placement_names(loaded.table, loaded.catalog, loaded.variants),
-            slots=loaded.slots,
-            drops=load_drop_locations(ENEMY_DROPS),
-            lots=load_item_drops(ENEMY_ITEM_LOTS),
-            bosses=bosses,
-            merged_labels=merged_labels(boss_overrides.merges),
-            aliases=boss_overrides.aliases,
-            remembrances=load_remembrance_bosses(overrides / "remembrance_bosses.csv"),
-            armor_shops=load_armor_shop_bosses(overrides / "boss_armor_shops.csv"),
-            slot_links=load_slot_links(overrides / "boss_slot_links.csv"),
-            ash_sources=loaded.ash_sources,
-        )
-    )
+    placements = build_placements(placement_sources)
     return PlacementData(
         table=loaded.table,
         placements=placements,

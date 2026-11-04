@@ -157,10 +157,34 @@ def test_no_row_is_at_the_roundtable(data: PlacementData) -> None:
         ("Circlet of Light", "Promised Consort Radahn"),
         ("Agheel's Flame", "Flying Dragon Agheel"),
         ("Bayle's Tyranny", "Bayle the Dread"),
+        ("Parrying Dagger", "Patches"),
+        ("Horse Crest Wooden Shield", "Patches"),
+        ("Bull-Goat Helm", "Magma Wyrm Makar"),
+        ("Bull-Goat Greaves", "Magma Wyrm Makar"),
+        ("Serpent-Hunter", "Godskin Noble"),
     ],
 )
 def test_a_fight_drop_is_tied_to_its_boss(data: PlacementData, item: str, boss: str) -> None:
     assert boss in _bosses_of(data, item)
+
+
+def test_gostoc_sells_before_godrick_dies(data: PlacementData) -> None:
+    assert _bosses_of(data, "Bandit Garb") == set()
+
+
+def test_either_of_two_bosses_can_open_one_item(data: PlacementData) -> None:
+    item = _item(data, "Erdtree Bow", None).id
+    rows = [row for row in item_locations(data.placements) if row.item_id == item]
+    assert all(row.location_id is None for row in rows)
+    labels = {
+        (boss.name, boss.location_label)
+        for boss in data.bosses
+        if boss.id in {row.boss_instance_id for row in rows}
+    }
+    assert labels == {
+        ("Godfrey, First Elden Lord", "Leyndell, Royal Capital"),
+        ("Sir Gideon Ofnir, the All-Knowing", "Leyndell, Ashen Capital"),
+    }
 
 
 @pytest.mark.parametrize(
@@ -453,7 +477,7 @@ def test_a_slot_with_no_boss_tag_gives_a_location(sources: GapSources) -> None:
 def test_an_unused_slot_link_stops_the_build(sources: GapSources) -> None:
     fake = replace(
         _fake_sources(sources, _slot(_line("Tile"))),
-        slot_links={("Sword", "elsewhere"): ("First", "Tile")},
+        slot_links={("Sword", "elsewhere"): (("First", "Tile"),)},
     )
 
     with pytest.raises(BuildError, match="Sword at elsewhere"):
@@ -463,7 +487,7 @@ def test_an_unused_slot_link_stops_the_build(sources: GapSources) -> None:
 def test_a_slot_link_to_no_boss_stops_the_build(sources: GapSources) -> None:
     fake = replace(
         _fake_sources(sources, _slot(_line("Tile"))),
-        slot_links={("Sword", "here"): ("Ghost", "Tile")},
+        slot_links={("Sword", "here"): (("Ghost", "Tile"),)},
     )
 
     with pytest.raises(BuildError, match="no boss instance 'Ghost'"):
@@ -518,4 +542,17 @@ def test_a_slot_link_label_drops_the_dlc_prefix(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    assert load_slot_links(path) == {("Sword", "here"): ("First", "Tile")}
+    assert load_slot_links(path) == {("Sword", "here"): (("First", "Tile"),)}
+
+
+def test_a_slot_link_can_name_two_bosses_but_not_one_twice(tmp_path: Path) -> None:
+    header = "item,area,boss,location_label,reason,reviewer\n"
+    first = "Sword,here,First,Tile,why,owner\n"
+    path = tmp_path / "links.csv"
+    path.write_text(f"{header}{first}Sword,here,Second,Tile,why,owner\n", encoding="utf-8")
+
+    assert load_slot_links(path) == {("Sword", "here"): (("First", "Tile"), ("Second", "Tile"))}
+
+    path.write_text(f"{header}{first}{first}", encoding="utf-8")
+    with pytest.raises(LoaderError, match="duplicate row"):
+        load_slot_links(path)

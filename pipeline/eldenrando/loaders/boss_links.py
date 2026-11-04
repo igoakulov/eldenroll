@@ -28,14 +28,17 @@ def load_armor_shop_bosses(path: Path) -> dict[str, BossPlace]:
     return {key[0]: place for key, place in _load(path, ("defeated",)).items()}
 
 
-def load_slot_links(path: Path) -> dict[tuple[str, str], BossPlace]:
-    """Return `{(item, area): (boss, label)}`, or raise `LoaderError`."""
-    return {(key[0], key[1]): place for key, place in _load(path, ("item", "area")).items()}
+def load_slot_links(path: Path) -> dict[tuple[str, str], tuple[BossPlace, ...]]:
+    """Return `{(item, area): each (boss, label) that opens it}`, or raise `LoaderError`."""
+    links: dict[tuple[str, str], tuple[BossPlace, ...]] = {}
+    for key, place in _load(path, ("item", "area", "boss", "location_label")).items():
+        links[key[0], key[1]] = (*links.get((key[0], key[1]), ()), place)
+    return links
 
 
 def _load(path: Path, key_columns: tuple[str, ...]) -> dict[tuple[str, ...], BossPlace]:
     """Return each row's key cells with its boss and label, or raise `LoaderError`."""
-    columns = (*key_columns, *_BOSS_COLUMNS)
+    columns = tuple(dict.fromkeys((*key_columns, *_BOSS_COLUMNS)))
     table = read_table(path, required_columns=columns)
     out: dict[tuple[str, ...], BossPlace] = {}
     for index, row in enumerate(table.rows, start=1):
