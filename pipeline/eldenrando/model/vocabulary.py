@@ -95,8 +95,6 @@ NO_STR_BONUS: Final[frozenset[str]] = frozenset(
         "hand_to_hand",
         "backhand_blade",
         "throwing_blade",
-        "greatbow",
-        "ballista",
         "perfume_bottle",
     }
 )

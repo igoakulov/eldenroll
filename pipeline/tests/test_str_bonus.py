@@ -54,8 +54,8 @@ def test_false_outside_the_classes_is_only_the_paired_list(table: tuple[Item, ..
 def test_counts(table: tuple[Item, ...]) -> None:
     weapons = [row for row in table if row.category in ("weapon", "shield")]
     assert len(weapons) == 487
-    assert sum(row.str_bonus_2h is False for row in weapons) == 48
-    assert sum(row.str_bonus_2h is True for row in weapons) == 439
+    assert sum(row.str_bonus_2h is False for row in weapons) == 40
+    assert sum(row.str_bonus_2h is True for row in weapons) == 447
 
 
 @pytest.mark.parametrize(
@@ -66,8 +66,9 @@ def test_counts(table: tuple[Item, ...]) -> None:
         ("Grafted Dragon", True),
         ("Caestus", False),
         ("Falx", False),
-        ("Greatbow", False),
-        ("Hand Ballista", False),
+        ("Greatbow", True),
+        ("Hand Ballista", True),
+        ("Light Crossbow", True),
         ("Backhand Blade", False),
         ("Lordsworn's Straight Sword", True),
         ("Brass Shield", True),
