@@ -59,14 +59,15 @@ def test_builds_and_their_odds() -> None:
         ("warrior_2h", "2H Warrior", 1),
         ("warrior_dw", "Dual-Wield Warrior", 1),
         ("ranger", "Ranger", 0.5),
-        ("mage", "Mage", 1),
+        ("sorcerer", "Sorcerer", 1),
+        ("pyromancer", "Pyromancer", 1),
         ("spellblade", "Spellblade", 1),
         ("jester", "Jester", 0.25),
     ]
 
 
 def test_the_real_pools_are_valid(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
-    assert len(pools) == 64
+    assert len(pools) == 72
     _validate(pools, data)
 
 
@@ -78,7 +79,21 @@ def test_hands_resolve_to_their_classes(pools: tuple[SlotPool, ...], data: Place
     assert _subcategories(resolved["warrior_dw", "lh"]) == UNPAIRED | {None}
     assert _subcategories(resolved["spellblade", "rh"]) == UNPAIRED
     assert _subcategories(resolved["ranger", "rh"]) == RANGED
-    assert _subcategories(resolved["mage", "rh"]) == CATALYST
+    assert _subcategories(resolved["sorcerer", "rh"]) == {"glintstone_staff"}
+    assert _subcategories(resolved["pyromancer", "rh"]) == {"sacred_seal"}
+    assert _subcategories(resolved["sorcerer", "lh"]) == {
+        None,
+        "glintstone_staff",
+        "small_shield",
+        "medium_shield",
+    }
+    assert _subcategories(resolved["pyromancer", "lh"]) == {
+        None,
+        "sacred_seal",
+        "small_shield",
+        "medium_shield",
+    }
+    assert _subcategories(resolved["spellblade", "lh"]) == CATALYST
     assert len(resolved["knight", "lh"]) == 78 + 1
     assert "none" in {row.id for row in resolved["knight", "lh"]}
 
@@ -87,10 +102,16 @@ def test_pool_sizes_follow_the_categories(
     pools: tuple[SlotPool, ...], data: PlacementData
 ) -> None:
     resolved = _resolved(pools, data.table)
-    assert len(resolved["mage", "rh"]) == len(resolved["mage", "lh"]) == 32
+    assert len(resolved["sorcerer", "rh"]) == 20
+    assert len(resolved["pyromancer", "rh"]) == 12
+    assert len(resolved["sorcerer", "lh"]) == 20 + 19 + 32 + 1
+    assert len(resolved["pyromancer", "lh"]) == 12 + 19 + 32 + 1
     assert len(resolved["spellblade", "lh"]) == 32
-    for build in ("mage", "spellblade"):
-        assert len(resolved[build, "spell"]) == 67 + 86
+    assert {row.category for row in resolved["sorcerer", "spell"]} == {"sorcery"}
+    assert {row.category for row in resolved["pyromancer", "spell"]} == {"incantation"}
+    assert len(resolved["sorcerer", "spell"]) == 67
+    assert len(resolved["pyromancer", "spell"]) == 86
+    assert len(resolved["spellblade", "spell"]) == 67 + 86
     for row in pools:
         found = resolved[row.build_id, row.slot]
         if row.slot == "item":
@@ -101,6 +122,11 @@ def test_pool_sizes_follow_the_categories(
             assert len(found) == 111
         elif row.slot.startswith("rule"):
             assert not found
+
+
+def test_seals_roll_at_twice_the_odds_of_staves(data: PlacementData) -> None:
+    assert {row.odds for row in data.table if row.subcategory == "sacred_seal"} == {2}
+    assert {row.odds for row in data.table if row.subcategory == "glintstone_staff"} == {1}
 
 
 def test_empty_hands_and_spells_hold_only_none(
@@ -131,7 +157,16 @@ def test_jester_right_hand(pools: tuple[SlotPool, ...], data: PlacementData) -> 
         "fist",
     }
     assert [row.name for row in found if row.subcategory == "fist"] == ["Grafted Dragon"]
-    staves = [row for row in found if row.subcategory == "glintstone_staff"]
+    assert {row.name for row in found if row.subcategory == "greatshield"} == {
+        "Briar Greatshield",
+        "Spiked Palisade Shield",
+        "Fingerprint Stone Shield",
+        "Jellyfish Shield",
+        "Visage Shield",
+        "One-Eyed Shield",
+    }
+    assert len(found) == 1 + 8 + 5 + 6 + 1 + 1
+    staves =[row for row in found if row.subcategory == "glintstone_staff"]
     assert [row.name for row in staves] == ["Demi-Human Queen's Staff"]
     assert staves[0].infusable
 
@@ -158,7 +193,9 @@ def _swap(pools: tuple[SlotPool, ...], build: str, slot: str, cell: str) -> tupl
     ("build", "slot", "cell", "message"),
     [
         ("knight", "rh", "subcategory:melee glintstone_staff", "knight rh has the wrong catalysts"),
-        ("mage", "lh", "subcategory:glintstone_staff", "mage lh has the wrong catalysts"),
+        ("sorcerer", "lh", "subcategory:catalyst", "sorcerer lh has the wrong catalysts"),
+        ("pyromancer", "rh", "subcategory:catalyst", "pyromancer rh has the wrong catalysts"),
+        ("spellblade", "lh", "subcategory:sacred_seal", "spellblade lh has the wrong catalysts"),
         ("jester", "rh", "subcategory:sacred_seal", "jester rh has the wrong catalysts"),
         ("jester", "rh", "subcategory:glintstone_staff", "jester rh has the wrong catalysts"),
         ("knight", "rh", "subcategory:torch", "knight rh has the wrong torches"),
@@ -190,8 +227,8 @@ def test_missing_extra_repeated_and_empty_rows_fail(
     missing = tuple(row for row in pools if (row.build_id, row.slot) != ("knight", "lh"))
     with pytest.raises(BuildError, match="knight lacks lh"):
         _validate(missing, data)
-    extra = (*pools, SlotPool("mage", "rh_ash", (Selector("category", ("ash",)),)))
-    with pytest.raises(BuildError, match="mage should not have rh_ash"):
+    extra = (*pools, SlotPool("sorcerer", "rh_ash", (Selector("category", ("ash",)),)))
+    with pytest.raises(BuildError, match="sorcerer should not have rh_ash"):
         _validate(extra, data)
     with pytest.raises(BuildError, match="knight rh repeats"):
         _validate((*pools, pools[0]), data)

@@ -1,5 +1,8 @@
 id,label,members
-any_staff_seal,Any staff / seal,subcategory:catalyst
+any_staff,Any staff,subcategory:glintstone_staff
+any_seal,Any seal,subcategory:sacred_seal
+any_torch,Any torch,subcategory:torch
+any_perfume_bottle,Any perfume bottle,subcategory:perfume_bottle
 any_parry_ash,Any parry ash,item:parry carian_retaliation golden_parry storm_wall thopss_barrier
 any_crucible_talisman,Any Crucible talisman,item:crucible_scale_talisman crucible_feather_talisman crucible_knot_talisman fine_crucible_feather_talisman talisman_of_all_crucibles
 any_scorpion_charm,Any Scorpion Charm,item:magic_scorpion_charm lightning_scorpion_charm fire_scorpion_charm sacred_scorpion_charm

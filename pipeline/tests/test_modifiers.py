@@ -358,7 +358,9 @@ def test_requirements_read_the_right_slots(modifiers: tuple[Modifier, ...]) -> N
     assert set(weapon.selector.ids or ()) > MELEE
     assert "bow" not in (weapon.selector.ids or ())
     assert "glintstone_staff" not in (weapon.selector.ids or ())
-    assert rows["l2_spam_needs_a_skill_not_mage"].when == (BuildCondition(("mage",)),)
+    assert rows["l2_spam_not_on_pure_casters"].when == (
+        BuildCondition(("sorcerer", "pyromancer")),
+    )
 
 
 @pytest.mark.parametrize(
@@ -395,13 +397,13 @@ def test_bad_rows_fail(rows: tuple[Modifier, ...], message: str, data: Placement
 
 @pytest.mark.parametrize("kind", ["rule", "item"])
 def test_an_unknown_id_fails(kind: SelectorKind, data: PlacementData) -> None:
-    row = Modifier("x", (BuildCondition(("mage",)),), Selector(kind, ("typo",)), 0)
+    row = Modifier("x", (BuildCondition(("sorcerer",)),), Selector(kind, ("typo",)), 0)
     with pytest.raises(BuildError, match=f"selector matches nothing: {kind}: typo"):
         _validate((row,), data)
 
 
 def test_a_boss_target_fails(data: PlacementData) -> None:
-    row = Modifier("x", (BuildCondition(("mage",)),), Selector("boss", (data.bosses[0].id,)), 2)
+    row = Modifier("x", (BuildCondition(("sorcerer",)),), Selector("boss", (data.bosses[0].id,)), 2)
     with pytest.raises(BuildError, match="a boss cannot be a modifier target"):
         _validate((row,), data)
 
@@ -415,7 +417,7 @@ def test_cells_parse(tmp_path: Path) -> None:
     path = tmp_path / "modifiers.csv"
     path.write_text(
         "id,when,target,value\n"
-        "a,rh!=subcategory:melee torch; build=mage jester,rule:r1_only,0\n",
+        "a,rh!=subcategory:melee torch; build=sorcerer jester,rule:r1_only,0\n",
         encoding="utf-8",
     )
     assert load_modifiers(path) == (
@@ -423,7 +425,7 @@ def test_cells_parse(tmp_path: Path) -> None:
             "a",
             (
                 ConditionRow("rh", True, "subcategory", ("melee", "torch")),
-                ConditionRow("build", False, "", ("mage", "jester")),
+                ConditionRow("build", False, "", ("sorcerer", "jester")),
             ),
             ("rule", ("r1_only",)),
             0,
@@ -440,7 +442,7 @@ def test_cells_parse(tmp_path: Path) -> None:
     [
         (",rh=category:none,rule:r1_only,0", "empty id"),
         ("a,rh,rule:r1_only,0", "has no operator"),
-        ("a,build!=mage,rule:r1_only,0", "cannot negate a build"),
+        ("a,build!=sorcerer,rule:r1_only,0", "cannot negate a build"),
         ("a,rh=none,rule:r1_only,0", "has no kind"),
         ("a,rh=category:none,r1_only,0", "has no kind"),
         ("a,rh=category:none,rule:r1_only,-1", "has odds"),

@@ -1,4 +1,4 @@
-"""Tests for the 7 aliases against the real item table (`prd.md` §6.7)."""
+"""Tests for the aliases against the real item table (`prd.md` §6.7)."""
 
 from __future__ import annotations
 
@@ -33,9 +33,12 @@ def _members(table: tuple[Item, ...], alias: str) -> set[str]:
     return {row.name for row in table if row.alias == alias}
 
 
-def test_the_7_labels_match_the_prd() -> None:
+def test_the_labels_match_the_prd() -> None:
     assert [alias.label for alias in build_aliases(load_aliases(CSV))] == [
-        "Any staff / seal",
+        "Any staff",
+        "Any seal",
+        "Any torch",
+        "Any perfume bottle",
         "Any parry ash",
         "Any Crucible talisman",
         "Any Scorpion Charm",
@@ -47,7 +50,10 @@ def test_the_7_labels_match_the_prd() -> None:
 
 def test_member_counts(table: tuple[Item, ...]) -> None:
     assert Counter(row.alias for row in table if row.alias) == {
-        "any_staff_seal": 32,
+        "any_staff": 20,
+        "any_seal": 12,
+        "any_torch": 8,
+        "any_perfume_bottle": 5,
         "any_parry_ash": 5,
         "any_crucible_talisman": 5,
         "any_scorpion_charm": 4,
@@ -82,7 +88,10 @@ def test_named_members(table: tuple[Item, ...]) -> None:
 
 def test_members_stay_in_their_category(table: tuple[Item, ...]) -> None:
     categories = {
-        "any_staff_seal": {"weapon"},
+        "any_staff": {"weapon"},
+        "any_seal": {"weapon"},
+        "any_torch": {"weapon"},
+        "any_perfume_bottle": {"weapon"},
         "any_parry_ash": {"ash"},
         "any_crucible_talisman": {"talisman"},
         "any_scorpion_charm": {"talisman"},
@@ -135,7 +144,7 @@ def test_other_items_keep_a_null_alias() -> None:
 @pytest.mark.parametrize(
     ("row", "message"),
     [
-        ("any_staff,Any staff / seal,subcategory:catalyst", "is not the slug"),
+        ("any_staff_seal,Any staff,subcategory:catalyst", "is not the slug"),
         (",,subcategory:catalyst", "is not the slug"),
         ("any_x,Any X,", "empty members"),
         ("any_x,Any X,catalyst", "has no kind"),

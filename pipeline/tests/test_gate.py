@@ -55,7 +55,7 @@ def _set_item(item_id: str, **changes: Any) -> Change:
 def _modifier(row_id: str, value: float, ids: tuple[str, ...] = ("r1_only",)) -> Modifier:
     return Modifier(
         id=row_id,
-        when=(BuildCondition(("mage",)),),
+        when=(BuildCondition(("sorcerer",)),),
         target=Selector("rule", ids),
         value=value,
     )
@@ -276,7 +276,7 @@ def test_the_report_counts_the_tables(data: GateData) -> None:
     counts = cast("dict[str, int]", report["counts"])
     assert counts["item"] == 1514
     assert counts["boss_instance"] == 229
-    assert counts["slot_pool"] == 64
+    assert counts["slot_pool"] == 72
 
 
 def test_main_writes_both_files(tmp_path: Path) -> None:

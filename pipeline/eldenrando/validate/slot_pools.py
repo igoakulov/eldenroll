@@ -18,7 +18,7 @@ from eldenrando.model.vocabulary import (
 from eldenrando.validate.selectors import resolve_items, validate_selectors
 
 RULE_SLOTS = frozenset({"rule_1", "rule_2"})
-# The card shows `Any staff / seal`, so one staff is enough, and this one shares its region with
+# The card shows `Any staff`, so one staff is enough, and this one shares its region with
 # `Spinning Weapon`, so the card always names the ash (`prd.md` §6.2).
 JESTER_STAFF = "demi_human_queens_staff"
 SCOPED_ODD_WEAPONS = frozenset({"torch", "perfume_bottle"})
@@ -62,10 +62,14 @@ def _kinds(rows: tuple[SlotPool, ...]) -> list[str]:
 def _scope(rows: tuple[SlotPool, ...], table: tuple[Item, ...]) -> list[str]:
     """Return each pool whose catalysts or odd weapons differ from what `prd.md` §6.2 allows."""
     catalysts = {item.id for item in table if item.subcategory in CATALYST}
+    staves = {item.id for item in table if item.subcategory == "glintstone_staff"}
+    seals = catalysts - staves
     odd_weapons = {item.id for item in table if item.subcategory in SCOPED_ODD_WEAPONS}
     allowed_catalysts: Mapping[tuple[str, str], AbstractSet[str]] = {
-        ("mage", "rh"): catalysts,
-        ("mage", "lh"): catalysts,
+        ("sorcerer", "rh"): staves,
+        ("sorcerer", "lh"): staves,
+        ("pyromancer", "rh"): seals,
+        ("pyromancer", "lh"): seals,
         ("spellblade", "lh"): catalysts,
         ("jester", "rh"): {JESTER_STAFF},
     }

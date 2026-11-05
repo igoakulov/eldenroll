@@ -1,5 +1,5 @@
 """`when` holds conditions split by `;`: `rule_1=rule:parry_only` when a slot rolled a match,
-`rh!=subcategory:melee` when it did not, and `build=mage jester` for the rolled build. `target`
+`rh!=subcategory:melee` when it did not, and `build=sorcerer jester` for the rolled build. `target`
 is one selector in the `slot_pools.csv` form.
 """
 

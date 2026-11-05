@@ -25,7 +25,7 @@ parry_only_needs_a_parry_ash,rh_ash!=item:parry carian_retaliation golden_parry 
 charged_r2_needs_a_melee_weapon_in_rh,rh!=subcategory:melee thrusting_shield torch perfume_bottle,rule:charged_r2_only,0
 stonebarb_needs_a_weapon_in_rh,rh!=subcategory:melee ranged thrusting_shield torch perfume_bottle,rule:stonebarb_cracked_tear,0
 melee_rules_need_a_melee_weapon_in_a_hand,rh!=subcategory:melee thrusting_shield torch perfume_bottle; lh!=subcategory:melee thrusting_shield torch perfume_bottle,rule:jump_attacks_only rolling_crouch_attacks_only take_riposte,0
-l2_spam_needs_a_skill_not_mage,build=mage,rule:l2_spam,0
+l2_spam_not_on_pure_casters,build=sorcerer pyromancer,rule:l2_spam,0
 l2_spam_needs_a_skill_not_empty,rh=category:none,rule:l2_spam,0
 blasphemous_blade_rh_boosts_healing_rules,rh=item:blasphemous_blade,rule:no_healing_flasks overloaded,5
 blasphemous_blade_lh_boosts_healing_rules,lh=item:blasphemous_blade,rule:no_healing_flasks overloaded,5

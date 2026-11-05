@@ -14,7 +14,8 @@ BUILDS: Final[tuple[str, ...]] = (
     "warrior_2h",
     "warrior_dw",
     "ranger",
-    "mage",
+    "sorcerer",
+    "pyromancer",
     "spellblade",
     "jester",
 )
@@ -36,7 +37,8 @@ BUILD_ASH_SLOTS: Final[Mapping[str, frozenset[str]]] = {
     "warrior_2h": frozenset({"rh_ash"}),
     "warrior_dw": ASH_SLOTS,
     "ranger": frozenset({"rh_ash"}),
-    "mage": frozenset(),
+    "sorcerer": frozenset(),
+    "pyromancer": frozenset(),
     "spellblade": frozenset({"rh_ash"}),
     "jester": frozenset({"rh_ash"}),
 }

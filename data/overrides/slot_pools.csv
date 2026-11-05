@@ -37,14 +37,22 @@ ranger,talisman_1,category:talisman
 ranger,talisman_2,category:talisman
 ranger,rule_1,rule:
 ranger,rule_2,rule:
-mage,rh,subcategory:catalyst
-mage,lh,subcategory:catalyst
-mage,spell,category:sorcery incantation
-mage,item,category:tool consumable
-mage,talisman_1,category:talisman
-mage,talisman_2,category:talisman
-mage,rule_1,rule:
-mage,rule_2,rule:
+sorcerer,rh,subcategory:glintstone_staff
+sorcerer,lh,category:none; subcategory:glintstone_staff small_shield medium_shield
+sorcerer,spell,category:sorcery
+sorcerer,item,category:tool consumable
+sorcerer,talisman_1,category:talisman
+sorcerer,talisman_2,category:talisman
+sorcerer,rule_1,rule:
+sorcerer,rule_2,rule:
+pyromancer,rh,subcategory:sacred_seal
+pyromancer,lh,category:none; subcategory:sacred_seal small_shield medium_shield
+pyromancer,spell,category:incantation
+pyromancer,item,category:tool consumable
+pyromancer,talisman_1,category:talisman
+pyromancer,talisman_2,category:talisman
+pyromancer,rule_1,rule:
+pyromancer,rule_2,rule:
 spellblade,rh,subcategory:unpaired
 spellblade,rh_ash,category:ash
 spellblade,lh,subcategory:catalyst
@@ -54,7 +62,7 @@ spellblade,talisman_1,category:talisman
 spellblade,talisman_2,category:talisman
 spellblade,rule_1,rule:
 spellblade,rule_2,rule:
-jester,rh,category:none; subcategory:greatshield torch perfume_bottle; item:demi_human_queens_staff grafted_dragon
+jester,rh,category:none; subcategory:torch perfume_bottle; item:demi_human_queens_staff grafted_dragon briar_greatshield spiked_palisade_shield fingerprint_stone_shield jellyfish_shield visage_shield one_eyed_shield
 jester,rh_ash,category:ash
 jester,lh,category:none
 jester,spell,category:none

@@ -40,7 +40,7 @@ def data() -> PlacementData:
 
 
 def test_vocabulary_counts() -> None:
-    assert len(BUILDS) == 7
+    assert len(BUILDS) == 8
     assert len(SLOTS) == 10
     assert set(SLOTS) > ASH_SLOTS
     assert len(CATEGORIES) == 10
