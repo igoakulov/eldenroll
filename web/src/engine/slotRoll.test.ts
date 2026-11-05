@@ -6,17 +6,23 @@ import { indexDatabase, type EngineData } from "./engineData";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
 import {
-  rollSlot,
+  NOTHING_REMOVED,
   sample,
   slotOptions,
   weighOptions,
   type OptionFilter,
+  type Random,
+  type RollContext,
   type SlotPoolResult,
 } from "./slotRoll";
 
 type Rolled = Partial<Record<PoolSlot, string | null>>;
 
 const real = indexDatabase(realDatabase);
+
+function rollSlot(context: RollContext, slot: PoolSlot, random: Random) {
+  return sample(weighOptions(context, slotOptions(context.data, context.state.build, slot)), random);
+}
 const ALL_REGIONS = new Set(
   realDatabase.region.map((row) => row.id).filter((id) => id !== "leyndell_ashen"),
 );
@@ -89,7 +95,7 @@ describe("a condition on a slot not rolled yet", () => {
     const options = slotOptions(real, "warrior_dw", "rh").filter(
       (one) => one.row.odds > 0 && EVERYTHING.has(one.row.id),
     );
-    expect(result.pool).toBe(options.length);
+    expect(result.total).toBe(options.length);
     expect(options.length - result.options.length).toBe(1);
     expect(ids(result)).not.toContain("grafted_dragon");
     for (const row of result.options) expect(row.weight).toBe(row.option.row.odds);
@@ -255,9 +261,12 @@ describe("on a small database", () => {
     expect(ids(smallPool(data))).toEqual(["b"]);
   });
 
-  it("counts a removed option in the pool, but not one at odds 0", () => {
+  it("counts an option a modifier removed in the total, and one at odds 0 nowhere", () => {
     const data = small([{ id: "m", when: whenBuild, target: targetA, value: 0 }]);
-    expect(smallPool(data).pool).toBe(2);
+    const result = smallPool(data);
+    expect(result.total).toBe(2);
+    expect(result.pool).toBe(1);
+    expect(result.removed.byModifier).toEqual([["m", 1]]);
   });
 
   it("needs every condition of a row", () => {
@@ -301,7 +310,7 @@ describe("on a small database", () => {
     const state = { build: "only", boss: null, rolled: new Map<PoolSlot, string | null>() };
     const options = slotOptions(data, "only", "talisman_1");
     expect(
-      weighOptions({ data, state, counted: COUNTED }, options, [notA]).options.map(
+      weighOptions({ data, state, counted: COUNTED }, options, { rules: [notA] }).options.map(
         (one) => one.option.row.id,
       ),
     ).toEqual(["b"]);
@@ -333,8 +342,9 @@ describe("on a small database", () => {
     });
 
     it("gives an empty result when nothing is left", () => {
-      const roll = sample({ pool: 3, options: [] }, () => 0.5);
-      expect(roll).toEqual({ pool: 3, chosen: null, probability: 0 });
+      const roll = sample({ total: 3, pool: 0, removed: NOTHING_REMOVED, options: [] }, () => 0.5);
+      expect(roll.chosen).toBeNull();
+      expect(roll.probability).toBe(0);
     });
 
     it("returns an empty result for a slot the build has no row for", () => {

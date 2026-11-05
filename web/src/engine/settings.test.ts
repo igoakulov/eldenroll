@@ -29,8 +29,8 @@ describe("derivedLevel", () => {
     expect(derivedLevel(stats)).toBe(32);
   });
 
-  it("never drops below 1", () => {
-    expect(derivedLevel(allStats(1))).toBe(1);
+  it("shows an impossible level for impossible stats, without clamping", () => {
+    expect(derivedLevel(allStats(8))).toBe(-15);
   });
 
   it("reaches 713 with every stat at 99", () => {
@@ -55,38 +55,33 @@ describe("defaultSettings", () => {
 
 describe("correctedStat", () => {
   it.each([
-    [1, 1],
-    [50, 50],
-    [99, 99],
-    [0, 1],
-    [-5, 1],
-    [100, 99],
-    [1000, 99],
-    [12.9, 12],
-    [0.5, 1],
-    [99.5, 99],
+    ["1", 1],
+    ["50", 50],
+    ["99", 99],
+    ["007", 7],
+    ["0", 1],
+    ["100", 99],
+    ["1000", 99],
   ])("turns %s into %s", (entered, corrected) => {
     expect(correctedStat(entered, 40)).toBe(corrected);
   });
 
-  it.each([Number.NaN, Number.POSITIVE_INFINITY])("keeps the previous value for %s", (entered) => {
+  it.each(["", "12.5", "-5", "1e2", " 5", "abc"])("keeps the previous value for %j", (entered) => {
     expect(correctedStat(entered, 40)).toBe(40);
   });
 });
 
 describe("correctedMaxStatGap", () => {
   it.each([
-    [0, 0],
-    [10, 10],
-    [500, 500],
-    [-1, 0],
-    [2.5, 2],
+    ["0", 0],
+    ["10", 10],
+    ["500", 500],
   ])("turns %s into %s", (entered, corrected) => {
     expect(correctedMaxStatGap(entered, 10)).toBe(corrected);
   });
 
-  it("keeps the previous value for a blank entry", () => {
-    expect(correctedMaxStatGap(Number.NaN, 10)).toBe(10);
+  it.each(["", "2.5", "-1"])("keeps the previous value for %j", (entered) => {
+    expect(correctedMaxStatGap(entered, 10)).toBe(10);
   });
 });
 

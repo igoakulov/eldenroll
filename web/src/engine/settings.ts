@@ -41,20 +41,21 @@ export function defaultSettings(
   };
 }
 
+/** Impossible stats give an impossible level, such as -15 with every stat at 8; it isn't clamped. */
 export function derivedLevel(stats: Stats): number {
-  const total = STATS.reduce((sum, stat) => sum + stats[stat], 0);
-  return Math.max(1, total - LEVEL_OFFSET);
+  return STATS.reduce((sum, stat) => sum + stats[stat], 0) - LEVEL_OFFSET;
 }
 
-/** A blank or non-numeric entry keeps `previous`; anything else lands on the nearest valid value. */
-export function correctedStat(entered: number, previous: number): number {
-  if (!Number.isFinite(entered)) return previous;
-  return Math.min(MAX_STAT, Math.max(MIN_STAT, Math.floor(entered)));
+const DIGITS = /^[0-9]+$/;
+
+/** Only the digits 0 to 9 are valid, so a blank or anything else keeps `previous`. */
+export function correctedStat(entered: string, previous: number): number {
+  if (!DIGITS.test(entered)) return previous;
+  return Math.min(MAX_STAT, Math.max(MIN_STAT, Number(entered)));
 }
 
-export function correctedMaxStatGap(entered: number, previous: number): number {
-  if (!Number.isFinite(entered)) return previous;
-  return Math.max(0, Math.floor(entered));
+export function correctedMaxStatGap(entered: string, previous: number): number {
+  return DIGITS.test(entered) ? Number(entered) : previous;
 }
 
 export function settingsProblems(settings: Settings): readonly string[] {

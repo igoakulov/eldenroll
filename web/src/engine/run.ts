@@ -1,0 +1,459 @@
+import type { PoolSlot } from "./database";
+import type { RolledSlots } from "./display";
+import { itemsWithACountingRow } from "./eligibility";
+import type { EngineData } from "./engineData";
+import type { Hyperparams } from "./hyperparams";
+import { LOADOUT_ORDER, rollLoadout } from "./loadout";
+import { pickWeighted, seededRandom } from "./random";
+import { bossPool, selectedLocations, type BossPool } from "./regions";
+import {
+  derivedLevel,
+  settingsProblems,
+  type Settings,
+  type Stats,
+} from "./settings";
+import { optionKey, repetitionMultiplier, type Random } from "./slotRoll";
+import {
+  buildRepeatLine,
+  pickTrace,
+  slotTrace,
+  type TraceBlock,
+  type TraceSlot,
+} from "./trace";
+
+export interface Engine {
+  readonly data: EngineData;
+  readonly hyperparams: Hyperparams;
+}
+
+export interface DeadBoss {
+  readonly instanceId: string;
+  /** The objective showing when the boss was marked; 0 before objective 1. */
+  readonly objectiveIndex: number;
+}
+
+export type RerollTarget = "boss" | "build" | PoolSlot;
+
+export interface Objective {
+  readonly boss: string;
+  readonly build: string;
+  readonly slots: RolledSlots;
+  readonly upgradedRh: boolean;
+  /** Every reroll since the last `Done`, carried across `Reroll objective` and `Reroll items`. */
+  readonly rerolls: readonly RerollTarget[];
+  /** One block per rolled slot, for the console in development (`prd.md` §8.7). */
+  readonly trace: readonly TraceBlock[];
+}
+
+export interface CompletedObjective extends Objective {
+  readonly stats: Stats;
+  readonly level: number;
+}
+
+export type Waiting = "no_region" | "no_bosses" | "regions_cleared";
+
+export const WAITING_MESSAGES: Readonly<Record<Waiting, string>> = {
+  no_region: "Select at least one region",
+  no_bosses: "No bosses available for the selected regions",
+  regions_cleared: "No bosses left in your selected regions",
+};
+
+/** Plain data throughout, so a run can be saved and restored as JSON. */
+export interface Run {
+  readonly seed: number;
+  readonly rngState: number;
+  readonly finished: boolean;
+  readonly stats: Stats;
+  readonly settings: Settings;
+  readonly regions: readonly string[];
+  readonly upgradedWeapons: readonly string[];
+  readonly deadBosses: readonly DeadBoss[];
+  /** Kept out of the boss pool by the player, but alive for their items and the summary. */
+  readonly skippedBosses: readonly string[];
+  /** `optionKey`s of gear and combat rules the player never wants rolled. */
+  readonly neverRoll: readonly string[];
+  readonly current: Objective | null;
+  readonly waiting: Waiting | null;
+  readonly completed: readonly CompletedObjective[];
+  /** How many completed objectives showed each `optionKey` or `build:` id. */
+  readonly seen: Readonly<Record<string, number>>;
+}
+
+export interface RunInputs {
+  readonly stats: Stats;
+  readonly settings: Settings;
+  readonly regions: readonly string[];
+  readonly upgradedWeapons: readonly string[];
+  readonly deadBosses: readonly string[];
+  readonly skippedBosses?: readonly string[];
+  readonly neverRoll?: readonly string[];
+}
+
+export type StartResult =
+  | { readonly ok: true; readonly run: Run }
+  | { readonly ok: false; readonly problems: readonly string[] };
+
+const ALL_DEAD_MESSAGE = "Every boss is already dead";
+
+function buildKey(build: string): string {
+  return `build:${build}`;
+}
+
+const TRACE_ORDER: readonly TraceSlot[] = ["boss", "build", ...LOADOUT_ORDER];
+
+function traceBefore(trace: readonly TraceBlock[], slot: TraceSlot): readonly TraceBlock[] {
+  const limit = TRACE_ORDER.indexOf(slot);
+  return trace.filter((block) => TRACE_ORDER.indexOf(block.slot) < limit);
+}
+
+function deadSet(run: Run): ReadonlySet<string> {
+  return new Set(run.deadBosses.map((row) => row.instanceId));
+}
+
+/** `asIfDead` only changes which boss rows count; the map still follows who is really dead. */
+function counted(engine: Engine, run: Run, asIfDead?: ReadonlySet<string>): ReadonlySet<string> {
+  return itemsWithACountingRow(engine.data, {
+    locations: selectedLocations(engine.data.database, new Set(run.regions), deadSet(run)),
+    deadBosses: asIfDead ?? deadSet(run),
+    bossItemsOnlyFromDeadBosses: run.settings.bossItemsOnlyFromDeadBosses,
+  });
+}
+
+function repetition(engine: Engine, run: Run) {
+  return { seen: run.seen, decay: engine.hyperparams.repetitionDecay };
+}
+
+type Rolled = { readonly id: string; readonly block: TraceBlock };
+
+function rollBoss(
+  engine: Engine,
+  run: Run,
+  random: Random,
+  exclude: string | null,
+): Rolled | Exclude<BossPool["status"], "ready"> {
+  const pool = bossPool(
+    engine.data.database,
+    new Set(run.regions),
+    deadSet(run),
+    new Set(run.skippedBosses),
+  );
+  if (pool.status !== "ready") return pool.status;
+  const rows = pool.bosses.map((row) => ({ value: row, weight: row.odds }));
+  const others = rows.filter((row) => row.value.id !== exclude);
+  const candidates = others.length > 0 ? others : rows;
+  const picked = pickWeighted(candidates, random);
+  if (picked === null) return "no_bosses";
+  const total = candidates.reduce((sum, row) => sum + row.weight, 0);
+  const boss = picked.value;
+  return {
+    id: boss.id,
+    block: pickTrace("boss", {
+      heading: `${boss.name} — ${boss.location_label}`,
+      pool: candidates.length,
+      odds: boss.odds,
+      repeat: null,
+      probability: picked.weight / total,
+    }),
+  };
+}
+
+function rollBuild(engine: Engine, run: Run, random: Random, exclude: string | null): Rolled | null {
+  const decay = repetition(engine, run);
+  const rows = engine.data.database.build
+    .filter((row) => run.settings.builds.includes(row.id))
+    .map((row) => ({ value: row, weight: row.odds * repetitionMultiplier(buildKey(row.id), decay) }))
+    .filter((row) => row.weight > 0);
+  const others = rows.filter((row) => row.value.id !== exclude);
+  const candidates = others.length > 0 ? others : rows;
+  const picked = pickWeighted(candidates, random);
+  if (picked === null) return null;
+  const total = candidates.reduce((sum, row) => sum + row.weight, 0);
+  const build = picked.value;
+  return {
+    id: build.id,
+    block: pickTrace("build", {
+      heading: build.name,
+      pool: candidates.length,
+      odds: build.odds,
+      repeat: buildRepeatLine(build.id, decay),
+      probability: picked.weight / total,
+    }),
+  };
+}
+
+interface RolledSlotsResult {
+  readonly slots: RolledSlots;
+  readonly upgradedRh: boolean | null;
+  readonly trace: readonly TraceBlock[];
+}
+
+function rollSlots(
+  engine: Engine,
+  run: Run,
+  random: Random,
+  objective: { boss: string; build: string },
+  from: PoolSlot = "rh",
+  kept: RolledSlots = {},
+  exclude: string | null = null,
+): RolledSlotsResult {
+  const decay = repetition(engine, run);
+  const allDead = new Set(engine.data.database.boss_instance.map((row) => row.id));
+  const loadout = rollLoadout({
+    data: engine.data,
+    build: objective.build,
+    boss: objective.boss,
+    counted: counted(engine, run),
+    countedIfBossesDead: counted(engine, run, allDead),
+    limits: { stats: run.stats, maxStatGap: run.settings.maxStatGap },
+    random,
+    repetition: decay,
+    upgraded: run.settings.upgradedWeaponsEnabled ? new Set(run.upgradedWeapons) : null,
+    neverRoll: new Set(run.neverRoll),
+    from,
+    kept,
+    exclude,
+  });
+  const start = LOADOUT_ORDER.indexOf(from);
+  const slots: Partial<Record<PoolSlot, string | null>> = {};
+  for (const slot of LOADOUT_ORDER.slice(0, start)) {
+    if (kept[slot] !== undefined) slots[slot] = kept[slot];
+  }
+  for (const [slot, roll] of loadout) slots[slot] = roll.chosen?.option.row.id ?? null;
+  const rolled = { boss: objective.boss, build: objective.build, slots };
+  const trace = [...loadout].map(([slot, roll]) => slotTrace(engine.data, slot, roll, rolled, decay));
+  const rh = loadout.get("rh");
+  return { slots, upgradedRh: rh === undefined ? null : rh.upgraded, trace };
+}
+
+function stopped(run: Run, status: Exclude<BossPool["status"], "ready">, rngState: number): Run {
+  if (status === "all_dead") return { ...run, rngState, current: null, waiting: null, finished: true };
+  return { ...run, rngState, current: null, waiting: status };
+}
+
+/** Rolls a whole new objective, or leaves the run waiting or finished when no boss can roll. */
+function rollObjective(
+  engine: Engine,
+  run: Run,
+  rerolls: readonly RerollTarget[],
+  excludeBoss: string | null,
+): Run {
+  const { random, state } = seededRandom(run.rngState);
+  const boss = rollBoss(engine, run, random, excludeBoss);
+  if (typeof boss === "string") return stopped(run, boss, state());
+  const build = rollBuild(engine, run, random, null);
+  if (build === null) return { ...run, rngState: state(), current: null, waiting: null };
+  const loadout = rollSlots(engine, run, random, { boss: boss.id, build: build.id });
+  return {
+    ...run,
+    rngState: state(),
+    waiting: null,
+    current: {
+      boss: boss.id,
+      build: build.id,
+      slots: loadout.slots,
+      upgradedRh: loadout.upgradedRh ?? false,
+      rerolls,
+      trace: [boss.block, build.block, ...loadout.trace],
+    },
+  };
+}
+
+export function startRun(engine: Engine, inputs: RunInputs, seed: number): StartResult {
+  const problems = [...settingsProblems(inputs.settings)];
+  const pool = bossPool(
+    engine.data.database,
+    new Set(inputs.regions),
+    new Set(inputs.deadBosses),
+    new Set(inputs.skippedBosses ?? []),
+  );
+  if (pool.status === "all_dead") problems.push(ALL_DEAD_MESSAGE);
+  else if (pool.status !== "ready") problems.push(WAITING_MESSAGES[pool.status]);
+  if (problems.length > 0) return { ok: false, problems };
+
+  const run: Run = {
+    seed,
+    rngState: seed,
+    finished: false,
+    stats: inputs.stats,
+    settings: inputs.settings,
+    regions: inputs.regions,
+    upgradedWeapons: inputs.upgradedWeapons,
+    deadBosses: inputs.deadBosses.map((instanceId) => ({ instanceId, objectiveIndex: 0 })),
+    skippedBosses: inputs.skippedBosses ?? [],
+    neverRoll: inputs.neverRoll ?? [],
+    current: null,
+    waiting: null,
+    completed: [],
+    seen: {},
+  };
+  return { ok: true, run: rollObjective(engine, run, [], null) };
+}
+
+export function objectiveNumber(run: Run): number {
+  return run.completed.length + 1;
+}
+
+/** Changes apply on the next roll; the current objective stays as it is. */
+export function editRun(
+  run: Run,
+  changes: Partial<Pick<Run, "stats" | "settings" | "regions" | "upgradedWeapons" | "neverRoll">>,
+): Run {
+  return { ...run, ...changes };
+}
+
+export type BossState = "alive" | "dead" | "skipped";
+
+export interface BossStatus {
+  readonly state: BossState;
+  /** Dead from `Done`, or the current objective's boss, which only `Already dead` may mark. */
+  readonly locked: boolean;
+}
+
+export function bossStatus(run: Run, boss: string): BossStatus {
+  const doneDead = run.completed.some((row) => row.boss === boss);
+  const state: BossState = run.deadBosses.some((row) => row.instanceId === boss)
+    ? "dead"
+    : run.skippedBosses.includes(boss)
+      ? "skipped"
+      : "alive";
+  return { state, locked: doneDead || run.current?.boss === boss };
+}
+
+/** The `Bosses` list; like any edit, it applies on the next roll and decays nothing. */
+export function setBossState(engine: Engine, run: Run, boss: string, state: BossState): Run {
+  const row = engine.data.bosses.get(boss);
+  if (row === undefined || row.odds <= 0 || bossStatus(run, boss).locked) return run;
+  const deadBosses = run.deadBosses.filter((one) => one.instanceId !== boss);
+  const skippedBosses = run.skippedBosses.filter((one) => one !== boss);
+  const marked = { instanceId: boss, objectiveIndex: run.current === null ? run.completed.length : objectiveNumber(run) };
+  return {
+    ...run,
+    deadBosses: state === "dead" ? [...deadBosses, marked] : deadBosses,
+    skippedBosses: state === "skipped" ? [...skippedBosses, boss] : skippedBosses,
+  };
+}
+
+function seenIn(engine: Engine, objective: Objective): string[] {
+  const keys = [buildKey(objective.build)];
+  for (const [slot, id] of Object.entries(objective.slots) as [PoolSlot, string | null][]) {
+    if (id === null) continue;
+    if (slot === "rule_1" || slot === "rule_2") {
+      const row = engine.data.rules.get(id);
+      if (row !== undefined) keys.push(optionKey({ kind: "rule", row }));
+      continue;
+    }
+    const row = engine.data.items.get(id);
+    if (row !== undefined) keys.push(optionKey({ kind: "item", row }));
+  }
+  return keys;
+}
+
+/** `none` can fill several slots of one objective, but the objective counts once. */
+function countedOnce(
+  seen: Readonly<Record<string, number>>,
+  keys: readonly string[],
+): Readonly<Record<string, number>> {
+  const next = { ...seen };
+  for (const key of new Set(keys)) next[key] = (next[key] ?? 0) + 1;
+  return next;
+}
+
+export function done(engine: Engine, run: Run): Run {
+  const objective = run.current;
+  if (objective === null || run.finished) return run;
+  const completed: CompletedObjective = {
+    ...objective,
+    stats: run.stats,
+    level: derivedLevel(run.stats),
+  };
+  const next: Run = {
+    ...run,
+    completed: [...run.completed, completed],
+    deadBosses: [
+      ...run.deadBosses,
+      { instanceId: objective.boss, objectiveIndex: objectiveNumber(run) },
+    ],
+    seen: countedOnce(run.seen, seenIn(engine, objective)),
+    current: null,
+  };
+  return rollObjective(engine, next, [], null);
+}
+
+/** After the selected regions run out, once the player ticks more. */
+export function rollNext(engine: Engine, run: Run): Run {
+  if (run.finished || run.current !== null) return run;
+  return rollObjective(engine, run, [], null);
+}
+
+/** Rerolls the target and everything after it; only the target avoids its current result. */
+export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
+  const objective = run.current;
+  if (objective === null || run.finished) return run;
+  const rerolls = [...objective.rerolls, target];
+
+  if (target === "boss") return rollObjective(engine, run, rerolls, objective.boss);
+
+  const { random, state } = seededRandom(run.rngState);
+  if (target === "build") {
+    const build = rollBuild(engine, run, random, objective.build);
+    const buildId = build?.id ?? objective.build;
+    const loadout = rollSlots(engine, run, random, { boss: objective.boss, build: buildId });
+    const kept = traceBefore(objective.trace, "build");
+    return {
+      ...run,
+      rngState: state(),
+      current: {
+        ...objective,
+        build: buildId,
+        slots: loadout.slots,
+        upgradedRh: loadout.upgradedRh ?? false,
+        rerolls,
+        trace: [...kept, ...(build === null ? [] : [build.block]), ...loadout.trace],
+      },
+    };
+  }
+  if (objective.slots[target] === undefined) return run;
+  const loadout = rollSlots(
+    engine,
+    run,
+    random,
+    objective,
+    target,
+    objective.slots,
+    objective.slots[target] ?? null,
+  );
+  return {
+    ...run,
+    rngState: state(),
+    current: {
+      ...objective,
+      slots: loadout.slots,
+      upgradedRh: loadout.upgradedRh ?? objective.upgradedRh,
+      rerolls,
+      trace: [...traceBefore(objective.trace, target), ...loadout.trace],
+    },
+  };
+}
+
+/** Swaps the boss and keeps the loadout, so a modifier read off the old boss may stay; accepted. */
+export function alreadyDead(engine: Engine, run: Run): Run {
+  const objective = run.current;
+  if (objective === null || run.finished) return run;
+  const marked: Run = {
+    ...run,
+    deadBosses: [
+      ...run.deadBosses,
+      { instanceId: objective.boss, objectiveIndex: objectiveNumber(run) },
+    ],
+  };
+  const { random, state } = seededRandom(marked.rngState);
+  const boss = rollBoss(engine, marked, random, null);
+  if (typeof boss === "string") return stopped(marked, boss, state());
+  const trace = [boss.block, ...objective.trace.filter((block) => block.slot !== "boss")];
+  return { ...marked, rngState: state(), current: { ...objective, boss: boss.id, trace } };
+}
+
+/** The current objective is discarded unless it was `Done`. */
+export function finishRun(run: Run): Run {
+  return { ...run, current: null, waiting: null, finished: true };
+}

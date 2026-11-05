@@ -1,7 +1,18 @@
 import type { Item, PoolSlot } from "./database";
 import { poolKey, type EngineData } from "./engineData";
 import type { RollState } from "./modifiers";
-import { rollSlot, type OptionFilter, type Random, type RollContext, type SlotRoll } from "./slotRoll";
+import {
+  NO_REPETITION,
+  sample,
+  slotOptions,
+  weighOptions,
+  type OptionFilter,
+  type PoolFilters,
+  type Random,
+  type Repetition,
+  type RollContext,
+  type SlotRoll,
+} from "./slotRoll";
 import { lhStatFilter, plainStatFilter, rhStatFilter, type StatLimits } from "./stats";
 
 export const LOADOUT_ORDER: readonly PoolSlot[] = [
@@ -22,11 +33,21 @@ export interface LoadoutInput {
   readonly build: string;
   readonly boss: string | null;
   readonly counted: ReadonlySet<string>;
+  readonly countedIfBossesDead?: ReadonlySet<string>;
+  readonly neverRoll?: ReadonlySet<string>;
   readonly limits: StatLimits;
   readonly random: Random;
+  readonly repetition?: Repetition;
+  /** RH rolls from these first; `null` when the setting is off. */
+  readonly upgraded?: ReadonlySet<string> | null;
+  /** A reroll keeps the slots before `from` as they are. */
+  readonly from?: PoolSlot;
+  readonly kept?: Readonly<Partial<Record<PoolSlot, string | null>>>;
+  /** The reroll target's current result, left out unless it's the only option. */
+  readonly exclude?: string | null;
 }
 
-/** Holds a roll for each slot the build has a row for, in rolling order. */
+/** Holds a roll for each slot rolled, in rolling order. */
 export type Loadout = ReadonlyMap<PoolSlot, SlotRoll>;
 
 function rolledItem(context: RollContext, slot: PoolSlot): Item | undefined {
@@ -76,41 +97,95 @@ export function spellTypeFilter(context: RollContext): OptionFilter {
     option.row.category === type;
 }
 
-function filtersFor(
-  slot: PoolSlot,
-  context: RollContext,
-  limits: StatLimits,
-): readonly OptionFilter[] {
+function filtersFor(slot: PoolSlot, context: RollContext, limits: StatLimits): PoolFilters {
   switch (slot) {
     case "rh":
-      return [rhStatFilter(context, limits)];
+      return { stats: rhStatFilter(context, limits) };
     case "rh_ash":
-      return [ashFilter(context, "rh")];
+      return { rules: [ashFilter(context, "rh")] };
     case "lh":
-      return [lhStatFilter(context, limits), notInTheOtherHand(context)];
+      return { rules: [notInTheOtherHand(context)], stats: lhStatFilter(context, limits) };
     case "lh_ash":
-      return [ashFilter(context, "lh"), differsFrom(context, "rh_ash")];
+      return { rules: [ashFilter(context, "lh"), differsFrom(context, "rh_ash")] };
     case "spell":
-      return [plainStatFilter(limits), spellTypeFilter(context)];
+      return { rules: [spellTypeFilter(context)], stats: plainStatFilter(limits) };
     case "talisman_2":
-      return [differsFrom(context, "talisman_1")];
+      return { rules: [differsFrom(context, "talisman_1")] };
     case "rule_2":
-      return [differsFrom(context, "rule_1")];
+      return { rules: [differsFrom(context, "rule_1")] };
     default:
-      return [];
+      return {};
   }
+}
+
+function excluding(filters: PoolFilters, exclude: string): PoolFilters {
+  return { ...filters, rules: [...(filters.rules ?? []), (option) => option.row.id !== exclude] };
+}
+
+/** Rolls without the excluded option, or with it when nothing else is left. */
+function rollExcluding(
+  context: RollContext,
+  slot: PoolSlot,
+  filters: PoolFilters,
+  exclude: string | null,
+  random: Random,
+): SlotRoll {
+  const options = slotOptions(context.data, context.state.build, slot);
+  if (exclude !== null) {
+    const roll = sample(weighOptions(context, options, excluding(filters, exclude)), random);
+    if (roll.chosen !== null) return roll;
+  }
+  return sample(weighOptions(context, options, filters), random);
+}
+
+/** Listed weapons skip location, boss status and stats; `none` can't be listed, so it only joins
+ * the pool, and a pool with no listed weapon left falls back to the usual one. */
+function rollUpgradedRh(
+  context: RollContext,
+  listed: ReadonlySet<string>,
+  exclude: string | null,
+  random: Random,
+): SlotRoll | null {
+  const firstPool: RollContext = { ...context, counted: listed };
+  const options = slotOptions(context.data, context.state.build, "rh").filter(
+    (option) => option.row.id === "none" || listed.has(option.row.id),
+  );
+  const isListed: OptionFilter = (option) => listed.has(option.row.id);
+  const notExcluded: OptionFilter = (option) => option.row.id !== exclude;
+  const result = weighOptions(firstPool, options, exclude === null ? {} : { rules: [notExcluded] });
+  if (!result.options.some((row) => isListed(row.option))) return null;
+  return { ...sample(result, random), upgraded: true };
 }
 
 export function rollLoadout(input: LoadoutInput): Loadout {
   const { data, build, boss, counted, limits, random } = input;
+  const from = input.from ?? "rh";
+  const start = LOADOUT_ORDER.indexOf(from);
   const rolled = new Map<PoolSlot, string | null>();
+  for (const slot of LOADOUT_ORDER.slice(0, start)) {
+    const value = input.kept?.[slot];
+    if (value !== undefined) rolled.set(slot, value);
+  }
   const loadout = new Map<PoolSlot, SlotRoll>();
   const state: RollState = { build, boss, rolled };
-  const context: RollContext = { data, state, counted };
+  const context: RollContext = {
+    data,
+    state,
+    counted,
+    repetition: input.repetition ?? NO_REPETITION,
+    ...(input.countedIfBossesDead === undefined
+      ? {}
+      : { countedIfBossesDead: input.countedIfBossesDead }),
+    ...(input.neverRoll === undefined ? {} : { neverRoll: input.neverRoll }),
+  };
 
-  for (const slot of LOADOUT_ORDER) {
+  for (const slot of LOADOUT_ORDER.slice(start)) {
     if (!data.pools.has(poolKey(build, slot))) continue;
-    const roll = rollSlot(context, slot, random, filtersFor(slot, context, limits));
+    const exclude = slot === from ? (input.exclude ?? null) : null;
+    const upgraded =
+      slot === "rh" && input.upgraded ? rollUpgradedRh(context, input.upgraded, exclude, random) : null;
+    const roll =
+      upgraded ?? rollExcluding(context, slot, filtersFor(slot, context, limits), exclude, random);
     rolled.set(slot, roll.chosen?.option.row.id ?? null);
     loadout.set(slot, roll);
   }

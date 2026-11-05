@@ -1,4 +1,5 @@
 import type { Item, PoolSlot } from "./database";
+import type { Option } from "./selectors";
 import type { Stats } from "./settings";
 import {
   slotOptions,
@@ -60,6 +61,10 @@ function leavesLhEmpty(context: RollContext, limits: StatLimits, rh: Item): bool
   rolled.set("rh", rh.id);
   const next: RollContext = { ...context, state: { ...context.state, rolled } };
   const options = slotOptions(next.data, next.state.build, "lh");
-  const result = weighOptions(next, options, [lhStatFilter(next, limits)]);
+  const notTheSameWeapon = (option: Option) => option.row.id === "none" || option.row.id !== rh.id;
+  const result = weighOptions(next, options, {
+    rules: [notTheSameWeapon],
+    stats: lhStatFilter(next, limits),
+  });
   return result.options.every((row) => row.option.row.id === "none");
 }

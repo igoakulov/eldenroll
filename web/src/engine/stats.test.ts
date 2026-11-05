@@ -145,6 +145,11 @@ describe("rhStatFilter looks ahead at LH", () => {
     );
   });
 
+  it("doesn't count the RH weapon itself as a possible LH", () => {
+    const alone: RollContext = { ...context("warrior_dw"), counted: new Set(["zweihander"]) };
+    expect(rhStatFilter(alone, needsBonus)(option("zweihander"))).toBe(true);
+  });
+
   it("treats a hand with no reachable option as empty", () => {
     const nothing: RollContext = { ...context("knight"), counted: new Set() };
     expect(rhStatFilter(nothing, needsBonus)(option("zweihander"))).toBe(true);

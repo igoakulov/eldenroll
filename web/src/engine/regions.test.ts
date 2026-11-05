@@ -61,7 +61,15 @@ describe("selectedLocations", () => {
     for (const location of SHUNNING_GROUNDS) expect(ashen.has(location)).toBe(true);
     expect(ashen.has("leyndell")).toBe(false);
     expect(ashen.has("leyndell2")).toBe(true);
-    expect([...selectedLocations(database, new Set([ROYAL, ASHEN]))]).toEqual([...ashen]);
+    expect([...selectedLocations(database, new Set([ROYAL, ASHEN]))].sort()).toEqual([...ashen].sort());
+  });
+
+  it("drops the Royal Capital once Maliketh is dead, without adding the Ashen one", () => {
+    const dead = new Set(["maliketh_the_black_blade_crumbling_farum_azula"]);
+    const royal = selectedLocations(database, new Set([ROYAL]), dead);
+    expect(royal.has("leyndell")).toBe(false);
+    expect(royal.has("leyndell2")).toBe(false);
+    for (const location of SHUNNING_GROUNDS) expect(royal.has(location)).toBe(true);
   });
 
   it("keeps the whole Royal Capital while the Ashen one is not selected", () => {
@@ -145,6 +153,27 @@ describe("bossPool", () => {
     expect(bossPool(database, new Set(["limgrave"]), new Set(limgrave))).toEqual({
       status: "regions_cleared",
     });
+  });
+
+  it("stops waiting on the Royal Capital's bosses once Maliketh is dead, and not before", () => {
+    const royalOnly = database.boss_instance
+      .filter(
+        (row) =>
+          row.odds > 0 && regionOf(row) === ROYAL && !SHUNNING_GROUNDS.includes(row.location_id),
+      )
+      .map((row) => row.id);
+    expect(royalOnly.length).toBeGreaterThan(0);
+    const othersDead = new Set(
+      database.boss_instance
+        .filter((row) => row.odds > 0 && !royalOnly.includes(row.id))
+        .map((row) => row.id),
+    );
+    expect(othersDead.has("maliketh_the_black_blade_crumbling_farum_azula")).toBe(true);
+    expect(bossPool(database, new Set([ASHEN]), othersDead)).toEqual({ status: "all_dead" });
+
+    const malikethAlive = new Set(othersDead);
+    malikethAlive.delete("maliketh_the_black_blade_crumbling_farum_azula");
+    expect(bossPool(database, new Set([ASHEN]), malikethAlive).status).not.toBe("all_dead");
   });
 
   it("finishes once every boss in the game is dead, with any selection", () => {
