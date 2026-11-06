@@ -88,7 +88,7 @@ def test_every_item_but_consumables_has_a_row(data: PlacementData) -> None:
     placed = {row.item_id for row in item_locations(data.placements)}
     wanted = {item.id for item in data.table if needs_location(item)}
 
-    assert len(wanted) == 1432
+    assert len(wanted) == 1435
     assert wanted - placed == set()
 
 
@@ -159,13 +159,30 @@ def test_no_row_is_at_the_roundtable(data: PlacementData) -> None:
         ("Bayle's Tyranny", "Bayle the Dread"),
         ("Parrying Dagger", "Patches"),
         ("Horse Crest Wooden Shield", "Patches"),
-        ("Bull-Goat Helm", "Magma Wyrm Makar"),
-        ("Bull-Goat Greaves", "Magma Wyrm Makar"),
         ("Serpent-Hunter", "Godskin Noble"),
     ],
 )
 def test_a_fight_drop_is_tied_to_its_boss(data: PlacementData, item: str, boss: str) -> None:
     assert boss in _bosses_of(data, item)
+
+
+@pytest.mark.parametrize(
+    ("item", "areas"),
+    [
+        ("Scaled Helm", {"volcano"}),
+        ("Bull-Goat Helm", {"volcano"}),
+        ("Beast Champion Armor", {"farumazula"}),
+        ("Eleonora's Poleblade", {"altus", "mountaintops"}),
+        ("Twinned Armor", {"deeproot_dream"}),
+        ("Giantsflame Take Thee", {"mountaintops"}),
+    ],
+)
+def test_an_item_a_later_quest_unlocks_is_found_only_there(
+    data: PlacementData, item: str, areas: set[str]
+) -> None:
+    item_id = _item(data, item).id
+    rows = [row for row in item_locations(data.placements) if row.item_id == item_id]
+    assert {row.location_id for row in rows} == areas
 
 
 def test_gostoc_sells_before_godrick_dies(data: PlacementData) -> None:
@@ -425,6 +442,7 @@ def _fake_sources(sources: GapSources, *slots: ItemSlot) -> PlacementSources:
         remembrances={},
         armor_shops={},
         slot_links={},
+        moved_areas={},
         ash_sources={},
     )
 
@@ -482,6 +500,18 @@ def test_an_unused_slot_link_stops_the_build(sources: GapSources) -> None:
 
     with pytest.raises(BuildError, match="Sword at elsewhere"):
         _built(fake)
+
+
+def test_a_moved_slot_line_gives_its_new_areas_and_an_unused_move_stops_the_build(
+    sources: GapSources,
+) -> None:
+    fake = _fake_sources(sources, _slot(_line("Tile")))
+
+    built = _built(replace(fake, moved_areas={("Sword", "here"): ("there", "yonder")}))
+
+    assert [placement.row.location_id for placement in built] == ["there", "yonder"]
+    with pytest.raises(BuildError, match="placement_areas names no slot line: Sword at elsewhere"):
+        _built(replace(fake, moved_areas={("Sword", "elsewhere"): ("there",)}))
 
 
 def test_a_slot_link_to_no_boss_stops_the_build(sources: GapSources) -> None:

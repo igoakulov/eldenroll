@@ -3,6 +3,7 @@ boss-tagged slot joins on its map label, because the mod often names an enemy by
 name decides only where a label holds several bosses. Enia's items take the boss their
 remembrance or unlock names. `boss_slot_links.csv` ties what no tag shows, such as the fights at
 `odds = 0`, and every row of it must apply, so a source change that orphans one stops the build.
+`placement_areas.csv` places a slot line at other areas, and every row of it must apply too.
 
 The drop CSVs add every regular enemy's farm spots. Last, an ash the mod has only on a weapon
 takes that weapon's rows, boss-tied ones included.
@@ -95,6 +96,7 @@ class PlacementSources:
     remembrances: Mapping[str, BossPlace]
     armor_shops: Mapping[str, BossPlace]
     slot_links: Mapping[tuple[str, str], tuple[BossPlace, ...]]
+    moved_areas: Mapping[tuple[str, str], tuple[str, ...]]
     ash_sources: Mapping[str, Sequence[str]]
 
 
@@ -158,6 +160,7 @@ def _slot_placements(sources: PlacementSources) -> Iterator[Placement]:
     for boss in sources.bosses:
         by_label.setdefault(boss.location_label, []).append(boss)
     linked: set[tuple[str, str]] = set()
+    moved: set[tuple[str, str]] = set()
     for slot in sources.slots:
         if not slot.is_randomizable:
             continue
@@ -179,10 +182,17 @@ def _slot_placements(sources: PlacementSources) -> Iterator[Placement]:
                 boss = _boss_of_slot(slot, line, by_label, sources.merged_labels)
                 yield _boss_placement(item, boss, source_name)
             else:
-                yield _location_placement(item, slot.area, source_name)
+                areas = sources.moved_areas.get(key)
+                if areas is not None:
+                    moved.add(key)
+                for area in areas or (slot.area,):
+                    yield _location_placement(item, area, source_name)
     unused = sorted(f"{item} at {area}" for item, area in set(sources.slot_links) - linked)
     if unused:
         raise BuildError(f"boss_slot_links names no slot line: {', '.join(unused)}")
+    unmoved = sorted(f"{item} at {area}" for item, area in set(sources.moved_areas) - moved)
+    if unmoved:
+        raise BuildError(f"placement_areas names no slot line: {', '.join(unmoved)}")
 
 
 def _enia_boss(line: str, sources: PlacementSources) -> BossPlace:

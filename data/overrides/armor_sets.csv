@@ -32,10 +32,14 @@ Bandit Set,Bandit Mask,listed in this set on the wiki's Armor Sets page,agent
 Bandit Set,Bandit Garb,listed in this set on the wiki's Armor Sets page,agent
 Bandit Set,Bandit Manchettes,listed in this set on the wiki's Armor Sets page,agent
 Bandit Set,Bandit Boots,listed in this set on the wiki's Armor Sets page,agent
-Banished Knight Set,Banished Knight Helm,listed in this set on the wiki's Armor Sets page,agent
-Banished Knight Set,Banished Knight Armor,listed in this set on the wiki's Armor Sets page,agent
+Banished Knight Set,Banished Knight Helm,"the hooded knights drop the plain helm with the altered armor, which can't be altered back",owner
+Banished Knight Set,Banished Knight Armor (Altered),"the hooded knights drop the plain helm with the altered armor, which can't be altered back",owner
 Banished Knight Set,Banished Knight Gauntlets,listed in this set on the wiki's Armor Sets page,agent
 Banished Knight Set,Banished Knight Greaves,listed in this set on the wiki's Armor Sets page,agent
+Banished Knight Set (Caped),Banished Knight Helm (Altered),"the Draconic knights drop the altered helm with the caped armor, which can't be altered back",owner
+Banished Knight Set (Caped),Banished Knight Armor,"the Draconic knights drop the altered helm with the caped armor, which can't be altered back",owner
+Banished Knight Set (Caped),Banished Knight Gauntlets,"the Draconic knights drop the altered helm with the caped armor, which can't be altered back",owner
+Banished Knight Set (Caped),Banished Knight Greaves,"the Draconic knights drop the altered helm with the caped armor, which can't be altered back",owner
 Battlemage Set,Haima Glintstone Crown,listed in this set on the wiki's Armor Sets page,agent
 Battlemage Set,Battlemage Robe,listed in this set on the wiki's Armor Sets page,agent
 Battlemage Set,Battlemage Manchettes,listed in this set on the wiki's Armor Sets page,agent
@@ -195,6 +199,10 @@ Fire Prelate Set,Fire Prelate Helm,listed in this set on the wiki's Armor Sets p
 Fire Prelate Set,Fire Prelate Armor,listed in this set on the wiki's Armor Sets page,agent
 Fire Prelate Set,Fire Prelate Gauntlets,listed in this set on the wiki's Armor Sets page,agent
 Fire Prelate Set,Fire Prelate Greaves,listed in this set on the wiki's Armor Sets page,agent
+Fire Prelate Set (Altered),Fire Prelate Helm,"the altered chest can't be altered back, so its look is a set of its own",owner
+Fire Prelate Set (Altered),Fire Prelate Armor (Altered),"the altered chest can't be altered back, so its look is a set of its own",owner
+Fire Prelate Set (Altered),Fire Prelate Gauntlets,"the altered chest can't be altered back, so its look is a set of its own",owner
+Fire Prelate Set (Altered),Fire Prelate Greaves,"the altered chest can't be altered back, so its look is a set of its own",owner
 Freyja's Set,Freyja's Helm,listed in this set on the wiki's Armor Sets page,agent
 Freyja's Set,Freyja's Armor,listed in this set on the wiki's Armor Sets page,agent
 Freyja's Set,Freyja's Gauntlets,listed in this set on the wiki's Armor Sets page,agent

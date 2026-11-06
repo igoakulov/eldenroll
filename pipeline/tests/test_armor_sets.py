@@ -53,6 +53,33 @@ HIGHLAND = {
 
 
 # Sets the page lacks, named by the owner (tasklist O50).
+# The page has one set for each; the game can't alter these chests back, so each look is a set.
+SPLIT = {
+    "Banished Knight Set": {
+        "Banished Knight Helm",
+        "Banished Knight Armor (Altered)",
+        "Banished Knight Gauntlets",
+        "Banished Knight Greaves",
+    },
+    "Banished Knight Set (Caped)": {
+        "Banished Knight Helm (Altered)",
+        "Banished Knight Armor",
+        "Banished Knight Gauntlets",
+        "Banished Knight Greaves",
+    },
+    "Fire Prelate Set": {
+        "Fire Prelate Helm",
+        "Fire Prelate Armor",
+        "Fire Prelate Gauntlets",
+        "Fire Prelate Greaves",
+    },
+    "Fire Prelate Set (Altered)": {
+        "Fire Prelate Helm",
+        "Fire Prelate Armor (Altered)",
+        "Fire Prelate Gauntlets",
+        "Fire Prelate Greaves",
+    },
+}
 OFF_PAGE = {
     "Golden Order Set": {
         "Broken Gold Mask",
@@ -94,12 +121,13 @@ def test_every_set_of_the_page_has_its_pieces(sets: dict[str, tuple[str, ...]]) 
     assert {name: set(pieces) for name, pieces in sets.items()} == {
         **expected,
         **HIGHLAND,
+        **SPLIT,
         **OFF_PAGE,
     }
 
 
 def test_the_highland_warrior_set_is_split_in_two(sets: dict[str, tuple[str, ...]]) -> None:
-    assert len(sets) == 161
+    assert len(sets) == 163
     assert {name: set(sets[name]) for name in HIGHLAND} == HIGHLAND
 
 

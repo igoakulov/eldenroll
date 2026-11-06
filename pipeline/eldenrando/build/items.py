@@ -19,7 +19,8 @@ from eldenrando.model.name_variant import NameVariant
 from eldenrando.normalize.slug import slugify
 
 _NEVER_A_ROW: frozenset[str] = frozenset({"Lamenter's Mask - Attack"})
-_NEVER_IN_A_NAME: tuple[str, ...] = ("(Altered)", "?ITEM?", "[ERROR]", "unused ESD")
+_NEVER_IN_A_NAME: tuple[str, ...] = ("?ITEM?", "[ERROR]", "unused ESD")
+_ALTERED = "(Altered)"
 _ANY = "any"
 _ALIAS_PREFIX = "Any "
 
@@ -112,6 +113,7 @@ def never_a_row(rows: Iterable[Item]) -> tuple[str, ...]:
             or row.name.lower() == _ANY
             or row.name.startswith(_ALIAS_PREFIX)
             or any(marker in row.name for marker in _NEVER_IN_A_NAME)
+            or (_ALTERED in row.name and row.category != "armor")
         )
     )
 

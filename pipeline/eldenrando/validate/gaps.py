@@ -26,6 +26,7 @@ from eldenrando.build.tools import build_tools
 from eldenrando.build.weapons import build_weapons
 from eldenrando.loaders.added_items import load_added_items
 from eldenrando.loaders.aliases import load_aliases
+from eldenrando.loaders.armor_sets import load_armor_sets
 from eldenrando.loaders.armor_slots import load_armor_slots
 from eldenrando.loaders.ash_overrides import load_ash_overrides
 from eldenrando.loaders.ash_sources import load_ash_sources
@@ -343,6 +344,10 @@ def add_missing(found: Iterable[Gap], tracked: Iterable[Gap]) -> tuple[Gap, ...]
     return tuple(rows.values())
 
 
+def _set_pieces(path: Path) -> frozenset[str]:
+    return frozenset(piece for pieces in load_armor_sets(path).values() for piece in pieces)
+
+
 def load_overrides(overrides_dir: Path) -> dict[str, frozenset[str]]:
     """Return `{area: the names its override file holds}`; a missing file holds nothing."""
     out: dict[str, frozenset[str]] = {}
@@ -375,7 +380,7 @@ def load_sources(root: Path) -> GapSources:
         (
             *weapons,
             *assign_armor_slots(
-                build_armor(catalog, variants),
+                build_armor(catalog, variants, _set_pieces(overrides / "armor_sets.csv")),
                 load_document(ARMOR_DIR, "armors").records,
                 variants,
                 load_armor_slots(overrides / "armor_slots.csv"),

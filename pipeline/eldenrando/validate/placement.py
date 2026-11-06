@@ -23,6 +23,7 @@ from eldenrando.loaders.boss_links import (
 )
 from eldenrando.loaders.drops import load_drop_locations, load_item_drops
 from eldenrando.loaders.odds import load_odds
+from eldenrando.loaders.placement_areas import load_placement_areas
 from eldenrando.loaders.region_areas import load_region_areas
 from eldenrando.loaders.regions import load_regions
 from eldenrando.model.armor_set import ArmorSet
@@ -113,6 +114,7 @@ def load_placement_sources(root: Path, loaded: GapSources) -> PlacementSources:
         remembrances=load_remembrance_bosses(overrides / "remembrance_bosses.csv"),
         armor_shops=load_armor_shop_bosses(overrides / "boss_armor_shops.csv"),
         slot_links=load_slot_links(overrides / "boss_slot_links.csv"),
+        moved_areas=load_placement_areas(overrides / "placement_areas.csv"),
         ash_sources=loaded.ash_sources,
     )
 

@@ -8,6 +8,8 @@ Armor of Solitude,body,"its place in the Solitude Set on the wiki's Armor Sets p
 Ascetic's Ankle Guards,legs,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms",agent
 Ascetic's Loincloth,body,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms",agent
 Ascetic's Wrist Guards,arms,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms",agent
+Banished Knight Armor (Altered),body,"kept apart from Banished Knight Armor, which armors.json holds only in its plain form",owner
+Banished Knight Helm (Altered),head,"kept apart from Banished Knight Helm, which armors.json holds only in its plain form",owner
 Black Knight Armor,body,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
 Black Knight Gauntlets,arms,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
 Black Knight Greaves,legs,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
@@ -49,6 +51,7 @@ Fire Knight Armor,body,"its place in the Fire Knight Set on the wiki's Armor Set
 Fire Knight Gauntlets,arms,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
 Fire Knight Greaves,legs,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
 Fire Knight Helm,head,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
+Fire Prelate Armor (Altered),body,"kept apart from Fire Prelate Armor, which armors.json holds only in its plain form",owner
 Freyja's Armor,body,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms",agent
 Freyja's Gauntlets,arms,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms",agent
 Freyja's Greaves,legs,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms",agent

@@ -44,12 +44,12 @@ def test_every_row_has_a_known_subcategory(sources: GapSources) -> None:
 
 
 def test_every_piece_has_exactly_one_slot(slots: dict[str, str | None]) -> None:
-    assert len(slots) == 631
+    assert len(slots) == 634
     assert set(slots.values()) == set(ARMOR_SLOTS)
 
 
 def test_overrides_hold_the_pieces_the_json_lacks() -> None:
-    assert len(load_armor_slots(OVERRIDES / "armor_slots.csv")) == 155
+    assert len(load_armor_slots(OVERRIDES / "armor_slots.csv")) == 158
 
 
 def test_slots_agree_with_the_game_ids_but_for_two_pieces(slots: dict[str, str | None]) -> None:
@@ -92,7 +92,7 @@ def test_piece_has_its_slot(slots: dict[str, str | None], name: str, slot: str) 
 
 
 def test_slot_counts(slots: dict[str, str | None]) -> None:
-    assert Counter(slots.values()) == {"head": 198, "body": 173, "arms": 123, "legs": 137}
+    assert Counter(slots.values()) == {"head": 199, "body": 175, "arms": 123, "legs": 137}
 
 
 def _piece(name: str) -> Item:

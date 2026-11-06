@@ -193,6 +193,12 @@ def test_variant_renames_an_altered_only_piece() -> None:
     assert [row.name for row in rows] == ["Gown"]
 
 
+def test_an_altered_piece_a_set_names_stays_its_own_row() -> None:
+    rows = build_armor(_catalog({1: "Hood", 2: "Hood (Altered)"}), {}, {"Hood (Altered)"})
+
+    assert [row.name for row in rows] == ["Hood", "Hood (Altered)"]
+
+
 def test_altered_piece_with_no_plain_row_stops_the_build() -> None:
     with pytest.raises(BuildError, match="no unaltered row: Gown"):
         build_armor(_catalog({1: "Gown (Altered)"}), {})

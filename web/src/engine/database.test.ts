@@ -62,7 +62,7 @@ describe("db.json", () => {
     expect(database.location).toHaveLength(174);
     expect(database.boss_instance).toHaveLength(229);
     expect(database.boss_instance.filter((row) => row.odds > 0)).toHaveLength(218);
-    expect(database.item).toHaveLength(1514);
+    expect(database.item).toHaveLength(1517);
     expect(database.item.filter((row) => row.category === "none")).toHaveLength(1);
     expect(database.build).toHaveLength(8);
     expect(database.slot_pool).toHaveLength(72);

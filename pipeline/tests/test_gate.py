@@ -274,7 +274,7 @@ def test_a_pool_item_named_on_a_slot_is_not_dropped(data: GateData) -> None:
 def test_the_report_counts_the_tables(data: GateData) -> None:
     report = import_report(data)
     counts = cast("dict[str, int]", report["counts"])
-    assert counts["item"] == 1514
+    assert counts["item"] == 1517
     assert counts["boss_instance"] == 229
     assert counts["slot_pool"] == 72
 
@@ -283,7 +283,7 @@ def test_main_writes_both_files(tmp_path: Path) -> None:
     assert main(["--out", str(tmp_path)]) == 0
     tables = json.loads((tmp_path / "db.json").read_text(encoding="utf-8"))
     assert set(tables) == set(TABLE_FIELDS)
-    assert len(tables["item"]) == 1514
+    assert len(tables["item"]) == 1517
     assert (tmp_path / "import-report.json").exists()
 
 

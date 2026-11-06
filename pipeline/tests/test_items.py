@@ -233,6 +233,7 @@ def test_only_the_items_that_never_roll_sit_at_odds_zero() -> None:
     assert {row.name for row in table if row.odds == 0} == {
         "Igon's Drake Hunt",
         "Lamenter's Mask",
+        "Litany of Proper Death",
         "Priestess Heart",
         "Rock Heart",
     }
