@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { Item, PoolSlot } from "./database";
-import { isReachable, itemsWithACountingRow } from "./eligibility";
+import type { Item, LoadoutSlot, PoolSlot } from "./database";
+import { isReachable, isSetReachable, itemsWithACountingRow } from "./eligibility";
 import { indexDatabase, poolKey } from "./engineData";
 import { LOADOUT_ORDER, ashFits, rollLoadout, spellTypeFilter, type Loadout } from "./loadout";
 import { realDatabase } from "./realDatabase.testing";
@@ -55,7 +55,7 @@ const CASES = [
   },
 ] as const;
 
-function id(loadout: Loadout, slot: PoolSlot): string | null | undefined {
+function id(loadout: Loadout, slot: LoadoutSlot): string | null | undefined {
   const roll = loadout.get(slot);
   return roll === undefined ? undefined : (roll.chosen?.option.row.id ?? null);
 }
@@ -84,15 +84,24 @@ describe.each(CASES)("every roll on $name", (testCase) => {
     const loadouts = rolls(build, testCase, 60);
 
     it("has exactly the slots the build has rows for", () => {
-      const expected = LOADOUT_ORDER.filter((slot) => data.pools.has(poolKey(build, slot)));
+      const expected = LOADOUT_ORDER.filter(
+        (slot) => slot === "armor" || data.pools.has(poolKey(build, slot)),
+      );
       for (const loadout of loadouts) expect([...loadout.keys()]).toEqual(expected);
     });
 
-    it("rolls only what each slot's selectors allow, and reachable items", () => {
+    it("rolls only what each slot's selectors allow, and reachable items and whole sets", () => {
       for (const loadout of loadouts) {
         for (const [slot, roll] of loadout) {
           if (roll.chosen === null) continue;
           const { option } = roll.chosen;
+          if (slot === "armor") {
+            expect(option.kind).toBe("armor_set");
+            if (option.kind === "armor_set") {
+              expect(isSetReachable(option.row, testCase.counted)).toBe(true);
+            }
+            continue;
+          }
           const pool = data.pools.get(poolKey(build, slot));
           expect(pool?.selectors.some((one) => matchesOption(one, option))).toBe(true);
           if (option.kind === "item") {
@@ -178,9 +187,9 @@ describe.each(CASES)("every roll on $name", (testCase) => {
       }
     });
 
-    it("always fills the item, both talismans and both rules", () => {
+    it("always fills the item, both talismans, both rules and the armor", () => {
       for (const loadout of loadouts) {
-        for (const slot of ["item", "talisman_1", "talisman_2", "rule_1", "rule_2"] as const) {
+        for (const slot of ["item", "talisman_1", "talisman_2", "rule_1", "rule_2", "armor"] as const) {
           expect(id(loadout, slot)).not.toBeNull();
         }
       }
@@ -249,6 +258,28 @@ describe("build shapes", () => {
       }
     }
     expect(seen).toBeGreaterThan(0);
+  });
+});
+
+describe("armor", () => {
+  it("makes Raptor's or Gravebird nearly certain after a Claw Talisman", () => {
+    const random = seeded(5);
+    const jumpSets = ["raptors_set", "gravebird_set"];
+    let hits = 0;
+    for (let roll = 0; roll < 100; roll += 1) {
+      const loadout = rollLoadout({
+        data,
+        build: "knight",
+        boss: null,
+        counted: CASES[0].counted,
+        limits: { stats: MAXED, maxStatGap: 0 },
+        random,
+        from: "armor",
+        kept: { talisman_1: "claw_talisman" },
+      });
+      if (jumpSets.includes(id(loadout, "armor") ?? "")) hits += 1;
+    }
+    expect(hits).toBeGreaterThanOrEqual(95);
   });
 });
 

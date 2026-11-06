@@ -1,4 +1,4 @@
-import type { BossInstance, Item, ItemLocation } from "./database";
+import type { ArmorSet, BossInstance, Item, ItemLocation } from "./database";
 import type { EngineData } from "./engineData";
 
 export interface Reachability {
@@ -36,4 +36,9 @@ export function itemsWithACountingRow(
 /** Consumables name a family and `none` is no place, so neither has rows to count. */
 export function isReachable(item: Item, counted: ReadonlySet<string>): boolean {
   return item.category === "consumable" || item.category === "none" || counted.has(item.id);
+}
+
+/** A set the data leaves short of a piece is not filtered; the missing slot shows `any`. */
+export function isSetReachable(set: ArmorSet, counted: ReadonlySet<string>): boolean {
+  return set.pieces.every((piece) => counted.has(piece));
 }

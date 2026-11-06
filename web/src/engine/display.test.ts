@@ -8,10 +8,17 @@ const data = indexDatabase(realDatabase);
 
 describe("displaySlots", () => {
   it("shows a rolled item and rule as themselves", () => {
-    const shown = displaySlots(data, { rh: "uchigatana", rh_ash: "parry", rule_1: "parry_only" });
+    const shown = displaySlots(data, { rh: "uchigatana", rh_ash: "barbaric_roar", rule_1: "parry_only" });
     expect(shown.rh).toEqual({ kind: "item", item: data.items.get("uchigatana") });
-    expect(shown.rh_ash).toEqual({ kind: "item", item: data.items.get("parry") });
+    expect(shown.rh_ash).toEqual({ kind: "item", item: data.items.get("barbaric_roar") });
     expect(shown.rule_1).toEqual({ kind: "rule", rule: data.rules.get("parry_only") });
+  });
+
+  it("shows an alias member as its label, and keeps the member it rolled", () => {
+    const shown = displaySlots(data, { rh: "astrologers_staff", lh: "brass_shield", lh_ash: "parry" });
+    expect(shown.rh).toEqual({ kind: "alias", label: "Any staff", item: data.items.get("astrologers_staff") });
+    expect(shown.lh.kind).toBe("item");
+    expect(shown.lh_ash).toMatchObject({ kind: "alias", label: "Any parry ash" });
   });
 
   it("shows none for a rolled none and for an empty result alike", () => {
@@ -35,6 +42,21 @@ describe("displaySlots", () => {
     const shown = displaySlots(data, { rh: "none", rh_ash: null, lh: null });
     expect(shown.rh_ash).toEqual({ kind: "none" });
     expect(shown.lh_ash).toEqual({ kind: "none" });
+  });
+
+  it("shows the armor set with each piece in its slot, and any where the set has none", () => {
+    const shown = displaySlots(data, { armor: "aristocrat_set" });
+    expect(shown.armor).toEqual({
+      kind: "armor_set",
+      set: data.armorSets.get("aristocrat_set"),
+      pieces: {
+        head: { kind: "item", item: data.items.get("aristocrat_headband") },
+        body: { kind: "item", item: data.items.get("aristocrat_garb") },
+        arms: { kind: "any" },
+        legs: { kind: "item", item: data.items.get("aristocrat_boots") },
+      },
+    });
+    expect(displaySlots(data, { armor: null }).armor).toEqual({ kind: "none" });
   });
 
   it("always shows talismans 3 and 4 as any", () => {

@@ -1,4 +1,4 @@
-import type { PoolSlot } from "./database";
+import type { LoadoutSlot } from "./database";
 import type { RolledSlots } from "./display";
 import { itemsWithACountingRow } from "./eligibility";
 import type { EngineData } from "./engineData";
@@ -12,7 +12,7 @@ import {
   type Settings,
   type Stats,
 } from "./settings";
-import { optionKey, repetitionMultiplier, type Random } from "./slotRoll";
+import { repeatKey, repetitionMultiplier, type Random } from "./slotRoll";
 import {
   buildRepeatLine,
   pickTrace,
@@ -32,7 +32,7 @@ export interface DeadBoss {
   readonly objectiveIndex: number;
 }
 
-export type RerollTarget = "boss" | "build" | PoolSlot;
+export type RerollTarget = "boss" | "build" | LoadoutSlot;
 
 export interface Objective {
   readonly boss: string;
@@ -75,7 +75,7 @@ export interface Run {
   readonly current: Objective | null;
   readonly waiting: Waiting | null;
   readonly completed: readonly CompletedObjective[];
-  /** How many completed objectives showed each `optionKey` or `build:` id. */
+  /** How many completed objectives showed each `repeatKey` or `build:` id. */
   readonly seen: Readonly<Record<string, number>>;
 }
 
@@ -192,7 +192,7 @@ function rollSlots(
   run: Run,
   random: Random,
   objective: { boss: string; build: string },
-  from: PoolSlot = "rh",
+  from: LoadoutSlot = "rh",
   kept: RolledSlots = {},
   exclude: string | null = null,
 ): RolledSlotsResult {
@@ -214,7 +214,7 @@ function rollSlots(
     exclude,
   });
   const start = LOADOUT_ORDER.indexOf(from);
-  const slots: Partial<Record<PoolSlot, string | null>> = {};
+  const slots: Partial<Record<LoadoutSlot, string | null>> = {};
   for (const slot of LOADOUT_ORDER.slice(0, start)) {
     if (kept[slot] !== undefined) slots[slot] = kept[slot];
   }
@@ -335,15 +335,20 @@ export function setBossState(engine: Engine, run: Run, boss: string, state: Boss
 
 function seenIn(engine: Engine, objective: Objective): string[] {
   const keys = [buildKey(objective.build)];
-  for (const [slot, id] of Object.entries(objective.slots) as [PoolSlot, string | null][]) {
+  for (const [slot, id] of Object.entries(objective.slots) as [LoadoutSlot, string | null][]) {
     if (id === null) continue;
+    if (slot === "armor") {
+      const row = engine.data.armorSets.get(id);
+      if (row !== undefined) keys.push(repeatKey({ kind: "armor_set", row }));
+      continue;
+    }
     if (slot === "rule_1" || slot === "rule_2") {
       const row = engine.data.rules.get(id);
-      if (row !== undefined) keys.push(optionKey({ kind: "rule", row }));
+      if (row !== undefined) keys.push(repeatKey({ kind: "rule", row }));
       continue;
     }
     const row = engine.data.items.get(id);
-    if (row !== undefined) keys.push(optionKey({ kind: "item", row }));
+    if (row !== undefined) keys.push(repeatKey({ kind: "item", row }));
   }
   return keys;
 }

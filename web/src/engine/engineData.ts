@@ -1,4 +1,5 @@
 import type {
+  ArmorSet,
   AshCompatibility,
   BossInstance,
   CombatRule,
@@ -12,6 +13,9 @@ export interface EngineData {
   readonly database: Database;
   readonly items: ReadonlyMap<string, Item>;
   readonly rules: ReadonlyMap<string, CombatRule>;
+  readonly armorSets: ReadonlyMap<string, ArmorSet>;
+  /** Alias id to its label. */
+  readonly aliasLabels: ReadonlyMap<string, string>;
   readonly bosses: ReadonlyMap<string, BossInstance>;
   readonly pools: ReadonlyMap<string, SlotPool>;
   readonly ashFits: ReadonlyMap<string, readonly AshCompatibility[]>;
@@ -31,6 +35,8 @@ export function indexDatabase(database: Database): EngineData {
     database,
     items: new Map(database.item.map((row) => [row.id, row])),
     rules: new Map(database.combat_rule.map((row) => [row.id, row])),
+    armorSets: new Map(database.armor_set.map((row) => [row.id, row])),
+    aliasLabels: new Map(database.alias.map((row) => [row.id, row.label])),
     bosses: new Map(database.boss_instance.map((row) => [row.id, row])),
     pools: new Map(database.slot_pool.map((row) => [poolKey(row.build_id, row.slot), row])),
   };

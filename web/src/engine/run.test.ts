@@ -126,6 +126,7 @@ describe("Done", () => {
     expect(next.completed[0]).toMatchObject({ boss: objective.boss, stats: MAXED, level: 713 });
     expect(next.seen[`build:${objective.build}`]).toBe(1);
     expect(next.seen[`rule:${objective.slots.rule_1}`]).toBe(1);
+    expect(next.seen[`armor_set:${objective.slots.armor}`]).toBe(1);
     expect(current(next).boss).not.toBe(objective.boss);
   });
 
@@ -166,6 +167,43 @@ describe("decay", () => {
   });
 });
 
+describe("aliases", () => {
+  const sorcerer = { settings: { ...defaultSettings(realDatabase), builds: ["sorcerer"] } };
+  const staves = realDatabase.item.filter((row) => row.alias === "any_staff").map((row) => row.id);
+
+  it("counts a shown member as its alias, so every member repeats", () => {
+    const run = done(engine, start(sorcerer));
+    expect(run.seen["alias:any_staff"]).toBe(1);
+    const context = {
+      data: engine.data,
+      counted: new Set(staves),
+      state: { build: "sorcerer", boss: null, rolled: new Map() },
+    };
+    const options = slotOptions(engine.data, "sorcerer", "rh");
+    const weigh = (seen: Record<string, number>) =>
+      weighOptions({ ...context, repetition: { seen, decay: 0.8 } }, options).options;
+    const fresh = weigh({});
+    const decayed = weigh({ "alias:any_staff": 1 });
+    for (const row of fresh) {
+      const after = decayed.find((one) => one.option.row.id === row.option.row.id);
+      expect(after?.weight).toBeCloseTo(row.weight * 0.8);
+    }
+  });
+
+  it("lets Never roll take out one member while the others still roll", () => {
+    let run = start({ ...sorcerer, neverRoll: ["item:meteorite_staff"] });
+    const rolled = new Set<string>();
+    for (let step = 0; step < 30 && run.current !== null; step += 1) {
+      const rh = current(run).slots.rh;
+      if (typeof rh === "string") rolled.add(rh);
+      run = done(engine, run);
+    }
+    expect(rolled.has("meteorite_staff")).toBe(false);
+    expect([...rolled].every((id) => staves.includes(id))).toBe(true);
+    expect(rolled.size).toBeGreaterThan(1);
+  });
+});
+
 describe("rerolls", () => {
   const knight = { settings: { ...defaultSettings(realDatabase), builds: ["knight"] } };
 
@@ -181,6 +219,23 @@ describe("rerolls", () => {
       expect(after.boss).toBe(before.boss);
     }
     expect(current(run).rerolls).toHaveLength(10);
+  });
+
+  it("rerolls only the armor when the armor is the target", () => {
+    const run = start(knight);
+    const before = current(run);
+    const after = current(reroll(engine, run, "armor"));
+    const { armor: oldArmor, ...rest } = before.slots;
+    const { armor: newArmor, ...restAfter } = after.slots;
+    expect(restAfter).toEqual(rest);
+    expect(newArmor).not.toBe(oldArmor);
+  });
+
+  it("rerolls the armor with any slot before it", () => {
+    const run = start(knight);
+    const after = current(reroll(engine, run, "rule_2"));
+    expect(after.trace.at(-1)?.slot).toBe("armor");
+    expect(after.trace.filter((block) => block.slot === "armor")).toHaveLength(1);
   });
 
   it("gives the same result back when it's the only option", () => {
@@ -332,6 +387,16 @@ describe("the Bosses list", () => {
     }
     run = done(engine, run);
     expect(run.finished).toBe(true);
+  });
+});
+
+describe("armor", () => {
+  it("rolls only sets whose every piece is in reach, and traces why the others are out", () => {
+    const run = start({ regions: ["limgrave"] });
+    const armor = current(run).trace.find((block) => block.slot === "armor")?.text ?? "";
+    expect(armor).toMatch(/^Armor: /);
+    expect(armor).toMatch(/not in region: -\d+/);
+    expect(armor).toMatch(/boss still alive: -\d+/);
   });
 });
 

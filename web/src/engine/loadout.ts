@@ -1,4 +1,4 @@
-import type { Item, PoolSlot } from "./database";
+import type { Item, LoadoutSlot, PoolSlot } from "./database";
 import { poolKey, type EngineData } from "./engineData";
 import type { RollState } from "./modifiers";
 import {
@@ -15,7 +15,7 @@ import {
 } from "./slotRoll";
 import { lhStatFilter, plainStatFilter, rhStatFilter, type StatLimits } from "./stats";
 
-export const LOADOUT_ORDER: readonly PoolSlot[] = [
+export const LOADOUT_ORDER: readonly LoadoutSlot[] = [
   "rh",
   "rh_ash",
   "lh",
@@ -26,6 +26,7 @@ export const LOADOUT_ORDER: readonly PoolSlot[] = [
   "talisman_2",
   "rule_1",
   "rule_2",
+  "armor",
 ];
 
 export interface LoadoutInput {
@@ -41,14 +42,14 @@ export interface LoadoutInput {
   /** RH rolls from these first; `null` when the setting is off. */
   readonly upgraded?: ReadonlySet<string> | null;
   /** A reroll keeps the slots before `from` as they are. */
-  readonly from?: PoolSlot;
-  readonly kept?: Readonly<Partial<Record<PoolSlot, string | null>>>;
+  readonly from?: LoadoutSlot;
+  readonly kept?: Readonly<Partial<Record<LoadoutSlot, string | null>>>;
   /** The reroll target's current result, left out unless it's the only option. */
   readonly exclude?: string | null;
 }
 
 /** Holds a roll for each slot rolled, in rolling order. */
-export type Loadout = ReadonlyMap<PoolSlot, SlotRoll>;
+export type Loadout = ReadonlyMap<LoadoutSlot, SlotRoll>;
 
 function rolledItem(context: RollContext, slot: PoolSlot): Item | undefined {
   const id = context.state.rolled.get(slot);
@@ -97,7 +98,7 @@ export function spellTypeFilter(context: RollContext): OptionFilter {
     option.row.category === type;
 }
 
-function filtersFor(slot: PoolSlot, context: RollContext, limits: StatLimits): PoolFilters {
+function filtersFor(slot: LoadoutSlot, context: RollContext, limits: StatLimits): PoolFilters {
   switch (slot) {
     case "rh":
       return { stats: rhStatFilter(context, limits) };
@@ -125,7 +126,7 @@ function excluding(filters: PoolFilters, exclude: string): PoolFilters {
 /** Rolls without the excluded option, or with it when nothing else is left. */
 function rollExcluding(
   context: RollContext,
-  slot: PoolSlot,
+  slot: LoadoutSlot,
   filters: PoolFilters,
   exclude: string | null,
   random: Random,
@@ -164,9 +165,9 @@ export function rollLoadout(input: LoadoutInput): Loadout {
   const rolled = new Map<PoolSlot, string | null>();
   for (const slot of LOADOUT_ORDER.slice(0, start)) {
     const value = input.kept?.[slot];
-    if (value !== undefined) rolled.set(slot, value);
+    if (value !== undefined && slot !== "armor") rolled.set(slot, value);
   }
-  const loadout = new Map<PoolSlot, SlotRoll>();
+  const loadout = new Map<LoadoutSlot, SlotRoll>();
   const state: RollState = { build, boss, rolled };
   const context: RollContext = {
     data,
@@ -180,13 +181,13 @@ export function rollLoadout(input: LoadoutInput): Loadout {
   };
 
   for (const slot of LOADOUT_ORDER.slice(start)) {
-    if (!data.pools.has(poolKey(build, slot))) continue;
+    if (slot !== "armor" && !data.pools.has(poolKey(build, slot))) continue;
     const exclude = slot === from ? (input.exclude ?? null) : null;
     const upgraded =
       slot === "rh" && input.upgraded ? rollUpgradedRh(context, input.upgraded, exclude, random) : null;
     const roll =
       upgraded ?? rollExcluding(context, slot, filtersFor(slot, context, limits), exclude, random);
-    rolled.set(slot, roll.chosen?.option.row.id ?? null);
+    if (slot !== "armor") rolled.set(slot, roll.chosen?.option.row.id ?? null);
     loadout.set(slot, roll);
   }
   return loadout;

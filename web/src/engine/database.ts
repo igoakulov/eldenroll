@@ -37,6 +37,9 @@ export const POOL_SLOTS = [
 ] as const;
 export type PoolSlot = (typeof POOL_SLOTS)[number];
 
+/** Armor has no `slot_pool` row: every build rolls one set, from every armor set, after the rules. */
+export type LoadoutSlot = PoolSlot | "armor";
+
 /** `ids: null` means every option of the kind. */
 export interface Selector {
   readonly kind: SelectorKind;

@@ -1,14 +1,14 @@
-import type { Condition, Modifier, PoolSlot } from "./database";
+import type { Condition, LoadoutSlot, Modifier, PoolSlot } from "./database";
 import type { RolledSlots } from "./display";
 import type { EngineData } from "./engineData";
 import {
-  optionKey,
+  repeatKey,
   type Removed,
   type Repetition,
   type SlotRoll,
 } from "./slotRoll";
 
-export type TraceSlot = "boss" | "build" | PoolSlot;
+export type TraceSlot = "boss" | "build" | LoadoutSlot;
 
 export interface TraceBlock {
   readonly slot: TraceSlot;
@@ -28,6 +28,7 @@ export const TRACE_LABELS: Readonly<Record<TraceSlot, string>> = {
   talisman_2: "Talisman 2",
   rule_1: "Rule 1",
   rule_2: "Rule 2",
+  armor: "Armor",
 };
 
 const REMOVAL_LABELS: readonly [Exclude<keyof Removed, "byModifier">, string][] = [
@@ -66,6 +67,7 @@ function rolledName(data: EngineData, rolled: RolledContext, slot: TraceSlot): s
   if (slot === "build") return data.database.build.find((row) => row.id === rolled.build)?.name ?? "none";
   const id = rolled.slots[slot];
   if (id === null || id === undefined) return "none";
+  if (slot === "armor") return data.armorSets.get(id)?.name ?? id;
   const row = slot === "rule_1" || slot === "rule_2" ? data.rules.get(id) : data.items.get(id);
   return row?.name ?? id;
 }
@@ -92,7 +94,7 @@ function modifierLabel(data: EngineData, rolled: RolledContext, modifier: Modifi
 
 export function slotTrace(
   data: EngineData,
-  slot: PoolSlot,
+  slot: LoadoutSlot,
   roll: SlotRoll,
   rolled: RolledContext,
   repetition: Repetition,
@@ -115,7 +117,7 @@ export function slotTrace(
   for (const modifier of chosen.modifiers) {
     lines.push(`  ${modifierLabel(data, rolled, modifier)}: ${formatMultiplier(modifier.value)}`);
   }
-  const repeat = repeatLine(optionKey(chosen.option), repetition);
+  const repeat = repeatLine(repeatKey(chosen.option), repetition);
   if (repeat !== null) lines.push(repeat);
   lines.push(`  prob: ${formatProbability(roll.probability)}`);
   return { slot, text: lines.join("\n") };

@@ -1,5 +1,5 @@
-import type { Modifier, PoolSlot } from "./database";
-import { isReachable } from "./eligibility";
+import type { LoadoutSlot, Modifier } from "./database";
+import { isReachable, isSetReachable } from "./eligibility";
 import { poolKey, type EngineData } from "./engineData";
 import { activeModifiers, type RollState } from "./modifiers";
 import { pickWeighted } from "./random";
@@ -63,7 +63,7 @@ export interface SlotRoll {
 }
 
 export interface Repetition {
-  /** How many completed objectives showed each `optionKey` this run. */
+  /** How many completed objectives showed each `repeatKey` this run. */
   readonly seen: Readonly<Record<string, number>>;
   readonly decay: number;
 }
@@ -91,7 +91,15 @@ export function optionKey(option: Option): string {
   return `${option.kind}:${option.row.id}`;
 }
 
-export function slotOptions(data: EngineData, build: string, slot: PoolSlot): readonly Option[] {
+/** An alias member repeats as its alias, so one seen member makes every member less likely.
+ * `Never roll` still keys on `optionKey`, because the player picks real items. */
+export function repeatKey(option: Option): string {
+  if (option.kind === "item" && option.row.alias !== null) return `alias:${option.row.alias}`;
+  return optionKey(option);
+}
+
+export function slotOptions(data: EngineData, build: string, slot: LoadoutSlot): readonly Option[] {
+  if (slot === "armor") return data.database.armor_set.map((row) => ({ kind: "armor_set", row }));
   const pool = data.pools.get(poolKey(build, slot));
   if (pool === undefined) return [];
 
@@ -104,12 +112,19 @@ export function slotOptions(data: EngineData, build: string, slot: PoolSlot): re
 
 type Verdict = "keep" | "rule" | Exclude<keyof Removed, "byModifier">;
 
+function reachable(option: Option, counted: ReadonlySet<string>): boolean {
+  if (option.kind === "item") return isReachable(option.row, counted);
+  if (option.kind === "armor_set") return isSetReachable(option.row, counted);
+  return true;
+}
+
 function verdict(option: Option, context: RollContext, filters: PoolFilters): Verdict {
   if (option.row.odds <= 0) return "rule";
   if (!(filters.rules ?? []).every((filter) => filter(option))) return "rule";
   if (context.neverRoll?.has(optionKey(option))) return "neverRoll";
-  if (option.kind === "item" && !isReachable(option.row, context.counted)) {
-    return context.countedIfBossesDead?.has(option.row.id) ? "bossStillAlive" : "notInRegion";
+  if (!reachable(option, context.counted)) {
+    const ifDead = context.countedIfBossesDead;
+    return ifDead !== undefined && reachable(option, ifDead) ? "bossStillAlive" : "notInRegion";
   }
   if (filters.stats !== undefined && !filters.stats(option)) return "statReq";
   return "keep";
@@ -136,7 +151,7 @@ export function weighOptions(
   const weighted = candidates
     .map((option) => {
       const modifiers = active.filter((row) => matchesOption(row.target, option));
-      const base = option.row.odds * repetitionMultiplier(optionKey(option), repetition);
+      const base = option.row.odds * repetitionMultiplier(repeatKey(option), repetition);
       const weight = modifiers.reduce((product, row) => product * row.value, base);
       return { option, weight, modifiers };
     });
