@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { BossInstance, Item, ItemLocation } from "./database";
-import { isReachable, rowCounts } from "./eligibility";
+import type { BossInstance, ItemLocation } from "./database";
+import { countedItems, rowCounts } from "./eligibility";
+import { indexDatabase } from "./engineData";
+import { realDatabase } from "./realDatabase.testing";
 
 function boss(id: string, odds = 1): [string, BossInstance] {
   return [id, { id, name: id, location_id: "tile", location_label: "Tile", odds }];
@@ -37,16 +39,16 @@ describe("rowCounts follows the prd.md table", () => {
   });
 });
 
-describe("isReachable", () => {
-  const item = (category: Item["category"]) => ({ id: "x", category }) as Item;
-
-  it("needs a counting row for most items", () => {
-    expect(isReachable(item("weapon"), new Set())).toBe(false);
-    expect(isReachable(item("weapon"), new Set(["x"]))).toBe(true);
-  });
-
-  it("exempts consumables and none", () => {
-    expect(isReachable(item("consumable"), new Set())).toBe(true);
-    expect(isReachable(item("none"), new Set())).toBe(true);
+describe("countedItems", () => {
+  it("counts an item with no location row everywhere, and others only from a row", () => {
+    const data = indexDatabase(realDatabase);
+    const counted = countedItems(data, {
+      locations: NOWHERE,
+      deadBosses: NOWHERE,
+      bossItemsOnlyFromDeadBosses: true,
+    });
+    const consumable = realDatabase.item.find((row) => row.category === "consumable")?.id;
+    for (const id of [consumable, "none", "none_head"]) expect(counted.has(id ?? "")).toBe(true);
+    expect(counted.has("uchigatana")).toBe(false);
   });
 });

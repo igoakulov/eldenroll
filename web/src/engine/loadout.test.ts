@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Item, LoadoutSlot, PoolSlot } from "./database";
-import { isReachable, isSetReachable, itemsWithACountingRow } from "./eligibility";
+import { countedItems, isSetReachable } from "./eligibility";
 import { indexDatabase, poolKey } from "./engineData";
 import { LOADOUT_ORDER, ashFits, rollLoadout, spellTypeFilter, type Loadout } from "./loadout";
 import { realDatabase } from "./realDatabase.testing";
@@ -30,7 +30,7 @@ function seeded(seed: number): Random {
 }
 
 function counted(regions: readonly string[], dead: readonly string[]): ReadonlySet<string> {
-  return itemsWithACountingRow(data, {
+  return countedItems(data, {
     locations: selectedLocations(realDatabase, new Set(regions)),
     deadBosses: new Set(dead),
     bossItemsOnlyFromDeadBosses: true,
@@ -105,7 +105,7 @@ describe.each(CASES)("every roll on $name", (testCase) => {
           const pool = data.pools.get(poolKey(build, slot));
           expect(pool?.selectors.some((one) => matchesOption(one, option))).toBe(true);
           if (option.kind === "item") {
-            expect(isReachable(option.row, testCase.counted)).toBe(true);
+            expect(testCase.counted.has(option.row.id)).toBe(true);
           }
           expect(option.row.odds).toBeGreaterThan(0);
         }
@@ -279,6 +279,54 @@ describe("armor", () => {
       });
       if (jumpSets.includes(id(loadout, "armor") ?? "")) hits += 1;
     }
+    expect(hits).toBeGreaterThanOrEqual(95);
+  });
+
+  it("makes the Naked Set nearly certain under No armor", () => {
+    const random = seeded(6);
+    let hits = 0;
+    for (let roll = 0; roll < 100; roll += 1) {
+      const loadout = rollLoadout({
+        data,
+        build: "knight",
+        boss: null,
+        counted: CASES[0].counted,
+        limits: { stats: MAXED, maxStatGap: 0 },
+        random,
+        from: "armor",
+        kept: { rule_1: "no_armor" },
+      });
+      if (id(loadout, "armor") === "naked_set") hits += 1;
+    }
+    expect(hits).toBeGreaterThanOrEqual(99);
+  });
+
+  it("dresses Blue Dancer Charm in a light set, unless a rule needs equip load", () => {
+    const random = seeded(7);
+    const light = new Set(
+      data.database.modifier.find((row) => row.id === "blue_dancer_charm_1_boosts_light_sets")
+        ?.target.ids,
+    );
+    const armorWith = (rule: string) =>
+      id(
+        rollLoadout({
+          data,
+          build: "knight",
+          boss: null,
+          counted: CASES[0].counted,
+          limits: { stats: MAXED, maxStatGap: 0 },
+          random,
+          from: "armor",
+          kept: { talisman_1: "blue_dancer_charm", rule_1: rule },
+        }),
+        "armor",
+      ) ?? "";
+    let hits = 0;
+    for (let roll = 0; roll < 100; roll += 1) {
+      if (light.has(armorWith("none"))) hits += 1;
+      expect(light.has(armorWith("overloaded"))).toBe(false);
+    }
+    expect(light.size).toBe(9);
     expect(hits).toBeGreaterThanOrEqual(95);
   });
 });

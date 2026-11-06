@@ -39,6 +39,7 @@ class GateData:
     gaps: tuple[Gap, ...]
     override_items: Mapping[str, frozenset[str]]
     dropped: tuple[DroppedValue, ...]
+    found_nowhere: frozenset[str]
 
 
 def load_gate_data(root: Path) -> GateData:
@@ -72,4 +73,5 @@ def load_gate_data(root: Path) -> GateData:
         gaps=load_gaps(root / "data" / "gaps.csv"),
         override_items=load_overrides(overrides),
         dropped=tuple(dropped_values(load_placement_sources(root, sources))),
+        found_nowhere=placement.found_nowhere,
     )

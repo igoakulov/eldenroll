@@ -86,9 +86,9 @@ def _bosses_of(data: PlacementData, name: str, category: str | None = None) -> s
 
 def test_every_item_but_consumables_has_a_row(data: PlacementData) -> None:
     placed = {row.item_id for row in item_locations(data.placements)}
-    wanted = {item.id for item in data.table if needs_location(item)}
+    wanted = {item.id for item in data.table if needs_location(item, data.found_nowhere)}
 
-    assert len(wanted) == 1435
+    assert len(wanted) == 1436
     assert wanted - placed == set()
 
 
@@ -290,6 +290,9 @@ def test_named_placements_hold(data: PlacementData) -> None:
     assert _places(data, "Guardian Garb (Full Bloom)") == {"leyndell"}
     assert _places(data, "Mushroom Crown") == {"lakeofrot"}
     assert _places(data, "White Mask") == {"mohgwyn"}
+    assert _places(data, "Finger Robe (High Priest Robe, Altered)") == _places(
+        data, "High Priest Robe"
+    )
 
 
 def test_every_tool_is_placed(data: PlacementData) -> None:
@@ -324,16 +327,27 @@ def test_every_armor_set_can_roll_under_some_selection(data: PlacementData) -> N
         rows, set(regions) - {ASHEN_CAPITAL}, dead, bosses, data.region_of_location
     )
 
-    reachable = {*eligible_sets(data.armor_sets, with_ashen)}
-    reachable |= {*eligible_sets(data.armor_sets, without)}
+    placed = {row.item_id for row in rows}
+    reachable = {*eligible_sets(data.armor_sets, with_ashen, placed)}
+    reachable |= {*eligible_sets(data.armor_sets, without, placed)}
     assert reachable == set(data.armor_sets)
 
 
 def test_a_set_with_an_unreachable_piece_is_filtered(data: PlacementData) -> None:
     mushroom = next(row for row in data.armor_sets if row.name == "Mushroom Set")
 
-    assert mushroom not in eligible_sets([mushroom], set(mushroom.pieces[1:]))
-    assert mushroom in eligible_sets([mushroom], set(mushroom.pieces))
+    placed = set(mushroom.pieces)
+
+    assert mushroom not in eligible_sets([mushroom], set(mushroom.pieces[1:]), placed)
+    assert mushroom in eligible_sets([mushroom], set(mushroom.pieces), placed)
+
+
+def test_a_piece_found_nowhere_counts_everywhere(data: PlacementData) -> None:
+    naked = next(row for row in data.armor_sets if row.name == "Naked Set")
+    placed = {row.item_id for row in item_locations(data.placements)}
+
+    assert set(naked.pieces) == data.found_nowhere
+    assert naked in eligible_sets([naked], set(), placed)
 
 
 BOSSES = {

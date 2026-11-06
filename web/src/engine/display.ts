@@ -53,6 +53,10 @@ function shown(data: EngineData, slots: RolledSlots, slot: PoolSlot): SlotDispla
   }
   const item = data.items.get(id);
   if (item === undefined || item.category === "none") return NONE;
+  return itemShown(data, item);
+}
+
+function itemShown(data: EngineData, item: Item): SlotDisplay {
   const label = item.alias === null ? undefined : data.aliasLabels.get(item.alias);
   return label === undefined ? { kind: "item", item } : { kind: "alias", label, item };
 }
@@ -74,7 +78,7 @@ function armor(data: EngineData, slots: RolledSlots): SlotDisplay {
   for (const pieceId of set.pieces) {
     const item = data.items.get(pieceId);
     const slot = ARMOR_PIECES.find((piece) => piece === item?.subcategory);
-    if (item !== undefined && slot !== undefined) pieces[slot] = { kind: "item", item };
+    if (item !== undefined && slot !== undefined) pieces[slot] = itemShown(data, item);
   }
   return { kind: "armor_set", set, pieces };
 }

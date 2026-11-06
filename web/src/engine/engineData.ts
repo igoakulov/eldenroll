@@ -19,6 +19,8 @@ export interface EngineData {
   readonly bosses: ReadonlyMap<string, BossInstance>;
   readonly pools: ReadonlyMap<string, SlotPool>;
   readonly ashFits: ReadonlyMap<string, readonly AshCompatibility[]>;
+  /** Items with no location row. */
+  readonly foundEverywhere: ReadonlySet<string>;
 }
 
 export function poolKey(build: string, slot: PoolSlot): string {
@@ -30,8 +32,10 @@ export function indexDatabase(database: Database): EngineData {
   for (const row of database.ash_compatibility) {
     ashFits.set(row.ash_id, [...(ashFits.get(row.ash_id) ?? []), row]);
   }
+  const placed = new Set(database.item_location.map((row) => row.item_id));
   return {
     ashFits,
+    foundEverywhere: new Set(database.item.filter((row) => !placed.has(row.id)).map((row) => row.id)),
     database,
     items: new Map(database.item.map((row) => [row.id, row])),
     rules: new Map(database.combat_rule.map((row) => [row.id, row])),

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import cast
 
 from eldenrando.build.aliases import assign_aliases
-from eldenrando.build.armor import build_armor
+from eldenrando.build.armor import added_armor, build_armor
 from eldenrando.build.ash_compatibility import build_ash_compatibility
 from eldenrando.build.ashes import build_ashes
 from eldenrando.build.consumables import build_consumables
@@ -24,6 +24,7 @@ from eldenrando.build.spells import build_incantations, build_sorceries
 from eldenrando.build.talismans import build_talismans
 from eldenrando.build.tools import build_tools
 from eldenrando.build.weapons import build_weapons
+from eldenrando.loaders.added_armor import load_added_armor
 from eldenrando.loaders.added_items import load_added_items
 from eldenrando.loaders.aliases import load_aliases
 from eldenrando.loaders.armor_sets import load_armor_sets
@@ -385,6 +386,7 @@ def load_sources(root: Path) -> GapSources:
                 variants,
                 load_armor_slots(overrides / "armor_slots.csv"),
             ),
+            *added_armor(load_added_armor(overrides / "added_armor.csv")),
             *build_talismans(catalog),
             *build_ashes(catalog, variants, ash_sources),
             *build_sorceries(catalog, variants),

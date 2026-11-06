@@ -67,7 +67,7 @@ def structure_problems(data: GateData) -> tuple[str, ...]:
         *_ash_rows(database),
         *_region_levels(database),
         *_bosses(data),
-        *_placement(database),
+        *_placement(database, data.found_nowhere),
         *_armor_sets(database),
         *_aliases(database),
         *_modifier_values(database.modifiers),
@@ -282,7 +282,7 @@ def _bosses(data: GateData) -> Iterator[str]:
         yield f"bosses repeat a name and label: {', '.join(repeated)}"
 
 
-def _placement(database: Database) -> Iterator[str]:
+def _placement(database: Database, found_nowhere: frozenset[str]) -> Iterator[str]:
     items = {row.id: row for row in database.items}
     locations = {row.id for row in database.locations}
     bosses = {row.id for row in database.bosses}
@@ -297,12 +297,16 @@ def _placement(database: Database) -> Iterator[str]:
             yield f"{row.item_id} has a row at no boss: {row.boss_instance_id}"
     exempt = {"consumable", "none"}
     missing = sorted(
-        row.id for row in database.items if row.category not in exempt and row.id not in placed
+        row.id
+        for row in database.items
+        if row.category not in exempt and row.id not in found_nowhere and row.id not in placed
     )
     if missing:
         yield f"no location row: {', '.join(missing)}"
     extra = sorted(
-        row.id for row in database.items if row.category in exempt and row.id in placed
+        row.id
+        for row in database.items
+        if (row.category in exempt or row.id in found_nowhere) and row.id in placed
     )
     if extra:
         yield f"location rows on what has none by design: {', '.join(extra)}"

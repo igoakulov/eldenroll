@@ -59,6 +59,19 @@ describe("displaySlots", () => {
     expect(displaySlots(data, { armor: null }).armor).toEqual({ kind: "none" });
   });
 
+  it("shows a None piece by its alias, unlike a slot the set lacks", () => {
+    const none = { kind: "alias", label: "None" };
+    expect(displaySlots(data, { armor: "naked_set" }).armor).toMatchObject({
+      pieces: { head: none, body: none, arms: none, legs: none },
+    });
+    expect(displaySlots(data, { armor: "fell_omen_set" }).armor).toMatchObject({
+      pieces: { head: none, body: { kind: "item" }, arms: none },
+    });
+    expect(displaySlots(data, { armor: "infected_fell_omen_set" }).armor).toMatchObject({
+      pieces: { head: { kind: "item" }, arms: { kind: "any" } },
+    });
+  });
+
   it("always shows talismans 3 and 4 as any", () => {
     const shown = displaySlots(data, {});
     expect(shown.talisman_3).toEqual({ kind: "any" });

@@ -9,3 +9,4 @@ any_scorpion_charm,Any Scorpion Charm,item:magic_scorpion_charm lightning_scorpi
 any_scarseal_soreseal,Any Scarseal / Soreseal,item:radagons_soreseal marikas_soreseal radagons_scarseal marikas_scarseal
 any_pots_perfumes,Any pots / perfumes,subcategory:pots perfumes
 other_throwables_not_pots_perfumes,Other throwables (not pots / perfumes),subcategory:throwables
+none,None,item:none_head none_body none_arms none_legs

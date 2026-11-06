@@ -17,7 +17,7 @@ parry_only,Parry only,Every attack must be a parry. No other attack input is all
 no_ripostes,No ripostes,"Never riposte the boss, even when its stance breaks.",1
 no_lock_on,No lock-on,Never lock on to the boss.,1
 no_healing_flasks,No healing flasks,"Do not drink Flasks of Crimson Tears. Healing items, healing spells and blocking are allowed.",1
-no_armor,No armor,Fight with no armor on. The rolled armor set stays on the card; ignore it.,1
+no_armor,No armor,Fight with no armor on.,1
 no_talismans,No talismans,Fight with no talismans on. The rolled talismans stay on the card; ignore them.,1
 no_rolling,No rolling,Never roll. Backsteps and jumps are allowed.,1
 heavy_rolling,Heavy rolling,"Keep your equip load at 70% or more but under 100%, so every roll is a heavy roll.",1

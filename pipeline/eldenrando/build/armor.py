@@ -37,3 +37,7 @@ def build_armor(
         for name in names
         if not name.endswith(_ALTERED_SUFFIX) or name in kept
     )
+
+
+def added_armor(rows: Mapping[str, tuple[str, str]]) -> tuple[Item, ...]:
+    return tuple(new_item(piece, "armor", subcategory=slot) for piece, (slot, _) in rows.items())

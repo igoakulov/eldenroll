@@ -168,7 +168,7 @@ def test_blue_dancer_charm_makes_no_armor_strong(
     modifiers: tuple[Modifier, ...], slot: str
 ) -> None:
     condition = RolledCondition(slot, Selector("item", ("blue_dancer_charm",)))
-    rows = [row for row in modifiers if row.when == (condition,)]
+    rows = [row for row in modifiers if row.when == (condition,) and row.target.kind == "rule"]
     assert [(row.target, row.value) for row in rows] == [(Selector("rule", ("no_armor",)), 10)]
 
 

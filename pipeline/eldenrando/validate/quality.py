@@ -20,7 +20,7 @@ from eldenrando.validate.gate_data import GateData
 POOL_COUNTS: Final[Mapping[str, int]] = {
     "weapon": 409,
     "shield": 78,
-    "armor": 634,
+    "armor": 639,
     "talisman": 41,
     "ash": 111,
     "sorcery": 67,

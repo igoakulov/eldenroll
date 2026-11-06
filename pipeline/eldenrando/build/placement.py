@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from eldenrando.build.bosses import BOSS_TAG, DLC_TAG
 from eldenrando.build.location_labels import NON_PLACE_LABELS
@@ -112,6 +112,28 @@ def build_placements(sources: PlacementSources) -> tuple[Placement, ...]:
     placements = [*_slot_placements(sources), *_drop_placements(sources)]
     placements.extend(_ash_placements(sources, placements))
     return tuple(dict.fromkeys(placements))
+
+
+def copied_placements(
+    placements: Sequence[Placement],
+    added: Mapping[str, tuple[str, str]],
+    table: Iterable[Item],
+) -> tuple[Placement, ...]:
+    ids = {row.name: row.id for row in table if row.category == "armor"}
+    copies = {piece: copied for piece, (_, copied) in added.items() if copied}
+    unknown = sorted(copied for copied in copies.values() if copied not in ids)
+    if unknown:
+        raise BuildError(f"added_armor copies no armor piece: {', '.join(unknown)}")
+    out: list[Placement] = []
+    for piece, copied in copies.items():
+        found = [p for p in placements if p.row.item_id == ids[copied]]
+        if not found:
+            raise BuildError(f"added_armor: {copied} is found nowhere, so {piece} would be too")
+        out.extend(
+            Placement(row=replace(p.row, item_id=ids[piece]), source_name=p.source_name)
+            for p in found
+        )
+    return (*placements, *out)
 
 
 def item_locations(placements: Iterable[Placement]) -> tuple[ItemLocation, ...]:

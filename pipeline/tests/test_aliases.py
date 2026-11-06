@@ -45,6 +45,7 @@ def test_the_labels_match_the_prd() -> None:
         "Any Scarseal / Soreseal",
         "Any pots / perfumes",
         "Other throwables (not pots / perfumes)",
+        "None",
     ]
 
 
@@ -58,6 +59,7 @@ def test_member_counts(table: tuple[Item, ...]) -> None:
         "any_crucible_talisman": 5,
         "any_scorpion_charm": 4,
         "any_scarseal_soreseal": 4,
+        "none": 4,
         "any_pots_perfumes": 50 + 6,
         "other_throwables_not_pots_perfumes": 25,
     }

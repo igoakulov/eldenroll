@@ -13,8 +13,10 @@ from eldenrando.build.placement import (
     Placement,
     PlacementSources,
     build_placements,
+    copied_placements,
     merged_labels,
 )
+from eldenrando.loaders.added_armor import load_added_armor
 from eldenrando.loaders.armor_sets import load_armor_sets
 from eldenrando.loaders.boss_links import (
     load_armor_shop_bosses,
@@ -45,11 +47,14 @@ class PlacementData:
     regions: tuple[Region, ...]
     region_of_location: Mapping[str, str]
     armor_sets: tuple[ArmorSet, ...]
+    found_nowhere: frozenset[str]
 
 
-def needs_location(item: Item) -> bool:
-    """Return whether an item must have a row: every one but consumables and `none`."""
-    return item.category not in ("consumable", "none")
+def needs_location(item: Item, found_nowhere: Collection[str]) -> bool:
+    """Return whether an item must have a row: every one but consumables, `none` and the pieces
+    `added_armor.csv` places nowhere.
+    """
+    return item.category not in ("consumable", "none") and item.id not in found_nowhere
 
 
 def selected_locations(
@@ -95,9 +100,17 @@ def eligible_items(
     return frozenset(row.item_id for row in rows if row_counts(row, locations, dead, bosses))
 
 
-def eligible_sets(sets: Iterable[ArmorSet], items: Collection[str]) -> tuple[ArmorSet, ...]:
-    """Return the sets whose every piece is reachable; a set short a piece is not filtered."""
-    return tuple(row for row in sets if all(piece in items for piece in row.pieces))
+def eligible_sets(
+    sets: Iterable[ArmorSet], items: Collection[str], placed: Collection[str]
+) -> tuple[ArmorSet, ...]:
+    """Return the sets whose every piece is reachable; a set short a piece is not filtered, and a
+    piece with no row is found everywhere.
+    """
+    return tuple(
+        row
+        for row in sets
+        if all(piece in items or piece not in placed for piece in row.pieces)
+    )
 
 
 def load_placement_sources(root: Path, loaded: GapSources) -> PlacementSources:
@@ -125,7 +138,9 @@ def load_placement_data(root: Path, sources: GapSources | None = None) -> Placem
     placement_sources = load_placement_sources(root, loaded)
     bosses = tuple(placement_sources.bosses)
     regions = load_regions(overrides / "regions.csv")
-    placements = build_placements(placement_sources)
+    added = load_added_armor(overrides / "added_armor.csv")
+    placements = copied_placements(build_placements(placement_sources), added, loaded.table)
+    nowhere = {piece for piece, (_, copied) in added.items() if not copied}
     return PlacementData(
         table=loaded.table,
         placements=placements,
@@ -137,5 +152,8 @@ def load_placement_data(root: Path, sources: GapSources | None = None) -> Placem
         armor_sets=assign_armor_set_odds(
             build_armor_sets(load_armor_sets(overrides / "armor_sets.csv"), loaded.table),
             load_odds(overrides / "armor_set_odds.csv", "armor_set"),
+        ),
+        found_nowhere=frozenset(
+            row.id for row in loaded.table if row.category == "armor" and row.name in nowhere
         ),
     )

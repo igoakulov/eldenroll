@@ -28,11 +28,11 @@ LEFT_OUT = {
     },
     "Gravebird Set": {"Gravebird Armor"},
     "Commoner's Set": {"Commoner's Garb"},
-    "Guardian Set": {"Guardian Garb"},
+    "Guardian Set": {"Guardian Garb (Full Bloom)"},
     "Hoslow's Set": {"Diallos's Mask"},
     "Noble's Traveling Set": {"Crimson Hood"},
     "Preceptor's Set": {"Mask of Confidence"},
-    "Mushroom Set": {"Mushroom Head"},
+    "Mushroom Set": {"Mushroom Crown"},
     # The altered form of High Priest Robe, so not a piece (data.md 4.3).
     "High Priest Set": {"Finger Robe"},
 }
@@ -96,6 +96,16 @@ OFF_PAGE = {
 }
 
 
+# The owner's changes to the page's sets (tasklist 2.6.3): Blue Dancer Charm keeps these empty slots
+# empty, and the Traveler's Set gains White Mask and a name for it.
+EMPTIED = {
+    "Bloodsoaked Set": {"None (Legs)"},
+    "Festive Set": {"None (Arms)", "None (Legs)"},
+    "Blue Festive Set": {"None (Arms)", "None (Legs)"},
+}
+RENAMED = {"Traveler's Set": ("Traveling Surgeon Set", {"White Mask"})}
+
+
 def _page_sets() -> dict[str, set[str]]:
     """Return the page's sets, with `(Altered)` removed and `Chain Gauntlets` under its name."""
     out: dict[str, set[str]] = {}
@@ -116,18 +126,19 @@ def sets() -> dict[str, tuple[str, ...]]:
 
 
 def test_every_set_of_the_page_has_its_pieces(sets: dict[str, tuple[str, ...]]) -> None:
-    expected = {name: pieces - LEFT_OUT.get(name, set()) for name, pieces in _page_sets().items()}
-    del expected["Highland Warrior Set"]
-    assert {name: set(pieces) for name, pieces in sets.items()} == {
-        **expected,
-        **HIGHLAND,
-        **SPLIT,
-        **OFF_PAGE,
+    expected = {
+        name: pieces - LEFT_OUT.get(name, set()) | EMPTIED.get(name, set())
+        for name, pieces in _page_sets().items()
     }
+    del expected["Highland Warrior Set"]
+    for old, (new, added) in RENAMED.items():
+        expected[new] = expected.pop(old) | added
+    expected |= HIGHLAND | SPLIT | OFF_PAGE
+    assert {name: set(sets.get(name, ())) for name in expected} == expected
 
 
 def test_the_highland_warrior_set_is_split_in_two(sets: dict[str, tuple[str, ...]]) -> None:
-    assert len(sets) == 163
+    assert len(sets) == 183
     assert {name: set(sets[name]) for name in HIGHLAND} == HIGHLAND
 
 

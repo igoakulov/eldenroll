@@ -1,5 +1,5 @@
 import type { LoadoutSlot, Modifier } from "./database";
-import { isReachable, isSetReachable } from "./eligibility";
+import { isSetReachable } from "./eligibility";
 import { poolKey, type EngineData } from "./engineData";
 import { activeModifiers, type RollState } from "./modifiers";
 import { pickWeighted } from "./random";
@@ -113,7 +113,7 @@ export function slotOptions(data: EngineData, build: string, slot: LoadoutSlot):
 type Verdict = "keep" | "rule" | Exclude<keyof Removed, "byModifier">;
 
 function reachable(option: Option, counted: ReadonlySet<string>): boolean {
-  if (option.kind === "item") return isReachable(option.row, counted);
+  if (option.kind === "item") return counted.has(option.row.id);
   if (option.kind === "armor_set") return isSetReachable(option.row, counted);
   return true;
 }

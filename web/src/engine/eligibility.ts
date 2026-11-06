@@ -1,4 +1,4 @@
-import type { ArmorSet, BossInstance, Item, ItemLocation } from "./database";
+import type { ArmorSet, BossInstance, ItemLocation } from "./database";
 import type { EngineData } from "./engineData";
 
 export interface Reachability {
@@ -22,20 +22,14 @@ export function rowCounts(
   return locations.has(boss.location_id);
 }
 
-export function itemsWithACountingRow(
-  data: EngineData,
-  reachability: Reachability,
-): ReadonlySet<string> {
-  return new Set(
-    data.database.item_location
+/** An item with no row at all is found everywhere: a consumable, `none` or a `None` armor piece. */
+export function countedItems(data: EngineData, reachability: Reachability): ReadonlySet<string> {
+  return new Set([
+    ...data.foundEverywhere,
+    ...data.database.item_location
       .filter((row) => rowCounts(row, data.bosses, reachability))
       .map((row) => row.item_id),
-  );
-}
-
-/** Consumables name a family and `none` is no place, so neither has rows to count. */
-export function isReachable(item: Item, counted: ReadonlySet<string>): boolean {
-  return item.category === "consumable" || item.category === "none" || counted.has(item.id);
+  ]);
 }
 
 /** A set the data leaves short of a piece is not filtered; the missing slot shows `any`. */

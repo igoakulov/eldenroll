@@ -1,6 +1,6 @@
 import type { LoadoutSlot } from "./database";
 import type { RolledSlots } from "./display";
-import { itemsWithACountingRow } from "./eligibility";
+import { countedItems } from "./eligibility";
 import type { EngineData } from "./engineData";
 import type { Hyperparams } from "./hyperparams";
 import { LOADOUT_ORDER, rollLoadout } from "./loadout";
@@ -112,7 +112,7 @@ function deadSet(run: Run): ReadonlySet<string> {
 
 /** `asIfDead` only changes which boss rows count; the map still follows who is really dead. */
 function counted(engine: Engine, run: Run, asIfDead?: ReadonlySet<string>): ReadonlySet<string> {
-  return itemsWithACountingRow(engine.data, {
+  return countedItems(engine.data, {
     locations: selectedLocations(engine.data.database, new Set(run.regions), deadSet(run)),
     deadBosses: asIfDead ?? deadSet(run),
     bossItemsOnlyFromDeadBosses: run.settings.bossItemsOnlyFromDeadBosses,

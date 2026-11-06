@@ -71,12 +71,15 @@ Bloodhound Knight Set,Bloodhound Knight Greaves,listed in this set on the wiki's
 Bloodsoaked Set,Bloodsoaked Mask,listed in this set on the wiki's Armor Sets page,agent
 Bloodsoaked Set,Official's Attire,listed in this set on the wiki's Armor Sets page,agent
 Bloodsoaked Set,Bloodsoaked Manchettes,listed in this set on the wiki's Armor Sets page,agent
+Bloodsoaked Set,None (Legs),"light enough for Blue Dancer Charm, so its empty slot stays empty",owner
 Blue Cloth Set,Blue Cloth Cowl,listed in this set on the wiki's Armor Sets page,agent
 Blue Cloth Set,Blue Cloth Vest,listed in this set on the wiki's Armor Sets page,agent
 Blue Cloth Set,Warrior Gauntlets,listed in this set on the wiki's Armor Sets page,agent
 Blue Cloth Set,Warrior Greaves,listed in this set on the wiki's Armor Sets page,agent
 Blue Festive Set,Blue Festive Hood,listed in this set on the wiki's Armor Sets page,agent
 Blue Festive Set,Blue Festive Garb,listed in this set on the wiki's Armor Sets page,agent
+Blue Festive Set,None (Arms),"light enough for Blue Dancer Charm, so its empty slot stays empty",owner
+Blue Festive Set,None (Legs),"light enough for Blue Dancer Charm, so its empty slot stays empty",owner
 Blue Silver Set,Blue Silver Mail Hood,listed in this set on the wiki's Armor Sets page,agent
 Blue Silver Set,Blue Silver Mail Armor,listed in this set on the wiki's Armor Sets page,agent
 Blue Silver Set,Blue Silver Bracelets,listed in this set on the wiki's Armor Sets page,agent
@@ -178,6 +181,8 @@ Exile Set,Exile Gauntlets,listed in this set on the wiki's Armor Sets page,agent
 Exile Set,Exile Greaves,listed in this set on the wiki's Armor Sets page,agent
 Festive Set,Festive Hood,listed in this set on the wiki's Armor Sets page,agent
 Festive Set,Festive Garb,listed in this set on the wiki's Armor Sets page,agent
+Festive Set,None (Arms),"light enough for Blue Dancer Charm, so its empty slot stays empty",owner
+Festive Set,None (Legs),"light enough for Blue Dancer Charm, so its empty slot stays empty",owner
 Fia's Set,Fia's Hood,listed in this set on the wiki's Armor Sets page,agent
 Fia's Set,Fia's Robe,listed in this set on the wiki's Armor Sets page,agent
 Finger Maiden Set,Finger Maiden Fillet,listed in this set on the wiki's Armor Sets page,agent
@@ -247,7 +252,7 @@ Gravebird Set,Gravebird's Blackquill Armor,"owner's pick of the page's 2 chests:
 Gravebird Set,Gravebird Bracelets,listed in this set on the wiki's Armor Sets page,agent
 Gravebird Set,Gravebird Anklets,listed in this set on the wiki's Armor Sets page,agent
 Guardian Set,Guardian Mask,listed in this set on the wiki's Armor Sets page,agent
-Guardian Set,Guardian Garb (Full Bloom),owner's pick of the page's 2 chests: its extra healing,owner
+Guardian Set,Guardian Garb,owner's pick of the page's 2 chests: Full Bloom goes to the Infected Guardian Set,owner
 Guardian Set,Guardian Bracers,listed in this set on the wiki's Armor Sets page,agent
 Guardian Set,Guardian Greaves,listed in this set on the wiki's Armor Sets page,agent
 Guilty Set,Guilty Hood,listed in this set on the wiki's Armor Sets page,agent
@@ -383,7 +388,7 @@ Messmer's Set,Messmer's Helm,listed in this set on the wiki's Armor Sets page,ag
 Messmer's Set,Messmer's Armor,listed in this set on the wiki's Armor Sets page,agent
 Messmer's Set,Messmer's Gauntlets,listed in this set on the wiki's Armor Sets page,agent
 Messmer's Set,Messmer's Greaves,listed in this set on the wiki's Armor Sets page,agent
-Mushroom Set,Mushroom Crown,owner's pick of the page's 2 heads: rot and poison synergies need it,owner
+Mushroom Set,Mushroom Head,owner's pick of the page's 2 heads: Mushroom Crown goes to the Mutated Mushroom Set,owner
 Mushroom Set,Mushroom Body,listed in this set on the wiki's Armor Sets page,agent
 Mushroom Set,Mushroom Arms,listed in this set on the wiki's Armor Sets page,agent
 Mushroom Set,Mushroom Legs,listed in this set on the wiki's Armor Sets page,agent
@@ -555,9 +560,10 @@ Thiollier's Set,Thiollier's Mask,listed in this set on the wiki's Armor Sets pag
 Thiollier's Set,Thiollier's Garb,listed in this set on the wiki's Armor Sets page,agent
 Thiollier's Set,Thiollier's Gloves,listed in this set on the wiki's Armor Sets page,agent
 Thiollier's Set,Thiollier's Trousers,listed in this set on the wiki's Armor Sets page,agent
-Traveler's Set,Traveler's Clothes,listed in this set on the wiki's Armor Sets page,agent
-Traveler's Set,Traveler's Manchettes,listed in this set on the wiki's Armor Sets page,agent
-Traveler's Set,Traveler's Boots,listed in this set on the wiki's Armor Sets page,agent
+Traveling Surgeon Set,White Mask,"owner's White Mask variant of the Traveler's Set, which it replaces",owner
+Traveling Surgeon Set,Traveler's Clothes,listed in this set on the wiki's Armor Sets page,agent
+Traveling Surgeon Set,Traveler's Manchettes,listed in this set on the wiki's Armor Sets page,agent
+Traveling Surgeon Set,Traveler's Boots,listed in this set on the wiki's Armor Sets page,agent
 Traveling Maiden Set,Traveling Maiden Hood,listed in this set on the wiki's Armor Sets page,agent
 Traveling Maiden Set,Traveling Maiden Robe,listed in this set on the wiki's Armor Sets page,agent
 Traveling Maiden Set,Traveling Maiden Gloves,listed in this set on the wiki's Armor Sets page,agent
@@ -610,3 +616,77 @@ Leontiel's Set,Leontiel's Hat,not on the wiki's Armor Sets page; owner named thi
 Leontiel's Set,Leontiel's Armor,not on the wiki's Armor Sets page; owner named this set,owner
 Leontiel's Set,Leontiel's Leather Gloves,not on the wiki's Armor Sets page; owner named this set,owner
 Leontiel's Set,Leontiel's Boots,not on the wiki's Armor Sets page; owner named this set,owner
+Leda's Knight Set,Greathelm,owner's custom set,owner
+Leda's Knight Set,Leda's Armor,owner's custom set,owner
+Leda's Knight Set,Gauntlets of Solitude,owner's custom set,owner
+Leda's Knight Set,Greaves of Solitude,owner's custom set,owner
+Leda's Surgeon Set,White Mask,owner's White Mask variant of Leda's Knight Set,owner
+Leda's Surgeon Set,Leda's Armor,owner's White Mask variant of Leda's Knight Set,owner
+Leda's Surgeon Set,Gauntlets of Solitude,owner's White Mask variant of Leda's Knight Set,owner
+Leda's Surgeon Set,Greaves of Solitude,owner's White Mask variant of Leda's Knight Set,owner
+Hoslow's Surgeon Set,White Mask,owner's White Mask variant of Hoslow's Set,owner
+Hoslow's Surgeon Set,Hoslow's Armor,owner's White Mask variant of Hoslow's Set,owner
+Hoslow's Surgeon Set,Hoslow's Gauntlets,owner's White Mask variant of Hoslow's Set,owner
+Hoslow's Surgeon Set,Hoslow's Greaves,owner's White Mask variant of Hoslow's Set,owner
+Finger Surgeon Set,White Mask,"owner's White Mask variant of the High Priest Set, with the altered robe",owner
+Finger Surgeon Set,"Finger Robe (High Priest Robe, Altered)","owner's White Mask variant of the High Priest Set, with the altered robe",owner
+Finger Surgeon Set,High Priest Gloves,"owner's White Mask variant of the High Priest Set, with the altered robe",owner
+Finger Surgeon Set,High Priest Undergarments,"owner's White Mask variant of the High Priest Set, with the altered robe",owner
+Twinned Surgeon Set,White Mask,owner's White Mask variant of the Twinned Set,owner
+Twinned Surgeon Set,Twinned Armor,owner's White Mask variant of the Twinned Set,owner
+Twinned Surgeon Set,Twinned Gauntlets,owner's White Mask variant of the Twinned Set,owner
+Twinned Surgeon Set,Twinned Greaves,owner's White Mask variant of the Twinned Set,owner
+Snow Surgeon Set,White Mask,owner's White Mask variant of the Snow Witch Set,owner
+Snow Surgeon Set,Snow Witch Robe,owner's White Mask variant of the Snow Witch Set,owner
+Snow Surgeon Set,Snow Witch Skirt,owner's White Mask variant of the Snow Witch Set,owner
+Marais Surgeon Set,White Mask,owner's White Mask variant of the Marais Set,owner
+Marais Surgeon Set,Marais Robe,owner's White Mask variant of the Marais Set,owner
+Blue Surgeon Set,White Mask,owner's White Mask variant of the Blue Cloth Set,owner
+Blue Surgeon Set,Blue Cloth Vest,owner's White Mask variant of the Blue Cloth Set,owner
+Blue Surgeon Set,Warrior Gauntlets,owner's White Mask variant of the Blue Cloth Set,owner
+Blue Surgeon Set,Warrior Greaves,owner's White Mask variant of the Blue Cloth Set,owner
+White Reed Surgeon Set,White Mask,owner's White Mask variant of the White Reed Set,owner
+White Reed Surgeon Set,White Reed Armor,owner's White Mask variant of the White Reed Set,owner
+White Reed Surgeon Set,White Reed Gauntlets,owner's White Mask variant of the White Reed Set,owner
+White Reed Surgeon Set,White Reed Greaves,owner's White Mask variant of the White Reed Set,owner
+Banished Surgeon Set,White Mask,owner's White Mask variant of the Banished Knight Set (Caped),owner
+Banished Surgeon Set,Banished Knight Armor,owner's White Mask variant of the Banished Knight Set (Caped),owner
+Banished Surgeon Set,Banished Knight Gauntlets,owner's White Mask variant of the Banished Knight Set (Caped),owner
+Banished Surgeon Set,Banished Knight Greaves,owner's White Mask variant of the Banished Knight Set (Caped),owner
+Naked Set,None (Head),owner's Blue Dancer set: no armor at all,owner
+Naked Set,None (Body),owner's Blue Dancer set: no armor at all,owner
+Naked Set,None (Arms),owner's Blue Dancer set: no armor at all,owner
+Naked Set,None (Legs),owner's Blue Dancer set: no armor at all,owner
+Fell Omen Set,None (Head),owner's Blue Dancer set: the cloak alone,owner
+Fell Omen Set,Fell Omen Cloak,owner's Blue Dancer set: the cloak alone,owner
+Fell Omen Set,None (Arms),owner's Blue Dancer set: the cloak alone,owner
+Fell Omen Set,None (Legs),owner's Blue Dancer set: the cloak alone,owner
+Guilty Lite Set,None (Head),owner's Blue Dancer set: the Guilty Set without its hood,owner
+Guilty Lite Set,Cloth Garb,owner's Blue Dancer set: the Guilty Set without its hood,owner
+Guilty Lite Set,None (Arms),owner's Blue Dancer set: the Guilty Set without its hood,owner
+Guilty Lite Set,Cloth Trousers,owner's Blue Dancer set: the Guilty Set without its hood,owner
+Prisoner Lite Set,None (Head),owner's Blue Dancer set: the Prisoner Set without its mask,owner
+Prisoner Lite Set,Prisoner Clothing,owner's Blue Dancer set: the Prisoner Set without its mask,owner
+Prisoner Lite Set,None (Arms),owner's Blue Dancer set: the Prisoner Set without its mask,owner
+Prisoner Lite Set,Prisoner Trousers,owner's Blue Dancer set: the Prisoner Set without its mask,owner
+Commoner's Lite Set,None (Head),owner's Blue Dancer set: the Commoner's Set without its headband,owner
+Commoner's Lite Set,Commoner's Simple Garb,owner's Blue Dancer set: the Commoner's Set without its headband,owner
+Commoner's Lite Set,None (Arms),owner's Blue Dancer set: the Commoner's Set without its headband,owner
+Commoner's Lite Set,Commoner's Shoes,owner's Blue Dancer set: the Commoner's Set without its headband,owner
+Mutated Mushroom Set,Mushroom Crown,owner's rot and poison set: the Mushroom Set with Mushroom Crown,owner
+Mutated Mushroom Set,Mushroom Body,owner's rot and poison set: the Mushroom Set with Mushroom Crown,owner
+Mutated Mushroom Set,Mushroom Arms,owner's rot and poison set: the Mushroom Set with Mushroom Crown,owner
+Mutated Mushroom Set,Mushroom Legs,owner's rot and poison set: the Mushroom Set with Mushroom Crown,owner
+Infected Prophet Set,Mushroom Crown,owner's Mushroom Crown variant of the Prophet Set,owner
+Infected Prophet Set,Prophet Robe,owner's Mushroom Crown variant of the Prophet Set,owner
+Infected Prophet Set,Prophet Trousers,owner's Mushroom Crown variant of the Prophet Set,owner
+Infected Fell Omen Set,Mushroom Crown,owner's Mushroom Crown variant of the Fell Omen cloak,owner
+Infected Fell Omen Set,Fell Omen Cloak,owner's Mushroom Crown variant of the Fell Omen cloak,owner
+Infected Cleanrot Set,Mushroom Crown,owner's Mushroom Crown variant of the Cleanrot Set,owner
+Infected Cleanrot Set,Cleanrot Armor,owner's Mushroom Crown variant of the Cleanrot Set,owner
+Infected Cleanrot Set,Cleanrot Gauntlets,owner's Mushroom Crown variant of the Cleanrot Set,owner
+Infected Cleanrot Set,Cleanrot Greaves,owner's Mushroom Crown variant of the Cleanrot Set,owner
+Infected Guardian Set,Mushroom Crown,"owner's Mushroom Crown variant of the Guardian Set, with the Full Bloom chest",owner
+Infected Guardian Set,Guardian Garb (Full Bloom),"owner's Mushroom Crown variant of the Guardian Set, with the Full Bloom chest",owner
+Infected Guardian Set,Guardian Bracers,"owner's Mushroom Crown variant of the Guardian Set, with the Full Bloom chest",owner
+Infected Guardian Set,Guardian Greaves,"owner's Mushroom Crown variant of the Guardian Set, with the Full Bloom chest",owner

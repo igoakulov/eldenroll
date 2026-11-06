@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Database, Item, Modifier, PoolSlot } from "./database";
-import { itemsWithACountingRow } from "./eligibility";
+import { countedItems } from "./eligibility";
 import { indexDatabase, type EngineData } from "./engineData";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
@@ -30,7 +30,7 @@ const ALL_BOSSES = new Set(realDatabase.boss_instance.map((row) => row.id));
 const EVERYTHING = countedFor(ALL_REGIONS, ALL_BOSSES);
 
 function countedFor(regions: ReadonlySet<string>, dead: ReadonlySet<string>): ReadonlySet<string> {
-  return itemsWithACountingRow(real, {
+  return countedItems(real, {
     locations: selectedLocations(realDatabase, regions),
     deadBosses: dead,
     bossItemsOnlyFromDeadBosses: true,

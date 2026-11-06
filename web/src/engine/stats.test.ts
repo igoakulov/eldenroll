@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Item, PoolSlot } from "./database";
-import { itemsWithACountingRow } from "./eligibility";
+import { countedItems } from "./eligibility";
 import { indexDatabase } from "./engineData";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
@@ -11,7 +11,7 @@ import type { RollContext } from "./slotRoll";
 import { lhStatFilter, plainStatFilter, rhStatFilter, statDeficit } from "./stats";
 
 const data = indexDatabase(realDatabase);
-const counted = itemsWithACountingRow(data, {
+const counted = countedItems(data, {
   locations: selectedLocations(
     realDatabase,
     new Set(realDatabase.region.map((row) => row.id).filter((id) => id !== "leyndell_ashen")),

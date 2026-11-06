@@ -44,7 +44,7 @@ def test_every_row_has_a_known_subcategory(sources: GapSources) -> None:
 
 
 def test_every_piece_has_exactly_one_slot(slots: dict[str, str | None]) -> None:
-    assert len(slots) == 634
+    assert len(slots) == 639
     assert set(slots.values()) == set(ARMOR_SLOTS)
 
 
@@ -59,10 +59,11 @@ def test_slots_agree_with_the_game_ids_but_for_two_pieces(slots: dict[str, str |
         variants[str(item_id)].canonical_name if str(item_id) in variants else name: item_id
         for item_id, name in catalog.names["protector"].items()
     }
+    game_ids = {name: by_id.get(name, by_id.get(f"{name} (Altered)")) for name in slots}
     disagree = {
         name
         for name, slot in slots.items()
-        if slot != ID_DIGITS[(by_id.get(name, by_id.get(f"{name} (Altered)", 0)) // 100) % 10]
+        if (game_id := game_ids[name]) is not None and slot != ID_DIGITS[(game_id // 100) % 10]
     }
     assert disagree == ID_MISLEADS
 
@@ -92,7 +93,7 @@ def test_piece_has_its_slot(slots: dict[str, str | None], name: str, slot: str) 
 
 
 def test_slot_counts(slots: dict[str, str | None]) -> None:
-    assert Counter(slots.values()) == {"head": 199, "body": 175, "arms": 123, "legs": 137}
+    assert Counter(slots.values()) == {"head": 200, "body": 177, "arms": 124, "legs": 138}
 
 
 def _piece(name: str) -> Item:
