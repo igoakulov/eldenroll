@@ -28,14 +28,14 @@ ALLOWED_TOGETHER = {
     ("jump_attacks_only", "r1_only"),
     ("jump_attacks_only", "r2_only"),
     ("jump_attacks_only", "l1_only_can_swap_hands"),
-    ("take_riposte", "r1_only"),
+    ("land_a_riposte", "r1_only"),
     ("no_ripostes", "r1_only"),
     ("do_not_get_hit", "no_rolling"),
-    ("do_not_get_hit", "stand_and_complete_3_full_gestures_without_getting_hit"),
+    ("do_not_get_hit", "gesture_3x_without_getting_hit"),
     ("no_healing_flasks", "overloaded"),
-    ("no_healing_flasks", "ruptured_crystal_tear"),
+    ("no_healing_flasks", "drink_ruptured_crystal_tear"),
     ("no_talismans", "heavy_rolling"),
-    ("no_rolling", "dodge_an_attack_with_duck_jump"),
+    ("no_rolling", "dodge_1x_with_crouch_or_jump"),
 }
 # Each pair is contradictory, or one rule is a harder version of the other, or voids it.
 EXCLUDED = {
@@ -43,13 +43,13 @@ EXCLUDED = {
     ("r1_only", "rolling_crouch_attacks_only"),
     ("r2_only", "charged_r2_only"),
     ("l1_only_can_swap_hands", "r1_only"),
-    ("l2_spam", "parry_only"),
+    ("l2_only", "parry_only"),
     ("jump_attacks_only", "rolling_crouch_attacks_only"),
     ("jump_attacks_only", "charged_r2_only"),
-    ("parry_only", "take_riposte"),
+    ("parry_only", "land_a_riposte"),
     ("parry_only", "no_ripostes"),
     ("parry_only", "r1_only"),
-    ("take_riposte", "no_ripostes"),
+    ("land_a_riposte", "no_ripostes"),
     ("no_ripostes", "r2_only"),
     ("no_rolling", "heavy_rolling"),
     ("no_rolling", "overloaded"),
@@ -62,8 +62,8 @@ EXCLUDED = {
     ("do_not_get_hit", "no_healing_flasks"),
     ("do_not_get_hit", "gesture_after_every_flask"),
     ("no_healing_flasks", "gesture_after_every_flask"),
-    ("do_not_get_hit", "ruptured_crystal_tear"),
-    ("stonebarb_cracked_tear", "ruptured_crystal_tear"),
+    ("do_not_get_hit", "drink_ruptured_crystal_tear"),
+    ("drink_stonebarb_cracked_tear", "drink_ruptured_crystal_tear"),
 }
 
 
@@ -248,8 +248,8 @@ def test_a_target_rolled_before_its_condition_fails(data: PlacementData) -> None
     [
         (("claw_talisman",), "rule", ("jump_attacks_only",), 1000000),
         (("claw_talisman",), "armor_set", ("gravebird_set", "raptors_set"), 10000),
-        (("shard_of_alexander", "warrior_jar_shard"), "rule", ("l2_spam",), 1000000),
-        (("axe_talisman",), "rule", ("charged_r2_only", "stonebarb_cracked_tear"), 1000000),
+        (("shard_of_alexander", "warrior_jar_shard"), "rule", ("l2_only",), 1000000),
+        (("axe_talisman",), "rule", ("charged_r2_only", "drink_stonebarb_cracked_tear"), 1000000),
     ],
 )
 def test_talismans_reach_their_targets_from_either_slot(
@@ -358,7 +358,7 @@ def test_requirements_read_the_right_slots(modifiers: tuple[Modifier, ...]) -> N
     assert set(weapon.selector.ids or ()) > MELEE
     assert "bow" not in (weapon.selector.ids or ())
     assert "glintstone_staff" not in (weapon.selector.ids or ())
-    assert rows["l2_spam_not_on_pure_casters"].when == (
+    assert rows["l2_only_not_on_pure_casters"].when == (
         BuildCondition(("sorcerer", "pyromancer")),
     )
 

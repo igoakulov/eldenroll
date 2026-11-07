@@ -99,7 +99,6 @@ export interface AshCompatibility {
 export interface CombatRule {
   readonly id: string;
   readonly name: string;
-  readonly description: string;
   readonly odds: number;
 }
 

@@ -8,7 +8,7 @@ from eldenrando.loaders.schema import LoaderError
 from eldenrando.model.combat_rule import CombatRule
 from eldenrando.normalize.slug import slugify
 
-COLUMNS: tuple[str, ...] = ("id", "name", "description", "odds")
+COLUMNS: tuple[str, ...] = ("id", "name", "odds")
 
 
 def load_combat_rules(path: Path) -> tuple[CombatRule, ...]:
@@ -31,7 +31,6 @@ def load_combat_rules(path: Path) -> tuple[CombatRule, ...]:
             CombatRule(
                 id=rule_id,
                 name=rule_name,
-                description=row[table.column("description")],
                 odds=parse_odds(path, rule_id, row[table.column("odds")]),
             )
         )

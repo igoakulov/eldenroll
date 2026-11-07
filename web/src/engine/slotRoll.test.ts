@@ -114,7 +114,7 @@ describe("a slot the build has no row for", () => {
   it("counts as rolled with nothing, so Parry only leaves the casters", () => {
     const result = pool("sorcerer", "rule_1", { rh: "astrologers_staff", lh: "none" });
     expect(ids(result)).not.toContain("parry_only");
-    expect(ids(result)).not.toContain("l2_spam");
+    expect(ids(result)).not.toContain("l2_only");
   });
 });
 

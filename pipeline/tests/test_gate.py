@@ -188,7 +188,7 @@ def test_off_tier_values_do_not_fail_the_spacing(data: GateData) -> None:
 
 def test_several_top_tiers_are_reported_not_rejected(data: GateData) -> None:
     top = several_top_tiers(data.database.modifiers, data.database.items)
-    assert {"jump_attacks_only", "l2_spam", "charged_r2_only"} <= set(top["rule"])
+    assert {"jump_attacks_only", "l2_only", "charged_r2_only"} <= set(top["rule"])
     assert not any("top" in problem for problem in structure_problems(data))
 
 
@@ -231,7 +231,7 @@ def test_a_modifier_writes_both_kinds_of_condition(data: GateData) -> None:
         "target": {"kind": "item", "ids": ["none"]},
         "value": 4,
     }
-    assert rows["l2_spam_needs_a_skill_not_empty"]["when"] == [
+    assert rows["l2_only_needs_a_skill_not_empty"]["when"] == [
         {
             "kind": "rolled",
             "slot": "rh",

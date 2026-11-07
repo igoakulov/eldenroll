@@ -7,5 +7,4 @@ from dataclasses import dataclass
 class CombatRule:
     id: str
     name: str
-    description: str
     odds: float = 1

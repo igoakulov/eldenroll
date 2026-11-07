@@ -34,7 +34,7 @@ const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number]
   },
   armor_set: { id: true, name: true, pieces: true, odds: true },
   ash_compatibility: { ash_id: true, category: true, subcategory: true },
-  combat_rule: { id: true, name: true, description: true, odds: true },
+  combat_rule: { id: true, name: true, odds: true },
   build: { id: true, name: true, odds: true },
   slot_pool: { build_id: true, slot: true, selectors: true },
   alias: { id: true, label: true },

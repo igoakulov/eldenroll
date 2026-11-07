@@ -30,7 +30,6 @@ AREAS: Final[tuple[str, ...]] = (
     "armor_sets",
     "blue_dancer",
     "rot_poison_triggers",
-    "rule_descriptions",
     "rule_conflicts",
     "aliases",
     "images",
