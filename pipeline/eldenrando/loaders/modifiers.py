@@ -1,6 +1,6 @@
 """`when` holds conditions split by `;`: `rule_1=rule:parry_only` when a slot rolled a match,
-`rh!=subcategory:melee` when it did not, and `build=sorcerer jester` for the rolled build. `target`
-is one selector in the `slot_pools.csv` form.
+`rh!=subcategory:melee` when it did not, and `character_class=sorcerer jester` for the rolled
+character class. `target` is one selector in the `slot_pools.csv` form.
 """
 
 from __future__ import annotations
@@ -8,17 +8,17 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from eldenrando.loaders.builds import parse_selector
+from eldenrando.loaders.character_classes import parse_selector
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.odds import parse_odds
 from eldenrando.loaders.schema import LoaderError
 
-BUILD_SUBJECT = "build"
+CHARACTER_CLASS_SUBJECT = "character_class"
 
 
 @dataclass(frozen=True, slots=True)
 class ConditionRow:
-    """One condition, split but not yet normalized; a build condition has an empty `kind`."""
+    """One condition, split but not yet normalized; a character class condition has no `kind`."""
 
     subject: str
     negated: bool
@@ -65,9 +65,9 @@ def _condition(part: str, where: str) -> ConditionRow:
     subject, equals, rest = part.partition("!=" if negated else "=")
     if not equals:
         raise LoaderError(f"{where}: condition {part!r} has no operator")
-    if subject != BUILD_SUBJECT:
+    if subject != CHARACTER_CLASS_SUBJECT:
         kind, ids = parse_selector(rest, where)
         return ConditionRow(subject, negated, kind, ids)
     if negated:
-        raise LoaderError(f"{where}: condition {part!r} cannot negate a build")
+        raise LoaderError(f"{where}: condition {part!r} cannot negate a character class")
     return ConditionRow(subject, False, "", tuple(rest.split()))

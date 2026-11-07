@@ -14,8 +14,8 @@ from eldenrando.model.item import Category
 from eldenrando.model.selector import SELECTOR_KINDS, Selector, SelectorKind
 from eldenrando.model.vocabulary import (
     ASH_SLOTS,
-    BUILDS,
     CATEGORIES,
+    CHARACTER_CLASSES,
     MELEE,
     SHIELD,
     SLOTS,
@@ -40,7 +40,7 @@ def data() -> PlacementData:
 
 
 def test_vocabulary_counts() -> None:
-    assert len(BUILDS) == 8
+    assert len(CHARACTER_CLASSES) == 8
     assert len(SLOTS) == 10
     assert set(SLOTS) > ASH_SLOTS
     assert len(CATEGORIES) == 10

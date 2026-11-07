@@ -116,7 +116,7 @@ def _unique_ids(database: Database) -> Iterator[str]:
         ("item", tuple((row.id, row.name) for row in database.items)),
         ("armor_set", tuple((row.id, row.name) for row in database.armor_sets)),
         ("combat_rule", tuple((row.id, row.name) for row in database.rules)),
-        ("build", tuple((row.id, row.name) for row in database.builds)),
+        ("character_class", tuple((row.id, row.name) for row in database.character_classes)),
         ("alias", tuple((row.id, row.label) for row in database.aliases)),
         ("modifier", tuple((row.id, row.id) for row in database.modifiers)),
     )
@@ -152,7 +152,7 @@ def _requirements(items: Iterable[Item]) -> Iterator[str]:
 def _odds(database: Database) -> Iterator[str]:
     """Yield what breaks the odds rules: below 0, `None` not at 4, or odds on an armor piece."""
     rows: tuple[tuple[str, float], ...] = (
-        *((f"build {row.id}", row.odds) for row in database.builds),
+        *((f"character class {row.id}", row.odds) for row in database.character_classes),
         *((f"boss {row.id}", row.odds) for row in database.bosses),
         *((f"item {row.id}", row.odds) for row in database.items),
         *((f"rule {row.id}", row.odds) for row in database.rules),

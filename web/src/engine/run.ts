@@ -14,7 +14,7 @@ import {
 } from "./settings";
 import { repeatKey, repetitionMultiplier, type Random } from "./slotRoll";
 import {
-  buildRepeatLine,
+  characterClassRepeatLine,
   pickTrace,
   slotTrace,
   type TraceBlock,
@@ -32,11 +32,11 @@ export interface DeadBoss {
   readonly objectiveIndex: number;
 }
 
-export type RerollTarget = "boss" | "build" | LoadoutSlot;
+export type RerollTarget = "boss" | "character_class" | LoadoutSlot;
 
 export interface Objective {
   readonly boss: string;
-  readonly build: string;
+  readonly characterClass: string;
   readonly slots: RolledSlots;
   readonly upgradedRh: boolean;
   /** Every reroll since the last `Done`, carried across `Reroll objective` and `Reroll items`. */
@@ -75,7 +75,7 @@ export interface Run {
   readonly current: Objective | null;
   readonly waiting: Waiting | null;
   readonly completed: readonly CompletedObjective[];
-  /** How many completed objectives showed each `repeatKey` or `build:` id. */
+  /** How many completed objectives showed each `repeatKey` or `character_class:` id. */
   readonly seen: Readonly<Record<string, number>>;
 }
 
@@ -95,11 +95,11 @@ export type StartResult =
 
 const ALL_DEAD_MESSAGE = "Every boss is already dead";
 
-function buildKey(build: string): string {
-  return `build:${build}`;
+function characterClassKey(characterClass: string): string {
+  return `character_class:${characterClass}`;
 }
 
-const TRACE_ORDER: readonly TraceSlot[] = ["boss", "build", ...LOADOUT_ORDER];
+const TRACE_ORDER: readonly TraceSlot[] = ["boss", "character_class", ...LOADOUT_ORDER];
 
 function traceBefore(trace: readonly TraceBlock[], slot: TraceSlot): readonly TraceBlock[] {
   const limit = TRACE_ORDER.indexOf(slot);
@@ -157,25 +157,25 @@ function rollBoss(
   };
 }
 
-function rollBuild(engine: Engine, run: Run, random: Random, exclude: string | null): Rolled | null {
+function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: string | null): Rolled | null {
   const decay = repetition(engine, run);
-  const rows = engine.data.database.build
-    .filter((row) => run.settings.builds.includes(row.id))
-    .map((row) => ({ value: row, weight: row.odds * repetitionMultiplier(buildKey(row.id), decay) }))
+  const rows = engine.data.database.character_class
+    .filter((row) => run.settings.characterClasses.includes(row.id))
+    .map((row) => ({ value: row, weight: row.odds * repetitionMultiplier(characterClassKey(row.id), decay) }))
     .filter((row) => row.weight > 0);
   const others = rows.filter((row) => row.value.id !== exclude);
   const candidates = others.length > 0 ? others : rows;
   const picked = pickWeighted(candidates, random);
   if (picked === null) return null;
   const total = candidates.reduce((sum, row) => sum + row.weight, 0);
-  const build = picked.value;
+  const characterClass = picked.value;
   return {
-    id: build.id,
-    block: pickTrace("build", {
-      heading: build.name,
+    id: characterClass.id,
+    block: pickTrace("character_class", {
+      heading: characterClass.name,
       pool: candidates.length,
-      odds: build.odds,
-      repeat: buildRepeatLine(build.id, decay),
+      odds: characterClass.odds,
+      repeat: characterClassRepeatLine(characterClass.id, decay),
       probability: picked.weight / total,
     }),
   };
@@ -191,7 +191,7 @@ function rollSlots(
   engine: Engine,
   run: Run,
   random: Random,
-  objective: { boss: string; build: string },
+  objective: { boss: string; characterClass: string },
   from: LoadoutSlot = "rh",
   kept: RolledSlots = {},
   exclude: string | null = null,
@@ -200,7 +200,7 @@ function rollSlots(
   const allDead = new Set(engine.data.database.boss_instance.map((row) => row.id));
   const loadout = rollLoadout({
     data: engine.data,
-    build: objective.build,
+    characterClass: objective.characterClass,
     boss: objective.boss,
     counted: counted(engine, run),
     countedIfBossesDead: counted(engine, run, allDead),
@@ -219,7 +219,7 @@ function rollSlots(
     if (kept[slot] !== undefined) slots[slot] = kept[slot];
   }
   for (const [slot, roll] of loadout) slots[slot] = roll.chosen?.option.row.id ?? null;
-  const rolled = { boss: objective.boss, build: objective.build, slots };
+  const rolled = { boss: objective.boss, characterClass: objective.characterClass, slots };
   const trace = [...loadout].map(([slot, roll]) => slotTrace(engine.data, slot, roll, rolled, decay));
   const rh = loadout.get("rh");
   return { slots, upgradedRh: rh === undefined ? null : rh.upgraded, trace };
@@ -240,20 +240,20 @@ function rollObjective(
   const { random, state } = seededRandom(run.rngState);
   const boss = rollBoss(engine, run, random, excludeBoss);
   if (typeof boss === "string") return stopped(run, boss, state());
-  const build = rollBuild(engine, run, random, null);
-  if (build === null) return { ...run, rngState: state(), current: null, waiting: null };
-  const loadout = rollSlots(engine, run, random, { boss: boss.id, build: build.id });
+  const characterClass = rollCharacterClass(engine, run, random, null);
+  if (characterClass === null) return { ...run, rngState: state(), current: null, waiting: null };
+  const loadout = rollSlots(engine, run, random, { boss: boss.id, characterClass: characterClass.id });
   return {
     ...run,
     rngState: state(),
     waiting: null,
     current: {
       boss: boss.id,
-      build: build.id,
+      characterClass: characterClass.id,
       slots: loadout.slots,
       upgradedRh: loadout.upgradedRh ?? false,
       rerolls,
-      trace: [boss.block, build.block, ...loadout.trace],
+      trace: [boss.block, characterClass.block, ...loadout.trace],
     },
   };
 }
@@ -334,7 +334,7 @@ export function setBossState(engine: Engine, run: Run, boss: string, state: Boss
 }
 
 function seenIn(engine: Engine, objective: Objective): string[] {
-  const keys = [buildKey(objective.build)];
+  const keys = [characterClassKey(objective.characterClass)];
   for (const [slot, id] of Object.entries(objective.slots) as [LoadoutSlot, string | null][]) {
     if (id === null) continue;
     if (slot === "armor") {
@@ -399,21 +399,21 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
   if (target === "boss") return rollObjective(engine, run, rerolls, objective.boss);
 
   const { random, state } = seededRandom(run.rngState);
-  if (target === "build") {
-    const build = rollBuild(engine, run, random, objective.build);
-    const buildId = build?.id ?? objective.build;
-    const loadout = rollSlots(engine, run, random, { boss: objective.boss, build: buildId });
-    const kept = traceBefore(objective.trace, "build");
+  if (target === "character_class") {
+    const characterClass = rollCharacterClass(engine, run, random, objective.characterClass);
+    const characterClassId = characterClass?.id ?? objective.characterClass;
+    const loadout = rollSlots(engine, run, random, { boss: objective.boss, characterClass: characterClassId });
+    const kept = traceBefore(objective.trace, "character_class");
     return {
       ...run,
       rngState: state(),
       current: {
         ...objective,
-        build: buildId,
+        characterClass: characterClassId,
         slots: loadout.slots,
         upgradedRh: loadout.upgradedRh ?? false,
         rerolls,
-        trace: [...kept, ...(build === null ? [] : [build.block]), ...loadout.trace],
+        trace: [...kept, ...(characterClass === null ? [] : [characterClass.block]), ...loadout.trace],
       },
     };
   }

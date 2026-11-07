@@ -14,7 +14,7 @@ from eldenrando.build.slot_pools import build_slot_pools
 from eldenrando.loaders.added_items import load_added_items
 from eldenrando.loaders.aliases import AliasRow, load_aliases
 from eldenrando.loaders.annotations import load_annotations
-from eldenrando.loaders.builds import load_builds, load_slot_pools
+from eldenrando.loaders.character_classes import load_character_classes, load_slot_pools
 from eldenrando.loaders.combat_rules import load_combat_rules
 from eldenrando.loaders.gaps import load_gaps
 from eldenrando.loaders.modifiers import load_modifiers
@@ -57,7 +57,7 @@ def load_gate_data(root: Path) -> GateData:
             armor_sets=placement.armor_sets,
             ash_compatibility=sources.ash_compatibility,
             rules=load_combat_rules(overrides / "combat_rules.csv"),
-            builds=load_builds(overrides / "builds.csv"),
+            character_classes=load_character_classes(overrides / "character_classes.csv"),
             slot_pools=build_slot_pools(load_slot_pools(overrides / "slot_pools.csv")),
             aliases=build_aliases(alias_rows),
             item_locations=item_locations(placement.placements),

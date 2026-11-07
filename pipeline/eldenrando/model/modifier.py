@@ -15,13 +15,13 @@ class RolledCondition:
 
 
 @dataclass(frozen=True, slots=True)
-class BuildCondition:
-    """The rolled build is one of these; builds are a fixed list, so this is no selector."""
+class CharacterClassCondition:
+    """The rolled character class is one of these; they are a fixed list, so this is no selector."""
 
-    builds: tuple[str, ...]
+    character_classes: tuple[str, ...]
 
 
-Condition = RolledCondition | BuildCondition
+Condition = RolledCondition | CharacterClassCondition
 
 
 @dataclass(frozen=True, slots=True)

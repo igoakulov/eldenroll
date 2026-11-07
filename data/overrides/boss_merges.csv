@@ -1,36 +1,36 @@
-label,csv_name,instance,instance_label,reason,reviewer
-"Leyndell, Ashen Capital","Godfrey, First Elden Lord","Godfrey, First Elden Lord",,one fight in two phases,owner
-"Leyndell, Ashen Capital","Godfrey - Hoarah Loux, Warrior","Godfrey, First Elden Lord",,one fight in two phases,owner
-Miquella's Haligtree - Elphael,"Malenia, Blade of Miquella","Malenia, Blade of Miquella",,one fight in two phases,owner
-Miquella's Haligtree - Elphael,"Malenia, Goddess of Rot","Malenia, Blade of Miquella",,one fight in two phases,owner
-Stone Platform,EB - Radagon of the Golden Order,Radagon / Elden Beast,,one fight in two phases,owner
-Stone Platform,EB - Elden Beast,Radagon / Elden Beast,,one fight in two phases,owner
-[DLC] Enir-Ilim,PCR - Promised Consort Radahn,Promised Consort Radahn,,one fight in two phases,owner
-[DLC] Enir-Ilim,"PCR - Radahn, Consort of Miquella",Promised Consort Radahn,,one fight in two phases,owner
-[DLC] Specimen Storehouse - Shadow Tower,Messmer the Impaler,Messmer the Impaler,,one fight in two phases,owner
-[DLC] Specimen Storehouse - Shadow Tower,Messmer - Base Serpent Messmer,Messmer the Impaler,,one fight in two phases,owner
-Crumbling Farum Azula,Beast Clergyman,"Maliketh, the Black Blade",,one fight in two phases,owner
-Crumbling Farum Azula,"Maliketh, The Black Blade","Maliketh, the Black Blade",,one fight in two phases,owner
-Volcano Manor,God-Devouring Serpent,"Rykard, Lord of Blasphemy",,one fight in two phases,owner
-Volcano Manor,"Rykard, Lord of Blasphemy","Rykard, Lord of Blasphemy",,one fight in two phases,owner
-Auriza Hero's Grave,Crucible Knight,Crucible Knight Ordovis,,one duo fight,owner
-Auriza Hero's Grave,Crucible Knight Ordovis,Crucible Knight Ordovis,,one duo fight,owner
-Caelid - Redmane Castle,Crucible Knight,Misbegotten Warrior / Crucible Knight,,one duo fight,owner
-Caelid - Redmane Castle,Misbegotten Warrior,Misbegotten Warrior / Crucible Knight,,one duo fight,owner
-Crumbling Farum Azula,Godskin Apostle,Godskin Duo,,one duo fight,owner
-Crumbling Farum Azula,Godskin Noble,Godskin Duo,,one duo fight,owner
-Spiritcaller Cave,Godskin Apostle,Spiritcaller Snail,,the snail summons both in one fight,owner
-Spiritcaller Cave,Godskin Noble,Spiritcaller Snail,,the snail summons both in one fight,owner
-Spiritcaller Cave,Spiritcaller Snail,Spiritcaller Snail,,the snail summons both in one fight,owner
-"Caelid - West Sellia, Sellia Crystal Tunnel Entrance",Nox Swordstress,Nox Swordstress & Nox Monk,,one duo fight,owner
-"Caelid - West Sellia, Sellia Crystal Tunnel Entrance",Nox Priest,Nox Swordstress & Nox Monk,,one duo fight,owner
-Perfumer's Grotto,Omenkiller,Omenkiller & Miranda the Blighted Bloom,,one duo fight,owner
-Perfumer's Grotto,Miranda Blossom,Omenkiller & Miranda the Blighted Bloom,,one duo fight,owner
-Unsightly Catacombs,Perfumer Tricia,Perfumer Tricia & Misbegotten Warrior,,one duo fight,owner
-Unsightly Catacombs,Misbegotten Warrior,Perfumer Tricia & Misbegotten Warrior,,one duo fight,owner
-[DLC] Scaduview - North Hinterland,Tree Sentinel,Tree Sentinel,Scaduview - Hinterland,"one duo fight that the CSV splits across 2 labels: they can be fought apart, but count as one boss and the runes come once both are dead",owner
-[DLC] Scaduview - South Hinterland,Tree Sentinel,Tree Sentinel,Scaduview - Hinterland,"one duo fight that the CSV splits across 2 labels: they can be fought apart, but count as one boss and the runes come once both are dead",owner
-"Altus Plateau - Abandoned Coffin, Ruin-Strewn Precipice Exit",Ancient Dragon Lansseax,Ancient Dragon Lansseax,"Altus Plateau - Rampartside Path, Altus Tunnel Entrance","she flies away at half health and is finished at Rampartside Path, so only her final location is an instance",owner
-"Altus Plateau - Rampartside Path, Altus Tunnel Entrance",Ancient Dragon Lansseax,Ancient Dragon Lansseax,"Altus Plateau - Rampartside Path, Altus Tunnel Entrance","she flies away at half health and is finished at Rampartside Path, so only her final location is an instance",owner
-"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise",Glintstone Dragon Adula,Glintstone Dragon Adula,Moonlight Altar - Moonfolk Ruins,"she flies away at half health and is finished at Moonlight Altar, so only her final location is an instance",owner
-Moonlight Altar - Moonfolk Ruins,Glintstone Dragon Adula,Glintstone Dragon Adula,Moonlight Altar - Moonfolk Ruins,"she flies away at half health and is finished at Moonlight Altar, so only her final location is an instance",owner
+label,csv_name,instance,instance_label,reason
+"Leyndell, Ashen Capital","Godfrey, First Elden Lord","Godfrey, First Elden Lord",,one fight in two phases
+"Leyndell, Ashen Capital","Godfrey - Hoarah Loux, Warrior","Godfrey, First Elden Lord",,one fight in two phases
+Miquella's Haligtree - Elphael,"Malenia, Blade of Miquella","Malenia, Blade of Miquella",,one fight in two phases
+Miquella's Haligtree - Elphael,"Malenia, Goddess of Rot","Malenia, Blade of Miquella",,one fight in two phases
+Stone Platform,EB - Radagon of the Golden Order,Radagon / Elden Beast,,one fight in two phases
+Stone Platform,EB - Elden Beast,Radagon / Elden Beast,,one fight in two phases
+[DLC] Enir-Ilim,PCR - Promised Consort Radahn,Promised Consort Radahn,,one fight in two phases
+[DLC] Enir-Ilim,"PCR - Radahn, Consort of Miquella",Promised Consort Radahn,,one fight in two phases
+[DLC] Specimen Storehouse - Shadow Tower,Messmer the Impaler,Messmer the Impaler,,one fight in two phases
+[DLC] Specimen Storehouse - Shadow Tower,Messmer - Base Serpent Messmer,Messmer the Impaler,,one fight in two phases
+Crumbling Farum Azula,Beast Clergyman,"Maliketh, the Black Blade",,one fight in two phases
+Crumbling Farum Azula,"Maliketh, The Black Blade","Maliketh, the Black Blade",,one fight in two phases
+Volcano Manor,God-Devouring Serpent,"Rykard, Lord of Blasphemy",,one fight in two phases
+Volcano Manor,"Rykard, Lord of Blasphemy","Rykard, Lord of Blasphemy",,one fight in two phases
+Auriza Hero's Grave,Crucible Knight,Crucible Knight Ordovis,,one duo fight
+Auriza Hero's Grave,Crucible Knight Ordovis,Crucible Knight Ordovis,,one duo fight
+Caelid - Redmane Castle,Crucible Knight,Misbegotten Warrior / Crucible Knight,,one duo fight
+Caelid - Redmane Castle,Misbegotten Warrior,Misbegotten Warrior / Crucible Knight,,one duo fight
+Crumbling Farum Azula,Godskin Apostle,Godskin Duo,,one duo fight
+Crumbling Farum Azula,Godskin Noble,Godskin Duo,,one duo fight
+Spiritcaller Cave,Godskin Apostle,Spiritcaller Snail,,the snail summons both in one fight
+Spiritcaller Cave,Godskin Noble,Spiritcaller Snail,,the snail summons both in one fight
+Spiritcaller Cave,Spiritcaller Snail,Spiritcaller Snail,,the snail summons both in one fight
+"Caelid - West Sellia, Sellia Crystal Tunnel Entrance",Nox Swordstress,Nox Swordstress & Nox Monk,,one duo fight
+"Caelid - West Sellia, Sellia Crystal Tunnel Entrance",Nox Priest,Nox Swordstress & Nox Monk,,one duo fight
+Perfumer's Grotto,Omenkiller,Omenkiller & Miranda the Blighted Bloom,,one duo fight
+Perfumer's Grotto,Miranda Blossom,Omenkiller & Miranda the Blighted Bloom,,one duo fight
+Unsightly Catacombs,Perfumer Tricia,Perfumer Tricia & Misbegotten Warrior,,one duo fight
+Unsightly Catacombs,Misbegotten Warrior,Perfumer Tricia & Misbegotten Warrior,,one duo fight
+[DLC] Scaduview - North Hinterland,Tree Sentinel,Tree Sentinel Duo,Scaduview - Hinterland,"one duo fight that the CSV splits across 2 labels: they can be fought apart, but count as one boss and the runes come once both are dead"
+[DLC] Scaduview - South Hinterland,Tree Sentinel,Tree Sentinel Duo,Scaduview - Hinterland,"one duo fight that the CSV splits across 2 labels: they can be fought apart, but count as one boss and the runes come once both are dead"
+"Altus Plateau - Abandoned Coffin, Ruin-Strewn Precipice Exit",Ancient Dragon Lansseax,Ancient Dragon Lansseax,"Altus Plateau - Rampartside Path, Altus Tunnel Entrance","she flies away at half health and is finished at Rampartside Path, so only her final location is an instance"
+"Altus Plateau - Rampartside Path, Altus Tunnel Entrance",Ancient Dragon Lansseax,Ancient Dragon Lansseax,"Altus Plateau - Rampartside Path, Altus Tunnel Entrance","she flies away at half health and is finished at Rampartside Path, so only her final location is an instance"
+"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise",Glintstone Dragon Adula,Glintstone Dragon Adula,Moonlight Altar - Moonfolk Ruins,"she flies away at half health and is finished at Moonlight Altar, so only her final location is an instance"
+Moonlight Altar - Moonfolk Ruins,Glintstone Dragon Adula,Glintstone Dragon Adula,Moonlight Altar - Moonfolk Ruins,"she flies away at half health and is finished at Moonlight Altar, so only her final location is an instance"

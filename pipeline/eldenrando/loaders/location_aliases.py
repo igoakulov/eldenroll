@@ -13,7 +13,7 @@ from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
 ALIAS_COLUMNS: tuple[str, ...] = ("label", "location_id")
-BOSS_OVERRIDE_COLUMNS: tuple[str, ...] = ("boss", "label", "location_id", "reason", "reviewer")
+BOSS_OVERRIDE_COLUMNS: tuple[str, ...] = ("boss", "label", "location_id", "reason")
 
 
 def load_location_aliases(path: Path, *, location_ids: Collection[str]) -> dict[str, str]:

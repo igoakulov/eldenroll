@@ -25,10 +25,10 @@ def build_weapons(
     catalog: ItemCatalog,
     variants: Mapping[str, NameVariant],
     added_names: Iterable[str],
-    classes: CsvTable,
+    weapon_classes: CsvTable,
 ) -> tuple[Item, ...]:
     names = (*canonical_names(catalog, "weapons", "weapon", variants), *added_names)
-    subcategories = _subcategories(classes)
+    subcategories = _subcategories(weapon_classes)
     unknown = sorted(set(subcategories) - set(names) - _NOT_A_ROW)
     if unknown:
         raise BuildError(f"weapon sheet names unknown weapon(s): {', '.join(unknown)}")
@@ -38,18 +38,18 @@ def build_weapons(
     return tuple(_row(name, subcategories[name]) for name in names)
 
 
-def _subcategories(classes: CsvTable) -> dict[str, str]:
+def _subcategories(weapon_classes: CsvTable) -> dict[str, str]:
     """Return `{weapon name: class slug}`, skipping the sheet's blank separator rows."""
-    class_column = classes.column("Weapon Class")
-    weapon_column = classes.column("Weapon")
+    weapon_class_column = weapon_classes.column("Weapon Class")
+    weapon_column = weapon_classes.column("Weapon")
     out: dict[str, str] = {}
-    for row in classes.rows:
+    for row in weapon_classes.rows:
         name = row[weapon_column]
         if not name:
             continue
         if name in out:
             raise BuildError(f"weapon sheet repeats {name!r}")
-        subcategory = slugify(row[class_column])
+        subcategory = slugify(row[weapon_class_column])
         if not subcategory:
             raise BuildError(f"weapon sheet gives {name!r} no class")
         out[name] = subcategory

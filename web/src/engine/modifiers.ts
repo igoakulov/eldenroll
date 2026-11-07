@@ -4,17 +4,17 @@ import { matchesOption, type Option } from "./selectors";
 
 /** A slot absent from `rolled` has not rolled yet; `null` means it rolled an empty result. */
 export interface RollState {
-  readonly build: string;
+  readonly characterClass: string;
   readonly boss: string | null;
   readonly rolled: ReadonlyMap<PoolSlot, string | null>;
 }
 
 const RULE_SLOTS: ReadonlySet<PoolSlot> = new Set(["rule_1", "rule_2"]);
 
-/** An empty result and a slot the build has no row for both read as `none`. */
+/** An empty result and a slot the class has no row for both read as `none`. */
 function rolledOption(data: EngineData, state: RollState, slot: PoolSlot): Option | "not_rolled" {
   const value = state.rolled.get(slot);
-  if (value === undefined && data.pools.has(poolKey(state.build, slot))) return "not_rolled";
+  if (value === undefined && data.pools.has(poolKey(state.characterClass, slot))) return "not_rolled";
 
   const id = value ?? "none";
   if (RULE_SLOTS.has(slot)) {
@@ -33,7 +33,7 @@ function bossMatches(selector: Selector, boss: string): boolean {
 
 /** A condition on a slot not rolled yet is inactive, whether it says "matches" or "does not". */
 function conditionHolds(data: EngineData, state: RollState, condition: Condition): boolean {
-  if (condition.kind === "build") return condition.ids.includes(state.build);
+  if (condition.kind === "character_class") return condition.ids.includes(state.characterClass);
 
   if (condition.slot === "boss") {
     if (state.boss === null) return false;

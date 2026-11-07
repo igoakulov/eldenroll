@@ -6,7 +6,7 @@ from eldenrando.model.selector import Selector
 
 
 @dataclass(frozen=True, slots=True)
-class Build:
+class CharacterClass:
     id: str
     name: str
     odds: float = 1
@@ -14,8 +14,8 @@ class Build:
 
 @dataclass(frozen=True, slots=True)
 class SlotPool:
-    """What one slot can roll for one build; the selectors carry the whole pool."""
+    """What one slot can roll for one character class; the selectors carry the whole pool."""
 
-    build_id: str
+    character_class_id: str
     slot: str
     selectors: tuple[Selector, ...]

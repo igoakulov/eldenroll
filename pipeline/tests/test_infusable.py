@@ -122,13 +122,13 @@ def test_name_that_is_no_weapon_stops_the_build(
 @pytest.mark.parametrize(
     ("line", "message"),
     [
-        ("A,maybe,why,owner", "infusable is"),
-        ("A,true,,owner", "empty reason"),
-        ("A,true,why,owner\nA,false,why,owner", "duplicate item"),
+        ("A,maybe,why", "infusable is"),
+        ("A,true,", "empty reason"),
+        ("A,true,why\nA,false,why", "duplicate item"),
     ],
 )
 def test_bad_override_row_stops_the_load(tmp_path: Path, line: str, message: str) -> None:
     path = tmp_path / "infusable.csv"
-    path.write_text(f"item,infusable,reason,reviewer\n{line}\n", encoding="utf-8")
+    path.write_text(f"item,infusable,reason\n{line}\n", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         load_infusable(path)

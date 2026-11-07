@@ -113,13 +113,13 @@ def test_override_naming_no_weapon_stops_the_build(name: str) -> None:
 @pytest.mark.parametrize(
     ("line", "message"),
     [
-        ("A,maybe,why,owner", "str_bonus_2h is"),
-        ("A,true,,owner", "empty reason"),
-        ("A,true,why,owner\nA,false,why,owner", "duplicate item"),
+        ("A,maybe,why", "str_bonus_2h is"),
+        ("A,true,", "empty reason"),
+        ("A,true,why\nA,false,why", "duplicate item"),
     ],
 )
 def test_bad_override_row_stops_the_load(tmp_path: Path, line: str, message: str) -> None:
     path = tmp_path / "str_bonus_2h.csv"
-    path.write_text(f"item,str_bonus_2h,reason,reviewer\n{line}\n", encoding="utf-8")
+    path.write_text(f"item,str_bonus_2h,reason\n{line}\n", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         load_str_bonus(path)

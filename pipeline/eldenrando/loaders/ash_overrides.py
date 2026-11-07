@@ -9,8 +9,8 @@ from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.model.vocabulary import SUBCATEGORIES
 
-COLUMNS: tuple[str, ...] = ("ash", "category", "subcategory", "reason", "reviewer")
-_REQUIRED: tuple[str, ...] = ("ash", "category", "reason", "reviewer")
+COLUMNS: tuple[str, ...] = ("ash", "category", "subcategory", "reason")
+_REQUIRED: tuple[str, ...] = ("ash", "category", "reason")
 
 
 @dataclass(frozen=True, slots=True)

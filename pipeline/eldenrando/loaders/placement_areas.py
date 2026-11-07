@@ -10,7 +10,7 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
-_COLUMNS: tuple[str, ...] = ("item", "area", "placed_at", "reason", "reviewer")
+_COLUMNS: tuple[str, ...] = ("item", "area", "placed_at", "reason")
 
 
 def load_placement_areas(path: Path) -> dict[tuple[str, str], tuple[str, ...]]:

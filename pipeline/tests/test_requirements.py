@@ -144,15 +144,15 @@ def test_other_categories_are_not_matched() -> None:
 @pytest.mark.parametrize(
     ("line", "message"),
     [
-        ("A,1,2,3,4,x,why,owner", "arc is"),
-        ("A,1,2,3,4,-5,why,owner", "arc is"),
-        ("A,1,2,3,4,,why,owner", "empty arc"),
-        ("A,1,2,3,4,5,,owner", "empty reason"),
-        ("A,1,2,3,4,5,why,owner\nA,1,2,3,4,5,why,owner", "duplicate item"),
+        ("A,1,2,3,4,x,why", "arc is"),
+        ("A,1,2,3,4,-5,why", "arc is"),
+        ("A,1,2,3,4,,why", "empty arc"),
+        ("A,1,2,3,4,5,", "empty reason"),
+        ("A,1,2,3,4,5,why\nA,1,2,3,4,5,why", "duplicate item"),
     ],
 )
 def test_bad_override_row_stops_the_load(tmp_path: Path, line: str, message: str) -> None:
     path = tmp_path / "requirements.csv"
-    path.write_text(f"item,str,dex,int,fth,arc,reason,reviewer\n{line}\n", encoding="utf-8")
+    path.write_text(f"item,str,dex,int,fth,arc,reason\n{line}\n", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         load_requirements(path)

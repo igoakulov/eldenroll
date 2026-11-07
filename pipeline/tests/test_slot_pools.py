@@ -1,4 +1,4 @@
-"""Tests for the builds and their slot pools against the real tables (`prd.md` §6.1, §6.2)."""
+"""Tests for the character classes and their slot pools against the real tables (`prd.md` §6)."""
 
 from __future__ import annotations
 
@@ -10,10 +10,14 @@ import pytest
 
 from eldenrando.build.slot_pools import build_slot_pools
 from eldenrando.errors import BuildError
-from eldenrando.loaders.builds import SlotPoolRow, load_builds, load_slot_pools
+from eldenrando.loaders.character_classes import (
+    SlotPoolRow,
+    load_character_classes,
+    load_slot_pools,
+)
 from eldenrando.loaders.combat_rules import load_combat_rules
 from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.build import SlotPool
+from eldenrando.model.character_class import SlotPool
 from eldenrando.model.item import Item
 from eldenrando.model.selector import Selector
 from eldenrando.model.vocabulary import CATALYST, MELEE, RANGED, UNPAIRED
@@ -45,7 +49,9 @@ def _validate(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
 def _resolved(
     pools: tuple[SlotPool, ...], table: tuple[Item, ...]
 ) -> Mapping[tuple[str, str], tuple[Item, ...]]:
-    return {(row.build_id, row.slot): resolve_items(row.selectors, table) for row in pools}
+    return {
+        (row.character_class_id, row.slot): resolve_items(row.selectors, table) for row in pools
+    }
 
 
 def _subcategories(rows: tuple[Item, ...]) -> set[str | None]:
@@ -53,8 +59,11 @@ def _subcategories(rows: tuple[Item, ...]) -> set[str | None]:
 
 
 def test_builds_and_their_odds() -> None:
-    builds = load_builds(OVERRIDES / "builds.csv")
-    assert [(build.id, build.name, build.odds) for build in builds] == [
+    character_classes = load_character_classes(OVERRIDES / "character_classes.csv")
+    assert [
+        (character_class.id, character_class.name, character_class.odds)
+        for character_class in character_classes
+    ] == [
         ("knight", "Knight", 1),
         ("warrior_2h", "2H Warrior", 1),
         ("warrior_dw", "Dual-Wield Warrior", 1),
@@ -113,7 +122,7 @@ def test_pool_sizes_follow_the_categories(
     assert len(resolved["pyromancer", "spell"]) == 86
     assert len(resolved["spellblade", "spell"]) == 67 + 86
     for row in pools:
-        found = resolved[row.build_id, row.slot]
+        found = resolved[row.character_class_id, row.slot]
         if row.slot == "item":
             assert len(found) == 9 + 81
         elif row.slot.startswith("talisman"):
@@ -137,7 +146,7 @@ def test_empty_hands_and_spells_hold_only_none(
         ("warrior_2h", "lh"),
         ("ranger", "lh"),
         ("jester", "lh"),
-        *((build, "spell") for build in ("knight", "warrior_2h", "warrior_dw")),
+        *((character_class, "spell") for character_class in ("knight", "warrior_2h", "warrior_dw")),
         ("ranger", "spell"),
         ("jester", "spell"),
     ]
@@ -180,17 +189,21 @@ def test_jester_staff_is_reachable_exactly_with_its_ash(data: PlacementData) -> 
     assert regions("demi_human_queens_staff") == regions("spinning_weapon") == {"limgrave"}
 
 
-def _swap(pools: tuple[SlotPool, ...], build: str, slot: str, cell: str) -> tuple[SlotPool, ...]:
+def _swap(
+    pools: tuple[SlotPool, ...], character_class: str, slot: str, cell: str
+) -> tuple[SlotPool, ...]:
     kind, ids = cell.split(":")
     new = new_selector(kind, ids.split())
     return tuple(
-        replace(row, selectors=(new,)) if (row.build_id, row.slot) == (build, slot) else row
+        replace(row, selectors=(new,))
+        if (row.character_class_id, row.slot) == (character_class, slot)
+        else row
         for row in pools
     )
 
 
 @pytest.mark.parametrize(
-    ("build", "slot", "cell", "message"),
+    ("character_class", "slot", "cell", "message"),
     [
         ("knight", "rh", "subcategory:melee glintstone_staff", "knight rh has the wrong catalysts"),
         ("sorcerer", "lh", "subcategory:catalyst", "sorcerer lh has the wrong catalysts"),
@@ -207,13 +220,13 @@ def _swap(pools: tuple[SlotPool, ...], build: str, slot: str, cell: str) -> tupl
 def test_out_of_scope_pools_fail(
     pools: tuple[SlotPool, ...],
     data: PlacementData,
-    build: str,
+    character_class: str,
     slot: str,
     cell: str,
     message: str,
 ) -> None:
     with pytest.raises(BuildError, match=message):
-        _validate(_swap(pools, build, slot, cell), data)
+        _validate(_swap(pools, character_class, slot, cell), data)
 
 
 def test_an_unknown_id_fails(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
@@ -224,7 +237,7 @@ def test_an_unknown_id_fails(pools: tuple[SlotPool, ...], data: PlacementData) -
 def test_missing_extra_repeated_and_empty_rows_fail(
     pools: tuple[SlotPool, ...], data: PlacementData
 ) -> None:
-    missing = tuple(row for row in pools if (row.build_id, row.slot) != ("knight", "lh"))
+    missing = tuple(row for row in pools if (row.character_class_id, row.slot) != ("knight", "lh"))
     with pytest.raises(BuildError, match="knight lacks lh"):
         _validate(missing, data)
     extra = (*pools, SlotPool("sorcerer", "rh_ash", (Selector("category", ("ash",)),)))
@@ -240,7 +253,7 @@ def test_missing_extra_repeated_and_empty_rows_fail(
 def test_selector_cells_parse(tmp_path: Path) -> None:
     path = tmp_path / "slot_pools.csv"
     path.write_text(
-        "build_id,slot,selectors\n"
+        "character_class_id,slot,selectors\n"
         "jester,rh,category:none; subcategory:torch perfume_bottle\n"
         "jester,rule_1,rule:\n",
         encoding="utf-8",
@@ -259,14 +272,14 @@ def test_selector_cells_parse(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("row", "message"),
     [
-        ("paladin,rh,category:ash", "unknown build"),
+        ("paladin,rh,category:ash", "unknown character class"),
         ("knight,talisman_3,category:ash", "unknown slot"),
         ("knight,rh,melee", "has no kind"),
     ],
 )
 def test_bad_rows_fail_to_load(tmp_path: Path, row: str, message: str) -> None:
     path = tmp_path / "slot_pools.csv"
-    path.write_text(f"build_id,slot,selectors\n{row}\n", encoding="utf-8")
+    path.write_text(f"character_class_id,slot,selectors\n{row}\n", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         load_slot_pools(path)
 
@@ -279,12 +292,12 @@ def test_an_unknown_kind_fails_to_build() -> None:
 @pytest.mark.parametrize(
     ("body", "message"),
     [
-        ("knight,Knight,1\n", "expected the builds"),
+        ("knight,Knight,1\n", "expected the character classes"),
         ("knight,Knight,-1\n", "has odds"),
     ],
 )
 def test_bad_builds_fail_to_load(tmp_path: Path, body: str, message: str) -> None:
-    path = tmp_path / "builds.csv"
+    path = tmp_path / "character_classes.csv"
     path.write_text(f"id,name,odds\n{body}", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
-        load_builds(path)
+        load_character_classes(path)

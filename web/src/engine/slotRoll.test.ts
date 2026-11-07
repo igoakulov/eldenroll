@@ -21,7 +21,7 @@ type Rolled = Partial<Record<PoolSlot, string | null>>;
 const real = indexDatabase(realDatabase);
 
 function rollSlot(context: RollContext, slot: PoolSlot, random: Random) {
-  return sample(weighOptions(context, slotOptions(context.data, context.state.build, slot)), random);
+  return sample(weighOptions(context, slotOptions(context.data, context.state.characterClass, slot)), random);
 }
 const ALL_REGIONS = new Set(
   realDatabase.region.map((row) => row.id).filter((id) => id !== "leyndell_ashen"),
@@ -38,15 +38,15 @@ function countedFor(regions: ReadonlySet<string>, dead: ReadonlySet<string>): Re
 }
 
 function pool(
-  build: string,
+  characterClass: string,
   slot: PoolSlot,
   rolled: Rolled = {},
   counted: ReadonlySet<string> = EVERYTHING,
   data: EngineData = real,
   boss: string | null = null,
 ): SlotPoolResult {
-  const state = { build, boss, rolled: new Map(Object.entries(rolled)) as Map<PoolSlot, string | null> };
-  return weighOptions({ data, state, counted }, slotOptions(data, build, slot));
+  const state = { characterClass, boss, rolled: new Map(Object.entries(rolled)) as Map<PoolSlot, string | null> };
+  return weighOptions({ data, state, counted }, slotOptions(data, characterClass, slot));
 }
 
 function ids(result: SlotPoolResult): string[] {
@@ -110,7 +110,7 @@ describe("a condition on a slot not rolled yet", () => {
   });
 });
 
-describe("a slot the build has no row for", () => {
+describe("a slot the class has no row for", () => {
   it("counts as rolled with nothing, so Parry only leaves the casters", () => {
     const result = pool("sorcerer", "rule_1", { rh: "astrologers_staff", lh: "none" });
     expect(ids(result)).not.toContain("parry_only");
@@ -164,7 +164,7 @@ describe("modifiers across slots", () => {
     expect(weightOf(result, "jump_attacks_only")).toBe(1_000_000);
   });
 
-  it("removes Blue Dancer Charm for a heavy RH, whatever the build", () => {
+  it("removes Blue Dancer Charm for a heavy RH, whatever the class", () => {
     expect(ids(pool("warrior_2h", "talisman_1", { rh: "uchigatana", lh: "none" }))).toContain(
       "blue_dancer_charm",
     );
@@ -221,14 +221,14 @@ describe("on a small database", () => {
       armor_set: [],
       ash_compatibility: [],
       combat_rule: [],
-      build: [{ id: "only", name: "Only", odds: 1 }],
+      character_class: [{ id: "only", name: "Only", odds: 1 }],
       slot_pool: [
         {
-          build_id: "only",
+          character_class_id: "only",
           slot: "talisman_1",
           selectors: [{ kind: "category", ids: ["talisman"] }],
         },
-        { build_id: "only", slot: "rh", selectors: [{ kind: "category", ids: ["none"] }] },
+        { character_class_id: "only", slot: "rh", selectors: [{ kind: "category", ids: ["none"] }] },
       ],
       alias: [],
       item_location: [],
@@ -238,7 +238,7 @@ describe("on a small database", () => {
   }
 
   const COUNTED = new Set(["a", "b", "off"]);
-  const whenBuild = [{ kind: "build", ids: ["only"] }] as const;
+  const whenCharacterClass = [{ kind: "character_class", ids: ["only"] }] as const;
   const targetA = { kind: "item", ids: ["a"] } as const;
 
   function smallPool(data: EngineData, rolled: Rolled = {}, boss: string | null = null) {
@@ -247,22 +247,22 @@ describe("on a small database", () => {
 
   it("compounds two modifiers that both hold", () => {
     const data = small([
-      { id: "m1", when: whenBuild, target: targetA, value: 10 },
-      { id: "m2", when: whenBuild, target: targetA, value: 2 },
+      { id: "m1", when: whenCharacterClass, target: targetA, value: 10 },
+      { id: "m2", when: whenCharacterClass, target: targetA, value: 2 },
     ]);
     expect(weightOf(smallPool(data), "a")).toBe(20);
   });
 
   it("lets a zero beat any boost", () => {
     const data = small([
-      { id: "m1", when: whenBuild, target: targetA, value: 1_000_000 },
-      { id: "m2", when: whenBuild, target: targetA, value: 0 },
+      { id: "m1", when: whenCharacterClass, target: targetA, value: 1_000_000 },
+      { id: "m2", when: whenCharacterClass, target: targetA, value: 0 },
     ]);
     expect(ids(smallPool(data))).toEqual(["b"]);
   });
 
   it("counts an option a modifier removed in the total, and one at odds 0 nowhere", () => {
-    const data = small([{ id: "m", when: whenBuild, target: targetA, value: 0 }]);
+    const data = small([{ id: "m", when: whenCharacterClass, target: targetA, value: 0 }]);
     const result = smallPool(data);
     expect(result.total).toBe(2);
     expect(result.pool).toBe(1);
@@ -276,7 +276,7 @@ describe("on a small database", () => {
       selector: { kind: "category", ids: ["none"] },
       negated: false,
     } as const;
-    const data = small([{ id: "m", when: [...whenBuild, rolledRh], target: targetA, value: 3 }]);
+    const data = small([{ id: "m", when: [...whenCharacterClass, rolledRh], target: targetA, value: 3 }]);
     expect(weightOf(smallPool(data), "a")).toBe(1);
     expect(weightOf(smallPool(data, { rh: "none" }), "a")).toBe(3);
   });
@@ -305,9 +305,9 @@ describe("on a small database", () => {
   });
 
   it("removes a filtered option before modifiers, so a boost can't bring it back", () => {
-    const data = small([{ id: "m", when: whenBuild, target: targetA, value: 1_000_000 }]);
+    const data = small([{ id: "m", when: whenCharacterClass, target: targetA, value: 1_000_000 }]);
     const notA: OptionFilter = (option) => option.row.id !== "a";
-    const state = { build: "only", boss: null, rolled: new Map<PoolSlot, string | null>() };
+    const state = { characterClass: "only", boss: null, rolled: new Map<PoolSlot, string | null>() };
     const options = slotOptions(data, "only", "talisman_1");
     expect(
       weighOptions({ data, state, counted: COUNTED }, options, { rules: [notA] }).options.map(
@@ -317,10 +317,10 @@ describe("on a small database", () => {
   });
 
   describe("sampling", () => {
-    const data = small([{ id: "m", when: whenBuild, target: targetA, value: 3 }]);
+    const data = small([{ id: "m", when: whenCharacterClass, target: targetA, value: 3 }]);
     const context = {
       data,
-      state: { build: "only", boss: null, rolled: new Map<PoolSlot, string | null>() },
+      state: { characterClass: "only", boss: null, rolled: new Map<PoolSlot, string | null>() },
       counted: COUNTED,
     };
 
@@ -347,7 +347,7 @@ describe("on a small database", () => {
       expect(roll.probability).toBe(0);
     });
 
-    it("returns an empty result for a slot the build has no row for", () => {
+    it("returns an empty result for a slot the class has no row for", () => {
       const roll = rollSlot(context, "lh", () => 0.5);
       expect(roll.chosen).toBeNull();
     });

@@ -10,48 +10,52 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.odds import parse_odds
 from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.build import Build
-from eldenrando.model.vocabulary import BUILDS, SLOTS
+from eldenrando.model.character_class import CharacterClass
+from eldenrando.model.vocabulary import CHARACTER_CLASSES, SLOTS
 
 
 @dataclass(frozen=True, slots=True)
 class SlotPoolRow:
-    build_id: str
+    character_class_id: str
     slot: str
     selectors: tuple[tuple[str, tuple[str, ...]], ...]
 
 
-def load_builds(path: Path) -> tuple[Build, ...]:
+def load_character_classes(path: Path) -> tuple[CharacterClass, ...]:
     table = read_table(path, required_columns=("id", "name", "odds"))
-    builds = tuple(
-        Build(
+    character_classes = tuple(
+        CharacterClass(
             id=row[table.column("id")],
             name=row[table.column("name")],
             odds=parse_odds(path, row[table.column("id")], row[table.column("odds")]),
         )
         for row in table.rows
     )
-    if tuple(build.id for build in builds) != BUILDS:
-        raise LoaderError(f"{path}: expected the builds {', '.join(BUILDS)}")
-    empty = sorted(build.id for build in builds if not build.name)
+    if tuple(character_class.id for character_class in character_classes) != CHARACTER_CLASSES:
+        raise LoaderError(f"{path}: expected the character classes {', '.join(CHARACTER_CLASSES)}")
+    empty = sorted(
+        character_class.id for character_class in character_classes if not character_class.name
+    )
     if empty:
         raise LoaderError(f"{path}: empty name on {', '.join(empty)}")
-    return builds
+    return character_classes
 
 
 def load_slot_pools(path: Path) -> tuple[SlotPoolRow, ...]:
-    table = read_table(path, required_columns=("build_id", "slot", "selectors"))
+    table = read_table(path, required_columns=("character_class_id", "slot", "selectors"))
     rows: list[SlotPoolRow] = []
     for index, row in enumerate(table.rows, start=1):
         where = f"{path}: data row {index}"
-        build_id = row[table.column("build_id")]
+        character_class_id = row[table.column("character_class_id")]
         slot = row[table.column("slot")]
-        if build_id not in BUILDS:
-            raise LoaderError(f"{where}: unknown build {build_id!r}")
+        if character_class_id not in CHARACTER_CLASSES:
+            raise LoaderError(f"{where}: unknown character class {character_class_id!r}")
         if slot not in SLOTS:
             raise LoaderError(f"{where}: unknown slot {slot!r}")
         rows.append(
-            SlotPoolRow(build_id, slot, parse_selectors(row[table.column("selectors")], where))
+            SlotPoolRow(
+                character_class_id, slot, parse_selectors(row[table.column("selectors")], where)
+            )
         )
     return tuple(rows)
 

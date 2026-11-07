@@ -175,13 +175,13 @@ def test_validate_subcategories(row: Item, fails: bool) -> None:
 @pytest.mark.parametrize(
     ("line", "message"),
     [
-        ("A,head,,owner", "empty reason"),
-        ("A,hat,why,owner", "slot is"),
-        ("A,head,why,owner\nA,body,why,owner", "duplicate piece"),
+        ("A,head,", "empty reason"),
+        ("A,hat,why", "slot is"),
+        ("A,head,why\nA,body,why", "duplicate piece"),
     ],
 )
 def test_bad_override_row_stops_the_load(tmp_path: Path, line: str, message: str) -> None:
     path = tmp_path / "armor_slots.csv"
-    path.write_text(f"piece,slot,reason,reviewer\n{line}\n", encoding="utf-8")
+    path.write_text(f"piece,slot,reason\n{line}\n", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         load_armor_slots(path)

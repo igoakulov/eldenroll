@@ -215,23 +215,23 @@ def test_a_bad_link_stops_the_build(sets: dict[str, tuple[str, ...]], message: s
 
 def test_a_set_may_hold_no_pieces(tmp_path: Path) -> None:
     path = tmp_path / "armor_sets.csv"
-    path.write_text("set,piece,reason,reviewer\nBare,,why,owner\n", encoding="utf-8")
+    path.write_text("set,piece,reason\nBare,,why\n", encoding="utf-8")
     assert load_armor_sets(path) == {"Bare": ()}
 
 
 @pytest.mark.parametrize(
     ("lines", "message"),
     [
-        ("A,B,,owner", "empty reason"),
-        (",B,why,owner", "empty set"),
-        ("A,B,why,owner\nA,B,why,owner", "repeats"),
-        ("A,,why,owner\nA,B,why,owner", "empty piece and another row"),
-        ("A,B,why,owner\nA,,why,owner", "empty piece and another row"),
-        ("\n".join(f"A,{piece},why,owner" for piece in "BCDEF"), "more than 4"),
+        ("A,B,", "empty reason"),
+        (",B,why", "empty set"),
+        ("A,B,why\nA,B,why", "repeats"),
+        ("A,,why\nA,B,why", "empty piece and another row"),
+        ("A,B,why\nA,,why", "empty piece and another row"),
+        ("\n".join(f"A,{piece},why" for piece in "BCDEF"), "more than 4"),
     ],
 )
 def test_bad_row_stops_the_load(tmp_path: Path, lines: str, message: str) -> None:
     path = tmp_path / "armor_sets.csv"
-    path.write_text(f"set,piece,reason,reviewer\n{lines}\n", encoding="utf-8")
+    path.write_text(f"set,piece,reason\n{lines}\n", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         load_armor_sets(path)

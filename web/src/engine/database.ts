@@ -37,7 +37,7 @@ export const POOL_SLOTS = [
 ] as const;
 export type PoolSlot = (typeof POOL_SLOTS)[number];
 
-/** Armor has no `slot_pool` row: every build rolls one set, from every armor set, after the rules. */
+/** Armor has no `slot_pool` row: every class rolls one set, from every armor set, after the rules. */
 export type LoadoutSlot = PoolSlot | "armor";
 
 /** `ids: null` means every option of the kind. */
@@ -102,14 +102,14 @@ export interface CombatRule {
   readonly odds: number;
 }
 
-export interface Build {
+export interface CharacterClass {
   readonly id: string;
   readonly name: string;
   readonly odds: number;
 }
 
 export interface SlotPool {
-  readonly build_id: string;
+  readonly character_class_id: string;
   readonly slot: PoolSlot;
   readonly selectors: readonly Selector[];
 }
@@ -125,8 +125,8 @@ export interface ItemLocation {
   readonly boss_instance_id: string | null;
 }
 
-export interface BuildCondition {
-  readonly kind: "build";
+export interface CharacterClassCondition {
+  readonly kind: "character_class";
   readonly ids: readonly string[];
 }
 
@@ -137,7 +137,7 @@ export interface RolledCondition {
   readonly negated: boolean;
 }
 
-export type Condition = BuildCondition | RolledCondition;
+export type Condition = CharacterClassCondition | RolledCondition;
 
 export interface Modifier {
   readonly id: string;
@@ -155,7 +155,7 @@ export interface Database {
   readonly armor_set: readonly ArmorSet[];
   readonly ash_compatibility: readonly AshCompatibility[];
   readonly combat_rule: readonly CombatRule[];
-  readonly build: readonly Build[];
+  readonly character_class: readonly CharacterClass[];
   readonly slot_pool: readonly SlotPool[];
   readonly alias: readonly Alias[];
   readonly item_location: readonly ItemLocation[];

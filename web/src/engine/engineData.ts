@@ -23,8 +23,8 @@ export interface EngineData {
   readonly foundEverywhere: ReadonlySet<string>;
 }
 
-export function poolKey(build: string, slot: PoolSlot): string {
-  return `${build}/${slot}`;
+export function poolKey(characterClass: string, slot: PoolSlot): string {
+  return `${characterClass}/${slot}`;
 }
 
 export function indexDatabase(database: Database): EngineData {
@@ -42,6 +42,6 @@ export function indexDatabase(database: Database): EngineData {
     armorSets: new Map(database.armor_set.map((row) => [row.id, row])),
     aliasLabels: new Map(database.alias.map((row) => [row.id, row.label])),
     bosses: new Map(database.boss_instance.map((row) => [row.id, row])),
-    pools: new Map(database.slot_pool.map((row) => [poolKey(row.build_id, row.slot), row])),
+    pools: new Map(database.slot_pool.map((row) => [poolKey(row.character_class_id, row.slot), row])),
   };
 }

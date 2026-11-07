@@ -12,7 +12,7 @@ from eldenrando.loaders.schema import LoaderError
 
 
 def load_odds(path: Path, key_column: str) -> dict[str, float]:
-    columns = (key_column, "odds", "reason", "reviewer")
+    columns = (key_column, "odds", "reason")
     table = read_table(path, required_columns=columns)
     out: dict[str, float] = {}
     for index, row in enumerate(table.rows, start=1):

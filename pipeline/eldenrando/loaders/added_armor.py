@@ -11,8 +11,8 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
-_COLUMNS: tuple[str, ...] = ("piece", "slot", "copies", "reason", "reviewer")
-_REQUIRED: tuple[str, ...] = ("piece", "slot", "reason", "reviewer")
+_COLUMNS: tuple[str, ...] = ("piece", "slot", "copies", "reason")
+_REQUIRED: tuple[str, ...] = ("piece", "slot", "reason")
 _SLOTS = ("head", "body", "arms", "legs")
 
 

@@ -9,11 +9,11 @@ from collections.abc import Iterable, Iterator, Mapping
 from collections.abc import Set as AbstractSet
 
 from eldenrando.errors import BuildError
-from eldenrando.model.build import SlotPool
+from eldenrando.model.character_class import SlotPool
 from eldenrando.model.item import Item
-from eldenrando.model.modifier import BuildCondition, Modifier, RolledCondition
+from eldenrando.model.modifier import CharacterClassCondition, Modifier, RolledCondition
 from eldenrando.model.selector import Selector, SelectorKind
-from eldenrando.model.vocabulary import BUILDS, SLOTS
+from eldenrando.model.vocabulary import CHARACTER_CLASSES, SLOTS
 from eldenrando.validate.selectors import (
     resolve_items,
     validate_modifier_target,
@@ -46,7 +46,9 @@ def validate_rolling_order(
 ) -> None:
     table = tuple(items)
     resolved = {
-        (pool.build_id, pool.slot): {one.id for one in resolve_items(pool.selectors, table)}
+        (pool.character_class_id, pool.slot): {
+            one.id for one in resolve_items(pool.selectors, table)
+        }
         for pool in pools
     }
     late = [row.id for row in modifiers if not _rolls_after_conditions(row, resolved, table)]
@@ -61,15 +63,15 @@ def _rolls_after_conditions(
     slots = [SLOTS.index(one.slot) for one in row.when if isinstance(one, RolledCondition)]
     if row.target.kind not in ITEM_KINDS or not slots:
         return True
-    builds = set(BUILDS)
+    character_classes = set(CHARACTER_CLASSES)
     for one in row.when:
-        if isinstance(one, BuildCondition):
-            builds &= set(one.builds)
+        if isinstance(one, CharacterClassCondition):
+            character_classes &= set(one.character_classes)
     targets = {one.id for one in resolve_items((row.target,), table)}
     return any(
         targets & ids
-        for (build, slot), ids in resolved.items()
-        if build in builds and SLOTS.index(slot) > max(slots)
+        for (character_class, slot), ids in resolved.items()
+        if character_class in character_classes and SLOTS.index(slot) > max(slots)
     )
 
 

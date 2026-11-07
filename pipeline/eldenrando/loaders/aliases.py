@@ -7,7 +7,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from eldenrando.loaders.builds import parse_selectors
+from eldenrando.loaders.character_classes import parse_selectors
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.normalize.slug import slugify

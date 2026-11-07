@@ -159,7 +159,7 @@ def test_the_docs_ids_are_built_as_written(instances: tuple[BossInstance, ...]) 
         (SELLIA, "Nox Swordstress & Nox Monk", "Nox Priest"),
         ("Perfumer's Grotto", "Omenkiller & Miranda the Blighted Bloom", "Omenkiller"),
         ("Unsightly Catacombs", "Perfumer Tricia & Misbegotten Warrior", "Misbegotten Warrior"),
-        ("Scaduview - Hinterland", "Tree Sentinel", "Tree Sentinel (Torch)"),
+        ("Scaduview - Hinterland", "Tree Sentinel Duo", "Tree Sentinel (Torch)"),
     ],
 )
 def test_one_fight_is_one_instance(
@@ -230,7 +230,7 @@ def test_every_instance_resolves_to_a_location_and_region(
         ),
         ("Enir-Ilim", "Leda and Allies", "dlc_enirilim"),
         ("Ainsel River Main", "Baleful Shadow", "ainsel"),
-        ("Scaduview - Hinterland", "Tree Sentinel", "dlc_shadowkeep"),
+        ("Scaduview - Hinterland", "Tree Sentinel Duo", "dlc_shadowkeep"),
         ("Charo's Hidden Grave - Southeast Mariner Area", "Tibia Mariner", "dlc_jaggedpeak"),
         ("Ancient Ruins of Rauh - Furnace Golem Area", "Furnace Golem", "dlc_gravesite"),
         ("Scadu Altus - South Ruins of Unte (inactive)", "Furnace Golem", "dlc_shadowkeep"),
@@ -380,9 +380,9 @@ def test_a_boss_with_no_alias_stops_the_build() -> None:
         build_boss_instances((("Nowhere", "Rat [Boss]"),), _fixture())
 
 
-MERGE_HEADER = "label,csv_name,instance,instance_label,reason,reviewer\n"
-ADDITION_HEADER = "name,location_label,location_id,reason,reviewer\n"
-ODDS_HEADER = "boss,odds,reason,reviewer\n"
+MERGE_HEADER = "label,csv_name,instance,instance_label,reason\n"
+ADDITION_HEADER = "name,location_label,location_id,reason\n"
+ODDS_HEADER = "boss,odds,reason\n"
 
 
 def _load_additions(path: Path) -> object:
@@ -392,24 +392,24 @@ def _load_additions(path: Path) -> object:
 @pytest.mark.parametrize(
     ("loader", "text", "message"),
     [
-        (load_boss_merges, f"{MERGE_HEADER}A,B,,,why,owner\n", "empty instance"),
-        (load_boss_merges, f"{MERGE_HEADER}A,B,C,,,owner\n", "empty reason"),
-        (load_boss_merges, f"{MERGE_HEADER}A,B,C,,why,owner\nA,B,D,,why,owner\n", "duplicate row"),
-        (load_boss_names, "csv_name,label,name,reason,reviewer\nA,,,why,owner\n", "empty name"),
-        (_load_additions, f"{ADDITION_HEADER}A,,cave,why,owner\n", "empty location_label"),
-        (_load_additions, f"{ADDITION_HEADER}A,B,nowhere,why,owner\n", "unknown location_id"),
+        (load_boss_merges, f"{MERGE_HEADER}A,B,,,why\n", "empty instance"),
+        (load_boss_merges, f"{MERGE_HEADER}A,B,C,,\n", "empty reason"),
+        (load_boss_merges, f"{MERGE_HEADER}A,B,C,,why\nA,B,D,,why\n", "duplicate row"),
+        (load_boss_names, "csv_name,label,name,reason\nA,,,why\n", "empty name"),
+        (_load_additions, f"{ADDITION_HEADER}A,,cave,why\n", "empty location_label"),
+        (_load_additions, f"{ADDITION_HEADER}A,B,nowhere,why\n", "unknown location_id"),
         (
             _load_additions,
-            f"{ADDITION_HEADER}A,B,cave,why,owner\nA,B,cave,why,owner\n",
+            f"{ADDITION_HEADER}A,B,cave,why\nA,B,cave,why\n",
             "duplicate",
         ),
         (_load_additions, ADDITION_HEADER, "no rows"),
-        (load_boss_odds, f"{ODDS_HEADER}a,-1,why,owner\n", "has odds"),
-        (load_boss_odds, f"{ODDS_HEADER}a,many,why,owner\n", "has odds"),
-        (load_boss_odds, f"{ODDS_HEADER}a,nan,why,owner\n", "has odds"),
-        (load_boss_odds, f"{ODDS_HEADER}a,,why,owner\n", "empty odds"),
-        (load_boss_odds, f"{ODDS_HEADER}a,1,,owner\n", "empty reason"),
-        (load_boss_odds, f"{ODDS_HEADER}a,1,why,owner\na,2,why,owner\n", "duplicate boss"),
+        (load_boss_odds, f"{ODDS_HEADER}a,-1,why\n", "has odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,many,why\n", "has odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,nan,why\n", "has odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,,why\n", "empty odds"),
+        (load_boss_odds, f"{ODDS_HEADER}a,1,\n", "empty reason"),
+        (load_boss_odds, f"{ODDS_HEADER}a,1,why\na,2,why\n", "duplicate boss"),
     ],
 )
 def test_a_bad_row_stops_the_load(
@@ -423,5 +423,5 @@ def test_a_bad_row_stops_the_load(
 
 def test_a_name_row_may_leave_the_label_empty(tmp_path: Path) -> None:
     path = tmp_path / "boss_names.csv"
-    path.write_text("csv_name,label,name,reason,reviewer\nA,,B,why,owner\n", encoding="utf-8")
+    path.write_text("csv_name,label,name,reason\nA,,B,why\n", encoding="utf-8")
     assert load_boss_names(path) == {("A", ""): "B"}

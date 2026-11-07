@@ -6,7 +6,7 @@ from eldenrando.model.alias import Alias
 from eldenrando.model.armor_set import ArmorSet
 from eldenrando.model.ash_compatibility import AshCompatibility
 from eldenrando.model.boss_instance import BossInstance
-from eldenrando.model.build import Build, SlotPool
+from eldenrando.model.character_class import CharacterClass, SlotPool
 from eldenrando.model.combat_rule import CombatRule
 from eldenrando.model.item import Item
 from eldenrando.model.item_location import ItemLocation
@@ -24,7 +24,7 @@ class Database:
     armor_sets: tuple[ArmorSet, ...]
     ash_compatibility: tuple[AshCompatibility, ...]
     rules: tuple[CombatRule, ...]
-    builds: tuple[Build, ...]
+    character_classes: tuple[CharacterClass, ...]
     slot_pools: tuple[SlotPool, ...]
     aliases: tuple[Alias, ...]
     item_locations: tuple[ItemLocation, ...]

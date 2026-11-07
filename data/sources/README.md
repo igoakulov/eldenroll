@@ -1,6 +1,6 @@
 # Source files
 
-The inputs the pipeline and its tests read, unchanged apart from their file names. They are grouped by what they are used for; `pipeline/eldenrando/paths.py` is the one place that knows the layout. Corrections never go here: they go in `data/overrides/`, with a reason and a reviewer.
+The inputs the pipeline and its tests read, unchanged apart from their file names. They are grouped by what they are used for; `pipeline/eldenrando/paths.py` is the one place that knows the layout. Corrections never go here: they go in `data/overrides/`, with a reason.
 
 | File | Used for | Source | Original name |
 |---|---|---|---|

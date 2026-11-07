@@ -60,7 +60,7 @@ function leavesLhEmpty(context: RollContext, limits: StatLimits, rh: Item): bool
   const rolled = new Map<PoolSlot, string | null>(context.state.rolled);
   rolled.set("rh", rh.id);
   const next: RollContext = { ...context, state: { ...context.state, rolled } };
-  const options = slotOptions(next.data, next.state.build, "lh");
+  const options = slotOptions(next.data, next.state.characterClass, "lh");
   const notTheSameWeapon = (option: Option) => option.row.id === "none" || option.row.id !== rh.id;
   const result = weighOptions(next, options, {
     rules: [notTheSameWeapon],

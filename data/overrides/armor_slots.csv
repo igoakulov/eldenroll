@@ -1,159 +1,159 @@
-piece,slot,reason,reviewer
-Albinauric Mask,head,"its place in the Albinauric's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Ansbach's Attire,body,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Ansbach's Boots,legs,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Ansbach's Manchettes,arms,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Armor of Night,body,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms",agent
-Armor of Solitude,body,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms",agent
-Ascetic's Ankle Guards,legs,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Ascetic's Loincloth,body,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Ascetic's Wrist Guards,arms,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Banished Knight Armor (Altered),body,"kept apart from Banished Knight Armor, which armors.json holds only in its plain form",owner
-Banished Knight Helm (Altered),head,"kept apart from Banished Knight Helm, which armors.json holds only in its plain form",owner
-Black Knight Armor,body,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Black Knight Gauntlets,arms,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Black Knight Greaves,legs,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Black Knight Helm,head,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Braided Arm Wraps,arms,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms",agent
-Braided Cord Robe,body,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms",agent
-Broken Gold Mask,head,not on the wiki's Armor Sets page; taken from its game id,owner
-Caterpillar Mask,head,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms",agent
-Champion Gaiters,legs,"its place in the Champion Set on the wiki's Armor Sets page, which its game id confirms",agent
-Circlet of Light,head,the wiki's Armor Sets page lists it under Helms,agent
-Common Soldier Cloth Armor,body,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Common Soldier Gauntlets,arms,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Common Soldier Greaves,legs,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Common Soldier Helm,head,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Crucible Hammer-Helm,head,the wiki's Armor Sets page lists it under Helms,agent
-Curseblade Mask,head,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dancer's Bracer,arms,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dancer's Dress,body,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dancer's Hood,head,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dancer's Trousers,legs,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dane's Hat,head,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Death Knight Armor,body,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Death Knight Gauntlets,arms,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Death Knight Greaves,legs,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Death Knight Helm,head,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Death Mask Helm,head,the wiki's Armor Sets page lists it under Helms,agent
-Divine Beast Head,head,the wiki's Armor Sets page lists it under Helms,agent
-Divine Beast Helm,head,"its place in the Divine Beast Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Divine Beast Warrior Armor,body,"its place in the Divine Beast Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Divine Bird Helm,head,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Divine Bird Warrior Armor,body,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Divine Bird Warrior Gauntlets,arms,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Divine Bird Warrior Greaves,legs,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dryleaf Arm Wraps,arms,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dryleaf Cuissardes,legs,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Dryleaf Robe,body,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Fang Helm,head,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms",agent
-Fire Knight Armor,body,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Fire Knight Gauntlets,arms,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Fire Knight Greaves,legs,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Fire Knight Helm,head,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Fire Prelate Armor (Altered),body,"kept apart from Fire Prelate Armor, which armors.json holds only in its plain form",owner
-Freyja's Armor,body,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Freyja's Gauntlets,arms,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Freyja's Greaves,legs,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Freyja's Helm,head,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gaius's Armor,body,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gaius's Gauntlets,arms,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gaius's Greaves,legs,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gaius's Helm,head,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gauntlets of Night,arms,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gauntlets of Solitude,arms,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gloried Attire,body,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gold Tattoo (Arm),arms,not on the wiki's Armor Sets page; taken from its game id,owner
-Gold Tattoo (Chest),body,not on the wiki's Armor Sets page; taken from its game id,owner
-Gold Tattoo (Leg),legs,not on the wiki's Armor Sets page; taken from its game id,owner
-Gravebird Anklets,legs,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gravebird Armor,body,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gravebird Bracelets,arms,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gravebird Helm,head,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms",agent
-Gravebird's Blackquill Armor,body,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms",agent
-Greatjar,head,the wiki's Armor Sets page lists it under Helms,agent
-Greaves of Night,legs,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms",agent
-Greaves of Solitude,legs,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms",agent
-Helm of Night,head,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms",agent
-Helm of Solitude,head,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms",agent
-High Priest Gloves,arms,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms",agent
-High Priest Hat,head,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms",agent
-High Priest Robe,body,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms",agent
-High Priest Undergarments,legs,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms",agent
-Highland Attire,body,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Horned Warrior Armor,body,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Horned Warrior Gauntlets,arms,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Horned Warrior Greaves,legs,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Horned Warrior Helm,head,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Igon's Armor,body,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Igon's Gauntlets,arms,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Igon's Helm,head,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Igon's Loincloth,legs,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Imp Head (Lion),head,the wiki's Armor Sets page lists it under Helms,agent
-Iron Rivet Armor,body,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms",agent
-Iron Rivet Gauntlets,arms,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms",agent
-Iron Rivet Greaves,legs,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms",agent
-Karolos Glintstone Crown,head,"its place in the Raya Lucaria Set on the wiki's Armor Sets page, which its game id confirms",agent
-Leather Arm Wraps,arms,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Leather Crown,head,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Leather Headband,head,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Leather Leg Wraps,legs,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms",agent
-Leda's Armor,body,not on the wiki's Armor Sets page; taken from its game id,owner
-Leontiel's Armor,body,not on the wiki's Armor Sets page; taken from its game id,owner
-Leontiel's Boots,legs,not on the wiki's Armor Sets page; taken from its game id,owner
-Leontiel's Hat,head,not on the wiki's Armor Sets page; taken from its game id,owner
-Leontiel's Leather Gloves,arms,not on the wiki's Armor Sets page; taken from its game id,owner
-Messmer Soldier Armor,body,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Messmer Soldier Gauntlets,arms,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Messmer Soldier Greaves,legs,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Messmer Soldier Helm,head,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms",agent
-Messmer's Armor,body,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Messmer's Gauntlets,arms,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Messmer's Greaves,legs,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Messmer's Helm,head,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Oathseeker Knight Armor,body,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Oathseeker Knight Gauntlets,arms,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Oathseeker Knight Greaves,legs,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Oathseeker Knight Helm,head,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms",agent
-Pelt of Ralva,head,the wiki's Armor Sets page lists it under Helms,agent
-Raging Wolf Gauntlets,arms,"its place in the Raging Wolf Set on the wiki's Armor Sets page, which its game id confirms",agent
-Raging Wolf Greaves,legs,"its place in the Raging Wolf Set on the wiki's Armor Sets page, which its game id confirms",agent
-Raging Wolf Helm,head,"its place in the Raging Wolf Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rakshasa Armor,body,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rakshasa Gauntlets,arms,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rakshasa Greaves,legs,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rakshasa Helm,head,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rellana's Armor,body,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rellana's Gloves,arms,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rellana's Greaves,legs,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Rellana's Helm,head,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Salza's Hood,head,the wiki's Armor Sets page lists it under Helms,agent
-Sanguine Noble Waistcloth,legs,"its place in the Sanguine Noble Set on the wiki's Armor Sets page, which its game id confirms",agent
-Shadow Militiaman Armor,body,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms",agent
-Shadow Militiaman Gauntlets,arms,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms",agent
-Shadow Militiaman Greaves,legs,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms",agent
-Shadow Militiaman Helm,head,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms",agent
-Silver Grooved Armor,body,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms",agent
-Silver Grooved Gauntlets,arms,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms",agent
-Silver Grooved Greaves,legs,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms",agent
-Silver Grooved Helm,head,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms",agent
-Soiled Loincloth,legs,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms",agent
-St. Trina's Blossom,head,the wiki's Armor Sets page lists it under Helms,agent
-Steel Armor,body,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms",agent
-Steel Gauntlets,arms,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms",agent
-Steel Greaves,legs,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms",agent
-Steel Helm,head,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms",agent
-Thiollier's Garb,body,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Thiollier's Gloves,arms,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Thiollier's Mask,head,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Thiollier's Trousers,legs,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Verdigris Armor,body,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms",agent
-Verdigris Gauntlets,arms,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms",agent
-Verdigris Greaves,legs,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms",agent
-Verdigris Helm,head,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms",agent
-Winged Serpent Helm,head,the wiki's Armor Sets page lists it under Helms,agent
-Wise Man's Mask,head,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Young Lion's Armor,body,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Young Lion's Gauntlets,arms,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Young Lion's Greaves,legs,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms",agent
-Young Lion's Helm,head,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms",agent
+piece,slot,reason
+Albinauric Mask,head,"its place in the Albinauric's Set on the wiki's Armor Sets page, which its game id confirms"
+Ansbach's Attire,body,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms"
+Ansbach's Boots,legs,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms"
+Ansbach's Manchettes,arms,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms"
+Armor of Night,body,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms"
+Armor of Solitude,body,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms"
+Ascetic's Ankle Guards,legs,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms"
+Ascetic's Loincloth,body,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms"
+Ascetic's Wrist Guards,arms,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms"
+Banished Knight Armor (Altered),body,"kept apart from Banished Knight Armor, which armors.json holds only in its plain form"
+Banished Knight Helm (Altered),head,"kept apart from Banished Knight Helm, which armors.json holds only in its plain form"
+Black Knight Armor,body,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Black Knight Gauntlets,arms,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Black Knight Greaves,legs,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Black Knight Helm,head,"its place in the Black Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Braided Arm Wraps,arms,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms"
+Braided Cord Robe,body,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms"
+Broken Gold Mask,head,not on the wiki's Armor Sets page; taken from its game id
+Caterpillar Mask,head,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms"
+Champion Gaiters,legs,"its place in the Champion Set on the wiki's Armor Sets page, which its game id confirms"
+Circlet of Light,head,the wiki's Armor Sets page lists it under Helms
+Common Soldier Cloth Armor,body,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Common Soldier Gauntlets,arms,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Common Soldier Greaves,legs,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Common Soldier Helm,head,"its place in the Common Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Crucible Hammer-Helm,head,the wiki's Armor Sets page lists it under Helms
+Curseblade Mask,head,"its place in the Ascetic's Set on the wiki's Armor Sets page, which its game id confirms"
+Dancer's Bracer,arms,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms"
+Dancer's Dress,body,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms"
+Dancer's Hood,head,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms"
+Dancer's Trousers,legs,"its place in the Dancer's Set on the wiki's Armor Sets page, which its game id confirms"
+Dane's Hat,head,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms"
+Death Knight Armor,body,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Death Knight Gauntlets,arms,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Death Knight Greaves,legs,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Death Knight Helm,head,"its place in the Death Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Death Mask Helm,head,the wiki's Armor Sets page lists it under Helms
+Divine Beast Head,head,the wiki's Armor Sets page lists it under Helms
+Divine Beast Helm,head,"its place in the Divine Beast Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Divine Beast Warrior Armor,body,"its place in the Divine Beast Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Divine Bird Helm,head,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Divine Bird Warrior Armor,body,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Divine Bird Warrior Gauntlets,arms,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Divine Bird Warrior Greaves,legs,"its place in the Divine Bird Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Dryleaf Arm Wraps,arms,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms"
+Dryleaf Cuissardes,legs,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms"
+Dryleaf Robe,body,"its place in the Dane's Set on the wiki's Armor Sets page, which its game id confirms"
+Fang Helm,head,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms"
+Fire Knight Armor,body,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Fire Knight Gauntlets,arms,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Fire Knight Greaves,legs,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Fire Knight Helm,head,"its place in the Fire Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Fire Prelate Armor (Altered),body,"kept apart from Fire Prelate Armor, which armors.json holds only in its plain form"
+Freyja's Armor,body,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms"
+Freyja's Gauntlets,arms,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms"
+Freyja's Greaves,legs,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms"
+Freyja's Helm,head,"its place in the Freyja's Set on the wiki's Armor Sets page, which its game id confirms"
+Gaius's Armor,body,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms"
+Gaius's Gauntlets,arms,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms"
+Gaius's Greaves,legs,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms"
+Gaius's Helm,head,"its place in the Gaius's Set on the wiki's Armor Sets page, which its game id confirms"
+Gauntlets of Night,arms,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms"
+Gauntlets of Solitude,arms,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms"
+Gloried Attire,body,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Gold Tattoo (Arm),arms,not on the wiki's Armor Sets page; taken from its game id
+Gold Tattoo (Chest),body,not on the wiki's Armor Sets page; taken from its game id
+Gold Tattoo (Leg),legs,not on the wiki's Armor Sets page; taken from its game id
+Gravebird Anklets,legs,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms"
+Gravebird Armor,body,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms"
+Gravebird Bracelets,arms,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms"
+Gravebird Helm,head,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms"
+Gravebird's Blackquill Armor,body,"its place in the Gravebird Set on the wiki's Armor Sets page, which its game id confirms"
+Greatjar,head,the wiki's Armor Sets page lists it under Helms
+Greaves of Night,legs,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms"
+Greaves of Solitude,legs,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms"
+Helm of Night,head,"its place in the Night Set on the wiki's Armor Sets page, which its game id confirms"
+Helm of Solitude,head,"its place in the Solitude Set on the wiki's Armor Sets page, which its game id confirms"
+High Priest Gloves,arms,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms"
+High Priest Hat,head,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms"
+High Priest Robe,body,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms"
+High Priest Undergarments,legs,"its place in the High Priest Set on the wiki's Armor Sets page, which its game id confirms"
+Highland Attire,body,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Horned Warrior Armor,body,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Horned Warrior Gauntlets,arms,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Horned Warrior Greaves,legs,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Horned Warrior Helm,head,"its place in the Horned Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Igon's Armor,body,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms"
+Igon's Gauntlets,arms,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms"
+Igon's Helm,head,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms"
+Igon's Loincloth,legs,"its place in the Igon's Set on the wiki's Armor Sets page, which its game id confirms"
+Imp Head (Lion),head,the wiki's Armor Sets page lists it under Helms
+Iron Rivet Armor,body,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms"
+Iron Rivet Gauntlets,arms,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms"
+Iron Rivet Greaves,legs,"its place in the Iron Rivet Set on the wiki's Armor Sets page, which its game id confirms"
+Karolos Glintstone Crown,head,"its place in the Raya Lucaria Set on the wiki's Armor Sets page, which its game id confirms"
+Leather Arm Wraps,arms,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Leather Crown,head,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Leather Headband,head,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Leather Leg Wraps,legs,"its place in the Highland Warrior Set on the wiki's Armor Sets page, which its game id confirms"
+Leda's Armor,body,not on the wiki's Armor Sets page; taken from its game id
+Leontiel's Armor,body,not on the wiki's Armor Sets page; taken from its game id
+Leontiel's Boots,legs,not on the wiki's Armor Sets page; taken from its game id
+Leontiel's Hat,head,not on the wiki's Armor Sets page; taken from its game id
+Leontiel's Leather Gloves,arms,not on the wiki's Armor Sets page; taken from its game id
+Messmer Soldier Armor,body,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Messmer Soldier Gauntlets,arms,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Messmer Soldier Greaves,legs,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Messmer Soldier Helm,head,"its place in the Messmer Soldier Set on the wiki's Armor Sets page, which its game id confirms"
+Messmer's Armor,body,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms"
+Messmer's Gauntlets,arms,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms"
+Messmer's Greaves,legs,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms"
+Messmer's Helm,head,"its place in the Messmer's Set on the wiki's Armor Sets page, which its game id confirms"
+Oathseeker Knight Armor,body,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Oathseeker Knight Gauntlets,arms,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Oathseeker Knight Greaves,legs,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Oathseeker Knight Helm,head,"its place in the Oathseeker Knight Set on the wiki's Armor Sets page, which its game id confirms"
+Pelt of Ralva,head,the wiki's Armor Sets page lists it under Helms
+Raging Wolf Gauntlets,arms,"its place in the Raging Wolf Set on the wiki's Armor Sets page, which its game id confirms"
+Raging Wolf Greaves,legs,"its place in the Raging Wolf Set on the wiki's Armor Sets page, which its game id confirms"
+Raging Wolf Helm,head,"its place in the Raging Wolf Set on the wiki's Armor Sets page, which its game id confirms"
+Rakshasa Armor,body,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms"
+Rakshasa Gauntlets,arms,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms"
+Rakshasa Greaves,legs,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms"
+Rakshasa Helm,head,"its place in the Rakshasa Set on the wiki's Armor Sets page, which its game id confirms"
+Rellana's Armor,body,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms"
+Rellana's Gloves,arms,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms"
+Rellana's Greaves,legs,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms"
+Rellana's Helm,head,"its place in the Rellana's Set on the wiki's Armor Sets page, which its game id confirms"
+Salza's Hood,head,the wiki's Armor Sets page lists it under Helms
+Sanguine Noble Waistcloth,legs,"its place in the Sanguine Noble Set on the wiki's Armor Sets page, which its game id confirms"
+Shadow Militiaman Armor,body,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms"
+Shadow Militiaman Gauntlets,arms,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms"
+Shadow Militiaman Greaves,legs,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms"
+Shadow Militiaman Helm,head,"its place in the Shadow Militiaman Set on the wiki's Armor Sets page, which its game id confirms"
+Silver Grooved Armor,body,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms"
+Silver Grooved Gauntlets,arms,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms"
+Silver Grooved Greaves,legs,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms"
+Silver Grooved Helm,head,"its place in the Silver Grooved Set on the wiki's Armor Sets page, which its game id confirms"
+Soiled Loincloth,legs,"its place in the Hornsent Set on the wiki's Armor Sets page, which its game id confirms"
+St. Trina's Blossom,head,the wiki's Armor Sets page lists it under Helms
+Steel Armor,body,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms"
+Steel Gauntlets,arms,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms"
+Steel Greaves,legs,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms"
+Steel Helm,head,"its place in the Steel Set on the wiki's Armor Sets page, which its game id confirms"
+Thiollier's Garb,body,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms"
+Thiollier's Gloves,arms,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms"
+Thiollier's Mask,head,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms"
+Thiollier's Trousers,legs,"its place in the Thiollier's Set on the wiki's Armor Sets page, which its game id confirms"
+Verdigris Armor,body,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms"
+Verdigris Gauntlets,arms,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms"
+Verdigris Greaves,legs,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms"
+Verdigris Helm,head,"its place in the Verdigris Set on the wiki's Armor Sets page, which its game id confirms"
+Winged Serpent Helm,head,the wiki's Armor Sets page lists it under Helms
+Wise Man's Mask,head,"its place in the Ansbach's Set on the wiki's Armor Sets page, which its game id confirms"
+Young Lion's Armor,body,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms"
+Young Lion's Gauntlets,arms,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms"
+Young Lion's Greaves,legs,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms"
+Young Lion's Helm,head,"its place in the Young Lion's Set on the wiki's Armor Sets page, which its game id confirms"

@@ -7,8 +7,8 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
-COLUMNS: tuple[str, ...] = ("set", "piece", "reason", "reviewer")
-_REQUIRED: tuple[str, ...] = ("set", "reason", "reviewer")
+COLUMNS: tuple[str, ...] = ("set", "piece", "reason")
+_REQUIRED: tuple[str, ...] = ("set", "reason")
 _MOST_PIECES = 4
 
 

@@ -17,7 +17,6 @@ COLUMNS: tuple[str, ...] = (
     "canonical_name",
     "by_name",
     "reason",
-    "reviewer",
 )
 _BY_NAME: dict[str, bool] = {"true": True, "false": False}
 

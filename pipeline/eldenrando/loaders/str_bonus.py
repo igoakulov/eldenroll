@@ -5,7 +5,7 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
-COLUMNS: tuple[str, ...] = ("item", "str_bonus_2h", "reason", "reviewer")
+COLUMNS: tuple[str, ...] = ("item", "str_bonus_2h", "reason")
 _VALUES: dict[str, bool] = {"true": True, "false": False}
 
 

@@ -10,7 +10,7 @@ from collections.abc import Mapping, Sequence
 from typing import Final, cast
 
 from eldenrando.model.database import Database
-from eldenrando.model.modifier import BuildCondition, Condition, Modifier
+from eldenrando.model.modifier import CharacterClassCondition, Condition, Modifier
 from eldenrando.model.selector import Selector
 
 Row = Mapping[str, object]
@@ -38,8 +38,8 @@ TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
     "armor_set": ("id", "name", "pieces", "odds"),
     "ash_compatibility": ("ash_id", "category", "subcategory"),
     "combat_rule": ("id", "name", "odds"),
-    "build": ("id", "name", "odds"),
-    "slot_pool": ("build_id", "slot", "selectors"),
+    "character_class": ("id", "name", "odds"),
+    "slot_pool": ("character_class_id", "slot", "selectors"),
     "alias": ("id", "label"),
     "item_location": ("item_id", "location_id", "boss_instance_id"),
     "modifier": ("id", "when", "target", "value"),
@@ -86,13 +86,13 @@ def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
             }
             for row in database.rules
         ],
-        "build": [
+        "character_class": [
             {"id": row.id, "name": row.name, "odds": _number(row.odds)}
-            for row in database.builds
+            for row in database.character_classes
         ],
         "slot_pool": [
             {
-                "build_id": row.build_id,
+                "character_class_id": row.character_class_id,
                 "slot": row.slot,
                 "selectors": [_selector(one) for one in row.selectors],
             }
@@ -141,8 +141,8 @@ def _selector(selector: Selector) -> Row:
 
 
 def _condition(condition: Condition) -> Row:
-    if isinstance(condition, BuildCondition):
-        return {"kind": "build", "ids": list(condition.builds)}
+    if isinstance(condition, CharacterClassCondition):
+        return {"kind": "character_class", "ids": list(condition.character_classes)}
     return {
         "kind": "rolled",
         "slot": condition.slot,

@@ -152,14 +152,13 @@ def test_upgraded_source_is_named_as_the_slot_lines_name_it(weapon: str) -> None
 @pytest.mark.parametrize(
     ("line", "message"),
     [
-        ("Parry,Dagger,,owner", "empty reason"),
-        ("Parry,Dagger,why,", "empty reviewer"),
-        (",Dagger,why,owner", "empty ash"),
+        ("Parry,Dagger,", "empty reason"),
+        (",Dagger,why", "empty ash"),
     ],
 )
 def test_incomplete_ash_source_stops_the_load(tmp_path: Path, line: str, message: str) -> None:
     path = tmp_path / "ash_sources.csv"
-    path.write_text(f"ash,weapon,reason,reviewer\n{line}\n")
+    path.write_text(f"ash,weapon,reason\n{line}\n")
 
     with pytest.raises(LoaderError, match=message):
         load_ash_sources(path)
@@ -167,7 +166,7 @@ def test_incomplete_ash_source_stops_the_load(tmp_path: Path, line: str, message
 
 def test_repeated_ash_source_stops_the_load(tmp_path: Path) -> None:
     path = tmp_path / "ash_sources.csv"
-    path.write_text("ash,weapon,reason,reviewer\nParry,Dagger,why,owner\nParry,Dagger,why,owner\n")
+    path.write_text("ash,weapon,reason\nParry,Dagger,why\nParry,Dagger,why\n")
 
     with pytest.raises(LoaderError, match="duplicate weapon 'Dagger'"):
         load_ash_sources(path)

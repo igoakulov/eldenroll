@@ -20,7 +20,7 @@ from eldenrando.errors import BuildError
 from eldenrando.model.ash_compatibility import AshCompatibility
 from eldenrando.model.database import Database
 from eldenrando.model.item_location import ItemLocation
-from eldenrando.model.modifier import BuildCondition, Modifier
+from eldenrando.model.modifier import CharacterClassCondition, Modifier
 from eldenrando.model.selector import Selector
 from eldenrando.validate.gate_data import GateData, load_gate_data
 from eldenrando.validate.quality import quality_problems
@@ -55,7 +55,7 @@ def _set_item(item_id: str, **changes: Any) -> Change:
 def _modifier(row_id: str, value: float, ids: tuple[str, ...] = ("r1_only",)) -> Modifier:
     return Modifier(
         id=row_id,
-        when=(BuildCondition(("sorcerer",)),),
+        when=(CharacterClassCondition(("sorcerer",)),),
         target=Selector("rule", ids),
         value=value,
     )
@@ -120,7 +120,7 @@ def _rule_odds(rule_id: str, odds: float) -> Change:
 def _catalyst_in_knight_rh(database: Database) -> Database:
     pools = tuple(
         replace(pool, selectors=(*pool.selectors, Selector("subcategory", ("sacred_seal",))))
-        if (pool.build_id, pool.slot) == ("knight", "rh")
+        if (pool.character_class_id, pool.slot) == ("knight", "rh")
         else pool
         for pool in database.slot_pools
     )
@@ -227,7 +227,7 @@ def test_a_modifier_writes_both_kinds_of_condition(data: GateData) -> None:
     rows = {str(row["id"]): row for row in database_rows(data.database)["modifier"]}
     assert rows["jester_none_x4"] == {
         "id": "jester_none_x4",
-        "when": [{"kind": "build", "ids": ["jester"]}],
+        "when": [{"kind": "character_class", "ids": ["jester"]}],
         "target": {"kind": "item", "ids": ["none"]},
         "value": 4,
     }
@@ -242,7 +242,7 @@ def test_a_modifier_writes_both_kinds_of_condition(data: GateData) -> None:
 
 
 def test_whole_odds_read_as_whole_numbers(data: GateData) -> None:
-    rows = {str(row["id"]): row for row in database_rows(data.database)["build"]}
+    rows = {str(row["id"]): row for row in database_rows(data.database)["character_class"]}
     assert rows["knight"]["odds"] == 1
     assert isinstance(rows["knight"]["odds"], int)
     assert rows["jester"]["odds"] == 0.25

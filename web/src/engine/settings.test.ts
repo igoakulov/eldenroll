@@ -11,13 +11,13 @@ import {
   type Stats,
 } from "./settings";
 
-const BUILDS = {
-  build: [
+const CHARACTER_CLASSES = {
+  character_class: [
     { id: "knight", name: "Knight", odds: 1 },
     { id: "jester", name: "Jester", odds: 0.25 },
   ],
 };
-const SETTINGS = defaultSettings(BUILDS);
+const SETTINGS = defaultSettings(CHARACTER_CLASSES);
 
 function allStats(value: number): Stats {
   return Object.fromEntries(STATS.map((stat) => [stat, value])) as Stats;
@@ -43,10 +43,10 @@ describe("derivedLevel", () => {
 });
 
 describe("defaultSettings", () => {
-  it("matches the defaults of the spec, with every build selected", () => {
+  it("matches the defaults of the spec, with every class selected", () => {
     expect(SETTINGS).toEqual({
       maxStatGap: 10,
-      builds: ["knight", "jester"],
+      characterClasses: ["knight", "jester"],
       upgradedWeaponsEnabled: false,
       bossItemsOnlyFromDeadBosses: true,
     });
@@ -86,12 +86,12 @@ describe("correctedMaxStatGap", () => {
 });
 
 describe("settingsProblems", () => {
-  it("accepts any selection of builds", () => {
+  it("accepts any selection of classes", () => {
     expect(settingsProblems(SETTINGS)).toEqual([]);
-    expect(settingsProblems({ ...SETTINGS, builds: ["jester"] })).toEqual([]);
+    expect(settingsProblems({ ...SETTINGS, characterClasses: ["jester"] })).toEqual([]);
   });
 
-  it("asks for a build when none is selected", () => {
-    expect(settingsProblems({ ...SETTINGS, builds: [] })).toEqual(["Select at least one build"]);
+  it("asks for a class when none is selected", () => {
+    expect(settingsProblems({ ...SETTINGS, characterClasses: [] })).toEqual(["Select at least one class"]);
   });
 });

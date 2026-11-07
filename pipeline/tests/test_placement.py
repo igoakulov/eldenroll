@@ -145,7 +145,7 @@ def test_no_row_is_at_the_roundtable(data: PlacementData) -> None:
         ("Gargoyle's Greatsword", "Valiant Gargoyle"),
         ("Siluria's Tree", "Crucible Knight Siluria"),
         ("Scepter of the All-Knowing", "Sir Gideon Ofnir, the All-Knowing"),
-        ("Night's Cavalry Helm", "Night's Cavalry"),
+        ("Night's Cavalry Helm", "Night's Cavalry Duo"),
         ("Bloodhound's Fang", "Bloodhound Knight Darriwil"),
         ("Frozen Needle", "Royal Revenant"),
         ("Devonia's Hammer", "Crucible Knight Devonia"),
@@ -313,8 +313,8 @@ def test_a_staff_and_a_seal_are_reachable_at_every_cumulative_selection(
     for region in data.regions:
         selected.append(region.id)
         found = eligible_items(rows, selected, (), bosses, data.region_of_location)
-        classes = {items[item_id].subcategory for item_id in found}
-        assert {"glintstone_staff", "sacred_seal"} <= classes, region.id
+        weapon_classes = {items[item_id].subcategory for item_id in found}
+        assert {"glintstone_staff", "sacred_seal"} <= weapon_classes, region.id
 
 
 def test_every_armor_set_can_roll_under_some_selection(data: PlacementData) -> None:
@@ -571,7 +571,7 @@ def test_a_drop_on_a_non_place_gives_nothing(sources: GapSources) -> None:
 def test_a_slot_link_row_needs_every_cell(tmp_path: Path) -> None:
     path = tmp_path / "links.csv"
     path.write_text(
-        "item,area,boss,location_label,reason,reviewer\nSword,here,First,Tile,,owner\n",
+        "item,area,boss,location_label,reason\nSword,here,First,Tile,\n",
         encoding="utf-8",
     )
 
@@ -582,7 +582,7 @@ def test_a_slot_link_row_needs_every_cell(tmp_path: Path) -> None:
 def test_a_slot_link_label_drops_the_dlc_prefix(tmp_path: Path) -> None:
     path = tmp_path / "links.csv"
     path.write_text(
-        "item,area,boss,location_label,reason,reviewer\nSword,here,First,[DLC] Tile,why,owner\n",
+        "item,area,boss,location_label,reason\nSword,here,First,[DLC] Tile,why\n",
         encoding="utf-8",
     )
 
@@ -590,10 +590,10 @@ def test_a_slot_link_label_drops_the_dlc_prefix(tmp_path: Path) -> None:
 
 
 def test_a_slot_link_can_name_two_bosses_but_not_one_twice(tmp_path: Path) -> None:
-    header = "item,area,boss,location_label,reason,reviewer\n"
-    first = "Sword,here,First,Tile,why,owner\n"
+    header = "item,area,boss,location_label,reason\n"
+    first = "Sword,here,First,Tile,why\n"
     path = tmp_path / "links.csv"
-    path.write_text(f"{header}{first}Sword,here,Second,Tile,why,owner\n", encoding="utf-8")
+    path.write_text(f"{header}{first}Sword,here,Second,Tile,why\n", encoding="utf-8")
 
     assert load_slot_links(path) == {("Sword", "here"): (("First", "Tile"), ("Second", "Tile"))}
 

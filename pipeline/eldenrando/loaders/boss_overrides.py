@@ -18,15 +18,13 @@ MERGE_COLUMNS: tuple[str, ...] = (
     "instance",
     "instance_label",
     "reason",
-    "reviewer",
 )
-NAME_COLUMNS: tuple[str, ...] = ("csv_name", "label", "name", "reason", "reviewer")
+NAME_COLUMNS: tuple[str, ...] = ("csv_name", "label", "name", "reason")
 ADDITION_COLUMNS: tuple[str, ...] = (
     "name",
     "location_label",
     "location_id",
     "reason",
-    "reviewer",
 )
 
 

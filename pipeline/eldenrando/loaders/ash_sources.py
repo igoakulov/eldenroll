@@ -10,7 +10,7 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
-COLUMNS: tuple[str, ...] = ("ash", "weapon", "reason", "reviewer")
+COLUMNS: tuple[str, ...] = ("ash", "weapon", "reason")
 
 
 def load_ash_sources(path: Path) -> dict[str, tuple[str, ...]]:

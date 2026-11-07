@@ -98,9 +98,9 @@ export function repeatKey(option: Option): string {
   return optionKey(option);
 }
 
-export function slotOptions(data: EngineData, build: string, slot: LoadoutSlot): readonly Option[] {
+export function slotOptions(data: EngineData, characterClass: string, slot: LoadoutSlot): readonly Option[] {
   if (slot === "armor") return data.database.armor_set.map((row) => ({ kind: "armor_set", row }));
-  const pool = data.pools.get(poolKey(build, slot));
+  const pool = data.pools.get(poolKey(characterClass, slot));
   if (pool === undefined) return [];
 
   const items: Option[] = data.database.item.map((row) => ({ kind: "item", row }));

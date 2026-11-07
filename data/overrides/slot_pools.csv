@@ -1,4 +1,4 @@
-build_id,slot,selectors
+character_class_id,slot,selectors
 knight,rh,subcategory:unpaired thrusting_shield
 knight,rh_ash,category:ash
 knight,lh,subcategory:shield; category:none

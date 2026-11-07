@@ -243,16 +243,16 @@ def test_only_the_items_that_never_roll_sit_at_odds_zero() -> None:
 @pytest.mark.parametrize(
     ("body", "message"),
     [
-        ("mask,-1,why,owner\n", "has odds"),
-        ("mask,many,why,owner\n", "has odds"),
-        ("mask,,why,owner\n", "empty odds"),
-        ("mask,0,,owner\n", "empty reason"),
-        ("mask,0,why,owner\nmask,1,why,owner\n", "duplicate item"),
+        ("mask,-1,why\n", "has odds"),
+        ("mask,many,why\n", "has odds"),
+        ("mask,,why\n", "empty odds"),
+        ("mask,0,\n", "empty reason"),
+        ("mask,0,why\nmask,1,why\n", "duplicate item"),
     ],
 )
 def test_a_bad_odds_row_is_a_loader_error(tmp_path: Path, body: str, message: str) -> None:
     path = tmp_path / "item_odds.csv"
-    path.write_text(f"item,odds,reason,reviewer\n{body}", encoding="utf-8")
+    path.write_text(f"item,odds,reason\n{body}", encoding="utf-8")
 
     with pytest.raises(LoaderError, match=message):
         load_odds(path, "item")
@@ -260,7 +260,7 @@ def test_a_bad_odds_row_is_a_loader_error(tmp_path: Path, body: str, message: st
 
 def test_an_odds_file_with_no_rows_changes_nothing(tmp_path: Path) -> None:
     path = tmp_path / "armor_set_odds.csv"
-    path.write_text("armor_set,odds,reason,reviewer\n", encoding="utf-8")
+    path.write_text("armor_set,odds,reason\n", encoding="utf-8")
 
     assert load_odds(path, "armor_set") == {}
 

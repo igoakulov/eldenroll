@@ -8,7 +8,7 @@ from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
 STATS: tuple[str, ...] = ("str", "dex", "int", "fth", "arc")
-COLUMNS: tuple[str, ...] = ("item", *STATS, "reason", "reviewer")
+COLUMNS: tuple[str, ...] = ("item", *STATS, "reason")
 
 
 def load_requirements(path: Path) -> dict[str, dict[str, int]]:

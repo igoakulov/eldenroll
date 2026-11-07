@@ -35,8 +35,8 @@ const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number]
   armor_set: { id: true, name: true, pieces: true, odds: true },
   ash_compatibility: { ash_id: true, category: true, subcategory: true },
   combat_rule: { id: true, name: true, odds: true },
-  build: { id: true, name: true, odds: true },
-  slot_pool: { build_id: true, slot: true, selectors: true },
+  character_class: { id: true, name: true, odds: true },
+  slot_pool: { character_class_id: true, slot: true, selectors: true },
   alias: { id: true, label: true },
   item_location: { item_id: true, location_id: true, boss_instance_id: true },
   modifier: { id: true, when: true, target: true, value: true },
@@ -64,7 +64,7 @@ describe("db.json", () => {
     expect(database.boss_instance.filter((row) => row.odds > 0)).toHaveLength(218);
     expect(database.item).toHaveLength(1522);
     expect(database.item.filter((row) => row.category === "none")).toHaveLength(1);
-    expect(database.build).toHaveLength(8);
+    expect(database.character_class).toHaveLength(8);
     expect(database.slot_pool).toHaveLength(72);
     expect(database.combat_rule).toHaveLength(28);
     expect(database.alias).toHaveLength(11);

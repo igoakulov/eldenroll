@@ -24,18 +24,18 @@ export const DEFAULT_STATS: Stats = {
 /** The upgraded weapons list and dead bosses are run state, so they sit beside these (`prd.md` §11). */
 export interface Settings {
   readonly maxStatGap: number;
-  readonly builds: readonly string[];
+  readonly characterClasses: readonly string[];
   readonly upgradedWeaponsEnabled: boolean;
   readonly bossItemsOnlyFromDeadBosses: boolean;
 }
 
 export function defaultSettings(
-  database: Pick<Database, "build">,
+  database: Pick<Database, "character_class">,
   hyperparams: Hyperparams = DEFAULT_HYPERPARAMS,
 ): Settings {
   return {
     maxStatGap: hyperparams.defaultMaxStatGap,
-    builds: database.build.map((row) => row.id),
+    characterClasses: database.character_class.map((row) => row.id),
     upgradedWeaponsEnabled: false,
     bossItemsOnlyFromDeadBosses: true,
   };
@@ -59,5 +59,5 @@ export function correctedMaxStatGap(entered: string, previous: number): number {
 }
 
 export function settingsProblems(settings: Settings): readonly string[] {
-  return settings.builds.length === 0 ? ["Select at least one build"] : [];
+  return settings.characterClasses.length === 0 ? ["Select at least one class"] : [];
 }

@@ -1,17 +1,19 @@
-csv_name,label,name,reason,reviewer
-Death Rite Bird,"Liurnia of the Lakes - Scenic Isle, Laskyar Ruins",Deathbird,the CSV names a Deathbird as a Death Rite Bird,owner
-Death Rite Bird,"Stormhill - Warmaster's Shack, Stormgate",Deathbird,the CSV names a Deathbird as a Death Rite Bird,owner
-Death Rite Bird,Weeping Peninsula - Castle Morne Approach North,Deathbird,the CSV names a Deathbird as a Death Rite Bird,owner
-Death Rite Bird,Capital Outskirts - Minor Erdtree,Deathbird,the CSV names a Deathbird as a Death Rite Bird,owner
-Miranda Blossom,,Miranda the Blighted Bloom,the game's name,owner
-Burial Watchdog,,Erdtree Burial Watchdog,the game's name,owner
-Demi-Human Queen,"Altus Plateau - Erdtree-Gazing Hill, Lux Ruins",Demi-Human Queen Gilika,the game's name,owner
-Demi-Human Queen,"Mt. Gelmir - Primeval Sorcerer Azur, Gelmir Hero's Grave Entrance",Demi-Human Queen Maggie,the mod's name,owner
-Demi-Human Queen,Volcano Cave,Demi-Human Queen Margot,the mod's name,owner
-Ancestor Spirit,"Nokron, Eternal City - Boss",Regal Ancestor Spirit,the game's name; the Ancestor Spirit in Siofra is a different boss,owner
-Gargoyle,Nokron,Valiant Gargoyle,the game's name,owner
-Large Wormface,"Altus Plateau - Woodfolk Ruins, Minor Erdtree",Wormface,the game's name,owner
-Bloodhound Knight Darriwill,"Limgrave - Agheel Lake South, Forlorn Hound Evergaol",Bloodhound Knight Darriwil,the CSV misspells the name,owner
-Bayle The Dread,,Bayle the Dread,the mod's spelling,owner
-"Mohg, The Omen",,"Mohg, the Omen",the mod's spelling,owner
-"Sir Gideon Ofnir, the All Knowing",,"Sir Gideon Ofnir, the All-Knowing",the mod's spelling,owner
+csv_name,label,name,reason
+Death Rite Bird,"Liurnia of the Lakes - Scenic Isle, Laskyar Ruins",Deathbird,the CSV names a Deathbird as a Death Rite Bird
+Death Rite Bird,"Stormhill - Warmaster's Shack, Stormgate",Deathbird,the CSV names a Deathbird as a Death Rite Bird
+Death Rite Bird,Weeping Peninsula - Castle Morne Approach North,Deathbird,the CSV names a Deathbird as a Death Rite Bird
+Death Rite Bird,Capital Outskirts - Minor Erdtree,Deathbird,the CSV names a Deathbird as a Death Rite Bird
+Miranda Blossom,,Miranda the Blighted Bloom,the game's name
+Burial Watchdog,,Erdtree Burial Watchdog,the game's name
+Demi-Human Queen,"Altus Plateau - Erdtree-Gazing Hill, Lux Ruins",Demi-Human Queen Gilika,the game's name
+Demi-Human Queen,"Mt. Gelmir - Primeval Sorcerer Azur, Gelmir Hero's Grave Entrance",Demi-Human Queen Maggie,the mod's name
+Demi-Human Queen,Volcano Cave,Demi-Human Queen Margot,the mod's name
+Ancestor Spirit,"Nokron, Eternal City - Boss",Regal Ancestor Spirit,the game's name; the Ancestor Spirit in Siofra is a different boss
+Gargoyle,Nokron,Valiant Gargoyle,the game's name
+Large Wormface,"Altus Plateau - Woodfolk Ruins, Minor Erdtree",Wormface,the game's name
+Bloodhound Knight Darriwill,"Limgrave - Agheel Lake South, Forlorn Hound Evergaol",Bloodhound Knight Darriwil,the CSV misspells the name
+Bayle The Dread,,Bayle the Dread,the mod's spelling
+"Mohg, The Omen",,"Mohg, the Omen",the mod's spelling
+"Sir Gideon Ofnir, the All Knowing",,"Sir Gideon Ofnir, the All-Knowing",the mod's spelling
+Tree Sentinel,"Altus Plateau - Tree Sentinel Duo, Perfumer's Grotto Entrance",Tree Sentinel Duo,two Tree Sentinels fought together at the Altus Plateau entrance
+Night's Cavalry,Southwest Mountaintops,Night's Cavalry Duo,two Night's Cavalry escorting the caravan southwest of the Inner Consecrated Snowfield grace

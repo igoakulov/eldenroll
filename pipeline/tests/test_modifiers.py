@@ -10,11 +10,11 @@ import pytest
 from eldenrando.build.modifiers import build_modifiers
 from eldenrando.build.slot_pools import build_slot_pools
 from eldenrando.errors import BuildError
-from eldenrando.loaders.builds import load_slot_pools
+from eldenrando.loaders.character_classes import load_slot_pools
 from eldenrando.loaders.combat_rules import load_combat_rules
 from eldenrando.loaders.modifiers import ConditionRow, ModifierRow, load_modifiers
 from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.modifier import BuildCondition, Modifier, RolledCondition
+from eldenrando.model.modifier import CharacterClassCondition, Modifier, RolledCondition
 from eldenrando.model.selector import Selector, SelectorKind
 from eldenrando.model.vocabulary import MELEE, UNPAIRED
 from eldenrando.validate.modifiers import validate_modifiers, validate_rolling_order
@@ -173,25 +173,28 @@ def test_blue_dancer_charm_makes_no_armor_strong(
 
 
 def test_dual_wield_boosts_each_unpaired_class_in_lh(modifiers: tuple[Modifier, ...]) -> None:
-    build = BuildCondition(("warrior_dw",))
+    character_class = CharacterClassCondition(("warrior_dw",))
     rows = [row for row in modifiers if row.id.startswith("warrior_dw_pairs_")]
     assert {one for row in rows for one in row.target.ids or ()} == UNPAIRED
     for row in rows:
         assert row.value == 67
-        assert row.when == (build, RolledCondition("rh", row.target))
+        assert row.when == (character_class, RolledCondition("rh", row.target))
 
 
 def test_only_grafted_dragon_loses_odds_in_dual_wield_rh(
     modifiers: tuple[Modifier, ...], data: PlacementData
 ) -> None:
     pools = build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
-    pool = next(row for row in pools if (row.build_id, row.slot) == ("warrior_dw", "rh"))
+    pool = next(row for row in pools if (row.character_class_id, row.slot) == ("warrior_dw", "rh"))
     rh = {item.id for item in resolve_items(pool.selectors, data.table)}
     known_before_rh = [
         row
         for row in modifiers
         if row.when
-        and all(isinstance(one, BuildCondition) and "warrior_dw" in one.builds for one in row.when)
+        and all(
+            isinstance(one, CharacterClassCondition) and "warrior_dw" in one.character_classes
+            for one in row.when
+        )
     ]
     assert [
         row.id
@@ -210,16 +213,16 @@ def test_a_paired_rh_leaves_only_none_in_dual_wield_lh(modifiers: tuple[Modifier
     assert {one.negated for one in keeps.when if isinstance(one, RolledCondition)} == {True}
 
 
-def test_paired_weapons_and_grafted_dragon_stay_off_the_other_builds(
+def test_paired_weapons_and_grafted_dragon_stay_off_the_other_character_classes(
     modifiers: tuple[Modifier, ...],
 ) -> None:
     rows = {row.id: row for row in modifiers}
     assert rows["knight_spellblade_no_paired_weapons"].when == (
-        BuildCondition(("knight", "spellblade")),
+        CharacterClassCondition(("knight", "spellblade")),
     )
     assert len(rows["knight_spellblade_no_paired_weapons"].target.ids or ()) == 9
     assert rows["grafted_dragon_only_on_jester"].when == (
-        BuildCondition(("warrior_2h", "warrior_dw")),
+        CharacterClassCondition(("warrior_2h", "warrior_dw")),
     )
 
 
@@ -327,7 +330,7 @@ def test_blue_dancer_charm_needs_light_hands(modifiers: tuple[Modifier, ...]) ->
 def test_jester_favours_an_empty_right_hand(modifiers: tuple[Modifier, ...]) -> None:
     row = next(one for one in modifiers if one.id == "jester_none_x4")
     assert (row.when, row.target, row.value) == (
-        (BuildCondition(("jester",)),),
+        (CharacterClassCondition(("jester",)),),
         Selector("item", ("none",)),
         4,
     )
@@ -337,10 +340,10 @@ def test_knight_left_hand_follows_the_right_hand(modifiers: tuple[Modifier, ...]
     rows = {row.id: row for row in modifiers}
     condition = RolledCondition("rh", Selector("subcategory", ("thrusting_shield",)))
     empties = rows["knight_thrusting_shield_empties_lh"]
-    assert empties.when == (BuildCondition(("knight",)), condition)
+    assert empties.when == (CharacterClassCondition(("knight",)), condition)
     assert empties.target.ids == ("greatshield", "medium_shield", "small_shield")
     keeps = rows["knight_other_rh_keeps_a_shield_in_lh"]
-    assert keeps.when == (BuildCondition(("knight",)), replace(condition, negated=True))
+    assert keeps.when == (CharacterClassCondition(("knight",)), replace(condition, negated=True))
     assert keeps.target == Selector("item", ("none",))
 
 
@@ -359,7 +362,7 @@ def test_requirements_read_the_right_slots(modifiers: tuple[Modifier, ...]) -> N
     assert "bow" not in (weapon.selector.ids or ())
     assert "glintstone_staff" not in (weapon.selector.ids or ())
     assert rows["l2_only_not_on_pure_casters"].when == (
-        BuildCondition(("sorcerer", "pyromancer")),
+        CharacterClassCondition(("sorcerer", "pyromancer")),
     )
 
 
@@ -397,13 +400,15 @@ def test_bad_rows_fail(rows: tuple[Modifier, ...], message: str, data: Placement
 
 @pytest.mark.parametrize("kind", ["rule", "item"])
 def test_an_unknown_id_fails(kind: SelectorKind, data: PlacementData) -> None:
-    row = Modifier("x", (BuildCondition(("sorcerer",)),), Selector(kind, ("typo",)), 0)
+    row = Modifier("x", (CharacterClassCondition(("sorcerer",)),), Selector(kind, ("typo",)), 0)
     with pytest.raises(BuildError, match=f"selector matches nothing: {kind}: typo"):
         _validate((row,), data)
 
 
 def test_a_boss_target_fails(data: PlacementData) -> None:
-    row = Modifier("x", (BuildCondition(("sorcerer",)),), Selector("boss", (data.bosses[0].id,)), 2)
+    row = Modifier(
+        "x", (CharacterClassCondition(("sorcerer",)),), Selector("boss", (data.bosses[0].id,)), 2
+    )
     with pytest.raises(BuildError, match="a boss cannot be a modifier target"):
         _validate((row,), data)
 
@@ -417,7 +422,7 @@ def test_cells_parse(tmp_path: Path) -> None:
     path = tmp_path / "modifiers.csv"
     path.write_text(
         "id,when,target,value\n"
-        "a,rh!=subcategory:melee torch; build=sorcerer jester,rule:r1_only,0\n",
+        "a,rh!=subcategory:melee torch; character_class=sorcerer jester,rule:r1_only,0\n",
         encoding="utf-8",
     )
     assert load_modifiers(path) == (
@@ -425,7 +430,7 @@ def test_cells_parse(tmp_path: Path) -> None:
             "a",
             (
                 ConditionRow("rh", True, "subcategory", ("melee", "torch")),
-                ConditionRow("build", False, "", ("sorcerer", "jester")),
+                ConditionRow("character_class", False, "", ("sorcerer", "jester")),
             ),
             ("rule", ("r1_only",)),
             0,
@@ -442,7 +447,7 @@ def test_cells_parse(tmp_path: Path) -> None:
     [
         (",rh=category:none,rule:r1_only,0", "empty id"),
         ("a,rh,rule:r1_only,0", "has no operator"),
-        ("a,build!=sorcerer,rule:r1_only,0", "cannot negate a build"),
+        ("a,character_class!=sorcerer,rule:r1_only,0", "cannot negate a character class"),
         ("a,rh=none,rule:r1_only,0", "has no kind"),
         ("a,rh=category:none,r1_only,0", "has no kind"),
         ("a,rh=category:none,rule:r1_only,-1", "has odds"),
@@ -458,7 +463,10 @@ def test_bad_cells_fail_to_load(tmp_path: Path, row: str, message: str) -> None:
 @pytest.mark.parametrize(
     ("condition", "message"),
     [
-        (ConditionRow("build", False, "", ("paladin",)), "bad build condition: paladin"),
+        (
+            ConditionRow("character_class", False, "", ("paladin",)),
+            "bad character class condition: paladin",
+        ),
         (ConditionRow("talisman_3", False, "item", ("a",)), "unknown slot talisman_3"),
         (ConditionRow("rh", False, "weapon", ("a",)), "unknown selector kind: weapon"),
     ],

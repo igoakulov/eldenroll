@@ -9,7 +9,7 @@ from pathlib import Path
 from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
-COLUMNS: tuple[str, ...] = ("name", "reason", "reviewer")
+COLUMNS: tuple[str, ...] = ("name", "reason")
 
 
 def load_added_items(path: Path) -> tuple[str, ...]:

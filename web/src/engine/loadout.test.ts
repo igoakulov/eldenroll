@@ -13,7 +13,7 @@ import type { Random, RollContext } from "./slotRoll";
 import { statDeficit } from "./stats";
 
 const data = indexDatabase(realDatabase);
-const BUILDS = realDatabase.build.map((row) => row.id);
+const CHARACTER_CLASSES = realDatabase.character_class.map((row) => row.id);
 const MAXED = Object.fromEntries(STATS.map((stat) => [stat, 99])) as Stats;
 const PARRY_ASHES = realDatabase.item
   .filter((row) => row.alias === "any_parry_ash")
@@ -65,12 +65,12 @@ function realItem(loadout: Loadout, slot: PoolSlot): Item | undefined {
   return value === null || value === undefined ? undefined : data.items.get(value);
 }
 
-function rolls(build: string, testCase: (typeof CASES)[number], times: number): Loadout[] {
-  const random = seeded(build.length * 1000 + times);
+function rolls(characterClass: string, testCase: (typeof CASES)[number], times: number): Loadout[] {
+  const random = seeded(characterClass.length * 1000 + times);
   return Array.from({ length: times }, () =>
     rollLoadout({
       data,
-      build,
+      characterClass,
       boss: null,
       counted: testCase.counted,
       limits: { stats: testCase.stats, maxStatGap: testCase.maxStatGap },
@@ -80,12 +80,12 @@ function rolls(build: string, testCase: (typeof CASES)[number], times: number): 
 }
 
 describe.each(CASES)("every roll on $name", (testCase) => {
-  describe.each(BUILDS)("%s", (build) => {
-    const loadouts = rolls(build, testCase, 60);
+  describe.each(CHARACTER_CLASSES)("%s", (characterClass) => {
+    const loadouts = rolls(characterClass, testCase, 60);
 
-    it("has exactly the slots the build has rows for", () => {
+    it("has exactly the slots the class has rows for", () => {
       const expected = LOADOUT_ORDER.filter(
-        (slot) => slot === "armor" || data.pools.has(poolKey(build, slot)),
+        (slot) => slot === "armor" || data.pools.has(poolKey(characterClass, slot)),
       );
       for (const loadout of loadouts) expect([...loadout.keys()]).toEqual(expected);
     });
@@ -102,7 +102,7 @@ describe.each(CASES)("every roll on $name", (testCase) => {
             }
             continue;
           }
-          const pool = data.pools.get(poolKey(build, slot));
+          const pool = data.pools.get(poolKey(characterClass, slot));
           expect(pool?.selectors.some((one) => matchesOption(one, option))).toBe(true);
           if (option.kind === "item") {
             expect(testCase.counted.has(option.row.id)).toBe(true);
@@ -197,12 +197,12 @@ describe.each(CASES)("every roll on $name", (testCase) => {
   });
 });
 
-describe("build shapes", () => {
+describe("class shapes", () => {
   const testCase = CASES[0];
 
   it("gives the casters no ash line", () => {
-    for (const build of ["sorcerer", "pyromancer"]) {
-      for (const loadout of rolls(build, testCase, 10)) {
+    for (const characterClass of ["sorcerer", "pyromancer"]) {
+      for (const loadout of rolls(characterClass, testCase, 10)) {
         expect(loadout.has("rh_ash")).toBe(false);
         expect(loadout.has("lh_ash")).toBe(false);
       }
@@ -239,7 +239,7 @@ describe("build shapes", () => {
     const nothing = new Set<string>();
     const loadout = rollLoadout({
       data,
-      build: "sorcerer",
+      characterClass: "sorcerer",
       boss: null,
       counted: nothing,
       limits: { stats: MAXED, maxStatGap: 0 },
@@ -269,7 +269,7 @@ describe("armor", () => {
     for (let roll = 0; roll < 100; roll += 1) {
       const loadout = rollLoadout({
         data,
-        build: "knight",
+        characterClass: "knight",
         boss: null,
         counted: CASES[0].counted,
         limits: { stats: MAXED, maxStatGap: 0 },
@@ -288,7 +288,7 @@ describe("armor", () => {
     for (let roll = 0; roll < 100; roll += 1) {
       const loadout = rollLoadout({
         data,
-        build: "knight",
+        characterClass: "knight",
         boss: null,
         counted: CASES[0].counted,
         limits: { stats: MAXED, maxStatGap: 0 },
@@ -311,7 +311,7 @@ describe("armor", () => {
       id(
         rollLoadout({
           data,
-          build: "knight",
+          characterClass: "knight",
           boss: null,
           counted: CASES[0].counted,
           limits: { stats: MAXED, maxStatGap: 0 },
@@ -338,7 +338,7 @@ describe("spellTypeFilter", () => {
     const context: RollContext = {
       data,
       counted: new Set(),
-      state: { build: "x", boss: null, rolled: new Map(Object.entries(rolled)) as Map<PoolSlot, string> },
+      state: { characterClass: "x", boss: null, rolled: new Map(Object.entries(rolled)) as Map<PoolSlot, string> },
     };
     const option: Option = { ...rule, row: spell };
     return spellTypeFilter(context)(option);
@@ -400,7 +400,7 @@ describe("determinism", () => {
   function run(seed: number): (string | null | undefined)[] {
     const loadout = rollLoadout({
       data,
-      build: "spellblade",
+      characterClass: "spellblade",
       boss: null,
       counted: CASES[0].counted,
       limits: { stats: MAXED, maxStatGap: 0 },

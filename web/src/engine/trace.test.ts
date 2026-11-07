@@ -57,12 +57,12 @@ describe("the trace of an objective", () => {
   it("has one block per rolled slot in rolling order, each ending in prob", () => {
     const run = start();
     const trace = run.current?.trace ?? [];
-    expect(trace.map((block) => block.slot).slice(0, 3)).toEqual(["boss", "build", "rh"]);
+    expect(trace.map((block) => block.slot).slice(0, 3)).toEqual(["boss", "character_class", "rh"]);
     for (const text of blocks(run)) expect(text.split("\n").at(-1)).toMatch(/^ {2}prob: /);
   });
 
   it("shows what the player's inputs removed, under pool", () => {
-    const rh = blocks(start({ settings: { ...defaultSettings(realDatabase), builds: ["knight"] } })).find(
+    const rh = blocks(start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } })).find(
       (text) => text.startsWith("RH: "),
     );
     expect(rh).toMatch(
@@ -74,7 +74,7 @@ describe("the trace of an objective", () => {
   });
 
   it("marks a roll from the upgraded list and prints no removals for it", () => {
-    const settings = { ...defaultSettings(realDatabase), builds: ["knight"], upgradedWeaponsEnabled: true };
+    const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], upgradedWeaponsEnabled: true };
     const rh = blocks(start({ settings, upgradedWeapons: ["uchigatana", "longsword"] })).find((text) =>
       text.startsWith("RH: "),
     );
@@ -83,29 +83,29 @@ describe("the trace of an objective", () => {
   });
 
   it("shows a modifier emptying a slot as a removal", () => {
-    const run = start({ settings: { ...defaultSettings(realDatabase), builds: ["knight"] } });
+    const run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
     const spell = blocks(run).find((text) => text.startsWith("Spell: "));
     expect(spell).toBe("Spell: none\n  pool: 0\n    total pool: 1\n    knight other rh keeps a shield in lh: -1\n  prob: 0%");
   });
 
   it("shows decay as a repeat line once something was seen", () => {
-    let run = start({ settings: { ...defaultSettings(realDatabase), builds: ["knight"] } });
+    let run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
     run = done(engine, done(engine, run));
-    const build = blocks(run).find((text) => text.startsWith("Build: "));
-    expect(build).toContain("  repeat: x0.8^2 = x0.64");
+    const characterClass = blocks(run).find((text) => text.startsWith("Class: "));
+    expect(characterClass).toContain("  repeat: x0.8^2 = x0.64");
   });
 
   it("names the condition behind a modifier", () => {
     let found = false;
     for (let seed = 1; seed <= 40 && !found; seed += 1) {
-      const run = start({ settings: { ...defaultSettings(realDatabase), builds: ["jester"] } }, seed);
+      const run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["jester"] } }, seed);
       found = blocks(run).some((text) => text === formatTrace([]) || text.includes("  Jester: x4"));
     }
     expect(found).toBe(true);
   });
 
   it("keeps the blocks before a rerolled slot and replaces the rest", () => {
-    const run = start({ settings: { ...defaultSettings(realDatabase), builds: ["knight"] } });
+    const run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
     const next = reroll(engine, run, "lh");
     const before = run.current?.trace ?? [];
     const after = next.current?.trace ?? [];

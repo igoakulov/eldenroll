@@ -49,10 +49,10 @@ function current(run: Run) {
 
 describe("startRun", () => {
   it("names every problem and starts nothing", () => {
-    const settings = { ...defaultSettings(realDatabase), builds: [] };
+    const settings = { ...defaultSettings(realDatabase), characterClasses: [] };
     expect(startRun(engine, inputs({ regions: [], settings }), 1)).toEqual({
       ok: false,
-      problems: ["Select at least one build", "Select at least one region"],
+      problems: ["Select at least one class", "Select at least one region"],
     });
   });
 
@@ -124,14 +124,14 @@ describe("Done", () => {
     const next = done(engine, run);
     expect(next.deadBosses).toEqual([{ instanceId: objective.boss, objectiveIndex: 1 }]);
     expect(next.completed[0]).toMatchObject({ boss: objective.boss, stats: MAXED, level: 713 });
-    expect(next.seen[`build:${objective.build}`]).toBe(1);
+    expect(next.seen[`character_class:${objective.characterClass}`]).toBe(1);
     expect(next.seen[`rule:${objective.slots.rule_1}`]).toBe(1);
     expect(next.seen[`armor_set:${objective.slots.armor}`]).toBe(1);
     expect(current(next).boss).not.toBe(objective.boss);
   });
 
   it("remembers the hands too, so weapons and shields decay like everything else", () => {
-    const run = start({ settings: { ...defaultSettings(realDatabase), builds: ["knight"] } });
+    const run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
     const { rh, lh } = current(run).slots;
     const next = done(engine, run);
     expect(next.seen[`item:${rh}`]).toBe(1);
@@ -139,9 +139,9 @@ describe("Done", () => {
   });
 
   it("counts each completed objective once, even when none fills several of its slots", () => {
-    let run = start({ settings: { ...defaultSettings(realDatabase), builds: ["warrior_2h"] } });
+    let run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["warrior_2h"] } });
     run = done(engine, done(engine, done(engine, run)));
-    expect(run.seen["build:warrior_2h"]).toBe(3);
+    expect(run.seen["character_class:warrior_2h"]).toBe(3);
     expect(run.seen["item:none"]).toBe(3);
   });
 });
@@ -151,7 +151,7 @@ describe("decay", () => {
     const context = {
       data: engine.data,
       counted: new Set<string>(),
-      state: { build: "knight", boss: null, rolled: new Map() },
+      state: { characterClass: "knight", boss: null, rolled: new Map() },
     };
     const options = slotOptions(engine.data, "knight", "rule_1");
     const weigh = (seen: Record<string, number>) =>
@@ -168,7 +168,7 @@ describe("decay", () => {
 });
 
 describe("aliases", () => {
-  const sorcerer = { settings: { ...defaultSettings(realDatabase), builds: ["sorcerer"] } };
+  const sorcerer = { settings: { ...defaultSettings(realDatabase), characterClasses: ["sorcerer"] } };
   const staves = realDatabase.item.filter((row) => row.alias === "any_staff").map((row) => row.id);
 
   it("counts a shown member as its alias, so every member repeats", () => {
@@ -177,7 +177,7 @@ describe("aliases", () => {
     const context = {
       data: engine.data,
       counted: new Set(staves),
-      state: { build: "sorcerer", boss: null, rolled: new Map() },
+      state: { characterClass: "sorcerer", boss: null, rolled: new Map() },
     };
     const options = slotOptions(engine.data, "sorcerer", "rh");
     const weigh = (seen: Record<string, number>) =>
@@ -205,7 +205,7 @@ describe("aliases", () => {
 });
 
 describe("rerolls", () => {
-  const knight = { settings: { ...defaultSettings(realDatabase), builds: ["knight"] } };
+  const knight = { settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } };
 
   it("keeps the slots before the target and changes the target", () => {
     let run = start(knight);
@@ -239,25 +239,25 @@ describe("rerolls", () => {
   });
 
   it("gives the same result back when it's the only option", () => {
-    const run = start({ settings: { ...defaultSettings(realDatabase), builds: ["warrior_2h"] } });
+    const run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["warrior_2h"] } });
     expect(current(reroll(engine, run, "lh")).slots.lh).toBe("none");
   });
 
-  it("changes the boss on Reroll objective, and the build on Reroll items", () => {
+  it("changes the boss on Reroll objective, and the class on Reroll items", () => {
     const run = start();
     const objective = current(run);
     expect(current(reroll(engine, run, "boss")).boss).not.toBe(objective.boss);
-    const items = current(reroll(engine, run, "build"));
+    const items = current(reroll(engine, run, "character_class"));
     expect(items.boss).toBe(objective.boss);
-    expect(items.build).not.toBe(objective.build);
+    expect(items.characterClass).not.toBe(objective.characterClass);
   });
 
   it("counts every reroll until Done, then starts again", () => {
     let run = start();
     run = reroll(engine, run, "boss");
-    run = reroll(engine, run, "build");
+    run = reroll(engine, run, "character_class");
     run = reroll(engine, run, "rule_2");
-    expect(current(run).rerolls).toEqual(["boss", "build", "rule_2"]);
+    expect(current(run).rerolls).toEqual(["boss", "character_class", "rule_2"]);
     run = done(engine, run);
     expect(run.completed[0]?.rerolls).toHaveLength(3);
     expect(current(run).rerolls).toEqual([]);
@@ -285,7 +285,7 @@ describe("Already dead and Finish run", () => {
 
 describe("Your upgraded weapons", () => {
   const weak = { ...DEFAULT_STATS, str: 1, dex: 1 };
-  const settings = { ...defaultSettings(realDatabase), builds: ["knight"], upgradedWeaponsEnabled: true };
+  const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], upgradedWeaponsEnabled: true };
 
   it("rolls a listed weapon, whatever the region, boss status and stats", () => {
     const run = start({
@@ -298,7 +298,7 @@ describe("Your upgraded weapons", () => {
     expect(current(run).upgradedRh).toBe(true);
   });
 
-  it("falls back to the usual pool when the build can't use a listed weapon", () => {
+  it("falls back to the usual pool when the class can't use a listed weapon", () => {
     const run = start({ settings, upgradedWeapons: ["longbow"] });
     expect(current(run).slots.rh).not.toBe("longbow");
     expect(current(run).upgradedRh).toBe(false);
@@ -331,7 +331,7 @@ describe("Your upgraded weapons", () => {
   });
 
   it("lets none join Jester's first pool without counting as a listed weapon", () => {
-    const jester = { ...settings, builds: ["jester"] };
+    const jester = { ...settings, characterClasses: ["jester"] };
     for (let seed = 1; seed <= 20; seed += 1) {
       const run = start({ settings: jester, upgradedWeapons: ["briar_greatshield"] }, seed);
       expect(["briar_greatshield", "none"]).toContain(current(run).slots.rh);
@@ -341,7 +341,7 @@ describe("Your upgraded weapons", () => {
 
 describe("the Bosses list", () => {
   it("skips a boss without unlocking its items, and marks one dead to unlock them", () => {
-    const settings = { ...defaultSettings(realDatabase), builds: ["warrior_2h"] };
+    const settings = { ...defaultSettings(realDatabase), characterClasses: ["warrior_2h"] };
     const morgott = realDatabase.item_location.find(
       (row) => row.item_id === "morgotts_cursed_sword" && row.boss_instance_id !== null,
     )?.boss_instance_id as string;
@@ -402,7 +402,7 @@ describe("armor", () => {
 
 describe("Never roll", () => {
   it("keeps an excluded item and rule from ever rolling, even from the upgraded list", () => {
-    const settings = { ...defaultSettings(realDatabase), builds: ["knight"], upgradedWeaponsEnabled: true };
+    const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], upgradedWeaponsEnabled: true };
     let run = start({
       settings,
       upgradedWeapons: ["uchigatana"],

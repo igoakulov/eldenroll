@@ -9,7 +9,7 @@ from typing import Final, get_args
 from eldenrando.model.item import Category
 
 CATEGORIES: Final[frozenset[str]] = frozenset(get_args(Category))
-BUILDS: Final[tuple[str, ...]] = (
+CHARACTER_CLASSES: Final[tuple[str, ...]] = (
     "knight",
     "warrior_2h",
     "warrior_dw",
@@ -32,7 +32,7 @@ SLOTS: Final[tuple[str, ...]] = (
     "rule_1",
     "rule_2",
 )
-BUILD_ASH_SLOTS: Final[Mapping[str, frozenset[str]]] = {
+CHARACTER_CLASS_ASH_SLOTS: Final[Mapping[str, frozenset[str]]] = {
     "knight": ASH_SLOTS,
     "warrior_2h": frozenset({"rh_ash"}),
     "warrior_dw": ASH_SLOTS,

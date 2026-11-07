@@ -5,14 +5,14 @@ from collections.abc import Iterable, Mapping
 from collections.abc import Set as AbstractSet
 
 from eldenrando.errors import BuildError
-from eldenrando.model.build import SlotPool
+from eldenrando.model.character_class import SlotPool
 from eldenrando.model.item import Item
 from eldenrando.model.selector import SelectorKind
 from eldenrando.model.vocabulary import (
     ASH_SLOTS,
-    BUILD_ASH_SLOTS,
-    BUILDS,
     CATALYST,
+    CHARACTER_CLASS_ASH_SLOTS,
+    CHARACTER_CLASSES,
     SLOTS,
 )
 from eldenrando.validate.selectors import resolve_items, validate_selectors
@@ -39,20 +39,28 @@ def validate_slot_pools(
 
 
 def _shape(rows: tuple[SlotPool, ...]) -> list[str]:
-    counts = Counter((row.build_id, row.slot) for row in rows)
-    problems = [f"{build} {slot} repeats" for (build, slot), n in counts.items() if n > 1]
-    for build in BUILDS:
-        wanted = {slot for slot in SLOTS if slot not in ASH_SLOTS} | BUILD_ASH_SLOTS[build]
-        found = {slot for (owner, slot) in counts if owner == build}
-        problems += [f"{build} lacks {slot}" for slot in sorted(wanted - found)]
-        problems += [f"{build} should not have {slot}" for slot in sorted(found - wanted)]
-    problems += [f"{row.build_id} {row.slot} has no selector" for row in rows if not row.selectors]
+    counts = Counter((row.character_class_id, row.slot) for row in rows)
+    problems = [
+        f"{character_class} {slot} repeats"
+        for (character_class, slot), n in counts.items()
+        if n > 1
+    ]
+    for character_class in CHARACTER_CLASSES:
+        wanted = {slot for slot in SLOTS if slot not in ASH_SLOTS} | CHARACTER_CLASS_ASH_SLOTS[
+            character_class
+        ]
+        found = {slot for (owner, slot) in counts if owner == character_class}
+        problems += [f"{character_class} lacks {slot}" for slot in sorted(wanted - found)]
+        problems += [f"{character_class} should not have {slot}" for slot in sorted(found - wanted)]
+    problems += [
+        f"{row.character_class_id} {row.slot} has no selector" for row in rows if not row.selectors
+    ]
     return problems
 
 
 def _kinds(rows: tuple[SlotPool, ...]) -> list[str]:
     return [
-        f"{row.build_id} {row.slot} selects by {one.kind}"
+        f"{row.character_class_id} {row.slot} selects by {one.kind}"
         for row in rows
         for one in row.selectors
         if one.kind not in ({"rule"} if row.slot in RULE_SLOTS else ITEM_KINDS)
@@ -75,10 +83,12 @@ def _scope(rows: tuple[SlotPool, ...], table: tuple[Item, ...]) -> list[str]:
     }
     problems: list[str] = []
     for row in rows:
-        key = (row.build_id, row.slot)
+        key = (row.character_class_id, row.slot)
         resolved = {item.id for item in resolve_items(row.selectors, table)}
         if resolved & catalysts != allowed_catalysts.get(key, set[str]()):
-            problems.append(f"{row.build_id} {row.slot} has the wrong catalysts")
+            problems.append(f"{row.character_class_id} {row.slot} has the wrong catalysts")
         if resolved & odd_weapons != (odd_weapons if key == ("jester", "rh") else set[str]()):
-            problems.append(f"{row.build_id} {row.slot} has the wrong torches or perfume bottles")
+            problems.append(
+                f"{row.character_class_id} {row.slot} has the wrong torches or perfume bottles"
+            )
     return problems

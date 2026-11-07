@@ -247,21 +247,21 @@ def ash_gaps(sources: GapSources) -> tuple[Gap, ...]:
     )
 
 
-def class_gaps(sources: GapSources) -> tuple[Gap, ...]:
+def weapon_class_gaps(sources: GapSources) -> tuple[Gap, ...]:
     start = sources.ash_sheet.header.index(_ASH_SHEET_FIRST_CLASS)
     columns = {
         _ASH_SHEET_CLASSES.get(name, name.casefold().replace(" ", "_"))
         for name in sources.ash_sheet.header[start:]
         if name != _ASH_SHEET_NOT_A_CLASS
     }
-    classes = {
+    weapon_classes = {
         item.subcategory
         for item in sources.table
         if item.category in ("weapon", "shield") and item.subcategory is not None
     }
     return tuple(
         Gap(
-            area="class_ashes",
+            area="weapon_class_ashes",
             item=name.replace("_", " ").title().replace(" To ", "-to-"),
             origin="dlc",
             problem="the ash sheet has no column for this class, so its weapons have no ash list",
@@ -269,7 +269,7 @@ def class_gaps(sources: GapSources) -> tuple[Gap, ...]:
             step="2.4.6",
             owner="both",
         )
-        for name in sorted(classes - columns)
+        for name in sorted(weapon_classes - columns)
     )
 
 
@@ -308,7 +308,7 @@ def find_gaps(sources: GapSources) -> tuple[Gap, ...]:
         *requirement_gaps(sources),
         *holds_ash_gaps(sources),
         *ash_gaps(sources),
-        *class_gaps(sources),
+        *weapon_class_gaps(sources),
         *remembrance_gaps(sources, names),
     )
 

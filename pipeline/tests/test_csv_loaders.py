@@ -64,11 +64,11 @@ def test_boss_table_starts_after_the_legend_line() -> None:
 
 def test_weapon_table_keeps_class_separators() -> None:
     table = load_weapon_categories(WEAPON_SHIELD_CLASSES)
-    class_column = table.column("Weapon Class")
-    classes = {row[class_column] for row in table.rows if any(row)}
+    weapon_class_column = table.column("Weapon Class")
+    weapon_classes = {row[weapon_class_column] for row in table.rows if any(row)}
 
     assert table.blank_row_count == 42
-    assert len(classes) == 42
+    assert len(weapon_classes) == 42
 
 
 def test_missing_csv_is_a_loader_error(tmp_path: Path) -> None:

@@ -8,7 +8,7 @@ import {
   type SlotRoll,
 } from "./slotRoll";
 
-export type TraceSlot = "boss" | "build" | LoadoutSlot;
+export type TraceSlot = "boss" | "character_class" | LoadoutSlot;
 
 export interface TraceBlock {
   readonly slot: TraceSlot;
@@ -17,7 +17,7 @@ export interface TraceBlock {
 
 export const TRACE_LABELS: Readonly<Record<TraceSlot, string>> = {
   boss: "Boss",
-  build: "Build",
+  character_class: "Class",
   rh: "RH",
   rh_ash: "RH ash",
   lh: "LH",
@@ -58,13 +58,15 @@ function repeatLine(key: string, repetition: Repetition): string | null {
 
 export interface RolledContext {
   readonly boss: string | null;
-  readonly build: string;
+  readonly characterClass: string;
   readonly slots: RolledSlots;
 }
 
 function rolledName(data: EngineData, rolled: RolledContext, slot: TraceSlot): string {
   if (slot === "boss") return data.bosses.get(rolled.boss ?? "")?.name ?? "none";
-  if (slot === "build") return data.database.build.find((row) => row.id === rolled.build)?.name ?? "none";
+  if (slot === "character_class") {
+    return data.database.character_class.find((row) => row.id === rolled.characterClass)?.name ?? "none";
+  }
   const id = rolled.slots[slot];
   if (id === null || id === undefined) return "none";
   if (slot === "armor") return data.armorSets.get(id)?.name ?? id;
@@ -74,7 +76,7 @@ function rolledName(data: EngineData, rolled: RolledContext, slot: TraceSlot): s
 
 /** Names what a modifier read, such as `Claw Talisman` or `RH katana`. */
 function conditionLabel(data: EngineData, rolled: RolledContext, condition: Condition): string | null {
-  if (condition.kind === "build") return null;
+  if (condition.kind === "character_class") return null;
   const { slot, selector } = condition;
   if (selector.kind === "subcategory" || selector.kind === "category") {
     const id = rolled.slots[slot as PoolSlot];
@@ -89,7 +91,7 @@ function modifierLabel(data: EngineData, rolled: RolledContext, modifier: Modifi
   const labels = modifier.when
     .map((condition) => conditionLabel(data, rolled, condition))
     .filter((label): label is string => label !== null);
-  return labels.length > 0 ? labels.join(" + ") : rolledName(data, rolled, "build");
+  return labels.length > 0 ? labels.join(" + ") : rolledName(data, rolled, "character_class");
 }
 
 export function slotTrace(
@@ -131,15 +133,15 @@ export interface PickTrace {
   readonly probability: number;
 }
 
-export function pickTrace(slot: "boss" | "build", pick: PickTrace): TraceBlock {
+export function pickTrace(slot: "boss" | "character_class", pick: PickTrace): TraceBlock {
   const lines = [`${TRACE_LABELS[slot]}: ${pick.heading}`, `  pool: ${pick.pool}`, `  odds: ${pick.odds}`];
   if (pick.repeat !== null) lines.push(pick.repeat);
   lines.push(`  prob: ${formatProbability(pick.probability)}`);
   return { slot, text: lines.join("\n") };
 }
 
-export function buildRepeatLine(build: string, repetition: Repetition): string | null {
-  return repeatLine(`build:${build}`, repetition);
+export function characterClassRepeatLine(characterClass: string, repetition: Repetition): string | null {
+  return repeatLine(`character_class:${characterClass}`, repetition);
 }
 
 export function formatTrace(blocks: readonly TraceBlock[]): string {

@@ -1,4 +1,4 @@
-name,reason,reviewer
-Serpent-Hunter,real weapon with no iteminfo name; the weapon CSV gives its class,owner
-Sword of Light,real weapon with no iteminfo name; the weapon CSV gives its class,owner
-Sword of Darkness,real weapon with no iteminfo name; the weapon CSV gives its class,owner
+name,reason
+Serpent-Hunter,real weapon with no iteminfo name; the weapon CSV gives its class
+Sword of Light,real weapon with no iteminfo name; the weapon CSV gives its class
+Sword of Darkness,real weapon with no iteminfo name; the weapon CSV gives its class

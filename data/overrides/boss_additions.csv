@@ -1,26 +1,26 @@
-name,location_label,location_id,reason,reviewer
-"Count Ymir, Mother of Fingers",Scadu Altus - Cathedral of Manus Metyr,scadualtus,a boss the CSV leaves untagged,owner
-Dryleaf Dane,"Scadu Altus - Moorth Ruins, Bonny Village West Entrance",scadualtus,a boss the CSV leaves untagged; his part in Leda's fight gives him no second instance,owner
-Tibia Mariner,Charo's Hidden Grave - Southeast Mariner Area,charo,both wikis list it and the mod tags it miniboss; the CSV leaves it untagged,owner
-Leda and Allies,Enir-Ilim,enirilim,Fextralife's name for the fight; the CSV leaves it untagged,owner
-Crucible Knight Devonia,"Ancient Ruins of Rauh - West Ruins Northeast Cliffside, East Ruins Cave Exit",rauhruins,Fandom lists it and the mod tags it miniboss; the CSV leaves it untagged,owner
-Furnace Golem,Gravesite Plain - Three-Path Cross,gravesite,"one of 8 separate fights by both wikis and the mod, north of Scorched Ruins",owner
-Furnace Golem,Gravesite Plain - Ellac River End,ellac,"one of 8 separate fights by both wikis and the mod, past Ellac River Downstream",owner
-Furnace Golem,Scadu Altus - Furnace Golem Area,scadualtus,"one of 8 separate fights by both wikis and the mod, in the camp south of Shadow Keep",owner
-Furnace Golem,Scadu Altus - Second Furnace Golem Area,scadualtus,"one of 8 separate fights by both wikis and the mod, east of Manus Metyr, with armored legs",owner
-Furnace Golem,Scadu Altus - Castle Watering Hole Southeast,scadualtus_recluse,"one of 8 separate fights by both wikis and the mod, the active one by Ruins of Unte",owner
-Furnace Golem,Scadu Altus - South Ruins of Unte (inactive),scadualtus_recluse,"one of 8 separate fights by both wikis and the mod, the one a thrown pot wakes",owner
-Furnace Golem,Ancient Ruins of Rauh - Furnace Golem Area,rauhbase,"one of 8 separate fights by both wikis and the mod, in the West Ruins",owner
-Furnace Golem,Charo's Hidden Grave - Southwest Furnace Golem Area,charo,"one of 8 separate fights by both wikis and the mod, with armored legs",owner
-Baleful Shadow,Ainsel River Main,ainsel,"owner decision: it forces Ranni's quest, which leads to a lot of other content",owner
-Blaidd the Half-Wolf,"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise",moonlight,"not an objective, kept for its drops: his armor pieces and Royal Greatsword. He invades at Ranni's Rise only after Ranni's quest is complete, past the Moonlight Altar, so he counts as there",owner
-Fire Knight Kood,Specimen Storehouse - Shadow Tower,storehouse_back,"not an objective, kept for its drops: Flame Spear and Winged Serpent Helm",owner
-Fire Knight Salza,Shadow Keep - West Rampart,westrampart,"not an objective, kept for its drops: Rain of Fire and Salza's Hood",owner
-Fire Knight Wego,Shadow Keep - Drained Church District,shadowkeep_church_lower,"not an objective, kept for its drops: Death Mask Helm",owner
-Divine Bird Warrior,"Belurat, Tower Settlement Swamp",belurat_swamp,"not an objective, kept for its drops: Horned Warrior's Sword",owner
-Divine Bird Warrior,Enir-Ilim,enirilim,"not an objective, kept for its drops: Horned Warrior's Greatsword",owner
-Ensha of the Royal Remains,Roundtable Hold,roundtable,"not an objective, kept for its drops: Clinging Bone",owner
-Erdtree Avatar,Deeproot Depths,deeproot,"not an objective, kept for its drops: Staff of the Avatar",owner
-Fire Prelate,Mt. Gelmir - Fort Laiedd,gelmir,"not an objective, kept for its drops: Prelate's Inferno Crozier",owner
-Putrid Avatar,Miquella's Haligtree - Elphael,haligtree_elphael,"not an objective, kept for its drops: Rotten Staff",owner
-Shadow Tree Spirit,Gravesite Plain - Ellac River Cave,ellac,"not an objective, kept for its drops: Horned Bairn",owner
+name,location_label,location_id,reason
+"Count Ymir, Mother of Fingers",Scadu Altus - Cathedral of Manus Metyr,scadualtus,a boss the CSV leaves untagged
+Dryleaf Dane,"Scadu Altus - Moorth Ruins, Bonny Village West Entrance",scadualtus,a boss the CSV leaves untagged; his part in Leda's fight gives him no second instance
+Tibia Mariner,Charo's Hidden Grave - Southeast Mariner Area,charo,both wikis list it and the mod tags it miniboss; the CSV leaves it untagged
+Leda and Allies,Enir-Ilim,enirilim,Fextralife's name for the fight; the CSV leaves it untagged
+Crucible Knight Devonia,"Ancient Ruins of Rauh - West Ruins Northeast Cliffside, East Ruins Cave Exit",rauhruins,Fandom lists it and the mod tags it miniboss; the CSV leaves it untagged
+Furnace Golem,Gravesite Plain - Three-Path Cross,gravesite,"one of 8 separate fights by both wikis and the mod, north of Scorched Ruins"
+Furnace Golem,Gravesite Plain - Ellac River End,ellac,"one of 8 separate fights by both wikis and the mod, past Ellac River Downstream"
+Furnace Golem,Scadu Altus - Furnace Golem Area,scadualtus,"one of 8 separate fights by both wikis and the mod, in the camp south of Shadow Keep"
+Furnace Golem,Scadu Altus - Second Furnace Golem Area,scadualtus,"one of 8 separate fights by both wikis and the mod, east of Manus Metyr, with armored legs"
+Furnace Golem,Scadu Altus - Castle Watering Hole Southeast,scadualtus_recluse,"one of 8 separate fights by both wikis and the mod, the active one by Ruins of Unte"
+Furnace Golem,Scadu Altus - South Ruins of Unte (inactive),scadualtus_recluse,"one of 8 separate fights by both wikis and the mod, the one a thrown pot wakes"
+Furnace Golem,Ancient Ruins of Rauh - Furnace Golem Area,rauhbase,"one of 8 separate fights by both wikis and the mod, in the West Ruins"
+Furnace Golem,Charo's Hidden Grave - Southwest Furnace Golem Area,charo,"one of 8 separate fights by both wikis and the mod, with armored legs"
+Baleful Shadow,Ainsel River Main,ainsel,"owner decision: it forces Ranni's quest, which leads to a lot of other content"
+Blaidd the Half-Wolf,"Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise",moonlight,"not an objective, kept for its drops: his armor pieces and Royal Greatsword. He invades at Ranni's Rise only after Ranni's quest is complete, past the Moonlight Altar, so he counts as there"
+Fire Knight Kood,Specimen Storehouse - Shadow Tower,storehouse_back,"not an objective, kept for its drops: Flame Spear and Winged Serpent Helm"
+Fire Knight Salza,Shadow Keep - West Rampart,westrampart,"not an objective, kept for its drops: Rain of Fire and Salza's Hood"
+Fire Knight Wego,Shadow Keep - Drained Church District,shadowkeep_church_lower,"not an objective, kept for its drops: Death Mask Helm"
+Divine Bird Warrior,"Belurat, Tower Settlement Swamp",belurat_swamp,"not an objective, kept for its drops: Horned Warrior's Sword"
+Divine Bird Warrior,Enir-Ilim,enirilim,"not an objective, kept for its drops: Horned Warrior's Greatsword"
+Ensha of the Royal Remains,Roundtable Hold,roundtable,"not an objective, kept for its drops: Clinging Bone"
+Erdtree Avatar,Deeproot Depths,deeproot,"not an objective, kept for its drops: Staff of the Avatar"
+Fire Prelate,Mt. Gelmir - Fort Laiedd,gelmir,"not an objective, kept for its drops: Prelate's Inferno Crozier"
+Putrid Avatar,Miquella's Haligtree - Elphael,haligtree_elphael,"not an objective, kept for its drops: Rotten Staff"
+Shadow Tree Spirit,Gravesite Plain - Ellac River Cave,ellac,"not an objective, kept for its drops: Horned Bairn"

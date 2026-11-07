@@ -10,7 +10,7 @@ from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 
 _DLC_TAG = "[DLC] "
-_BOSS_COLUMNS: tuple[str, ...] = ("boss", "location_label", "reason", "reviewer")
+_BOSS_COLUMNS: tuple[str, ...] = ("boss", "location_label", "reason")
 
 BossPlace = tuple[str, str]
 

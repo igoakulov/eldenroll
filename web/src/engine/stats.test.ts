@@ -32,9 +32,9 @@ function option(id: string): Option {
   return { kind: "item", row: item(id) };
 }
 
-function context(build: string, rolled: Partial<Record<PoolSlot, string | null>> = {}): RollContext {
+function context(characterClass: string, rolled: Partial<Record<PoolSlot, string | null>> = {}): RollContext {
   const map = new Map(Object.entries(rolled)) as Map<PoolSlot, string | null>;
-  return { data, counted, state: { build, boss: null, rolled: map } };
+  return { data, counted, state: { characterClass, boss: null, rolled: map } };
 }
 
 /** The lowest Strength that reaches `required` only with the two-handed bonus. */
@@ -115,7 +115,7 @@ describe("rhStatFilter looks ahead at LH", () => {
     expect(rhStatFilter(context("spellblade"), needsBonus)(option("zweihander"))).toBe(false);
   });
 
-  it("keeps a weapon the player can wield one-handed, in any build", () => {
+  it("keeps a weapon the player can wield one-handed, in any class", () => {
     const met = { stats: MAXED, maxStatGap: 0 };
     expect(rhStatFilter(context("knight"), met)(option("zweihander"))).toBe(true);
   });

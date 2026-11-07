@@ -1,18 +1,18 @@
-item,odds,reason,reviewer
-igons_drake_hunt,0,"owner decision: easily missed, so it stays a row that never rolls",owner
-lamenters_mask,0,"owner decision: a transform that conflicts with gear, so it stays a row that never rolls",owner
-priestess_heart,0,"owner decision: a transform that conflicts with gear, so it stays a row that never rolls",owner
-rock_heart,0,"owner decision: a transform that conflicts with gear, so it stays a row that never rolls",owner
-litany_of_proper_death,0,"owner decision: its places are hard to pin down, and it is nearly useless against anything not undead, so it stays a row that never rolls",owner
-finger_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-godslayers_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-giants_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-gravel_stone_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-clawmark_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-golden_order_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-erdtree_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-dragon_communion_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-frenzied_flame_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-dryleaf_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-fire_knights_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
-spiraltree_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds",owner
+item,odds,reason
+igons_drake_hunt,0,"owner decision: easily missed, so it stays a row that never rolls"
+lamenters_mask,0,"owner decision: a transform that conflicts with gear, so it stays a row that never rolls"
+priestess_heart,0,"owner decision: a transform that conflicts with gear, so it stays a row that never rolls"
+rock_heart,0,"owner decision: a transform that conflicts with gear, so it stays a row that never rolls"
+litany_of_proper_death,0,"owner decision: its places are hard to pin down, and it is nearly useless against anything not undead, so it stays a row that never rolls"
+finger_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+godslayers_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+giants_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+gravel_stone_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+clawmark_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+golden_order_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+erdtree_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+dragon_communion_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+frenzied_flame_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+dryleaf_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+fire_knights_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"
+spiraltree_seal,2,"owner decision: staves outnumber seals, and a rolled catalyst decides the spell type, so seals roll at twice the odds"

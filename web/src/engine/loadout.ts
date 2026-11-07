@@ -31,7 +31,7 @@ export const LOADOUT_ORDER: readonly LoadoutSlot[] = [
 
 export interface LoadoutInput {
   readonly data: EngineData;
-  readonly build: string;
+  readonly characterClass: string;
   readonly boss: string | null;
   readonly counted: ReadonlySet<string>;
   readonly countedIfBossesDead?: ReadonlySet<string>;
@@ -131,7 +131,7 @@ function rollExcluding(
   exclude: string | null,
   random: Random,
 ): SlotRoll {
-  const options = slotOptions(context.data, context.state.build, slot);
+  const options = slotOptions(context.data, context.state.characterClass, slot);
   if (exclude !== null) {
     const roll = sample(weighOptions(context, options, excluding(filters, exclude)), random);
     if (roll.chosen !== null) return roll;
@@ -148,7 +148,7 @@ function rollUpgradedRh(
   random: Random,
 ): SlotRoll | null {
   const firstPool: RollContext = { ...context, counted: listed };
-  const options = slotOptions(context.data, context.state.build, "rh").filter(
+  const options = slotOptions(context.data, context.state.characterClass, "rh").filter(
     (option) => option.row.id === "none" || listed.has(option.row.id),
   );
   const isListed: OptionFilter = (option) => listed.has(option.row.id);
@@ -159,7 +159,7 @@ function rollUpgradedRh(
 }
 
 export function rollLoadout(input: LoadoutInput): Loadout {
-  const { data, build, boss, counted, limits, random } = input;
+  const { data, characterClass, boss, counted, limits, random } = input;
   const from = input.from ?? "rh";
   const start = LOADOUT_ORDER.indexOf(from);
   const rolled = new Map<PoolSlot, string | null>();
@@ -168,7 +168,7 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     if (value !== undefined && slot !== "armor") rolled.set(slot, value);
   }
   const loadout = new Map<LoadoutSlot, SlotRoll>();
-  const state: RollState = { build, boss, rolled };
+  const state: RollState = { characterClass, boss, rolled };
   const context: RollContext = {
     data,
     state,
@@ -181,7 +181,7 @@ export function rollLoadout(input: LoadoutInput): Loadout {
   };
 
   for (const slot of LOADOUT_ORDER.slice(start)) {
-    if (slot !== "armor" && !data.pools.has(poolKey(build, slot))) continue;
+    if (slot !== "armor" && !data.pools.has(poolKey(characterClass, slot))) continue;
     const exclude = slot === from ? (input.exclude ?? null) : null;
     const upgraded =
       slot === "rh" && input.upgraded ? rollUpgradedRh(context, input.upgraded, exclude, random) : null;

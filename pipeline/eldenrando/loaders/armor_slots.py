@@ -6,7 +6,7 @@ from eldenrando.loaders.csv_source import read_table
 from eldenrando.loaders.schema import LoaderError
 from eldenrando.model.vocabulary import ARMOR_SLOTS
 
-COLUMNS: tuple[str, ...] = ("piece", "slot", "reason", "reviewer")
+COLUMNS: tuple[str, ...] = ("piece", "slot", "reason")
 
 
 def load_armor_slots(path: Path) -> dict[str, str]:

@@ -339,12 +339,12 @@ def test_missing_column_is_a_loader_error(tmp_path: Path) -> None:
 
 def _override_file(tmp_path: Path, row: str) -> Path:
     source = tmp_path / "overrides.csv"
-    source.write_text(f"boss,label,location_id,reason,reviewer\n{row}\n", encoding="utf-8")
+    source.write_text(f"boss,label,location_id,reason\n{row}\n", encoding="utf-8")
     return source
 
 
 def test_override_row_loads(tmp_path: Path) -> None:
-    source = _override_file(tmp_path, "Boss,Tile,a,why,owner")
+    source = _override_file(tmp_path, "Boss,Tile,a,why")
 
     loaded = load_boss_location_overrides(source, labels={"Tile"}, location_ids={"a"})
 
@@ -354,12 +354,11 @@ def test_override_row_loads(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("row", "message"),
     [
-        (",Tile,a,why,owner", "empty boss"),
-        ("Boss,Tile,a,,owner", "empty reason"),
-        ("Boss,Tile,a,why,", "empty reviewer"),
-        ("Boss,Ghost,a,why,owner", "unknown label 'Ghost'"),
-        ("Boss,Tile,moon,why,owner", "unknown location_id 'moon'"),
-        ("Boss,Tile,a,why,owner\nBoss,Tile,a,why,owner", "duplicate override"),
+        (",Tile,a,why", "empty boss"),
+        ("Boss,Tile,a,", "empty reason"),
+        ("Boss,Ghost,a,why", "unknown label 'Ghost'"),
+        ("Boss,Tile,moon,why", "unknown location_id 'moon'"),
+        ("Boss,Tile,a,why\nBoss,Tile,a,why", "duplicate override"),
     ],
 )
 def test_bad_override_row_is_a_loader_error(tmp_path: Path, row: str, message: str) -> None:

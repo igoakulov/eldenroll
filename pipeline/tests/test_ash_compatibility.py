@@ -225,15 +225,15 @@ def test_only_an_infusable_weapon_in_a_class_with_no_ash_is_reported() -> None:
 @pytest.mark.parametrize(
     ("line", "message"),
     [
-        ("A,weapon,dagger,,owner", "empty reason"),
-        ("A,armor,head,why,owner", "category is"),
-        ("A,weapon,small_shield,why,owner", "is not a weapon class"),
-        ("A,weapon,dagger,why,owner\nA,weapon,dagger,why,owner", "duplicate row"),
+        ("A,weapon,dagger,", "empty reason"),
+        ("A,armor,head,why", "category is"),
+        ("A,weapon,small_shield,why", "is not a weapon class"),
+        ("A,weapon,dagger,why\nA,weapon,dagger,why", "duplicate row"),
     ],
 )
 def test_bad_override_row_stops_the_load(tmp_path: Path, line: str, message: str) -> None:
     path = tmp_path / "ash_compatibility.csv"
-    path.write_text(f"ash,category,subcategory,reason,reviewer\n{line}\n", encoding="utf-8")
+    path.write_text(f"ash,category,subcategory,reason\n{line}\n", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         load_ash_overrides(path)
 
@@ -241,6 +241,6 @@ def test_bad_override_row_stops_the_load(tmp_path: Path, line: str, message: str
 def test_blank_subcategory_is_the_whole_category(tmp_path: Path) -> None:
     path = tmp_path / "ash_compatibility.csv"
     path.write_text(
-        "ash,category,subcategory,reason,reviewer\nA,shield,,why,owner\n", encoding="utf-8"
+        "ash,category,subcategory,reason\nA,shield,,why\n", encoding="utf-8"
     )
     assert load_ash_overrides(path) == (AshOverride("A", "shield", None),)
