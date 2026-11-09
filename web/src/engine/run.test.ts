@@ -30,7 +30,7 @@ function inputs(changes: Partial<RunInputs> = {}): RunInputs {
     stats: MAXED,
     settings: defaultSettings(realDatabase),
     regions: BEFORE_ASHEN,
-    upgradedWeapons: [],
+    weaponShortlist: [],
     deadBosses: [],
     ...changes,
   };
@@ -283,47 +283,47 @@ describe("Already dead and Finish run", () => {
   });
 });
 
-describe("Your upgraded weapons", () => {
+describe("Weapon shortlist", () => {
   const weak = { ...DEFAULT_STATS, str: 1, dex: 1 };
-  const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], upgradedWeaponsEnabled: true };
+  const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], weaponShortlistEnabled: true };
 
   it("rolls a listed weapon, whatever the region, boss status and stats", () => {
     const run = start({
       settings,
       stats: weak,
       regions: ["limgrave"],
-      upgradedWeapons: ["morgotts_cursed_sword"],
+      weaponShortlist: ["morgotts_cursed_sword"],
     });
     expect(current(run).slots.rh).toBe("morgotts_cursed_sword");
-    expect(current(run).upgradedRh).toBe(true);
+    expect(current(run).shortlistRh).toBe(true);
   });
 
   it("falls back to the usual pool when the class can't use a listed weapon", () => {
-    const run = start({ settings, upgradedWeapons: ["longbow"] });
+    const run = start({ settings, weaponShortlist: ["longbow"] });
     expect(current(run).slots.rh).not.toBe("longbow");
-    expect(current(run).upgradedRh).toBe(false);
+    expect(current(run).shortlistRh).toBe(false);
   });
 
   it("does nothing while the checkbox is off", () => {
     const run = start({
-      settings: { ...settings, upgradedWeaponsEnabled: false },
+      settings: { ...settings, weaponShortlistEnabled: false },
       stats: weak,
       regions: ["limgrave"],
-      upgradedWeapons: ["morgotts_cursed_sword"],
+      weaponShortlist: ["morgotts_cursed_sword"],
     });
     expect(current(run).slots.rh).not.toBe("morgotts_cursed_sword");
   });
 
   it("lets a reroll of RH move on to the usual pool when the one listed weapon is excluded", () => {
-    const run = start({ settings, upgradedWeapons: ["uchigatana"] });
+    const run = start({ settings, weaponShortlist: ["uchigatana"] });
     const next = current(reroll(engine, run, "rh"));
     expect(next.slots.rh).not.toBe("uchigatana");
-    expect(next.upgradedRh).toBe(false);
+    expect(next.shortlistRh).toBe(false);
   });
 
   it("decays a used listed weapon against the others on the list", () => {
     const listed = ["uchigatana", "longsword"];
-    let run = start({ settings, upgradedWeapons: listed });
+    let run = start({ settings, weaponShortlist: listed });
     const first = current(run).slots.rh;
     run = done(engine, run);
     expect(run.seen[`item:${first}`]).toBe(1);
@@ -333,7 +333,7 @@ describe("Your upgraded weapons", () => {
   it("lets none join Jester's first pool without counting as a listed weapon", () => {
     const jester = { ...settings, characterClasses: ["jester"] };
     for (let seed = 1; seed <= 20; seed += 1) {
-      const run = start({ settings: jester, upgradedWeapons: ["briar_greatshield"] }, seed);
+      const run = start({ settings: jester, weaponShortlist: ["briar_greatshield"] }, seed);
       expect(["briar_greatshield", "none"]).toContain(current(run).slots.rh);
     }
   });
@@ -401,11 +401,11 @@ describe("armor", () => {
 });
 
 describe("Never roll", () => {
-  it("keeps an excluded item and rule from ever rolling, even from the upgraded list", () => {
-    const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], upgradedWeaponsEnabled: true };
+  it("keeps an excluded item and rule from ever rolling, even from the weapon shortlist", () => {
+    const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], weaponShortlistEnabled: true };
     let run = start({
       settings,
-      upgradedWeapons: ["uchigatana"],
+      weaponShortlist: ["uchigatana"],
       neverRoll: ["item:uchigatana", "rule:none"],
     });
     for (let step = 0; step < 25; step += 1) {

@@ -21,11 +21,11 @@ export const DEFAULT_STATS: Stats = {
   arc: 10,
 };
 
-/** The upgraded weapons list and dead bosses are run state, so they sit beside these (`prd.md` §11). */
+/** The weapon shortlist and dead bosses are run state, so they sit beside these (`prd.md` §11). */
 export interface Settings {
   readonly maxStatGap: number;
   readonly characterClasses: readonly string[];
-  readonly upgradedWeaponsEnabled: boolean;
+  readonly weaponShortlistEnabled: boolean;
   readonly bossItemsOnlyFromDeadBosses: boolean;
 }
 
@@ -36,7 +36,7 @@ export function defaultSettings(
   return {
     maxStatGap: hyperparams.defaultMaxStatGap,
     characterClasses: database.character_class.map((row) => row.id),
-    upgradedWeaponsEnabled: false,
+    weaponShortlistEnabled: false,
     bossItemsOnlyFromDeadBosses: true,
   };
 }

@@ -38,7 +38,7 @@ export interface Objective {
   readonly boss: string;
   readonly characterClass: string;
   readonly slots: RolledSlots;
-  readonly upgradedRh: boolean;
+  readonly shortlistRh: boolean;
   /** Every reroll since the last `Done`, carried across `Reroll objective` and `Reroll items`. */
   readonly rerolls: readonly RerollTarget[];
   /** One block per rolled slot, for the console in development (`prd.md` §8.7). */
@@ -66,7 +66,7 @@ export interface Run {
   readonly stats: Stats;
   readonly settings: Settings;
   readonly regions: readonly string[];
-  readonly upgradedWeapons: readonly string[];
+  readonly weaponShortlist: readonly string[];
   readonly deadBosses: readonly DeadBoss[];
   /** Kept out of the boss pool by the player, but alive for their items and the summary. */
   readonly skippedBosses: readonly string[];
@@ -83,7 +83,7 @@ export interface RunInputs {
   readonly stats: Stats;
   readonly settings: Settings;
   readonly regions: readonly string[];
-  readonly upgradedWeapons: readonly string[];
+  readonly weaponShortlist: readonly string[];
   readonly deadBosses: readonly string[];
   readonly skippedBosses?: readonly string[];
   readonly neverRoll?: readonly string[];
@@ -183,7 +183,7 @@ function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: s
 
 interface RolledSlotsResult {
   readonly slots: RolledSlots;
-  readonly upgradedRh: boolean | null;
+  readonly shortlistRh: boolean | null;
   readonly trace: readonly TraceBlock[];
 }
 
@@ -207,7 +207,7 @@ function rollSlots(
     limits: { stats: run.stats, maxStatGap: run.settings.maxStatGap },
     random,
     repetition: decay,
-    upgraded: run.settings.upgradedWeaponsEnabled ? new Set(run.upgradedWeapons) : null,
+    shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,
     neverRoll: new Set(run.neverRoll),
     from,
     kept,
@@ -222,7 +222,7 @@ function rollSlots(
   const rolled = { boss: objective.boss, characterClass: objective.characterClass, slots };
   const trace = [...loadout].map(([slot, roll]) => slotTrace(engine.data, slot, roll, rolled, decay));
   const rh = loadout.get("rh");
-  return { slots, upgradedRh: rh === undefined ? null : rh.upgraded, trace };
+  return { slots, shortlistRh: rh === undefined ? null : rh.fromShortlist, trace };
 }
 
 function stopped(run: Run, status: Exclude<BossPool["status"], "ready">, rngState: number): Run {
@@ -251,7 +251,7 @@ function rollObjective(
       boss: boss.id,
       characterClass: characterClass.id,
       slots: loadout.slots,
-      upgradedRh: loadout.upgradedRh ?? false,
+      shortlistRh: loadout.shortlistRh ?? false,
       rerolls,
       trace: [boss.block, characterClass.block, ...loadout.trace],
     },
@@ -277,7 +277,7 @@ export function startRun(engine: Engine, inputs: RunInputs, seed: number): Start
     stats: inputs.stats,
     settings: inputs.settings,
     regions: inputs.regions,
-    upgradedWeapons: inputs.upgradedWeapons,
+    weaponShortlist: inputs.weaponShortlist,
     deadBosses: inputs.deadBosses.map((instanceId) => ({ instanceId, objectiveIndex: 0 })),
     skippedBosses: inputs.skippedBosses ?? [],
     neverRoll: inputs.neverRoll ?? [],
@@ -296,7 +296,7 @@ export function objectiveNumber(run: Run): number {
 /** Changes apply on the next roll; the current objective stays as it is. */
 export function editRun(
   run: Run,
-  changes: Partial<Pick<Run, "stats" | "settings" | "regions" | "upgradedWeapons" | "neverRoll">>,
+  changes: Partial<Pick<Run, "stats" | "settings" | "regions" | "weaponShortlist" | "neverRoll">>,
 ): Run {
   return { ...run, ...changes };
 }
@@ -411,7 +411,7 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
         ...objective,
         characterClass: characterClassId,
         slots: loadout.slots,
-        upgradedRh: loadout.upgradedRh ?? false,
+        shortlistRh: loadout.shortlistRh ?? false,
         rerolls,
         trace: [...kept, ...(characterClass === null ? [] : [characterClass.block]), ...loadout.trace],
       },
@@ -433,7 +433,7 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
     current: {
       ...objective,
       slots: loadout.slots,
-      upgradedRh: loadout.upgradedRh ?? objective.upgradedRh,
+      shortlistRh: loadout.shortlistRh ?? objective.shortlistRh,
       rerolls,
       trace: [...traceBefore(objective.trace, target), ...loadout.trace],
     },

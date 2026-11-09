@@ -40,7 +40,7 @@ export interface LoadoutInput {
   readonly random: Random;
   readonly repetition?: Repetition;
   /** RH rolls from these first; `null` when the setting is off. */
-  readonly upgraded?: ReadonlySet<string> | null;
+  readonly shortlist?: ReadonlySet<string> | null;
   /** A reroll keeps the slots before `from` as they are. */
   readonly from?: LoadoutSlot;
   readonly kept?: Readonly<Partial<Record<LoadoutSlot, string | null>>>;
@@ -141,7 +141,7 @@ function rollExcluding(
 
 /** Listed weapons skip location, boss status and stats; `none` can't be listed, so it only joins
  * the pool, and a pool with no listed weapon left falls back to the usual one. */
-function rollUpgradedRh(
+function rollShortlistRh(
   context: RollContext,
   listed: ReadonlySet<string>,
   exclude: string | null,
@@ -155,7 +155,7 @@ function rollUpgradedRh(
   const notExcluded: OptionFilter = (option) => option.row.id !== exclude;
   const result = weighOptions(firstPool, options, exclude === null ? {} : { rules: [notExcluded] });
   if (!result.options.some((row) => isListed(row.option))) return null;
-  return { ...sample(result, random), upgraded: true };
+  return { ...sample(result, random), fromShortlist: true };
 }
 
 export function rollLoadout(input: LoadoutInput): Loadout {
@@ -183,10 +183,10 @@ export function rollLoadout(input: LoadoutInput): Loadout {
   for (const slot of LOADOUT_ORDER.slice(start)) {
     if (slot !== "armor" && !data.pools.has(poolKey(characterClass, slot))) continue;
     const exclude = slot === from ? (input.exclude ?? null) : null;
-    const upgraded =
-      slot === "rh" && input.upgraded ? rollUpgradedRh(context, input.upgraded, exclude, random) : null;
+    const shortlisted =
+      slot === "rh" && input.shortlist ? rollShortlistRh(context, input.shortlist, exclude, random) : null;
     const roll =
-      upgraded ?? rollExcluding(context, slot, filtersFor(slot, context, limits), exclude, random);
+      shortlisted ?? rollExcluding(context, slot, filtersFor(slot, context, limits), exclude, random);
     if (slot !== "armor") rolled.set(slot, roll.chosen?.option.row.id ?? null);
     loadout.set(slot, roll);
   }

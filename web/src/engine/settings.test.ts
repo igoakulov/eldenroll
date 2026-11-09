@@ -47,7 +47,7 @@ describe("defaultSettings", () => {
     expect(SETTINGS).toEqual({
       maxStatGap: 10,
       characterClasses: ["knight", "jester"],
-      upgradedWeaponsEnabled: false,
+      weaponShortlistEnabled: false,
       bossItemsOnlyFromDeadBosses: true,
     });
   });

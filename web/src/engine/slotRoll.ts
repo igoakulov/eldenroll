@@ -58,8 +58,8 @@ export interface SlotRoll {
   /** `null` is an empty result. */
   readonly chosen: WeightedOption | null;
   readonly probability: number;
-  /** Rolled from the `Your upgraded weapons` list rather than the usual pool. */
-  readonly upgraded: boolean;
+  /** Rolled from the `Weapon shortlist` rather than the usual pool. */
+  readonly fromShortlist: boolean;
 }
 
 export interface Repetition {
@@ -173,7 +173,7 @@ export function sample(result: SlotPoolResult, random: Random): SlotRoll {
     result.options.map((row) => ({ value: row, weight: row.weight })),
     random,
   );
-  const shared = { total: result.total, pool: result.pool, removed: result.removed, upgraded: false };
+  const shared = { total: result.total, pool: result.pool, removed: result.removed, fromShortlist: false };
   return picked === null
     ? { ...shared, chosen: null, probability: 0 }
     : { ...shared, chosen: picked.value, probability: picked.weight / total };

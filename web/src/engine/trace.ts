@@ -102,7 +102,7 @@ export function slotTrace(
   repetition: Repetition,
 ): TraceBlock {
   const lines = [`${TRACE_LABELS[slot]}: ${rolledName(data, rolled, slot)}`];
-  lines.push(`  pool${roll.upgraded ? " (upgraded)" : ""}: ${roll.pool}`);
+  lines.push(`  pool${roll.fromShortlist ? " (shortlist)" : ""}: ${roll.pool}`);
   if (roll.total !== roll.pool) lines.push(`    total pool: ${roll.total}`);
   for (const [key, label] of REMOVAL_LABELS) {
     if (roll.removed[key] > 0) lines.push(`    ${label}: -${roll.removed[key]}`);

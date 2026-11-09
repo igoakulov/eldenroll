@@ -16,7 +16,7 @@ function start(changes: Partial<RunInputs> = {}, seed = 3): Run {
       stats: DEFAULT_STATS,
       settings: defaultSettings(realDatabase),
       regions: ["limgrave"],
-      upgradedWeapons: [],
+      weaponShortlist: [],
       deadBosses: [],
       ...changes,
     },
@@ -73,12 +73,12 @@ describe("the trace of an objective", () => {
     expect(total + removed.reduce((sum, value) => sum + value, 0)).toBe(pool);
   });
 
-  it("marks a roll from the upgraded list and prints no removals for it", () => {
-    const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], upgradedWeaponsEnabled: true };
-    const rh = blocks(start({ settings, upgradedWeapons: ["uchigatana", "longsword"] })).find((text) =>
+  it("marks a roll from the weapon shortlist and prints no removals for it", () => {
+    const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], weaponShortlistEnabled: true };
+    const rh = blocks(start({ settings, weaponShortlist: ["uchigatana", "longsword"] })).find((text) =>
       text.startsWith("RH: "),
     );
-    expect(rh).toContain("pool (upgraded): 2");
+    expect(rh).toContain("pool (shortlist): 2");
     expect(rh).not.toContain("not in region");
   });
 
