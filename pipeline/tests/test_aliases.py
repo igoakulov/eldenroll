@@ -8,16 +8,16 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.aliases import assign_aliases, build_aliases
-from eldenrando.build.items import new_item
-from eldenrando.build.modifiers import build_modifiers
-from eldenrando.errors import BuildError
-from eldenrando.loaders.aliases import AliasRow, load_aliases
-from eldenrando.loaders.modifiers import load_modifiers
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.item import Item
-from eldenrando.model.modifier import RolledCondition
-from eldenrando.validate.gaps import load_sources
+from eldenroll.build.aliases import assign_aliases, build_aliases
+from eldenroll.build.items import new_item
+from eldenroll.build.modifiers import build_modifiers
+from eldenroll.errors import BuildError
+from eldenroll.loaders.aliases import AliasRow, load_aliases
+from eldenroll.loaders.modifiers import load_modifiers
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.item import Item
+from eldenroll.model.modifier import RolledCondition
+from eldenroll.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"

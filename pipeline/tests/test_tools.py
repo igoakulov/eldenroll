@@ -6,14 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.tools import TOOLS, TRANSFORMS, build_tools, sheet_base_names
-from eldenrando.errors import BuildError
-from eldenrando.loaders.consumables import load_consumable_categories
-from eldenrando.loaders.csv_source import CsvTable
-from eldenrando.loaders.iteminfo import load_item_catalog
-from eldenrando.model.item import Item
-from eldenrando.model.item_catalog import ItemCatalog
-from eldenrando.paths import ITEM_INFO, TOOL_CONSUMABLE_CLASSES
+from eldenroll.build.tools import TOOLS, TRANSFORMS, build_tools, sheet_base_names
+from eldenroll.errors import BuildError
+from eldenroll.loaders.consumables import load_consumable_categories
+from eldenroll.loaders.csv_source import CsvTable
+from eldenroll.loaders.iteminfo import load_item_catalog
+from eldenroll.model.item import Item
+from eldenroll.model.item_catalog import ItemCatalog
+from eldenroll.paths import ITEM_INFO, TOOL_CONSUMABLE_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 

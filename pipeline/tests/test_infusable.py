@@ -6,13 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import new_item
-from eldenrando.errors import BuildError
-from eldenrando.loaders.infusable import load_infusable
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.item import Item
-from eldenrando.normalize.infusable import assign_infusable
-from eldenrando.validate.gaps import load_sources
+from eldenroll.build.items import new_item
+from eldenroll.errors import BuildError
+from eldenroll.loaders.infusable import load_infusable
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.item import Item
+from eldenroll.normalize.infusable import assign_infusable
+from eldenroll.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 

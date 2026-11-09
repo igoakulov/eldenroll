@@ -3,7 +3,7 @@ raw/
 docs/
 .claude/
 
-# ---- build output; rebuilt with python -m eldenrando.build.database ----
+# ---- build output; rebuilt with python -m eldenroll.build.database ----
 data/build/
 
 # ---- python ----

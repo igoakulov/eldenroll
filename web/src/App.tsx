@@ -19,7 +19,7 @@ export function App() {
 
   return (
     <main>
-      <h1>EldenRando</h1>
+      <h1>EldenRoll</h1>
       {state.status === "loading" && <p>Loading…</p>}
       {state.status === "failed" && <p>The game data could not be loaded.</p>}
       {state.status === "ready" && (

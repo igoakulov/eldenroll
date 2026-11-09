@@ -6,27 +6,27 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.armor import build_armor
-from eldenrando.build.ashes import build_ashes
-from eldenrando.build.items import build_item_table
-from eldenrando.build.spells import (
+from eldenroll.build.armor import build_armor
+from eldenroll.build.ashes import build_ashes
+from eldenroll.build.items import build_item_table
+from eldenroll.build.spells import (
     EXCLUDED_INCANTATIONS,
     EXCLUDED_SORCERIES,
     build_incantations,
     build_sorceries,
 )
-from eldenrando.build.talismans import build_talismans
-from eldenrando.build.weapons import build_weapons
-from eldenrando.errors import BuildError
-from eldenrando.loaders.added_items import load_added_items
-from eldenrando.loaders.ash_sources import load_ash_sources
-from eldenrando.loaders.iteminfo import load_item_catalog
-from eldenrando.loaders.json_source import load_document
-from eldenrando.loaders.name_variants import load_name_variants
-from eldenrando.loaders.weapons import load_weapon_categories
-from eldenrando.model.item import Item
-from eldenrando.model.item_catalog import CatalogGroup, ItemCatalog
-from eldenrando.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
+from eldenroll.build.talismans import build_talismans
+from eldenroll.build.weapons import build_weapons
+from eldenroll.errors import BuildError
+from eldenroll.loaders.added_items import load_added_items
+from eldenroll.loaders.ash_sources import load_ash_sources
+from eldenroll.loaders.iteminfo import load_item_catalog
+from eldenroll.loaders.json_source import load_document
+from eldenroll.loaders.name_variants import load_name_variants
+from eldenroll.loaders.weapons import load_weapon_categories
+from eldenroll.model.item import Item
+from eldenroll.model.item_catalog import CatalogGroup, ItemCatalog
+from eldenroll.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"

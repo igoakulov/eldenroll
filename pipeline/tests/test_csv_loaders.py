@@ -11,17 +11,17 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.loaders.bosses import load_boss_creature_locations
-from eldenrando.loaders.consumables import load_consumable_categories
-from eldenrando.loaders.csv_source import CsvTable, read_table
-from eldenrando.loaders.drops import load_drop_locations, load_item_drops
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.loaders.weapons import (
+from eldenroll.loaders.bosses import load_boss_creature_locations
+from eldenroll.loaders.consumables import load_consumable_categories
+from eldenroll.loaders.csv_source import CsvTable, read_table
+from eldenroll.loaders.drops import load_drop_locations, load_item_drops
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.loaders.weapons import (
     load_ash_compatibility,
     load_somber_weapons,
     load_weapon_categories,
 )
-from eldenrando.paths import (
+from eldenroll.paths import (
     ASH_WEAPON_MATRIX,
     ENEMY_DROPS,
     ENEMY_ITEM_LOTS,

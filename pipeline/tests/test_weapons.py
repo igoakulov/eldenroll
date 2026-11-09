@@ -7,20 +7,20 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import build_item_table
-from eldenrando.build.weapons import build_weapons
-from eldenrando.errors import BuildError
-from eldenrando.loaders.added_items import load_added_items
-from eldenrando.loaders.csv_source import CsvTable
-from eldenrando.loaders.iteminfo import load_item_catalog
-from eldenrando.loaders.json_source import load_document
-from eldenrando.loaders.name_variants import load_name_variants
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.loaders.weapons import load_weapon_categories
-from eldenrando.model.item import Item
-from eldenrando.model.item_catalog import CatalogGroup, ItemCatalog
-from eldenrando.model.name_variant import NameVariant
-from eldenrando.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
+from eldenroll.build.items import build_item_table
+from eldenroll.build.weapons import build_weapons
+from eldenroll.errors import BuildError
+from eldenroll.loaders.added_items import load_added_items
+from eldenroll.loaders.csv_source import CsvTable
+from eldenroll.loaders.iteminfo import load_item_catalog
+from eldenroll.loaders.json_source import load_document
+from eldenroll.loaders.name_variants import load_name_variants
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.loaders.weapons import load_weapon_categories
+from eldenroll.model.item import Item
+from eldenroll.model.item_catalog import CatalogGroup, ItemCatalog
+from eldenroll.model.name_variant import NameVariant
+from eldenroll.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"

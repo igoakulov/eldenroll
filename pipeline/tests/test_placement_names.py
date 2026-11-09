@@ -9,27 +9,27 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.armor import build_armor
-from eldenrando.build.ashes import build_ashes
-from eldenrando.build.consumables import build_consumables
-from eldenrando.build.items import build_item_table, new_item, none_item
-from eldenrando.build.spells import build_incantations, build_sorceries
-from eldenrando.build.talismans import build_talismans
-from eldenrando.build.tools import build_tools
-from eldenrando.build.weapons import build_weapons
-from eldenrando.errors import BuildError
-from eldenrando.loaders.added_items import load_added_items
-from eldenrando.loaders.ash_sources import load_ash_sources
-from eldenrando.loaders.consumables import load_consumable_categories
-from eldenrando.loaders.iteminfo import load_item_catalog
-from eldenrando.loaders.itemslots import load_slots
-from eldenrando.loaders.name_variants import load_name_variants
-from eldenrando.loaders.weapons import load_weapon_categories
-from eldenrando.model.item import Item
-from eldenrando.model.item_catalog import ItemCatalog
-from eldenrando.model.name_variant import NameVariant
-from eldenrando.normalize.placement_names import PlacementNames, placement_names
-from eldenrando.paths import (
+from eldenroll.build.armor import build_armor
+from eldenroll.build.ashes import build_ashes
+from eldenroll.build.consumables import build_consumables
+from eldenroll.build.items import build_item_table, new_item, none_item
+from eldenroll.build.spells import build_incantations, build_sorceries
+from eldenroll.build.talismans import build_talismans
+from eldenroll.build.tools import build_tools
+from eldenroll.build.weapons import build_weapons
+from eldenroll.errors import BuildError
+from eldenroll.loaders.added_items import load_added_items
+from eldenroll.loaders.ash_sources import load_ash_sources
+from eldenroll.loaders.consumables import load_consumable_categories
+from eldenroll.loaders.iteminfo import load_item_catalog
+from eldenroll.loaders.itemslots import load_slots
+from eldenroll.loaders.name_variants import load_name_variants
+from eldenroll.loaders.weapons import load_weapon_categories
+from eldenroll.model.item import Item
+from eldenroll.model.item_catalog import ItemCatalog
+from eldenroll.model.name_variant import NameVariant
+from eldenroll.normalize.placement_names import PlacementNames, placement_names
+from eldenroll.paths import (
     ENEMY_DROPS,
     ENEMY_ITEM_LOTS,
     ITEM_INFO,

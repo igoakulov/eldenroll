@@ -8,7 +8,7 @@ const databasePath = fileURLToPath(new URL("../data/build/db.json", import.meta.
 
 if (!existsSync(databasePath)) {
   throw new Error(
-    `${databasePath} is missing. Build it first: cd pipeline && ../.venv/bin/python -m eldenrando.build.database`,
+    `${databasePath} is missing. Build it first: cd pipeline && ../.venv/bin/python -m eldenroll.build.database`,
   );
 }
 

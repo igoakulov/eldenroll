@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.loaders.combat_rules import load_combat_rules
-from eldenrando.loaders.schema import LoaderError
+from eldenroll.loaders.combat_rules import load_combat_rules
+from eldenroll.loaders.schema import LoaderError
 
 CSV = Path(__file__).resolve().parents[2] / "data" / "overrides" / "combat_rules.csv"
 

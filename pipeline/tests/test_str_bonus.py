@@ -6,14 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import new_item, none_item
-from eldenrando.errors import BuildError
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.loaders.str_bonus import load_str_bonus
-from eldenrando.model.item import Item
-from eldenrando.model.vocabulary import NO_STR_BONUS
-from eldenrando.normalize.str_bonus import assign_str_bonus
-from eldenrando.validate.gaps import GapSources, load_sources
+from eldenroll.build.items import new_item, none_item
+from eldenroll.errors import BuildError
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.loaders.str_bonus import load_str_bonus
+from eldenroll.model.item import Item
+from eldenroll.model.vocabulary import NO_STR_BONUS
+from eldenroll.normalize.str_bonus import assign_str_bonus
+from eldenroll.validate.gaps import GapSources, load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 

@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.ash_compatibility import build_ash_compatibility
-from eldenrando.build.items import new_item
-from eldenrando.errors import BuildError
-from eldenrando.loaders.ash_overrides import AshOverride, load_ash_overrides
-from eldenrando.loaders.csv_source import CsvTable
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.ash_compatibility import AshCompatibility
-from eldenrando.model.item import Item
-from eldenrando.validate.ash_compatibility import infusable_without_ashes
-from eldenrando.validate.gaps import GapSources, load_sources
+from eldenroll.build.ash_compatibility import build_ash_compatibility
+from eldenroll.build.items import new_item
+from eldenroll.errors import BuildError
+from eldenroll.loaders.ash_overrides import AshOverride, load_ash_overrides
+from eldenroll.loaders.csv_source import CsvTable
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.ash_compatibility import AshCompatibility
+from eldenroll.model.item import Item
+from eldenroll.validate.ash_compatibility import infusable_without_ashes
+from eldenroll.validate.gaps import GapSources, load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 

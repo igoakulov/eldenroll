@@ -8,11 +8,11 @@ from typing import cast
 
 import pytest
 
-from eldenrando.build.items import new_item, none_item
-from eldenrando.errors import BuildError
-from eldenrando.model.item import Category
-from eldenrando.model.selector import SELECTOR_KINDS, Selector, SelectorKind
-from eldenrando.model.vocabulary import (
+from eldenroll.build.items import new_item, none_item
+from eldenroll.errors import BuildError
+from eldenroll.model.item import Category
+from eldenroll.model.selector import SELECTOR_KINDS, Selector, SelectorKind
+from eldenroll.model.vocabulary import (
     ASH_SLOTS,
     CATEGORIES,
     CHARACTER_CLASSES,
@@ -21,15 +21,15 @@ from eldenrando.model.vocabulary import (
     SLOTS,
     SUBCATEGORIES,
 )
-from eldenrando.normalize.selectors import new_selector
-from eldenrando.validate.placement import PlacementData, load_placement_data
-from eldenrando.validate.selectors import (
+from eldenroll.normalize.selectors import new_selector
+from eldenroll.validate.placement import PlacementData, load_placement_data
+from eldenroll.validate.selectors import (
     known_ids,
     resolve_items,
     validate_modifier_target,
     validate_selectors,
 )
-from eldenrando.validate.subcategories import validate_subcategories
+from eldenroll.validate.subcategories import validate_subcategories
 
 ROOT = Path(__file__).resolve().parents[2]
 

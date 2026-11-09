@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.loaders.regions import load_regions
-from eldenrando.loaders.schema import LoaderError
+from eldenroll.loaders.regions import load_regions
+from eldenroll.loaders.schema import LoaderError
 
 REGIONS_CSV = Path(__file__).resolve().parents[2] / "data" / "overrides" / "regions.csv"
 

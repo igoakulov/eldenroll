@@ -10,12 +10,12 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.loaders.annotations import load_annotations
-from eldenrando.loaders.iteminfo import load_item_catalog
-from eldenrando.loaders.itemslots import extract_items, load_slots
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.loaders.yaml_source import load_mapping
-from eldenrando.paths import AREAS, ITEM_INFO, ITEM_SLOTS
+from eldenroll.loaders.annotations import load_annotations
+from eldenroll.loaders.iteminfo import load_item_catalog
+from eldenroll.loaders.itemslots import extract_items, load_slots
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.loaders.yaml_source import load_mapping
+from eldenroll.paths import AREAS, ITEM_INFO, ITEM_SLOTS
 
 
 def test_annotations_counts() -> None:

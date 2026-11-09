@@ -8,11 +8,11 @@ from typing import cast
 
 import pytest
 
-from eldenrando.loaders.gaps import COLUMNS, load_gaps, write_gaps
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.gap import Gap
-from eldenrando.model.item import Item
-from eldenrando.validate.gaps import (
+from eldenroll.loaders.gaps import COLUMNS, load_gaps, write_gaps
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.gap import Gap
+from eldenroll.model.item import Item
+from eldenroll.validate.gaps import (
     GapSources,
     add_missing,
     find_gaps,

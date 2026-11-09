@@ -7,19 +7,19 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import new_item
-from eldenrando.errors import BuildError
-from eldenrando.loaders.armor_slots import load_armor_slots
-from eldenrando.loaders.iteminfo import load_item_catalog
-from eldenrando.loaders.name_variants import load_name_variants
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.item import Item
-from eldenrando.model.name_variant import NameVariant
-from eldenrando.model.vocabulary import ARMOR_SLOTS
-from eldenrando.normalize.armor_slots import assign_armor_slots
-from eldenrando.paths import ITEM_INFO
-from eldenrando.validate.gaps import GapSources, load_sources
-from eldenrando.validate.subcategories import validate_subcategories
+from eldenroll.build.items import new_item
+from eldenroll.errors import BuildError
+from eldenroll.loaders.armor_slots import load_armor_slots
+from eldenroll.loaders.iteminfo import load_item_catalog
+from eldenroll.loaders.name_variants import load_name_variants
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.item import Item
+from eldenroll.model.name_variant import NameVariant
+from eldenroll.model.vocabulary import ARMOR_SLOTS
+from eldenroll.normalize.armor_slots import assign_armor_slots
+from eldenroll.paths import ITEM_INFO
+from eldenroll.validate.gaps import GapSources, load_sources
+from eldenroll.validate.subcategories import validate_subcategories
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"

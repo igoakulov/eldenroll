@@ -7,16 +7,16 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import build_item_table, new_item, none_item
-from eldenrando.errors import BuildError
-from eldenrando.loaders.iteminfo import load_item_catalog
-from eldenrando.loaders.odds import load_odds
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.armor_set import ArmorSet
-from eldenrando.normalize.odds import assign_armor_set_odds, assign_item_odds
-from eldenrando.normalize.slug import slugify
-from eldenrando.paths import ITEM_INFO
-from eldenrando.validate.gaps import load_sources
+from eldenroll.build.items import build_item_table, new_item, none_item
+from eldenroll.errors import BuildError
+from eldenroll.loaders.iteminfo import load_item_catalog
+from eldenroll.loaders.odds import load_odds
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.armor_set import ArmorSet
+from eldenroll.normalize.odds import assign_armor_set_odds, assign_item_odds
+from eldenroll.normalize.slug import slugify
+from eldenroll.paths import ITEM_INFO
+from eldenroll.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 

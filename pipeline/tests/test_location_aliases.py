@@ -8,33 +8,33 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.location_labels import (
+from eldenroll.build.location_labels import (
     NON_PLACE_LABELS,
     resolve_boss_location,
     resolve_labels,
 )
-from eldenrando.errors import BuildError
-from eldenrando.loaders.annotations import load_annotations
-from eldenrando.loaders.bosses import load_boss_creature_locations
-from eldenrando.loaders.drops import load_drop_locations, load_item_drops
-from eldenrando.loaders.itemslots import load_slots
-from eldenrando.loaders.json_source import load_document
-from eldenrando.loaders.location_aliases import (
+from eldenroll.errors import BuildError
+from eldenroll.loaders.annotations import load_annotations
+from eldenroll.loaders.bosses import load_boss_creature_locations
+from eldenroll.loaders.drops import load_drop_locations, load_item_drops
+from eldenroll.loaders.itemslots import load_slots
+from eldenroll.loaders.json_source import load_document
+from eldenroll.loaders.location_aliases import (
     load_boss_location_overrides,
     load_location_aliases,
 )
-from eldenrando.loaders.region_areas import load_region_areas
-from eldenrando.loaders.regions import load_regions
-from eldenrando.loaders.schema import (
+from eldenroll.loaders.region_areas import load_region_areas
+from eldenroll.loaders.regions import load_regions
+from eldenroll.loaders.schema import (
     LoaderError,
     get_optional_string,
     get_string,
     require_mapping,
     require_sequence,
 )
-from eldenrando.loaders.yaml_source import load_mapping
-from eldenrando.model.annotations import Area
-from eldenrando.paths import (
+from eldenroll.loaders.yaml_source import load_mapping
+from eldenroll.model.annotations import Area
+from eldenroll.paths import (
     AREAS,
     ENEMY_DROPS,
     ENEMY_ITEM_LOTS,

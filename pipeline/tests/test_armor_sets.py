@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.armor_sets import build_armor_sets
-from eldenrando.build.items import new_item
-from eldenrando.errors import BuildError
-from eldenrando.loaders.armor_sets import load_armor_sets
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.vocabulary import ARMOR_SLOTS
-from eldenrando.paths import ARMOR_SETS_PAGE
-from eldenrando.validate.gaps import load_sources
+from eldenroll.build.armor_sets import build_armor_sets
+from eldenroll.build.items import new_item
+from eldenroll.errors import BuildError
+from eldenroll.loaders.armor_sets import load_armor_sets
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.vocabulary import ARMOR_SLOTS
+from eldenroll.paths import ARMOR_SETS_PAGE
+from eldenroll.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 SETS = ROOT / "data" / "overrides" / "armor_sets.csv"

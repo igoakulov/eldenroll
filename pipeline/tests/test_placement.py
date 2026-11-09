@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import new_item
-from eldenrando.build.placement import (
+from eldenroll.build.items import new_item
+from eldenroll.build.placement import (
     BOSS_SHOP_TAGS,
     BOSS_SLOT_TAGS,
     Placement,
@@ -16,18 +16,18 @@ from eldenrando.build.placement import (
     build_placements,
     item_locations,
 )
-from eldenrando.errors import BuildError
-from eldenrando.loaders.boss_links import load_slot_links
-from eldenrando.loaders.csv_source import CsvTable
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.boss_instance import BossInstance
-from eldenrando.model.item import Item
-from eldenrando.model.item_location import ItemLocation
-from eldenrando.model.item_slot import ItemSlot
-from eldenrando.model.region import ASHEN_CAPITAL, ROYAL_CAPITAL, SHUNNING_GROUNDS
-from eldenrando.normalize.placement_names import PlacementNames, placement_names
-from eldenrando.validate.gaps import GapSources, load_sources
-from eldenrando.validate.placement import (
+from eldenroll.errors import BuildError
+from eldenroll.loaders.boss_links import load_slot_links
+from eldenroll.loaders.csv_source import CsvTable
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.boss_instance import BossInstance
+from eldenroll.model.item import Item
+from eldenroll.model.item_location import ItemLocation
+from eldenroll.model.item_slot import ItemSlot
+from eldenroll.model.region import ASHEN_CAPITAL, ROYAL_CAPITAL, SHUNNING_GROUNDS
+from eldenroll.normalize.placement_names import PlacementNames, placement_names
+from eldenroll.validate.gaps import GapSources, load_sources
+from eldenroll.validate.placement import (
     PlacementData,
     eligible_items,
     eligible_sets,

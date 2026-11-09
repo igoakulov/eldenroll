@@ -11,12 +11,12 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.loaders.annotations import load_annotations
-from eldenrando.loaders.itemslots import load_slots
-from eldenrando.loaders.region_areas import load_region_areas
-from eldenrando.loaders.regions import load_regions
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.paths import AREAS, ITEM_SLOTS
+from eldenroll.loaders.annotations import load_annotations
+from eldenroll.loaders.itemslots import load_slots
+from eldenroll.loaders.region_areas import load_region_areas
+from eldenroll.loaders.regions import load_regions
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.paths import AREAS, ITEM_SLOTS
 
 ROOT = Path(__file__).resolve().parents[2]
 REGIONS_CSV = ROOT / "data" / "overrides" / "regions.csv"

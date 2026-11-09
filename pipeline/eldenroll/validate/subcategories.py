@@ -1,0 +1,22 @@
+from __future__ import annotations
+
+from collections.abc import Iterable
+
+from eldenroll.errors import BuildError
+from eldenroll.model.item import Item
+from eldenroll.model.vocabulary import CATEGORIES, SUBCATEGORIES
+
+
+def validate_subcategories(table: Iterable[Item]) -> None:
+    bad = [f"{row.name} ({row.category}: {row.subcategory})" for row in table if not _is_valid(row)]
+    if bad:
+        raise BuildError(f"bad category or subcategory on: {', '.join(sorted(bad))}")
+
+
+def _is_valid(row: Item) -> bool:
+    if row.category not in CATEGORIES:
+        return False
+    allowed = SUBCATEGORIES.get(row.category)
+    if allowed is None:
+        return row.subcategory is None
+    return row.subcategory in allowed

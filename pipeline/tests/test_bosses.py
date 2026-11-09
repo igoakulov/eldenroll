@@ -8,27 +8,27 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.boss_table import load_boss_overrides, load_boss_rows
-from eldenrando.build.bosses import (
+from eldenroll.build.boss_table import load_boss_overrides, load_boss_rows
+from eldenroll.build.bosses import (
     DLC_TAG,
     BossOverrides,
     boss_identity,
     boss_pairs,
     build_boss_instances,
 )
-from eldenrando.errors import BuildError
-from eldenrando.loaders.annotations import load_annotations
-from eldenrando.loaders.boss_overrides import (
+from eldenroll.errors import BuildError
+from eldenroll.loaders.annotations import load_annotations
+from eldenroll.loaders.boss_overrides import (
     load_boss_additions,
     load_boss_merges,
     load_boss_names,
     load_boss_odds,
 )
-from eldenrando.loaders.region_areas import load_region_areas
-from eldenrando.loaders.regions import load_regions
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.boss_instance import BossInstance
-from eldenrando.paths import AREAS
+from eldenroll.loaders.region_areas import load_region_areas
+from eldenroll.loaders.regions import load_regions
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.boss_instance import BossInstance
+from eldenroll.paths import AREAS
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"

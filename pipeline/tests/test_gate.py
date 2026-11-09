@@ -13,18 +13,18 @@ from typing import Any, cast
 
 import pytest
 
-from eldenrando.build import database as build_database
-from eldenrando.build.database import gate_problems, import_report, main, write_artifacts
-from eldenrando.build.serialize import TABLE_FIELDS, database_rows, render
-from eldenrando.errors import BuildError
-from eldenrando.model.ash_compatibility import AshCompatibility
-from eldenrando.model.database import Database
-from eldenrando.model.item_location import ItemLocation
-from eldenrando.model.modifier import CharacterClassCondition, Modifier
-from eldenrando.model.selector import Selector
-from eldenrando.validate.gate_data import GateData, load_gate_data
-from eldenrando.validate.quality import quality_problems
-from eldenrando.validate.structure import several_top_tiers, structure_problems
+from eldenroll.build import database as build_database
+from eldenroll.build.database import gate_problems, import_report, main, write_artifacts
+from eldenroll.build.serialize import TABLE_FIELDS, database_rows, render
+from eldenroll.errors import BuildError
+from eldenroll.model.ash_compatibility import AshCompatibility
+from eldenroll.model.database import Database
+from eldenroll.model.item_location import ItemLocation
+from eldenroll.model.modifier import CharacterClassCondition, Modifier
+from eldenroll.model.selector import Selector
+from eldenroll.validate.gate_data import GateData, load_gate_data
+from eldenroll.validate.quality import quality_problems
+from eldenroll.validate.structure import several_top_tiers, structure_problems
 
 ROOT = Path(__file__).resolve().parents[2]
 PIPELINE = ROOT / "pipeline"
@@ -320,7 +320,7 @@ def test_write_artifacts_holds_no_timestamp_or_path(data: GateData, tmp_path: Pa
 
 def _run_build(folder: Path, seed: str) -> None:
     subprocess.run(
-        [sys.executable, "-m", "eldenrando.build.database", "--out", str(folder)],
+        [sys.executable, "-m", "eldenroll.build.database", "--out", str(folder)],
         check=True,
         cwd=PIPELINE,
         env={**os.environ, "PYTHONHASHSEED": seed},

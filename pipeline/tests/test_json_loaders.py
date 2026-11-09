@@ -10,14 +10,14 @@ from typing import cast
 
 import pytest
 
-from eldenrando.loaders.json_source import (
+from eldenroll.loaders.json_source import (
     JSON_FILES,
     JsonDocument,
     load_document,
     read_records,
 )
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.paths import ARMOR_DIR, ITEMS_DIR, LOCATIONS_DIR
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.paths import ARMOR_DIR, ITEMS_DIR, LOCATIONS_DIR
 
 REPEATED_NAMES: dict[str, int] = {"armors": 2, "location_names": 3, "weapons": 1}
 

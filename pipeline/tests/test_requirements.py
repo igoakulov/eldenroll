@@ -6,13 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.items import new_item
-from eldenrando.loaders.requirements import load_requirements
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.item import Item
-from eldenrando.model.name_variant import NameVariant
-from eldenrando.normalize.requirements import assign_requirements, readable_stats
-from eldenrando.validate.gaps import load_sources
+from eldenroll.build.items import new_item
+from eldenroll.loaders.requirements import load_requirements
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.item import Item
+from eldenroll.model.name_variant import NameVariant
+from eldenroll.normalize.requirements import assign_requirements, readable_stats
+from eldenroll.validate.gaps import load_sources
 
 ROOT = Path(__file__).resolve().parents[2]
 BEARS_STATS = ("weapon", "shield", "sorcery", "incantation")

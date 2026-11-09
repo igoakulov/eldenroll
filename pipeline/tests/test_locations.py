@@ -7,16 +7,16 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.locations import build_locations
-from eldenrando.errors import BuildError
-from eldenrando.loaders.annotations import load_annotations
-from eldenrando.loaders.region_areas import load_region_areas
-from eldenrando.loaders.regions import load_regions
-from eldenrando.model.annotations import Area
-from eldenrando.model.location import Location
-from eldenrando.model.region import Region
-from eldenrando.paths import AREAS
-from eldenrando.validate.regions import validate_region_dlc_prefix, validate_region_membership
+from eldenroll.build.locations import build_locations
+from eldenroll.errors import BuildError
+from eldenroll.loaders.annotations import load_annotations
+from eldenroll.loaders.region_areas import load_region_areas
+from eldenroll.loaders.regions import load_regions
+from eldenroll.model.annotations import Area
+from eldenroll.model.location import Location
+from eldenroll.model.region import Region
+from eldenroll.paths import AREAS
+from eldenroll.validate.regions import validate_region_dlc_prefix, validate_region_membership
 
 ROOT = Path(__file__).resolve().parents[2]
 REGIONS_CSV = ROOT / "data" / "overrides" / "regions.csv"

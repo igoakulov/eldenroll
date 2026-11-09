@@ -7,19 +7,19 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.modifiers import build_modifiers
-from eldenrando.build.slot_pools import build_slot_pools
-from eldenrando.errors import BuildError
-from eldenrando.loaders.character_classes import load_slot_pools
-from eldenrando.loaders.combat_rules import load_combat_rules
-from eldenrando.loaders.modifiers import ConditionRow, ModifierRow, load_modifiers
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.modifier import CharacterClassCondition, Modifier, RolledCondition
-from eldenrando.model.selector import Selector, SelectorKind
-from eldenrando.model.vocabulary import MELEE, UNPAIRED
-from eldenrando.validate.modifiers import validate_modifiers, validate_rolling_order
-from eldenrando.validate.placement import PlacementData, load_placement_data
-from eldenrando.validate.selectors import known_ids, resolve_items
+from eldenroll.build.modifiers import build_modifiers
+from eldenroll.build.slot_pools import build_slot_pools
+from eldenroll.errors import BuildError
+from eldenroll.loaders.character_classes import load_slot_pools
+from eldenroll.loaders.combat_rules import load_combat_rules
+from eldenroll.loaders.modifiers import ConditionRow, ModifierRow, load_modifiers
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.modifier import CharacterClassCondition, Modifier, RolledCondition
+from eldenroll.model.selector import Selector, SelectorKind
+from eldenroll.model.vocabulary import MELEE, UNPAIRED
+from eldenroll.validate.modifiers import validate_modifiers, validate_rolling_order
+from eldenroll.validate.placement import PlacementData, load_placement_data
+from eldenroll.validate.selectors import known_ids, resolve_items
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"

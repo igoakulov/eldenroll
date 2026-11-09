@@ -8,23 +8,23 @@ from pathlib import Path
 
 import pytest
 
-from eldenrando.build.slot_pools import build_slot_pools
-from eldenrando.errors import BuildError
-from eldenrando.loaders.character_classes import (
+from eldenroll.build.slot_pools import build_slot_pools
+from eldenroll.errors import BuildError
+from eldenroll.loaders.character_classes import (
     SlotPoolRow,
     load_character_classes,
     load_slot_pools,
 )
-from eldenrando.loaders.combat_rules import load_combat_rules
-from eldenrando.loaders.schema import LoaderError
-from eldenrando.model.character_class import SlotPool
-from eldenrando.model.item import Item
-from eldenrando.model.selector import Selector
-from eldenrando.model.vocabulary import CATALYST, MELEE, RANGED, UNPAIRED
-from eldenrando.normalize.selectors import new_selector
-from eldenrando.validate.placement import PlacementData, load_placement_data
-from eldenrando.validate.selectors import known_ids, resolve_items
-from eldenrando.validate.slot_pools import validate_slot_pools
+from eldenroll.loaders.combat_rules import load_combat_rules
+from eldenroll.loaders.schema import LoaderError
+from eldenroll.model.character_class import SlotPool
+from eldenroll.model.item import Item
+from eldenroll.model.selector import Selector
+from eldenroll.model.vocabulary import CATALYST, MELEE, RANGED, UNPAIRED
+from eldenroll.normalize.selectors import new_selector
+from eldenroll.validate.placement import PlacementData, load_placement_data
+from eldenroll.validate.selectors import known_ids, resolve_items
+from eldenroll.validate.slot_pools import validate_slot_pools
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
