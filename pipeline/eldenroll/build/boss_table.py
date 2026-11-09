@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from eldenroll.build.boss_locations import with_locations
 from eldenroll.build.bosses import BossOverrides, build_boss_instances
 from eldenroll.loaders.annotations import load_annotations
 from eldenroll.loaders.boss_overrides import (
     load_boss_additions,
+    load_boss_landmarks,
     load_boss_merges,
     load_boss_names,
     load_boss_odds,
+    load_location_display,
 )
 from eldenroll.loaders.bosses import load_boss_creature_locations
 from eldenroll.loaders.location_aliases import (
@@ -42,4 +45,11 @@ def load_boss_overrides(overrides: Path) -> BossOverrides:
 
 
 def load_boss_instances(overrides: Path) -> tuple[BossInstance, ...]:
-    return build_boss_instances(load_boss_rows(), load_boss_overrides(overrides))
+    areas = load_annotations(AREAS).areas
+    names = {area.name: area.text for area in areas}
+    return with_locations(
+        build_boss_instances(load_boss_rows(), load_boss_overrides(overrides)),
+        names,
+        load_location_display(overrides / "location_display.csv", location_ids=names),
+        load_boss_landmarks(overrides / "boss_landmarks.csv"),
+    )

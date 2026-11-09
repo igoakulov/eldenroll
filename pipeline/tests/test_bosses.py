@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from eldenroll.build.boss_table import load_boss_overrides, load_boss_rows
+from eldenroll.build.boss_locations import MAX_LOCATION, with_locations
+from eldenroll.build.boss_table import load_boss_instances, load_boss_overrides, load_boss_rows
 from eldenroll.build.bosses import (
     DLC_TAG,
     BossOverrides,
@@ -425,3 +426,36 @@ def test_a_name_row_may_leave_the_label_empty(tmp_path: Path) -> None:
     path = tmp_path / "boss_names.csv"
     path.write_text("csv_name,label,name,reason\nA,,B,why\n", encoding="utf-8")
     assert load_boss_names(path) == {("A", ""): "B"}
+
+
+def test_every_fight_shows_a_short_location_that_tells_it_apart() -> None:
+    shown = {(row.name, row.location_label): row.location for row in load_boss_instances(OVERRIDES)}
+    assert max(len(location) for location in shown.values()) <= MAX_LOCATION
+    assert shown[("Night's Cavalry", "Bellum Highway - East Raya Lucaria Gate")] == (
+        "Liurnia, Bellum Highway"
+    )
+    assert shown[("Night's Cavalry", "Liurnia of the Lakes - Liurnia Highway Far North")] == (
+        "Liurnia, Gate Town Bridge"
+    )
+    assert shown[("Fell Twin", "Divine Tower of East Altus")] == (
+        "Capital Outskirts, Divine Tower of East Altus"
+    )
+
+
+def test_a_place_reads_area_then_place_unless_an_override_says_otherwise() -> None:
+    bosses = (
+        BossInstance("rat_a", "Rat", "cave", "A"),
+        BossInstance("rat_b", "Rat", "cave", "B"),
+        BossInstance("bat_c", "Bat", "road", "C"),
+    )
+    names = {"cave": "Caelid - Gael Tunnel", "road": "Bellum Highway"}
+    shown = with_locations(
+        bosses, names, {"road": ("Liurnia", "Bellum Highway")}, {("Rat", "B"): "Far End"}
+    )
+    assert [row.location for row in shown] == [
+        "Caelid, Gael Tunnel",
+        "Caelid, Far End",
+        "Liurnia, Bellum Highway",
+    ]
+    with pytest.raises(BuildError, match="read the same"):
+        with_locations(bosses, names, {}, {})

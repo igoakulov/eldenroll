@@ -148,7 +148,7 @@ function rollBoss(
   return {
     id: boss.id,
     block: pickTrace("boss", {
-      heading: `${boss.name} — ${boss.location_label}`,
+      heading: `${boss.name} — ${boss.location}`,
       pool: candidates.length,
       odds: boss.odds,
       repeat: null,

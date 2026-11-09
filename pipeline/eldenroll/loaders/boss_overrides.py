@@ -63,6 +63,30 @@ def load_boss_additions(
     return tuple(out)
 
 
+DISPLAY_COLUMNS: tuple[str, ...] = ("location", "area", "place", "reason")
+LANDMARK_COLUMNS: tuple[str, ...] = ("boss", "label", "landmark", "reason")
+
+
+def load_location_display(
+    path: Path, *, location_ids: Collection[str]
+) -> dict[str, tuple[str, str]]:
+    """Return `{location_id: (area, place)}`; an empty place shows the area alone."""
+    table = read_table(path, required_columns=DISPLAY_COLUMNS)
+    required = tuple(column for column in DISPLAY_COLUMNS if column != "place")
+    rows = _rows(path, table, required=required, wanted=DISPLAY_COLUMNS[:3])
+    unknown = sorted({location for location, _, _ in rows} - set(location_ids))
+    if unknown:
+        raise LoaderError(f"{path}: unknown location {', '.join(unknown)}")
+    return {location: (area, place) for location, area, place in rows}
+
+
+def load_boss_landmarks(path: Path) -> dict[tuple[str, str], str]:
+    """Return `{(boss, label): landmark}`, the label as the boss CSV writes it, `[DLC] ` dropped."""
+    table = read_table(path, required_columns=LANDMARK_COLUMNS)
+    rows = _rows(path, table, required=LANDMARK_COLUMNS, wanted=LANDMARK_COLUMNS[:3])
+    return {(boss, label): landmark for boss, label, landmark in rows}
+
+
 def load_boss_odds(path: Path) -> dict[str, float]:
     return load_odds(path, "boss")
 

@@ -18,7 +18,7 @@ Row = Mapping[str, object]
 TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
     "region": ("id", "name", "region_level"),
     "location": ("id", "name", "region_id"),
-    "boss_instance": ("id", "name", "location_id", "location_label", "odds"),
+    "boss_instance": ("id", "name", "location_id", "location", "odds"),
     "item": (
         "id",
         "name",
@@ -61,7 +61,7 @@ def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
                 "id": row.id,
                 "name": row.name,
                 "location_id": row.location_id,
-                "location_label": row.location_label,
+                "location": row.location,
                 "odds": _number(row.odds),
             }
             for row in database.bosses

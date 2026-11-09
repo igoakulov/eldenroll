@@ -7,8 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from eldenroll.build.armor_sets import build_armor_sets
-from eldenroll.build.boss_table import load_boss_overrides, load_boss_rows
-from eldenroll.build.bosses import build_boss_instances
+from eldenroll.build.boss_table import load_boss_instances, load_boss_overrides
 from eldenroll.build.placement import (
     Placement,
     PlacementSources,
@@ -121,7 +120,7 @@ def load_placement_sources(root: Path, loaded: GapSources) -> PlacementSources:
         slots=loaded.slots,
         drops=load_drop_locations(ENEMY_DROPS),
         lots=load_item_drops(ENEMY_ITEM_LOTS),
-        bosses=build_boss_instances(load_boss_rows(), boss_overrides),
+        bosses=load_boss_instances(overrides),
         merged_labels=merged_labels(boss_overrides.merges),
         aliases=boss_overrides.aliases,
         remembrances=load_remembrance_bosses(overrides / "remembrance_bosses.csv"),

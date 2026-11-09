@@ -15,7 +15,7 @@ import { realDatabase as database } from "./realDatabase.testing";
 const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number], true> } = {
   region: { id: true, name: true, region_level: true },
   location: { id: true, name: true, region_id: true },
-  boss_instance: { id: true, name: true, location_id: true, location_label: true, odds: true },
+  boss_instance: { id: true, name: true, location_id: true, location: true, odds: true },
   item: {
     id: true,
     name: true,

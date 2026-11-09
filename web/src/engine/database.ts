@@ -62,7 +62,7 @@ export interface BossInstance {
   readonly id: string;
   readonly name: string;
   readonly location_id: string;
-  readonly location_label: string;
+  readonly location: string;
   readonly odds: number;
 }
 

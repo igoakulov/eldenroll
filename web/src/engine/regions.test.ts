@@ -30,7 +30,7 @@ function fixture(bosses: readonly Pick<BossInstance, "id" | "odds">[]): Pick<
       ...row,
       name: row.id,
       location_id: "here",
-      location_label: "Here",
+      location: "Here",
     })),
   };
 }

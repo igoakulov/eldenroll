@@ -1,5 +1,5 @@
-"""The region comes through `location_id`, and the display is derived from the name and the label,
-so neither is stored.
+"""The region comes through `location_id`. `location_label` is the source spreadsheet's text, kept
+only to build the id and match override rows; `location` is the short place the player sees.
 """
 
 from __future__ import annotations
@@ -16,3 +16,4 @@ class BossInstance:
     location_id: str
     location_label: str
     odds: float = 1
+    location: str = ""
