@@ -1,7 +1,7 @@
 """Tests for the seven CSV loaders.
 
-Row counts are the ones recorded in `data.md` §7.2; they double as a regression suite for
-the committed sources.
+The row counts here are the record; no doc repeats them. They double as a regression suite
+for the committed sources.
 """
 
 from __future__ import annotations

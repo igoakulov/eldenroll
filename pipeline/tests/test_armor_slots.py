@@ -1,4 +1,4 @@
-"""Tests for subcategories and armor slots against the real sources (`data.md` §4.3)."""
+"""Tests for subcategories and armor slots against the real sources (`data/README.md#Armor`)."""
 
 from __future__ import annotations
 

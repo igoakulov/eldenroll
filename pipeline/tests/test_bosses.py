@@ -1,4 +1,5 @@
-"""Tests for the boss instances against the real CSV and the owner's tables (`data.md` §6)."""
+"""Tests for the boss instances against the real CSV and the owner's tables
+(`data/README.md#Bosses`)."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Tests for the armor set table against the real sources (`data.md` §4.3)."""
+"""Tests for the armor set table against the real sources (`data/README.md#Armor`)."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from eldenroll.validate.gaps import load_sources
 ROOT = Path(__file__).resolve().parents[2]
 SETS = ROOT / "data" / "overrides" / "armor_sets.csv"
 
-# What the table leaves out of the page's sets: the owner's variant picks (tasklist O48).
+# What the table leaves out of the page's sets: the variant picks.
 LEFT_OUT = {
     "Raya Lucaria Set": {
         "Karolos Glintstone Crown",
@@ -33,7 +33,7 @@ LEFT_OUT = {
     "Noble's Traveling Set": {"Crimson Hood"},
     "Preceptor's Set": {"Mask of Confidence"},
     "Mushroom Set": {"Mushroom Crown"},
-    # The altered form of High Priest Robe, so not a piece (data.md 4.3).
+    # The altered form of High Priest Robe, so not a piece (data/README.md#Armor).
     "High Priest Set": {"Finger Robe"},
 }
 HIGHLAND = {
@@ -52,7 +52,7 @@ HIGHLAND = {
 }
 
 
-# Sets the page lacks, named by the owner (tasklist O50).
+# Sets the page lacks, named in armor_sets.csv.
 # The page has one set for each; the game can't alter these chests back, so each look is a set.
 SPLIT = {
     "Banished Knight Set": {
@@ -96,7 +96,7 @@ OFF_PAGE = {
 }
 
 
-# The owner's changes to the page's sets (tasklist 2.6.3): Blue Dancer Charm keeps these empty slots
+# The changes to the page's sets: Blue Dancer Charm keeps these empty slots
 # empty, and the Traveler's Set gains White Mask and a name for it.
 EMPTIED = {
     "Bloodsoaked Set": {"None (Legs)"},

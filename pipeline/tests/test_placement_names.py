@@ -1,4 +1,5 @@
-"""Tests for the name variants and for resolving placement names (`data.md` §8.4)."""
+"""Tests for the name variants and for resolving placement names
+(`data/sources/README.md#Matching names`)."""
 
 from __future__ import annotations
 
@@ -46,8 +47,8 @@ _EMPTY_CATALOG = ItemCatalog(
     names={"goods": {}}, counts={}, unique_counts={}, groups={}, locations=()
 )
 _NOT_A_PLACE = frozenset({"Unused", "Spirit Summon"})
-# The rows of `data.md` §8.4 that name a source record. Title case, `Omen Bairn 1/2` and `+N` are
-# handled by code.
+# The name variants that name a source record; this list is their record. Title case,
+# `Omen Bairn 1/2` and `+N` are handled by code.
 SECTION_8_4: tuple[tuple[str, str], ...] = (
     ("Nox Monk Bracelets", "Nox Bracelets"),
     ("Nox Monk Greaves", "Nox Greaves"),

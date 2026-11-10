@@ -32,7 +32,8 @@ ROLLABLE_BOSSES: Final[int] = 218
 BASE_BOSSES: Final[int] = 166
 DLC_BOSSES: Final[int] = 52
 # A guarantee is a boost or above. Lower values such as the same-class x67 are tuned by hand at the
-# simulation, off the tier table on purpose, so spacing does not apply to them (`prd.md` §8.5).
+# simulation, off the tier table on purpose, so spacing does not apply to them
+# (`data/balance.md#Tiers`).
 LOWEST_GUARANTEE: Final[float] = 100
 GUARANTEE_SPACING: Final[float] = 10
 TOP_TIER: Final[float] = 1_000_000
@@ -78,7 +79,8 @@ def structure_problems(data: GateData) -> tuple[str, ...]:
 def several_top_tiers(
     modifiers: Iterable[Modifier], items: Iterable[Item]
 ) -> dict[str, tuple[str, ...]]:
-    """Return each pool with several top-tier targets, to report, not reject (`prd.md` §8.5)."""
+    """Return each pool with several top-tier targets, to report, not reject
+    (`data/balance.md#Tiers`)."""
     table = tuple(items)
     targets: dict[str, set[str]] = {}
     for row in modifiers:
@@ -100,7 +102,7 @@ def _caught(check: Callable[[], None]) -> tuple[str, ...]:
 def _table_shape(database: Database) -> Iterator[str]:
     rows = database_rows(database)
     if set(rows) != set(TABLE_FIELDS):
-        yield f"tables differ from data.md: {', '.join(sorted(set(rows) ^ set(TABLE_FIELDS)))}"
+        yield f"tables differ from the model: {', '.join(sorted(set(rows) ^ set(TABLE_FIELDS)))}"
     for table, fields in TABLE_FIELDS.items():
         for row in rows.get(table, ()):
             if tuple(row) != fields:

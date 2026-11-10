@@ -1,4 +1,4 @@
-"""Tests for `str_bonus_2h` against the real sources (`prd.md` §6.4)."""
+"""Tests for `str_bonus_2h` against the real sources (`web/src/engine/README.md#Two-handing`)."""
 
 from __future__ import annotations
 

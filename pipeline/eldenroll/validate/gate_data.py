@@ -16,11 +16,9 @@ from eldenroll.loaders.aliases import AliasRow, load_aliases
 from eldenroll.loaders.annotations import load_annotations
 from eldenroll.loaders.character_classes import load_character_classes, load_slot_pools
 from eldenroll.loaders.combat_rules import load_combat_rules
-from eldenroll.loaders.gaps import load_gaps
 from eldenroll.loaders.modifiers import load_modifiers
 from eldenroll.loaders.str_bonus import load_str_bonus
 from eldenroll.model.database import Database
-from eldenroll.model.gap import Gap
 from eldenroll.paths import AREAS
 from eldenroll.validate.gaps import GapSources, load_overrides, load_sources
 from eldenroll.validate.placement import load_placement_data, load_placement_sources
@@ -36,7 +34,6 @@ class GateData:
     str_bonus: Mapping[str, bool]
     alias_rows: tuple[AliasRow, ...]
     added_items: tuple[str, ...]
-    gaps: tuple[Gap, ...]
     override_items: Mapping[str, frozenset[str]]
     dropped: tuple[DroppedValue, ...]
     found_nowhere: frozenset[str]
@@ -70,7 +67,6 @@ def load_gate_data(root: Path) -> GateData:
         str_bonus=load_str_bonus(overrides / "str_bonus_2h.csv"),
         alias_rows=alias_rows,
         added_items=tuple(load_added_items(overrides / "items.csv")),
-        gaps=load_gaps(root / "data" / "gaps.csv"),
         override_items=load_overrides(overrides),
         dropped=tuple(dropped_values(load_placement_sources(root, sources))),
         found_nowhere=placement.found_nowhere,

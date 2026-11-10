@@ -1,4 +1,5 @@
-"""Tests for the modifier rows, starting with the combat rules' P1 rows (`prd.md` §7, §8.4)."""
+"""Tests for the modifier rows, starting with the combat rules' P1 rows
+(`web/src/engine/README.md#Combat rules`)."""
 
 from __future__ import annotations
 

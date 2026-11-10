@@ -1,40 +1,27 @@
-"""Tests for `data/gaps.csv` and the checks that hold it to the sources (`data.md` §10)."""
+"""Tests for the gap checks: what they find in the sources, and that every gap has its override
+(`data/overrides/README.md#Gaps`)."""
 
 from __future__ import annotations
 
-from dataclasses import replace
 from pathlib import Path
 from typing import cast
 
 import pytest
 
-from eldenroll.loaders.gaps import COLUMNS, load_gaps, write_gaps
-from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.gap import Gap
 from eldenroll.model.item import Item
 from eldenroll.validate.gaps import (
     GapSources,
-    add_missing,
     find_gaps,
     item_origin,
     load_overrides,
     load_sources,
-    reconcile,
     requirement_gaps,
+    uncovered,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-GAPS = ROOT / "data" / "gaps.csv"
-
-GAP = Gap(
-    area="requirements",
-    item="Pata",
-    origin="dlc",
-    problem="no stat record",
-    found_by="check",
-    step="2.5.3",
-    owner="both",
-)
+GAP = Gap("requirements", "Pata", "no stat record")
 
 
 @pytest.fixture(scope="module")
@@ -51,15 +38,8 @@ def _item(sources: GapSources, name: str) -> Item:
     return next(item for item in sources.table if item.name == name)
 
 
-def test_the_list_agrees_with_the_checks_and_overrides(found: tuple[Gap, ...]) -> None:
-    tracked = load_gaps(GAPS)
-    assert reconcile(found, tracked, load_overrides(ROOT / "data" / "overrides")) == ()
-
-
-def test_the_file_is_written_the_way_the_writer_writes_it(tmp_path: Path) -> None:
-    written = tmp_path / "gaps.csv"
-    write_gaps(written, load_gaps(GAPS))
-    assert written.read_text(encoding="utf-8") == GAPS.read_text(encoding="utf-8")
+def test_every_gap_has_its_override(found: tuple[Gap, ...]) -> None:
+    assert uncovered(found, load_overrides(ROOT / "data" / "overrides")) == ()
 
 
 @pytest.mark.parametrize(
@@ -143,90 +123,8 @@ def test_stat_records_of_one_item_may_repeat_if_they_agree(sources: GapSources) 
     assert ("requirements", "Ekzykes's Decay") not in {gap.key for gap in requirement_gaps(sources)}
 
 
-def test_gap_without_a_row_is_reported() -> None:
-    assert reconcile([GAP], [], {}) == ("requirements 'Pata' has no row",)
-
-
-def test_row_whose_gap_went_away_is_reported() -> None:
-    assert reconcile([], [GAP], {}) == (
-        "requirements 'Pata' is open, but the check no longer finds it",
+def test_gap_without_an_override_is_reported() -> None:
+    assert uncovered([GAP], {}) == (
+        "requirements 'Pata': no stat record; answer it in requirements.csv",
     )
-
-
-def test_manual_row_needs_no_check() -> None:
-    assert reconcile([], [replace(GAP, found_by="manual")], {}) == ()
-
-
-def test_wrong_origin_is_reported() -> None:
-    assert reconcile([GAP], [replace(GAP, origin="base")], {}) == (
-        "requirements 'Pata' is dlc, the row says base",
-    )
-
-
-def test_applied_row_needs_its_override() -> None:
-    row = replace(GAP, status="applied", answer="STR 10", source="wiki")
-    assert reconcile([], [row], {}) == (
-        "requirements 'Pata' is applied, but requirements.csv lacks it",
-    )
-    assert reconcile([], [row], {"requirements": frozenset({"Pata"})}) == ()
-
-
-def test_add_missing_keeps_what_a_person_wrote() -> None:
-    answered = replace(GAP, status="answered", answer="STR 10", source="owner")
-    other = replace(GAP, item="Bone Bow")
-    assert add_missing([GAP, other], [answered]) == (answered, other)
-
-
-def _write(path: Path, **cells: str) -> None:
-    row = {
-        "area": "requirements",
-        "item": "Pata",
-        "origin": "dlc",
-        "problem": "no stat record",
-        "found_by": "check",
-        "step": "2.5.3",
-        "owner": "both",
-        "status": "open",
-        "answer": "",
-        "source": "",
-        **cells,
-    }
-    path.write_text(
-        ",".join(COLUMNS) + "\n" + ",".join(row[name] for name in COLUMNS) + "\n",
-        encoding="utf-8",
-    )
-
-
-@pytest.mark.parametrize(
-    ("cells", "message"),
-    [
-        ({"area": "nope"}, "area is"),
-        ({"origin": "nope"}, "origin is"),
-        ({"found_by": "nope"}, "found_by is"),
-        ({"owner": "nope"}, "owner is"),
-        ({"status": "nope"}, "status is"),
-        ({"problem": ""}, "empty problem"),
-        ({"status": "answered"}, "needs an answer"),
-        ({"status": "applied", "answer": "STR 10"}, "needs an answer"),
-    ],
-)
-def test_bad_row_stops_the_load(tmp_path: Path, cells: dict[str, str], message: str) -> None:
-    path = tmp_path / "gaps.csv"
-    _write(path, **cells)
-    with pytest.raises(LoaderError, match=message):
-        load_gaps(path)
-
-
-def test_open_row_may_hold_a_proposal(tmp_path: Path) -> None:
-    path = tmp_path / "gaps.csv"
-    _write(path, answer="STR 10")
-    assert load_gaps(path)[0].answer == "STR 10"
-
-
-def test_repeated_row_stops_the_load(tmp_path: Path) -> None:
-    path = tmp_path / "gaps.csv"
-    write_gaps(path, [GAP])
-    data_row = path.read_text(encoding="utf-8").splitlines()[1]
-    path.write_text(path.read_text(encoding="utf-8") + data_row + "\n", encoding="utf-8")
-    with pytest.raises(LoaderError, match="duplicate"):
-        load_gaps(path)
+    assert uncovered([GAP], {"requirements": frozenset({"Pata"})}) == ()

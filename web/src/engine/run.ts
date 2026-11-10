@@ -41,7 +41,7 @@ export interface Objective {
   readonly shortlistRh: boolean;
   /** Every reroll since the last `Done`, carried across `Reroll objective` and `Reroll items`. */
   readonly rerolls: readonly RerollTarget[];
-  /** One block per rolled slot, for the console in development (`prd.md` §8.7). */
+  /** One block per rolled slot, for the console in development (`web/src/engine/README.md#Trace`). */
   readonly trace: readonly TraceBlock[];
 }
 

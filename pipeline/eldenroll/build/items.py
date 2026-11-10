@@ -61,7 +61,8 @@ def new_item(
 
 
 def none_item() -> Item:
-    """Return the row a slot samples for a deliberately empty result (`prd.md` §6.7)."""
+    """Return the row a slot samples for a deliberately empty result
+    (`web/src/engine/README.md#Empty slots and aliases`)."""
     return new_item("none", "none", str_bonus_2h=False)
 
 

@@ -267,7 +267,7 @@ def _boss_placement(item: Item, boss: BossInstance, source_name: str) -> Placeme
 
 
 def _location_placement(item: Item, area: str, source_name: str) -> Placement:
-    """The Roundtable counts as Limgrave (`data.md` §5.2)."""
+    """The Roundtable counts as Limgrave (`data/overrides/README.md#Regions`)."""
     location_id = _ROUNDTABLE_LOCATION if area == _ROUNDTABLE else area
     row = ItemLocation(item_id=item.id, location_id=location_id)
     return Placement(row=row, source_name=source_name)

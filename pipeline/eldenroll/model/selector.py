@@ -1,4 +1,5 @@
-"""One selector, the single dialect for slot pools and modifier targets (`prd.md` §8.4)."""
+"""One selector, the single dialect for slot pools and modifier targets
+(`data/overrides/README.md#Selectors and modifiers`)."""
 
 from __future__ import annotations
 

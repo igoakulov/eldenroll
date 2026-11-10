@@ -1,4 +1,5 @@
-"""Tests for the vocabulary and the selector dialect (`prd.md` §6.3, §8.4)."""
+"""Tests for the vocabulary and the selector dialect
+(`data/overrides/README.md#Selectors and modifiers`)."""
 
 from __future__ import annotations
 

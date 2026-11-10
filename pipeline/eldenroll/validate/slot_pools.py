@@ -19,7 +19,7 @@ from eldenroll.validate.selectors import resolve_items, validate_selectors
 
 RULE_SLOTS = frozenset({"rule_1", "rule_2"})
 # The card shows `Any staff`, so one staff is enough, and this one shares its region with
-# `Spinning Weapon`, so the card always names the ash (`prd.md` §6.2).
+# `Spinning Weapon`, so the card always names the ash (`web/src/engine/README.md#Classes`).
 JESTER_STAFF = "demi_human_queens_staff"
 SCOPED_ODD_WEAPONS = frozenset({"torch", "perfume_bottle"})
 ITEM_KINDS: frozenset[SelectorKind] = frozenset({"item", "subcategory", "category"})
@@ -68,7 +68,8 @@ def _kinds(rows: tuple[SlotPool, ...]) -> list[str]:
 
 
 def _scope(rows: tuple[SlotPool, ...], table: tuple[Item, ...]) -> list[str]:
-    """Return each pool whose catalysts or odd weapons differ from what `prd.md` §6.2 allows."""
+    """Return each pool whose catalysts or odd weapons differ from what
+    `web/src/engine/README.md#Classes` allows."""
     catalysts = {item.id for item in table if item.subcategory in CATALYST}
     staves = {item.id for item in table if item.subcategory == "glintstone_staff"}
     seals = catalysts - staves

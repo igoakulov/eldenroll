@@ -14,7 +14,7 @@ from eldenroll.loaders.aliases import AliasRow
 from eldenroll.model.database import Database
 from eldenroll.model.item import Item
 from eldenroll.model.item_slot import ItemSlot
-from eldenroll.validate.gaps import find_gaps, reconcile
+from eldenroll.validate.gaps import find_gaps, uncovered
 from eldenroll.validate.gate_data import GateData
 
 POOL_COUNTS: Final[Mapping[str, int]] = {
@@ -53,7 +53,7 @@ def quality_problems(data: GateData) -> tuple[str, ...]:
         *_listed(database.items, data.added_items),
         *_alias_members(data.alias_rows),
         *_never_a_row(database.items),
-        *reconcile(find_gaps(data.sources), data.gaps, data.override_items),
+        *uncovered(find_gaps(data.sources), data.override_items),
     )
 
 

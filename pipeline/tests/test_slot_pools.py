@@ -1,4 +1,5 @@
-"""Tests for the character classes and their slot pools against the real tables (`prd.md` §6)."""
+"""Tests for the character classes and their slot pools against the real tables
+(`web/src/engine/README.md#Classes`)."""
 
 from __future__ import annotations
 

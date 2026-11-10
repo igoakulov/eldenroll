@@ -1,6 +1,6 @@
-# ---- unused inputs and planning docs (not published); sources in use are in data/sources/ ----
-raw/
-docs/
+# ---- internal planning (not published) ----
+internal/
+CLAUDE.local.md
 .claude/
 
 # ---- build output; rebuilt with python -m eldenroll.build.database ----

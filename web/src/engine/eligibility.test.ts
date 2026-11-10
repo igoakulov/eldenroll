@@ -22,7 +22,7 @@ function fromBoss(id: string): ItemLocation {
   return { item_id: "i", location_id: null, boss_instance_id: id };
 }
 
-describe("rowCounts follows the prd.md table", () => {
+describe("rowCounts follows the eligibility table", () => {
   it.each([
     ["pickup, region selected", located("spot"), HERE, true, true],
     ["pickup, region not selected", located("spot"), NOWHERE, false, false],

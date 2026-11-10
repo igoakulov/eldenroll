@@ -24,7 +24,7 @@ Category = Literal[
 
 @dataclass(frozen=True, slots=True)
 class Item:
-    """One rollable item; only the `data.md` §2 fields exist, so nothing else can ship."""
+    """One rollable item; only the fields declared here exist, so nothing else can ship."""
 
     id: str
     name: str
@@ -42,7 +42,7 @@ class Item:
     odds: float = 1
 
     def to_row(self) -> dict[str, object]:
-        """Return the row as stored in `db.json`, in `data.md` §2 field order."""
+        """Return the row as stored in `db.json`, in `model/` field order."""
         return {
             "id": self.id,
             "name": self.name,

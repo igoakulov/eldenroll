@@ -1,4 +1,5 @@
-"""Tests for the aliases against the real item table (`prd.md` §6.7)."""
+"""Tests for the aliases against the real item table
+(`web/src/engine/README.md#Empty slots and aliases`)."""
 
 from __future__ import annotations
 

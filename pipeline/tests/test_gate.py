@@ -1,4 +1,4 @@
-"""Tests for the Phase 0 gate and the build command (`data.md` §11, §12)."""
+"""Tests for the Phase 0 gate and the build command (`data/README.md#Build`)."""
 
 from __future__ import annotations
 
@@ -210,9 +210,9 @@ def test_a_broken_table_is_a_quality_problem(data: GateData, change: Change, mes
     assert any(message in problem for problem in problems), problems
 
 
-def test_a_gap_with_no_row_is_a_quality_problem(data: GateData) -> None:
-    problems = quality_problems(replace(data, gaps=()))
-    assert any("has no row" in problem for problem in problems)
+def test_a_gap_with_no_override_is_a_quality_problem(data: GateData) -> None:
+    problems = quality_problems(replace(data, override_items={}))
+    assert any("answer it in requirements.csv" in problem for problem in problems)
 
 
 def test_the_tables_hold_exactly_the_documented_fields(data: GateData) -> None:

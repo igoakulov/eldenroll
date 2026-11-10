@@ -9,7 +9,8 @@ from dataclasses import dataclass
 DLC_PREFIX: str = "DLC: "
 ROYAL_CAPITAL: str = "leyndell"
 ASHEN_CAPITAL: str = "leyndell_ashen"
-# Their rows stay in the Royal Capital's region, but both capitals reach them (`prd.md` §3.2).
+# Their rows stay in the Royal Capital's region, but both capitals reach them
+# (`web/src/engine/README.md#Inputs`).
 SHUNNING_GROUNDS: frozenset[str] = frozenset({"sewer", "sewer_flame", "sewer_catacombs"})
 
 

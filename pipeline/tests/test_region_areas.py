@@ -1,7 +1,7 @@
 """Tests for the authored area → region map.
 
-Area names come from `areas.yaml`; per-region slot counts are the ones recorded
-in `data.md` §3.2 and are recomputed from `item_slots.yaml`.
+Area names come from `areas.yaml`; the per-region slot counts here are
+the record, recomputed from `item_slots.yaml`.
 """
 
 from __future__ import annotations

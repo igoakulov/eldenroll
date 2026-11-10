@@ -1,4 +1,4 @@
-"""Tests for the spell rows against the real sources (`data.md` §4.6, §4.7)."""
+"""Tests for the spell rows against the real sources (`data/README.md#Scope`)."""
 
 from __future__ import annotations
 

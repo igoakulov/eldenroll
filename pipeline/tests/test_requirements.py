@@ -1,4 +1,5 @@
-"""Tests for the stat requirements against the real sources (`data.md` §2, §7.3)."""
+"""Tests for the stat requirements against the real sources
+(`data/sources/README.md#The base-game JSON files`)."""
 
 from __future__ import annotations
 

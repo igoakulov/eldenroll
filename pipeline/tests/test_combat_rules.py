@@ -1,4 +1,4 @@
-"""Tests for the combat rule table against `prd.md` §7."""
+"""Tests for the combat rule table against `web/src/engine/README.md#Combat rules`."""
 
 from __future__ import annotations
 

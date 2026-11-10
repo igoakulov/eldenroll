@@ -1,4 +1,4 @@
-"""Tests for the tool rows against the real sources (`data.md` §4.8, §4.9)."""
+"""Tests for the tool rows against the real sources (`data/README.md#Scope`)."""
 
 from __future__ import annotations
 

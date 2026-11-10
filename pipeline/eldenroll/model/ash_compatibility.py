@@ -1,7 +1,7 @@
 """One ash fits one weapon class, or a whole category when `subcategory` is null.
 
 This says nothing about a single weapon: whether that can hold an ash at all is its `infusable`
-flag (`data.md` §4.5).
+flag (`data/README.md#Ashes`).
 """
 
 from __future__ import annotations

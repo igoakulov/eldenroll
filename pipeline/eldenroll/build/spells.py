@@ -1,4 +1,4 @@
-"""Offensive spells only (`data.md` §4.6, §4.7).
+"""Offensive spells only (`data/README.md#Scope`).
 
 `alias`, `image` and the requirements stay at their defaults here; later steps fill them in.
 """

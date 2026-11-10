@@ -1,4 +1,5 @@
-"""A display label over concrete items, never a sampling unit (`prd.md` §6.7).
+"""A display label over concrete items, never a sampling unit
+(`web/src/engine/README.md#Empty slots and aliases`).
 
 Membership is on the item, as `item.alias`, so a label is all this row holds.
 """

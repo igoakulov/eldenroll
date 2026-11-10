@@ -1,6 +1,6 @@
 """Tests for the authored region seed.
 
-The expected ids, names and levels are the ones recorded in `data.md` §3.1 and §3.2.
+The expected ids, names and levels here are the record; no doc repeats them.
 """
 
 from __future__ import annotations

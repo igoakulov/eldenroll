@@ -1,4 +1,4 @@
-"""Tests for the talisman rows against the real sources (`data.md` §4.4)."""
+"""Tests for the talisman rows against the real sources (`data/README.md#Scope`)."""
 
 from __future__ import annotations
 

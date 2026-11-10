@@ -1,4 +1,5 @@
-"""Which rows count for a selection of regions and dead bosses (`prd.md` §3.2, §8.3)."""
+"""Which rows count for a selection of regions and dead bosses
+(`web/src/engine/README.md#Eligibility`)."""
 
 from __future__ import annotations
 
@@ -79,7 +80,8 @@ def row_counts(
     *,
     boss_items_only_from_dead: bool = True,
 ) -> bool:
-    """Return whether one row makes its item eligible, by the table in `prd.md` §8.3."""
+    """Return whether one row makes its item eligible, by the table in
+    `web/src/engine/README.md#Eligibility`."""
     if row.location_id is not None:
         return row.location_id in locations
     boss = bosses[str(row.boss_instance_id)]

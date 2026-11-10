@@ -1,5 +1,5 @@
 """An ash only ever rolls as part of a weapon slot, so the canonical name drops the source's `Ash of
-War: ` prefix (`data.md` §4.5). The ashes the mod has only attached to a weapon are added by
+War: ` prefix (`data/README.md#Ashes`). The ashes the mod has only attached to a weapon are added by
 name.
 
 `alias` and `image` stay at their defaults here; later steps fill them in.

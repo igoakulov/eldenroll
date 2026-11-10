@@ -1,0 +1,43 @@
+# EldenRoll — agent notes
+
+How to work in this repo. Facts about the project live in the READMEs beside what they describe; start at `README.md`.
+
+## Checks
+
+Run both before and after a change, and expect them clean with no skips:
+
+- `cd pipeline && ../.venv/bin/ruff check . && ../.venv/bin/pyright && ../.venv/bin/python -m pytest`
+- `cd web && pnpm typecheck && pnpm test`
+
+`data/build/` is git-ignored: build `db.json` before any web check (`pipeline/README.md`).
+
+## Docs
+
+- A fact goes once, where it belongs: in the README beside the code or data it describes, written for a public reader, stating facts.
+- Don't write down what code or data files say plainly: values, lists, counts, defaults, signatures, file contents, the `reason` of one CSV row. They drift. Write the reasons, the rules that span many rows, and the traps you need to find your way around the files. When a feature is built, trim its README spec to what the code can't say.
+- Reference a section as `path#Heading`, with the heading text exactly as written and no `#` marks; a bare `#Heading` means the same file, and `#A`, `#B` after a path stay in that file. To read one: `grep -n '^#\+ Heading' path`, then read to the next heading of that level. Keep headings unique within a file and free of backticks. Reference a whole file only when it is short or all of it applies. Code comments cite sections the same way.
+- Any change to odds or `data/overrides/modifiers.csv` lands with its reason in `data/balance.md` in the same commit; `pipeline/tests/test_balance.py` fails otherwise. A new item-to-item exception goes there first, by priority. Never state a reason nobody gave: write "not recorded".
+- An agreed change lands in the docs in the same session, even if the build waits.
+- Comments in code are for what the code can't say: no docstrings that restate a name, record history or repeat counts.
+
+## Naming
+
+- A rename reaches everything in one pass: UI text, docs, code identifiers and tests. Grep every spelling of the old name.
+- "Class" alone means the character class; code says `character_class` and `CharacterClass`. A weapon's class is `weapon_class` in code and `subcategory` as a field. "Build" means only the pipeline step (`eldenroll.build`, `data/build/`), never a character. The game's own classes are "starting classes".
+- UI text uses the game's word where one exists: a boss is *felled*. Code and stored data keep `dead`.
+
+## Data and tests
+
+- Look up only data we lack. No wiki is authoritative, so a disagreement with an existing record is reported, not a reason to re-verify everything.
+- Tests are few and judged on the outcome for the player. The full-run simulation is the main balance tool.
+- Never write a test value from memory: the JSON sources can be wrong while looking normal.
+
+## Traps
+
+- zsh aborts a whole command when a glob matches nothing. Quote globs.
+- The shell's directory can change between commands; use absolute paths or `cd` in the same command.
+- Deleting a Markdown table row by script can merge two rows; search for `||` afterwards.
+- The item `none` is one key across all slots, so compounding decay hits it on almost every objective: `Jester`'s empty right hand and the rule `None` fade fast.
+- Felling Maliketh before every Royal Capital boss leaves those bosses unreachable; the run then finishes without them.
+- `Great Épée`, `Miséricorde`, `Kalé` and `Varré's Bouquet` carry accents. Slugs keep every letter: `Thops's Barrier` is `thopss_barrier`.
+- Fandom refuses WebFetch with HTTP 402; read it in a browser.

@@ -1,4 +1,4 @@
-"""Tests for ash compatibility against the real sources (`data.md` §4.5)."""
+"""Tests for ash compatibility against the real sources (`data/README.md#Ashes`)."""
 
 from __future__ import annotations
 

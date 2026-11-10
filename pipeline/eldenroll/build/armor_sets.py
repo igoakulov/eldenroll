@@ -1,6 +1,6 @@
 """The join is strict: a name that is no armor piece, a second piece in one slot or two sets with
 one id all stop the build. An armor piece no set names is fine, because it stays a row that
-cannot roll (`data.md` §1.1).
+cannot roll (`data/README.md#Scope`).
 """
 
 from __future__ import annotations

@@ -1,4 +1,5 @@
-"""Tests for the location table and the region invariants across it (`data.md` §3, §11)."""
+"""Tests for the location table and the region invariants across it
+(`data/overrides/README.md#Regions`)."""
 
 from __future__ import annotations
 

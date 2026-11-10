@@ -1,6 +1,6 @@
 """The base-game JSON supplies them, under stat names that vary in case and form. `requirements.csv`
 wins over it. A value with no usable stat name is left out, so a broken record keeps whatever it
-can still say, and `data/gaps.csv` tracks it until an override corrects it. An item with no
+can still say, and the gap check stops the build until an override corrects it. An item with no
 record stays at zero the same way.
 """
 

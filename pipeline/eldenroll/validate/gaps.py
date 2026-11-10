@@ -1,8 +1,8 @@
-"""Every gap a check finds must have a row, and a row whose gap has gone away must be closed, so the
-list cannot drift from the sources. A problem no check can see, such as a wrong value that looks
-normal, is a row a person added, and nothing here touches it.
+"""Every gap a check finds in the sources must be answered by a row in its override file, so a new
+source or a lost override row stops the build. A problem no check can see, such as a wrong value
+that looks normal, is tracked as an open question until it is answered.
 
-Run `python -m eldenroll.validate.gaps` from `pipeline/` to add a row for every new gap.
+Run `python -m eldenroll.validate.gaps` from `pipeline/` to list the gaps no override answers yet.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import Literal, cast
 
 from eldenroll.build.aliases import assign_aliases
 from eldenroll.build.armor import added_armor, build_armor
@@ -33,7 +33,6 @@ from eldenroll.loaders.ash_overrides import load_ash_overrides
 from eldenroll.loaders.ash_sources import load_ash_sources
 from eldenroll.loaders.consumables import load_consumable_categories
 from eldenroll.loaders.csv_source import CsvTable, read_table
-from eldenroll.loaders.gaps import load_gaps, write_gaps
 from eldenroll.loaders.infusable import load_infusable
 from eldenroll.loaders.iteminfo import load_item_catalog
 from eldenroll.loaders.itemslots import load_slots
@@ -48,7 +47,7 @@ from eldenroll.loaders.weapons import (
     load_weapon_categories,
 )
 from eldenroll.model.ash_compatibility import AshCompatibility
-from eldenroll.model.gap import Gap, Origin, Owner
+from eldenroll.model.gap import Gap
 from eldenroll.model.item import Item
 from eldenroll.model.item_catalog import ItemCatalog
 from eldenroll.model.item_slot import ItemSlot
@@ -73,6 +72,8 @@ from eldenroll.paths import (
     WEAPON_SHIELD_CLASSES,
     WEAPON_SKILLS,
 )
+
+Origin = Literal["base", "tarnished", "dlc"]
 
 _ASH_SHEET_CLASSES: Mapping[str, str] = {"Staff": "glintstone_staff", "Seal": "sacred_seal"}
 _ASH_SHEET_FIRST_CLASS = "Dagger"
@@ -100,6 +101,7 @@ _OVERRIDE_FILES: Mapping[str, str] = {
     "holds_ash": "infusable.csv",
     "ash_usable_on": "ash_compatibility.csv",
     "remembrance_boss": "remembrance_bosses.csv",
+    "weapon_class_ashes": "ash_compatibility.csv",
 }
 
 
@@ -162,7 +164,7 @@ def requirement_gaps(sources: GapSources) -> tuple[Gap, ...]:
     for item in names.values():
         problem = _requirement_problem(found.get(item.name, []))
         if problem is not None:
-            out.append(_gap("requirements", item, sources, problem, "2.5.3", "both"))
+            out.append(Gap("requirements", item.name, problem))
     return tuple(out)
 
 
@@ -227,20 +229,17 @@ def holds_ash_gaps(sources: GapSources) -> tuple[Gap, ...]:
             if not real:
                 continue
             problem = f"on the unique-skill sheet, but its skill {', '.join(real)} is a real ash"
-        out.append(_gap("holds_ash", item, sources, problem, "2.4.5", "both"))
+        out.append(Gap("holds_ash", item.name, problem))
     return tuple(out)
 
 
 def ash_gaps(sources: GapSources) -> tuple[Gap, ...]:
     rows = _ash_sheet_rows(sources.ash_sheet)
     return tuple(
-        _gap(
+        Gap(
             "ash_usable_on",
-            item,
-            sources,
+            item.name,
             "the ash sheet has no row for it, so nothing says which weapons can hold it",
-            "2.4.6",
-            "both",
         )
         for item in sources.table
         if item.category == "ash" and item.name not in rows
@@ -261,13 +260,9 @@ def weapon_class_gaps(sources: GapSources) -> tuple[Gap, ...]:
     }
     return tuple(
         Gap(
-            area="weapon_class_ashes",
-            item=name.replace("_", " ").title().replace(" To ", "-to-"),
-            origin="dlc",
-            problem="the ash sheet has no column for this class, so its weapons have no ash list",
-            found_by="check",
-            step="2.4.6",
-            owner="both",
+            "weapon_class_ashes",
+            name,
+            "the ash sheet has no column for this class, so its weapons have no ash list",
         )
         for name in sorted(weapon_classes - columns)
     )
@@ -284,22 +279,14 @@ def remembrance_gaps(sources: GapSources, names: PlacementNames) -> tuple[Gap, .
             item = names.resolve_slot_line(line) if ENIA in line else None
             if match is not None and item is not None:
                 sold.setdefault(match[1], set()).add(item)
-    out: list[Gap] = []
-    for remembrance, items in sold.items():
-        origins = {item_origin(item, sources.catalog, sources.variants) for item in items}
-        listed = ", ".join(sorted(item.name for item in items))
-        out.append(
-            Gap(
-                area="remembrance_boss",
-                item=remembrance,
-                origin="dlc" if "dlc" in origins else "base",
-                problem=f"which boss gives it? Enia sells {listed} for it",
-                found_by="check",
-                step="2.8.3",
-                owner="both",
-            )
+    return tuple(
+        Gap(
+            "remembrance_boss",
+            remembrance,
+            f"which boss gives it? Enia sells {', '.join(sorted(item.name for item in items))}",
         )
-    return tuple(out)
+        for remembrance, items in sold.items()
+    )
 
 
 def find_gaps(sources: GapSources) -> tuple[Gap, ...]:
@@ -313,36 +300,13 @@ def find_gaps(sources: GapSources) -> tuple[Gap, ...]:
     )
 
 
-def reconcile(
-    found: Iterable[Gap], tracked: Iterable[Gap], overrides: Mapping[str, frozenset[str]]
-) -> tuple[str, ...]:
-    gaps = {gap.key: gap for gap in found}
-    rows = {gap.key: gap for gap in tracked}
-    out: list[str] = []
-    for key, gap in gaps.items():
-        row = rows.get(key)
-        if row is None:
-            out.append(f"{key[0]} {key[1]!r} has no row")
-        elif row.origin != gap.origin:
-            out.append(f"{key[0]} {key[1]!r} is {gap.origin}, the row says {row.origin}")
-    for key, row in rows.items():
-        if row.found_by == "check" and row.status != "applied" and key not in gaps:
-            out.append(f"{key[0]} {key[1]!r} is {row.status}, but the check no longer finds it")
-        if (
-            row.status == "applied"
-            and row.found_by == "check"
-            and row.area in _OVERRIDE_FILES
-            and row.item not in overrides.get(row.area, frozenset())
-        ):
-            out.append(f"{key[0]} {key[1]!r} is applied, but {_OVERRIDE_FILES[row.area]} lacks it")
-    return tuple(out)
-
-
-def add_missing(found: Iterable[Gap], tracked: Iterable[Gap]) -> tuple[Gap, ...]:
-    rows = {gap.key: gap for gap in tracked}
-    for gap in found:
-        rows.setdefault(gap.key, gap)
-    return tuple(rows.values())
+def uncovered(found: Iterable[Gap], overrides: Mapping[str, frozenset[str]]) -> tuple[str, ...]:
+    """Return each gap no override row answers yet."""
+    return tuple(
+        f"{gap.area} {gap.item!r}: {gap.problem}; answer it in {_OVERRIDE_FILES[gap.area]}"
+        for gap in found
+        if gap.item not in overrides.get(gap.area, frozenset())
+    )
 
 
 def _set_pieces(path: Path) -> frozenset[str]:
@@ -355,7 +319,8 @@ def load_overrides(overrides_dir: Path) -> dict[str, frozenset[str]]:
     for area, name in _OVERRIDE_FILES.items():
         path = overrides_dir / name
         if path.is_file():
-            out[area] = frozenset(row[0] for row in read_table(path).rows)
+            column = 2 if area == "weapon_class_ashes" else 0
+            out[area] = frozenset(row[column] for row in read_table(path).rows)
     return out
 
 
@@ -445,28 +410,12 @@ def _ash_sheet_rows(sheet: CsvTable) -> frozenset[str]:
     return frozenset(row[name].strip() for row in sheet.rows)
 
 
-def _gap(area: str, item: Item, sources: GapSources, problem: str, step: str, owner: Owner) -> Gap:
-    return Gap(
-        area=area,
-        item=item.name,
-        origin=item_origin(item, sources.catalog, sources.variants),
-        problem=problem,
-        found_by="check",
-        step=step,
-        owner=owner,
-    )
-
-
 def main() -> None:
     root = Path(__file__).resolve().parents[3]
-    path = root / "data" / "gaps.csv"
-    tracked = load_gaps(path)
-    found = find_gaps(load_sources(root))
-    rows = add_missing(found, tracked)
-    write_gaps(path, rows)
-    print(f"{len(rows)} rows, {len(rows) - len(tracked)} new")
-    for problem in reconcile(found, rows, load_overrides(root / "data" / "overrides")):
+    problems = uncovered(find_gaps(load_sources(root)), load_overrides(root / "data" / "overrides"))
+    for problem in problems:
         print(problem)
+    print(f"{len(problems)} gaps no override answers")
 
 
 if __name__ == "__main__":

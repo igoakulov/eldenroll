@@ -1,4 +1,4 @@
-"""Tests for the consumable rows and the whole catalog (`data.md` §4.1, §4.9)."""
+"""Tests for the consumable rows and the whole catalog (`data/README.md#Scope`)."""
 
 from __future__ import annotations
 

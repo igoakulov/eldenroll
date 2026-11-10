@@ -1,5 +1,5 @@
 """Odds are for balancing, and 0 keeps a row that never rolls, such as a transform that conflicts
-with armor. Modifiers apply on top, and only under their conditions (`prd.md` §8.2, §8.4). An
+with armor. Modifiers apply on top, and only under their conditions (`data/README.md#Rows`). An
 armor piece rolls only through its set, so odds on a piece would do nothing, and the build
 refuses them.
 """

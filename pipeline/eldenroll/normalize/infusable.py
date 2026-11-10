@@ -1,4 +1,5 @@
-"""This is a fact about the single item, apart from which ashes fit its class (`data.md` §4.5). In
+"""This is a fact about the single item, apart from which ashes fit its class
+(`data/README.md#Ashes`). In
 order: `infusable.csv` decides, then a class that never holds one, then a unique skill means no,
 and anything else can. Every other category keeps its null.
 """

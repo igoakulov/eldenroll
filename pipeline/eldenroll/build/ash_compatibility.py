@@ -1,6 +1,6 @@
 """The sheet is base-game data: a `TRUE` cell says an ash fits a class, and its affinity columns say
 nothing here. It has no row for the DLC ashes and no column for the DLC classes, so
-`data/gaps.csv` tracks those until the overrides hold them. An ash fitting every shield class
+the gap check stops the build until the overrides hold them. An ash fitting every shield class
 becomes one whole-category row, so no row is ever covered by a broader one. Weapons have no such
 row, because the sheet cannot speak for the classes it lacks.
 """

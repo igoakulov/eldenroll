@@ -1,4 +1,5 @@
-"""Tests for the armor rows against the real sources (`data.md` §4.3, §8.4)."""
+"""Tests for the armor rows against the real sources
+(`data/README.md#Armor`, `data/sources/README.md#Matching names`)."""
 
 from __future__ import annotations
 

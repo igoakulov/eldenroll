@@ -1,6 +1,6 @@
 """Tests for the eight base-game JSON loaders.
 
-Record counts are the ones recorded in `data.md` §7.3.
+The record counts here are the record; no doc repeats them.
 """
 
 from __future__ import annotations

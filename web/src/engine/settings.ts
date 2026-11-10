@@ -21,7 +21,7 @@ export const DEFAULT_STATS: Stats = {
   arc: 10,
 };
 
-/** The weapon shortlist and dead bosses are run state, so they sit beside these (`prd.md` §11). */
+/** The weapon shortlist and dead bosses are run state, so they sit beside these (`web/README.md#Saving`). */
 export interface Settings {
   readonly maxStatGap: number;
   readonly characterClasses: readonly string[];

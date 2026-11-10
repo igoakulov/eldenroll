@@ -1,4 +1,4 @@
-"""Tests for `infusable` against the real sources (`data.md` §4.2, §4.5)."""
+"""Tests for `infusable` against the real sources (`data/README.md#Weapons and shields`)."""
 
 from __future__ import annotations
 

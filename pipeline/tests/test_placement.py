@@ -1,4 +1,5 @@
-"""Tests for `item_location` rows against the real sources (`data.md` §5, `prd.md` §8.3)."""
+"""Tests for `item_location` rows against the real sources
+(`data/README.md#Placement`, `web/src/engine/README.md#Eligibility`)."""
 
 from __future__ import annotations
 

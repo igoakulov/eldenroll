@@ -1,4 +1,4 @@
-"""Tests for the item table: ids, names and row shape (`data.md` §2, §8.3, §11)."""
+"""Tests for the item table: ids, names and row shape (`data/README.md#Rows`)."""
 
 from __future__ import annotations
 

@@ -1,4 +1,5 @@
-"""Tests for the weapon and shield rows against the real sources (`data.md` §4.2, `prd.md` §6.3)."""
+"""Tests for the weapon and shield rows against the real sources
+(`data/README.md#Weapons and shields`)."""
 
 from __future__ import annotations
 

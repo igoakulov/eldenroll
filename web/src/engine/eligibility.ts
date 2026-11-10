@@ -7,7 +7,7 @@ export interface Reachability {
   readonly bossItemsOnlyFromDeadBosses: boolean;
 }
 
-/** One row of the `prd.md` §8.3 table. A boss at odds 0 acts as a regular enemy. */
+/** One row of the `web/src/engine/README.md#Eligibility` table. A boss at odds 0 acts as a regular enemy. */
 export function rowCounts(
   row: ItemLocation,
   bosses: ReadonlyMap<string, BossInstance>,

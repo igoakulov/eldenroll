@@ -15,5 +15,5 @@ Palm Blast,Dane's Footwork,the mod has no separate item; the ash comes on this w
 Shield Strike,Dueling Shield,the mod has no separate item; the ash comes on this weapon and can be taken off
 Shield Strike,Carian Thrusting Shield,the mod has no separate item; the ash comes on this weapon and can be taken off
 Shield Strike,Ritual Thrusting Shield,the mod has no separate item; the ash comes on this weapon and can be taken off
-Igon's Drake Hunt,Igon's Greatbow,the mod has no separate item; kept as a row but given a zero-odds modifier because it is easily missed
+Igon's Drake Hunt,Igon's Greatbow,the mod has no separate item; kept as a row at odds 0 (item_odds.csv) because it is easily missed
 Spinning Gravity Thrust,Sword Lance,"the mod has no separate item; the ash comes on this weapon, which Enia sells for the Remembrance of the Wild Boar Rider"
