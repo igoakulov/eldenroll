@@ -6,26 +6,43 @@ Scripts are in `package.json`. The app and the engine tests read `../data/build/
 
 ## Views
 
-Player-facing text says *felled* where the game does: `Felled?`, `Boss items only from felled bosses`, `Felled` in `Bosses`. Code and stored data say `dead`.
+Player-facing text says *felled* where the game does: `Felled?`, `Felled on the way`, `Boss gear locked until felled`, `Felled` in `Bosses`. Code and stored data say `dead`. *Felled on the way* names a boss felled outside an objective: before the run, between objectives, or one `Felled?` marks.
 
 There are no item pictures. Every image slot shows our own icon for the item's subcategory, so pictures could replace them later without a redesign.
+
+### Navigation
+
+Home is the current objective's card while a run is in progress, and Start otherwise. Every other screen opens over home and its `✕` returns there; only a run opened from `Run history` closes back to the list. There is no separate `Resume` inside the app: closing is enough.
+
+The main flows:
+
+1. **Start a run:** Start → stats, regions, `Run settings` → `Start run` → the card.
+2. **Play an objective:** the card → `Reroll` as often as wanted → `Done` → `Great enemy felled` with `Undo` → `Level up` → `Roll objective N` → the card.
+3. **A boss already felled:** `Felled?` → `Felled on the way?` → `Confirm and reroll` → `Rerolling in` with `Undo` → the card.
+4. **Change things mid-run:** `Level N` → `Level up` → `Save`. Menu → `Run settings` → `General`, `Never roll` or `Shortlist` → `Save`; `Bosses` opens from `General`.
+5. **Check progress:** menu → the run's row → `Summary` and `Timeline`.
+6. **Finish:** menu → `Finish run` → confirmation → the run's view over Start → `✕` → Start.
+7. **Come back later:** reopening the app with a run in progress lands on Start: `Resume` returns to the card; `New run` asks first, finishes the current run, then shows a fresh Start.
+8. **Look back:** Start or the menu → `Run history` → a run → `Summary` and `Timeline`; `Delete run` at the end of `Summary`.
 
 ### Start
 
 - The wordmark and the tagline.
-- Read-only `Level`, then the 8 stats, each a number field between `−` and `+`.
-- `Regions`: 17 checkboxes by `region_level`; a DLC region shows a `DLC` tag in place of its `DLC: ` prefix.
-- `More settings` opens `Run settings`.
-- `Start run`; with a run in progress, `Resume run` and `New run` with a confirmation.
+- **No run in progress:** read-only `Level`, then the 8 stats, each a number field between `−` and `+`; `Regions`, 17 checkboxes by `region_level`, a DLC region showing a `DLC` tag in place of its `DLC: ` prefix; `Run settings`, with the menu's line, then `Run history` once a run is saved, so everything that sets up the run comes before navigation; `Start run`.
+- **A run in progress:** `Current run` with the run's title and `In progress`, `Run history`, and `New run` beside `Resume`. Stats, regions and settings belong to the run then, so they stay hidden until `New run`.
 - The disclaimer.
 
 ### Run settings
 
-The same screen from Start and from the menu: `Changes apply on the next roll.`, `Save`, and a close button that discards every change. Three groups:
+One screen from Start and from the menu, with three tabs: `General`, `Never roll` and `Shortlist`. `Changes apply on the next roll.`, one `Save` for every tab, and a close button that discards every change. It reopens on the last tab used, so a list edited often stays two taps from the card.
 
-- **Classes:** one checkbox per class.
-- **Gear:** `Max stat gap`; `Never roll` and `Weapon shortlist`, each a row opening its own screen.
-- **Bosses:** a row opening `Bosses`, showing how many are felled and skipped, and the `Boss items only from felled bosses` toggle, on by default. Off stops the boss filter; `Bosses` stays, because felled and skipped bosses still leave the pool.
+- **General:**
+  - **Classes:** one checkbox per class.
+  - **Gear:** `Max stat gap`.
+  - **Bosses:** a row opening `Bosses`, showing how many are felled and skipped, and the `Boss gear locked until felled` toggle, on by default. Off stops the boss filter; `Bosses` stays, because felled and skipped bosses still leave the pool.
+- **Never roll** searches every gear item and combat rule with `odds > 0`, empty by default; there is no browsing by category. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, without the `None` pieces; typing a piece's name finds every set that holds it. It writes to `neverRoll`.
+- **Shortlist** has the checkbox `Roll Right Hand from shortlist`, off by default, and searches every weapon and greatshield with `odds > 0`, never narrowed by class, since classes can change at any time. Its line: `Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.` The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`.
+- Both lists show the selected entries in card order under `N selected`, with `Clear all`. An unticked entry stays in place until `Save`.
 
 ### Bosses
 
@@ -34,21 +51,15 @@ Every boss instance with `odds > 0`, each its name over its `location`, one line
 | State | Lines |
 |---|---|
 | `Alive` (default) | `Can be rolled as an objective.` / `Its gear cannot be rolled yet.` |
-| `Felled` | `Felled in an objective or before.` / `Its gear can be rolled.` |
+| `Felled` | `Felled in an objective or on the way.` / `Its gear can be rolled.` |
 | `Skipped` | `Never rolled as an objective.` / `Its gear cannot be rolled.` |
 
-`Felled` writes to `deadBosses`, `Skipped` to `skippedBosses`. A boss felled with `Done` can't change: it sits in `N felled in objectives`, a numbered list in objective order folded behind `Show all N`. The current objective's boss reads `Current`. Every other boss has a cycler stepping through the three states; one marked by `Felled?` is `Felled` and can change. Without a search the screen lists `Skipped`, then `Felled`, then the folded group; alive bosses show only in search results. A changed row stays in place until `Save`. Marking a boss here decays nothing.
-
-### Never roll and Weapon shortlist
-
-- **Never roll** searches every gear item and combat rule with `odds > 0`, empty by default; there is no browsing by category. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, without the `None` pieces; typing a piece's name finds every set that holds it. It writes to `neverRoll`.
-- **Weapon shortlist** has the checkbox `Roll Right Hand from shortlist`, off by default, and searches every weapon and greatshield with `odds > 0`, never narrowed by class, since classes can change at any time. Its line: `Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.`
-- Both show the selected entries in card order under `N selected`, with `Clear all`. An unticked entry stays in place until `Save`; the close button discards every change.
+`Felled` writes to `deadBosses`, `Skipped` to `skippedBosses`. A boss felled with `Done` can't change: it sits in `N felled in objectives`, a numbered list in objective order folded behind `Show all N`. The current objective's boss reads `Current`. Every other boss has a cycler stepping through the three states; one marked by `Felled?` is `Felled` and can change. Without a search the screen lists `N skipped`, then `N felled on the way`, then the folded group; alive bosses show only in search results. A changed row stays in place until `Save`. Marking a boss here decays nothing.
 
 ### Current run
 
 - **Top bar:** `Objective N` at the left; at the right `Level N`, which opens `Level up` with `Changes apply on the next roll.`, and the menu.
-- **Menu**, one flat list: `Run history`, `Current run` with its level, `Never roll`, `Weapon shortlist`, `Run settings`, and `Finish run`, which can't be undone.
+- **Menu**, one flat list: `Run history`; the run's row, its title over `In progress`, opening its view; `Run settings`; and `Finish run` in red.
 - **Card:**
   - The boss name, a bar with `Felled?` on it, and the location with a pin.
   - The class name as the loadout heading, with a small group of icons for its typical loadout.
@@ -57,18 +68,34 @@ Every boss instance with `odds > 0`, each its name over its `location`, one line
   - `Combat rules`: each name beside a red lozenge.
   - Wiki links: each item tile, a named ash and the armor set name open the item's wiki page where one exists. Names and rows aren't tappable; `none`, `any` and aliases have no link. The card shows no item locations: the wiki covers them better, and the data's placements are sometimes adjusted for balance.
 - **Bottom bar:** `Reroll` and `Done`.
-- **Reroll panel** replaces the bar: read-only chips for every target in roll order, lit where the reroll will change them; the 9-stop slider; `Reroll`; a close button. Each slot that will change shows the reroll icon in a lit tile and its name struck through; `Felled?` and links hide.
-- **Felled?** opens the same panel locked at `Full objective`, with the chips `Boss skipped until end of run`, `Boss gear unlocked` and `New objective`, and `Skip boss and reroll`. Confirming shows the `Rerolling in` countdown.
+- **Reroll panel** opens over the dimmed card, as every sheet does: read-only chips for every slot in reverse roll order, `Armor` first, so they read like the slider; lit where the reroll will change them; the 9-stop slider; `Reroll`; a close button. The panel hides most of the card on a phone, so the chips carry the whole scope. The lit chips always form one run from the left, growing with the slider's fill and glow, which teaches that a reroll redoes everything from its target on.
+- **Felled?** opens the same panel locked at `Full objective`, titled `Felled on the way?`, with the chips `Boss felled on the way`, `Boss gear unlocked` and `New objective`, and `Confirm and reroll`. Confirming shows the `Rerolling in` countdown. These chips state how things stand after the reroll, so they read as states, unlike the confirmation chips, which name actions.
 - **After `Done`:** the boss name over its emptied bar, `Great enemy felled`, `Next objective in` counting from 5, and `Undo`. Then **Level up**: `Level` before and after, the 8 stats with changed values marked, `N of 17 selected` with the next 3 unticked regions and `Show all 17 regions`, and `Roll objective N`. The waiting messages show here.
 - The reroll count is kept for the summary but not shown on the card.
 
-### Finished run
+### Confirmations
 
-Completed count, total rerolls, the timeline (`Objective 1 → 2 rerolls → Objective 2 → …`) and the summary. A read-only list of each completed objective: boss, loadout, rules, stats and level at `Done`, rerolls before it. The unfinished objective is never shown as completed.
+`Finish run`, `New run` and `Delete run` share one sheet over the screen: a question, chips for what happens, red for what is lost and gold for what is kept, and the action in the glow band. Chips are in the active voice with no contractions: `Abandon objective N`, `Cannot resume`, `Save to Run history`, `Cannot undo`. A run with no completed objective isn't saved, so its sheet doesn't offer `Save to Run history`.
+
+### Run view
+
+The same view for the run in progress and a finished one, read-only. Its title is the last completed objective and its boss, `Objective 88` over `Malenia, Blade of Miquella`; in progress, the current objective. The boss name alone is enough: the player knows which instance they fought. Under the title, a status: `Finished 10 Jan 2027` or `In progress`. Two tabs follow, `Summary` and `Timeline`, so the timeline isn't buried under the summary.
+
+- **Summary**, in order:
+  - `Level` and the 8 stats, from the last `Done`; in progress, the current ones.
+  - `Totals`: objectives completed, bosses felled, bosses skipped and rerolls. `Bosses skipped` opens its list, each boss's name over its location, since one name can cover several instances.
+  - `N top classes`: completed objectives per class, with the class's icon group; the top 3, then `Show all N`.
+  - `N unique gear`: rows for weapons, shields, sorceries, incantations, armor sets and the shortlist, each with its count, opening an A–Z list. Tapping a name opens `Timeline` searched for it.
+  - `10 most rerolled`: the top 5, then `Show all 10`.
+  - `Delete run`, on a finished run only.
+  - Every count from `Totals` down sits in one column, a chevron's width in from the edge, so rows that open something line up with rows that don't. `Level` and the stats keep the edge under their own rule.
+- **Timeline**, oldest first. Each objective shows its number, boss and class, and opens to its loadout, rules, and level and stats at `Done`. Bosses felled on the way show as one `Felled on the way` entry listing them, just before the objective they were marked under; those marked before objective 1 come first, and those marked during the unfinished last objective come last. No reroll counts: per objective they say nothing.
+  - **Search** picks one entry from this run: a boss, a class, an item, a set or a rule. Skipped bosses are never in it, since they're never in the timeline. A pick shows `N of M objectives` and only the matching entries, each showing the line that matched; `✕` in the field clears it.
+- The unfinished objective is never shown as completed.
 
 ### Run history
 
-Finished runs are kept beside the active one, listed newest first, each opening its finished-run view read-only. One run is active at a time, and nothing from a finished run reaches the engine.
+From the menu or from Start. The run in progress, if any, is pinned on top under `Current run`, its title over `In progress`, opening its view. Then the finished runs, newest first, each its title over `Finished <date>`, cut with `…`, opening its run view. A run finished with no completed objective isn't saved, so trying the app leaves no clutter; any saved run can be deleted from its view. One run is active at a time, and nothing from a finished run reaches the engine.
 
 ## Saving
 
@@ -92,16 +119,19 @@ Finished runs are kept beside the active one, listed newest first, each opening 
 - `schemaVersion` is bumped only when the stored shape changes; it is not a migration system.
 - Completed objectives store snapshots with names: boss name and location, item names or alias labels, set and piece names, rule names, stats and level at `Done`. A finished run renders from them: a missing image shows the icon, a missing URL no link, a missing name `unknown item`.
 - An unknown `schemaVersion`, a missing id or an invalid shape keeps stats, settings, regions, felled bosses, the shortlist, owned state and completed objectives, and rerolls the current objective; if that fails, it offers a reset. A shortlisted weapon gone from the data is dropped from the list. Corrupt storage prompts a reset, never a crash.
-- `deadBosses` entries carry `instanceId` and the `objectiveIndex` showing when the boss was marked, `0` before objective 1, in marking order.
+- `deadBosses` entries carry `instanceId` and the `objectiveIndex` showing when the boss was marked, `0` before objective 1, in marking order. The timeline draws a boss felled on the way from this index. It stays on the boss rather than becoming an event of its own, so such bosses could later fold into their objective as other kills.
+- Each reroll event records what it replaced in every slot it changed, for `10 most rerolled`. The reroll after `Felled?` isn't counted there: the player didn't turn that boss down.
+- Finished runs are kept beside the active one until deleted.
 - No personal data, no cookies, no analytics.
 - The installable app keeps the app and `db.json` on the phone so rolls work offline. iPhone has no install prompt and keeps a home-screen app's storage apart from Safari's, so Start explains `Add to Home Screen` before the first run.
 
 ## Summary
 
-By category: classes, weapons and shields, sorceries and incantations, talismans, armor sets, combat rules, tools and consumables.
+Totals, top classes, unique gear and most rerolled; their layout is in #Run view.
 
-- Only completed objectives count; each appearance once per slot; `none` and `any` never.
-- An alias counts as one label (`15 Any staff`).
-- Top 10 per category; ties by count descending, then name.
-- Bosses aren't ranked: each completes at most once. Felled bosses appear in the timeline at the objective they were marked under, in marking order, and count toward the boss total; those marked before objective 1 appear at its start. Completed objectives and bosses accounted for can differ.
+- Only completed objectives count; `none` and `any` never.
+- Top lists by gear category were dropped: with decay a category drifts towards an even spread, or the shortlist dominates it, and the player already knows their shortlist. Counts of unique gear say more.
+- **Unique gear** counts distinct entries per category, an alias as one label. `Any staff` and `Any seal` are left out of weapons: those classes attack with spells, so the label says nothing about their weapon. `Any torch` counts, because the torch is the weapon.
+- **Most rerolled** ranks everything a reroll replaced, across bosses, classes, gear and rules, by how often; ties by name.
+- Bosses aren't ranked: each completes at most once. `Bosses felled` counts those felled in objectives and on the way. Completed objectives and bosses accounted for can differ.
 - Recovering a save never crashes and never loses completed objectives.

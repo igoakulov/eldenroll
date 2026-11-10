@@ -18,6 +18,7 @@ Run both before and after a change, and expect them clean with no skips:
 - Reference a section as `path#Heading`, with the heading text exactly as written and no `#` marks; a bare `#Heading` means the same file, and `#A`, `#B` after a path stay in that file. To read one: `grep -n '^#\+ Heading' path`, then read to the next heading of that level. Keep headings unique within a file and free of backticks. Reference a whole file only when it is short or all of it applies. Code comments cite sections the same way.
 - Any change to odds or `data/overrides/modifiers.csv` lands with its reason in `data/balance.md` in the same commit; `pipeline/tests/test_balance.py` fails otherwise. A new item-to-item exception goes there first, by priority. Never state a reason nobody gave: write "not recorded".
 - An agreed change lands in the docs in the same session, even if the build waits.
+- Docs state the current design and the reasons that shape it, never its history: no variants tried and dropped, no small styling choices.
 - Comments in code are for what the code can't say: no docstrings that restate a name, record history or repeat counts.
 
 ## Naming

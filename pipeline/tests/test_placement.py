@@ -379,7 +379,7 @@ def test_row_eligibility_follows_the_prd_table(
     dead = {"dead", "zero"}
 
     assert row_counts(row, locations, dead, BOSSES) is on
-    assert row_counts(row, locations, dead, BOSSES, boss_items_only_from_dead=False) is off
+    assert row_counts(row, locations, dead, BOSSES, boss_gear_locked_until_dead=False) is off
 
 
 def test_the_ashen_capital_replaces_the_royal_one_but_not_the_shunning_grounds(

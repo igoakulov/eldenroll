@@ -26,7 +26,7 @@ export interface Settings {
   readonly maxStatGap: number;
   readonly characterClasses: readonly string[];
   readonly weaponShortlistEnabled: boolean;
-  readonly bossItemsOnlyFromDeadBosses: boolean;
+  readonly bossGearLockedUntilDead: boolean;
 }
 
 export function defaultSettings(
@@ -37,7 +37,7 @@ export function defaultSettings(
     maxStatGap: hyperparams.defaultMaxStatGap,
     characterClasses: database.character_class.map((row) => row.id),
     weaponShortlistEnabled: false,
-    bossItemsOnlyFromDeadBosses: true,
+    bossGearLockedUntilDead: true,
   };
 }
 

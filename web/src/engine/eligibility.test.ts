@@ -34,8 +34,8 @@ describe("rowCounts follows the eligibility table", () => {
     ["boss at odds 0, region not selected", fromBoss("zero"), NOWHERE, false, false],
   ] as const)("%s", (_case, row, locations, on, off) => {
     const reach = { locations, deadBosses: DEAD };
-    expect(rowCounts(row, BOSSES, { ...reach, bossItemsOnlyFromDeadBosses: true })).toBe(on);
-    expect(rowCounts(row, BOSSES, { ...reach, bossItemsOnlyFromDeadBosses: false })).toBe(off);
+    expect(rowCounts(row, BOSSES, { ...reach, bossGearLockedUntilDead: true })).toBe(on);
+    expect(rowCounts(row, BOSSES, { ...reach, bossGearLockedUntilDead: false })).toBe(off);
   });
 });
 
@@ -45,7 +45,7 @@ describe("countedItems", () => {
     const counted = countedItems(data, {
       locations: NOWHERE,
       deadBosses: NOWHERE,
-      bossItemsOnlyFromDeadBosses: true,
+      bossGearLockedUntilDead: true,
     });
     const consumable = realDatabase.item.find((row) => row.category === "consumable")?.id;
     for (const id of [consumable, "none", "none_head"]) expect(counted.has(id ?? "")).toBe(true);

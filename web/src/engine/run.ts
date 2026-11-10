@@ -115,7 +115,7 @@ function counted(engine: Engine, run: Run, asIfDead?: ReadonlySet<string>): Read
   return countedItems(engine.data, {
     locations: selectedLocations(engine.data.database, new Set(run.regions), deadSet(run)),
     deadBosses: asIfDead ?? deadSet(run),
-    bossItemsOnlyFromDeadBosses: run.settings.bossItemsOnlyFromDeadBosses,
+    bossGearLockedUntilDead: run.settings.bossGearLockedUntilDead,
   });
 }
 

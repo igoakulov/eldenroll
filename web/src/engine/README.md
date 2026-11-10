@@ -29,7 +29,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 - Build `Engine` once from the loaded `db.json`.
 - Before a run exists, the Start view holds plain `RunInputs`. `startRun` needs a 32-bit seed from the UI (the engine never calls `Math.random`) and returns either a run or the exact messages to show. After start, edits go through `editRun`, and bosses through `setBossState`, which returns the same run for a locked boss. So the boss controls have two paths: arrays before the run, run actions after.
 - `displaySlots` returns rows in card order. An `alias` armor piece is a `None` piece: the set keeps that slot empty, so the player wears nothing there, while `any` means they wear what they like. Make the two easy to tell apart.
-- The roll order differs from the card order, so mark the slots a reroll will change from the roll order (#Rerolls), not the card.
+- The roll order differs from the card order: compute and show the slots a reroll will change in roll order (#Rerolls), where they always form one run; the panel lists it reversed, to match the slider. In card order a kept slot can sit between two that change.
 - A slot the class has no row for can't be rerolled: `reroll` returns the run unchanged.
 - `done` still rolls the next objective at once, and `alreadyDead` keeps the loadout; both change to #Lifecycle.
 - Print the trace in development only after an action that rolls, from the action handler, not a React effect: `StrictMode` runs effects twice.
@@ -49,7 +49,7 @@ An objective is a boss instance, a class loadout and 2 combat rules. The player 
 2. `Done` marks the objective completed and its boss felled, stores the snapshot and applies decay. `Great enemy felled` counts down 5 seconds with `Undo`, which restores the run exactly. `Level up` follows, to update stats and regions, then `Roll objective N`. If the selected regions hold no living boss, the run waits with no current objective until more are ticked.
 3. `Felled?` is for a boss felled before this objective: it marks it felled, so its items unlock, and rerolls the full objective after the same countdown, reading `Rerolling in`, with no `Level up`.
 4. `Finish run` works at any time; the current objective is discarded unless `Done`. The run finishes by itself when every boss with `odds > 0` is felled or skipped, whatever the regions. Once Maliketh is felled, a Royal Capital boss left alive outside the Shunning-Grounds doesn't count: his death turns the city to ash.
-5. `New run` clears all run state.
+5. `New run` finishes the current run as `Finish run` does, then clears all run state.
 
 ### Rerolls
 
@@ -84,7 +84,7 @@ Every input and setting stays editable; changes apply on the next roll and never
 - **Stats** are typed by hand and impossible builds are accepted; the level isn't clamped. Gear, Great Runes and buffs are ignored; two-handing is the only adjustment.
 - **Regions** are the only progression input: no boss level or rune filter. Region 1 is the default, because region 2 bundles Mohgwyn and region 3 is a higher level band. Selecting the Ashen Capital drops the Royal Capital silently, except the Shunning-Grounds, which both reach. A felled Maliketh drops the Royal Capital the same way without selecting the Ashen Capital's areas.
 - **`Max stat gap`** is per item, never a shared loadout budget.
-- **Weapon shortlist** is in #Weapon shortlist; **`Boss items only from felled bosses`** in #Eligibility.
+- **Weapon shortlist** is in #Weapon shortlist; **`Boss gear locked until felled`** in #Eligibility.
 
 ## Bosses
 
@@ -133,7 +133,7 @@ The player lists favourite or upgraded weapons and greatshields; with the checkb
 
 ## Eligibility
 
-An item rolls if at least one of its location rows counts (`eligibility.ts`). A place row counts when its region is selected. With `Boss items only from felled bosses` on, a boss row counts once the boss is felled, whatever the region, and never before: Radahn's weapons stay out while he lives, even with Caelid ticked, and keep rolling after he falls with Caelid unticked. Off, a boss row counts by the boss's region. A boss at `odds = 0` always counts by region, like a regular enemy, and is absent from `Bosses`.
+An item rolls if at least one of its location rows counts (`eligibility.ts`). A place row counts when its region is selected. With `Boss gear locked until felled` on, a boss row counts once the boss is felled, whatever the region, and never before: Radahn's weapons stay out while he lives, even with Caelid ticked, and keep rolling after he falls with Caelid unticked. Off, a boss row counts by the boss's region. A boss at `odds = 0` always counts by region, like a regular enemy, and is absent from `Bosses`.
 
 - A boss is known felled only through `Done`, `Felled?` or `Bosses`; skipped bosses are presumed alive. With the setting off, felled bosses still leave the boss pool; off is mainly for testing.
 - An item with no location row counts everywhere: consumables, whose result names a family the player fills with any variant, and the `None` pieces. A set rolls only if every piece is reachable.

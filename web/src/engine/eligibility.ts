@@ -4,7 +4,7 @@ import type { EngineData } from "./engineData";
 export interface Reachability {
   readonly locations: ReadonlySet<string>;
   readonly deadBosses: ReadonlySet<string>;
-  readonly bossItemsOnlyFromDeadBosses: boolean;
+  readonly bossGearLockedUntilDead: boolean;
 }
 
 /** One row of the `web/src/engine/README.md#Eligibility` table. A boss at odds 0 acts as a regular enemy. */
@@ -13,12 +13,12 @@ export function rowCounts(
   bosses: ReadonlyMap<string, BossInstance>,
   reachability: Reachability,
 ): boolean {
-  const { locations, deadBosses, bossItemsOnlyFromDeadBosses } = reachability;
+  const { locations, deadBosses, bossGearLockedUntilDead } = reachability;
   if (row.location_id !== null) return locations.has(row.location_id);
 
   const boss = bosses.get(row.boss_instance_id ?? "");
   if (boss === undefined) return false;
-  if (bossItemsOnlyFromDeadBosses && boss.odds > 0) return deadBosses.has(boss.id);
+  if (bossGearLockedUntilDead && boss.odds > 0) return deadBosses.has(boss.id);
   return locations.has(boss.location_id);
 }
 

@@ -78,14 +78,14 @@ def row_counts(
     dead: Collection[str],
     bosses: Mapping[str, BossInstance],
     *,
-    boss_items_only_from_dead: bool = True,
+    boss_gear_locked_until_dead: bool = True,
 ) -> bool:
     """Return whether one row makes its item eligible, by the table in
     `web/src/engine/README.md#Eligibility`."""
     if row.location_id is not None:
         return row.location_id in locations
     boss = bosses[str(row.boss_instance_id)]
-    if boss_items_only_from_dead and boss.odds > 0:
+    if boss_gear_locked_until_dead and boss.odds > 0:
         return boss.id in dead
     return boss.location_id in locations
 
