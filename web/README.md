@@ -27,7 +27,7 @@ The main flows:
 
 ### Start
 
-- The wordmark and the tagline.
+- The wordmark and `Follow fate to become Elden Rold.` Tapping `Elden Rold`, underlined as links are, swaps in `Roll objectives, gather your gear, and fell your foes to become Elden Rold.`, which says what becoming Elden Rold takes, and tapping it again swaps back.
 - **No run in progress:** read-only `Level`, then the 8 stats, each a number field between `−` and `+`; `Regions`, 17 checkboxes by `region_level`, a DLC region showing a `DLC` tag in place of its `DLC: ` prefix; `Run settings`, with the menu's line, then `Run history` once a run is saved, so everything that sets up the run comes before navigation; `Start run`.
 - **A run in progress:** `Current run` with the run's title and `In progress`, `Run history`, and `New run` beside `Resume`. Stats, regions and settings belong to the run then, so they stay hidden until `New run`.
 - The disclaimer.
@@ -96,6 +96,17 @@ The same view for the run in progress and a finished one, read-only. Its title i
 ### Run history
 
 From the menu or from Start. The run in progress, if any, is pinned on top under `Current run`, its title over `In progress`, opening its view. Then the finished runs, newest first, each its title over `Finished <date>`, cut with `…`, opening its run view. A run finished with no completed objective isn't saved, so trying the app leaves no clutter; any saved run can be deleted from its view. One run is active at a time, and nothing from a finished run reaches the engine.
+
+### Desktop
+
+Most players keep this open on a phone beside a console, so desktop gets no layout of its own: the app runs inside a drawn phone, centred on the page, and every screen inside it is the phone's, unchanged.
+
+- The phone has an iPhone 18 Pro's proportions and corner radius, with a punch hole. It draws no status bar or home bar, so the top bar starts beside the punch hole and the bottom bar keeps only its own margin.
+- It scales as a whole to the window's height, so its content keeps a phone's proportions. Below a minimum scale the page scrolls instead, so browser zoom still enlarges the text.
+- `ELDEN` stands to its left and `ROLL` to its right, in the kit's dimmest gold, sized to the space beside the phone and hidden when they would be too small to read.
+- The mouse wheel scrolls the phone from anywhere on the page. Scrolling, sheets and anything positioned stay inside the phone's screen, so components size themselves to their container, never to the window.
+- Hover and keyboard focus states are for desktop; phones ignore them.
+- A phone-sized window gets no frame: the app fills it.
 
 ## Saving
 
