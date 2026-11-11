@@ -14,6 +14,8 @@ There are no item pictures. Every image slot shows our own icon for the item's s
 
 Home is the current objective's card while a run is in progress, and Start otherwise. Every other screen opens over home and its `✕` returns there; only a run opened from `Run history` closes back to the list. There is no separate `Resume` inside the app: closing is enough.
 
+A sheet (the menu, the reroll panel, `Felled?` and the confirmations) holds the keyboard while it is open: `Esc` closes it, `Tab` stays inside it, and closing returns focus to the control that opened it. Keyboard focus shows on every control as one thin gold outline; on the reroll slider, whose input is invisible, it rings the handle.
+
 The main flows:
 
 1. **Start a run:** Start → stats, regions, `Run settings` → `Start run` → the card.
@@ -105,7 +107,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 - It scales as a whole to the window's height, so its content keeps a phone's proportions. Below a minimum scale the page scrolls instead, so browser zoom still enlarges the text.
 - `ELDEN` stands to its left and `ROLL` to its right, in the kit's dimmest gold, sized to the space beside the phone and hidden when they would be too small to read.
 - The mouse wheel scrolls the phone from anywhere on the page. Scrolling, sheets and anything positioned stay inside the phone's screen, so components size themselves to their container, never to the window.
-- Hover and keyboard focus states are for desktop; phones ignore them.
+- Hover states are for desktop; phones ignore them.
 - A phone-sized window gets no frame: the app fills it.
 
 ## Saving
