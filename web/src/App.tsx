@@ -99,7 +99,6 @@ function Game({ database }: { readonly database: Database }) {
     setView("start");
   };
   const menu = (current: Run): RunMenuActions => ({
-    title: runTitle(engine.data, current),
     onRunSettings: () => setView("settings"),
     onFinish: () => endRun(finishRun(current)),
   });

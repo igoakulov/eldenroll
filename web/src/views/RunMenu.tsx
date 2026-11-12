@@ -48,7 +48,6 @@ export function NewRunConfirm({
 }
 
 export interface RunMenuActions {
-  readonly title: string;
   readonly onRunSettings: () => void;
   readonly onFinish: () => void;
 }
@@ -72,15 +71,12 @@ export function RunMenu({
     setWasOpen(open);
     if (open) setFinishing(false);
   }
-  // Run history (9.10) and the run's view (9.7) open from these rows once they are built
-  const notYet = () => {};
 
   return (
     <>
       <Sheet open={open && !finishing} eyebrow="Menu" closeLabel="Close menu" onClose={onClose}>
         <div className="run-menu">
-          <ListRow title="Run history" onClick={notYet} />
-          <ListRow title={actions.title} detail="In progress" cut onClick={notYet} />
+          {/* Run history (9.10) and the run's own row, opening its view (9.7), join the menu once those screens exist */}
           <ListRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={actions.onRunSettings} />
           <ListRow
             title="Finish run"
