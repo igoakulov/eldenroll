@@ -54,6 +54,23 @@ a {
   color: var(--gold);
 }
 
+/* Controls, tiles and branding are tapped, not read: a press never starts a text selection on them. Names,
+   rules and other reading text stay selectable. */
+button,
+label,
+[role="tab"],
+input[type="range"],
+.tile,
+.chip,
+.wordmark,
+.tagline,
+.phone-frame-mark,
+.felled-band,
+.countdown {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* Keyboard focus: one thin gold outline outside any control */
 :focus-visible {
   outline: 1px solid var(--grace);
