@@ -29,10 +29,17 @@ The main flows:
 
 ### Start
 
-- The wordmark and `Follow fate to become Elden Rold.` Tapping `Elden Rold`, underlined as links are, swaps in `Roll objectives, gather your gear, and fell your foes to become Elden Rold.`, which says what becoming Elden Rold takes, and tapping it again swaps back.
+- The wordmark and a tagline that types itself: behind a thin gold caret it types one variant, holds it long enough to read, deletes it about twice as fast and types the next, in a loop. Each variant is at most two lines and holds `Elden Rold`, underlined as links are, which opens the `Elden Rold` card. The first variants are `Follow fate to become Elden Rold.` and `Roll objectives, gather your gear, and fell your foes to become Elden Rold.`
+  - The tagline keeps the height of its longest variant, so nothing below it moves while it types.
+  - It pauses while a field on Start has focus or it is scrolled out of view, so it doesn't pull the eye while the player sets up.
+  - Screen readers get the first variant as plain text; with reduced motion the variants cross-fade.
 - **No run in progress:** read-only `Level`, then the 8 stats, each a number field between `−` and `+`; `Regions`, 17 checkboxes by `region_level`, a DLC region showing a `DLC` tag in place of its `DLC: ` prefix; `Run settings`, with the menu's line, then `Run history` once a run is saved, so everything that sets up the run comes before navigation; `Start run`.
 - **A run in progress:** `Current run` with the run's title and `In progress`, `Run history`, and `New run` beside `Resume`. Stats, regions and settings belong to the run then, so they stay hidden until `New run`.
 - The disclaimer.
+
+### Elden Rold card
+
+The onboarding card, opened from `Elden Rold` in Start's tagline, full screen with `✕` back to Start. It greets the player with `Welcome to EldenRoll, Tarnished` over the tagline's first variant, says the app is a companion kept open while playing that rolls a boss and the gear to fell it with, so every playthrough feels new again, then gives a run in five numbered steps and how to add the app to the Home Screen, one line each for iPhone and Android. The Home Screen comes before the first run because iPhone keeps a home-screen app's storage apart from Safari's: a run started in Safari stays there.
 
 ### Run settings
 
@@ -136,7 +143,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 - Each reroll event records what it replaced in every slot it changed, for `10 most rerolled`. The reroll after `Felled?` isn't counted there: the player didn't turn that boss down.
 - Finished runs are kept beside the active one until deleted.
 - No personal data, no cookies, no analytics.
-- The installable app keeps the app and `db.json` on the phone so rolls work offline. iPhone has no install prompt and keeps a home-screen app's storage apart from Safari's, so Start explains `Add to Home Screen` before the first run.
+- The installable app keeps the app and `db.json` on the phone so rolls work offline. iPhone has no install prompt and keeps a home-screen app's storage apart from Safari's, so the `Elden Rold` card explains `Add to Home Screen` before the first run.
 
 ## Summary
 
