@@ -44,9 +44,9 @@ One screen from Start and from the menu. It reopens on the last tab used, so a l
 
 - **General:**
   - **Bosses:** a row opening `Bosses`, and the `Boss gear locked until felled` toggle. Off stops the boss filter; `Bosses` stays, because felled and skipped bosses still leave the pool.
-- **Never roll** searches every gear item and combat rule with `odds > 0`, empty by default; there is no browsing by category. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, without the `None` pieces; typing a piece's name finds every set that holds it. It writes to `neverRoll`.
-- **Shortlist** has the checkbox `Roll Right Hand from shortlist`, off by default, and searches every weapon and greatshield with `odds > 0`, never narrowed by class, since classes can change at any time. Its line: `Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.` The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`.
-- Both lists show the selected entries in card order under `N selected`, with `Clear all`. An unticked entry stays in place until `Save`.
+- **Never roll** has no browsing by category, only search. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, since a set is what rolls; typing a piece's name finds every set that holds it.
+- **Shortlist** searches weapons and greatshields never narrowed by class, since classes can change at any time. The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`.
+- In both lists an unticked entry keeps its place until `Save`. Search results group like the card, names starting with the search first.
 
 ### Bosses
 

@@ -25,11 +25,12 @@ import { boardBefore, boardOf, countState, inState } from "./views/bossList";
 import { Bosses } from "./views/Bosses";
 import { Card, type Reveal } from "./views/Card";
 import { Felled } from "./views/Felled";
+import { neverRollEntries, shortlistEntries } from "./views/gearList";
 import { LevelUp } from "./views/LevelUp";
 import { rerollTarget } from "./views/rerollScope";
 import { RoldCard } from "./views/RoldCard";
 import { runTitle, type RunMenuActions } from "./views/RunMenu";
-import { RunSettings, type SettingsTab } from "./views/RunSettings";
+import { RunSettings, type RunLists, type SettingsTab } from "./views/RunSettings";
 import { Start, StartResume } from "./views/Start";
 import "./App.css";
 
@@ -58,6 +59,10 @@ function Game({ database }: { readonly database: Database }) {
     [database],
   );
   const rollableBosses = useMemo(() => database.boss_instance.filter((boss) => boss.odds > 0), [database]);
+  const gear = useMemo(
+    () => ({ neverRoll: neverRollEntries(database), shortlist: shortlistEntries(database) }),
+    [database],
+  );
   // Before a run; once one starts, the run holds its own
   const [settings, setSettings] = useState(() => defaultSettings(database));
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("General");
@@ -65,6 +70,7 @@ function Game({ database }: { readonly database: Database }) {
   const [regions, setRegions] = useState<readonly string[]>(DEFAULT_REGIONS);
   const [deadBosses, setDeadBosses] = useState<readonly string[]>([]);
   const [skippedBosses, setSkippedBosses] = useState<readonly string[]>([]);
+  const [lists, setLists] = useState<RunLists>({ neverRoll: [], weaponShortlist: [] });
   const [problems, setProblems] = useState<readonly string[]>([]);
   const [run, setRun] = useState<Run | null>(() => {
     if (!DEV_RESUME) return null;
@@ -89,6 +95,7 @@ function Game({ database }: { readonly database: Database }) {
     setSettings(defaultSettings(database));
     setDeadBosses([]);
     setSkippedBosses([]);
+    setLists({ neverRoll: [], weaponShortlist: [] });
     setProblems([]);
     setView("start");
   };
@@ -113,6 +120,8 @@ function Game({ database }: { readonly database: Database }) {
       <RunSettings
         eyebrow={eyebrow}
         settings={run?.settings ?? settings}
+        lists={run === null ? lists : { neverRoll: run.neverRoll, weaponShortlist: run.weaponShortlist }}
+        gear={gear}
         characterClasses={database.character_class}
         tab={settingsTab}
         onTab={setSettingsTab}
@@ -139,12 +148,19 @@ function Game({ database }: { readonly database: Database }) {
           />
         )}
         onClose={home}
-        onSave={(next) => {
+        onSave={(next, nextLists) => {
           if (run === null) {
             setSettings(next);
+            setLists(nextLists);
             setProblems([]);
           } else {
-            setRun(editRun(run, { settings: next }));
+            setRun(
+              editRun(run, {
+                settings: next,
+                neverRoll: nextLists.neverRoll,
+                weaponShortlist: nextLists.weaponShortlist,
+              }),
+            );
           }
           home();
         }}
@@ -281,7 +297,7 @@ function Game({ database }: { readonly database: Database }) {
       onStartRun={() => {
         const result = startRun(
           engine,
-          { stats, settings, regions, weaponShortlist: [], deadBosses, skippedBosses },
+          { stats, settings, regions, ...lists, deadBosses, skippedBosses },
           newSeed(),
         );
         if (!result.ok) {

@@ -1,5 +1,6 @@
 import type { BossInstance } from "../engine/database";
 import type { BossState, Run } from "../engine/run";
+import { findMatch } from "./search";
 
 /** Every boss as `Bosses` opens: its state, those felled with `Done` in objective order, and the current objective's
  * boss. An absent boss is alive. */
@@ -57,22 +58,6 @@ export type SectionKind = "alive" | "skipped" | "dead" | "objectives";
 export interface BossSection {
   readonly kind: SectionKind;
   readonly rows: readonly BossRow[];
-}
-
-// One character in, one out, so a match's position holds in the name as written
-function fold(text: string): string {
-  return [...text].map((char) => char.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().charAt(0) || char).join("");
-}
-
-export function findMatch(name: string, query: string): readonly [number, number] | null {
-  const wanted = fold(query.trim());
-  if (wanted === "") return null;
-  const chars = [...name];
-  const at = fold(name).indexOf(wanted);
-  if (at < 0) return null;
-  // Back from code points to UTF-16 offsets, which is what slicing the name uses
-  const start = chars.slice(0, at).join("").length;
-  return [start, start + chars.slice(at, at + [...wanted].length).join("").length];
 }
 
 /** `placed` is the state each row is listed under, so a changed row stays where it was. Without a search, alive bosses

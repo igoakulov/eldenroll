@@ -2,13 +2,23 @@ import type { ReactNode } from "react";
 
 import "./Headings.css";
 
-/** A section on Start and Level up: Cinzel caps and a rule fading to the right. */
-export function SectionHeading({ children }: { readonly children: ReactNode }) {
+/** A section on Start and Level up: Cinzel caps and a rule fading to the right, then an optional action. */
+export function SectionHeading({ children, action }: { readonly children: ReactNode; readonly action?: ReactNode }) {
   return (
     <div className="section-heading">
       <h2>{children}</h2>
       <span className="fading-rule" />
+      {action}
     </div>
+  );
+}
+
+/** A small text action at the end of a section heading, such as `Clear all`. */
+export function HeadingAction({ children, onClick }: { readonly children: ReactNode; readonly onClick: () => void }) {
+  return (
+    <button type="button" className="heading-action" onClick={onClick}>
+      <span>{children}</span>
+    </button>
   );
 }
 

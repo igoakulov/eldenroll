@@ -10,11 +10,19 @@ import { Screen } from "../ui/Screen";
 import { Stepper } from "../ui/Stepper";
 import { Tabs } from "../ui/Tabs";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
+import type { GearEntry } from "./gearList";
+import { GearPicker } from "./GearPicker";
 import { CHARACTER_CLASS_ICONS } from "./icons";
 import "./RunSettings.css";
 
 export const SETTINGS_TABS = ["General", "Never roll", "Shortlist"] as const;
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
+
+/** Run state rather than settings (`Settings`), edited on this screen all the same. */
+export interface RunLists {
+  readonly neverRoll: readonly string[];
+  readonly weaponShortlist: readonly string[];
+}
 
 /** The settings before a run or for the next roll in one. Edits stay here until `Save`, which keeps every tab's; a
  * setting no roll could use, such as no class, holds `Save` back with the reason. `Bosses` opens over it and saves on
@@ -22,7 +30,9 @@ export type SettingsTab = (typeof SETTINGS_TABS)[number];
 export function RunSettings({
   eyebrow,
   settings,
+  lists,
   characterClasses,
+  gear,
   tab,
   onTab,
   bossCounts,
@@ -32,16 +42,20 @@ export function RunSettings({
 }: {
   readonly eyebrow: string;
   readonly settings: Settings;
+  readonly lists: RunLists;
   readonly characterClasses: readonly CharacterClass[];
+  /** What each list can pick from, in card order. */
+  readonly gear: { readonly neverRoll: readonly GearEntry[]; readonly shortlist: readonly GearEntry[] };
   readonly tab: SettingsTab;
   readonly onTab: (tab: SettingsTab) => void;
   readonly bossCounts: { readonly felled: number; readonly skipped: number };
   /** The `Bosses` screen, given the way back here. */
   readonly bosses: (back: () => void) => ReactNode;
-  readonly onSave: (settings: Settings) => void;
+  readonly onSave: (settings: Settings, lists: RunLists) => void;
   readonly onClose: () => void;
 }) {
   const [draft, setDraft] = useState(settings);
+  const [listsDraft, setListsDraft] = useState(lists);
   const [problems, setProblems] = useState<readonly string[]>([]);
   const [bossesOpen, setBossesOpen] = useState(false);
   const edit = (changes: Partial<Settings>) => {
@@ -63,7 +77,7 @@ export function RunSettings({
             onClick={() => {
               const found = settingsProblems(draft);
               if (found.length > 0) setProblems(found);
-              else onSave(draft);
+              else onSave(draft, listsDraft);
             }}
           >
             Save
@@ -137,6 +151,43 @@ export function RunSettings({
                 Boss gear locked until felled
               </LozengeCheckbox>
             </div>
+          </>
+        )}
+
+        {tab === "Never roll" && (
+          <>
+            <p className="run-settings-note">Anything selected here never rolls again.</p>
+            <GearPicker
+              key="never-roll"
+              entries={gear.neverRoll}
+              picked={listsDraft.neverRoll}
+              onChange={(neverRoll) => setListsDraft({ ...listsDraft, neverRoll })}
+              searchLabel="Search Never roll"
+              notFound="Nothing by that name."
+            />
+          </>
+        )}
+
+        {tab === "Shortlist" && (
+          <>
+            <p className="run-settings-note">
+              Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.
+            </p>
+            <LozengeCheckbox
+              className="run-settings-shortlist-toggle"
+              checked={draft.weaponShortlistEnabled}
+              onChange={(weaponShortlistEnabled) => edit({ weaponShortlistEnabled })}
+            >
+              Roll Right Hand from shortlist
+            </LozengeCheckbox>
+            <GearPicker
+              key="shortlist"
+              entries={gear.shortlist}
+              picked={listsDraft.weaponShortlist}
+              onChange={(weaponShortlist) => setListsDraft({ ...listsDraft, weaponShortlist })}
+              searchLabel="Search weapons"
+              notFound="No weapon by that name."
+            />
           </>
         )}
       </Tabs>
