@@ -1,0 +1,61 @@
+.cycler {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  height: 36px;
+  border: 1px solid rgba(169, 160, 127, 0.28);
+  background: rgba(8, 8, 7, 0.7);
+}
+
+.cycler button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gold-mute);
+}
+
+/* A 44px touch area on a 34px button */
+.cycler button::after {
+  content: "";
+  position: absolute;
+  inset: -5px 0;
+}
+
+.cycler-back .icon-svg {
+  transform: rotate(180deg);
+}
+
+.cycler .cycler-word {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.cycler-word span {
+  display: inline-block;
+}
+
+.cycler-stepped-on {
+  animation: cycler-on var(--dur-glide) var(--ease-out);
+}
+
+.cycler-stepped-back {
+  animation: cycler-back var(--dur-glide) var(--ease-out);
+}
+
+@keyframes cycler-on {
+  from {
+    opacity: 0.4;
+    transform: translateX(calc(-1 * var(--cycle-x)));
+  }
+}
+
+@keyframes cycler-back {
+  from {
+    opacity: 0.4;
+    transform: translateX(var(--cycle-x));
+  }
+}

@@ -4,11 +4,12 @@ import { Icon } from "./Icon";
 import "./LozengeCheckbox.css";
 
 /** A checkbox row: a lozenge that fills and glows, like a grace being lit. `icons` follow the name, dimmer while
- * unchecked. */
+ * unchecked. A setting carries a `detail` line under its name. */
 export function LozengeCheckbox({
   checked,
   onChange,
   children,
+  detail,
   tag,
   icons,
   className,
@@ -16,16 +17,25 @@ export function LozengeCheckbox({
   readonly checked: boolean;
   readonly onChange: (checked: boolean) => void;
   readonly children: ReactNode;
+  readonly detail?: ReactNode;
   readonly tag?: string;
   readonly icons?: readonly string[];
   readonly className?: string;
 }) {
-  const modifier = icons === undefined ? "" : " lozenge-row-icons";
+  const modifier =
+    (icons === undefined ? "" : " lozenge-row-icons") + (detail === undefined ? "" : " lozenge-row-detail");
   return (
     <label className={`lozenge-row${modifier}${className === undefined ? "" : ` ${className}`}`}>
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
       <span className="lozenge-box" aria-hidden="true" />
-      <span className="lozenge-label">{children}</span>
+      {detail === undefined ? (
+        <span className="lozenge-label">{children}</span>
+      ) : (
+        <span className="lozenge-label">
+          <span className="lozenge-name">{children}</span>
+          <span className="lozenge-detail">{detail}</span>
+        </span>
+      )}
       {icons !== undefined && (
         <span className="lozenge-icons" aria-hidden="true">
           {icons.map((icon, index) => (

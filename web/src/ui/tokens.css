@@ -43,6 +43,7 @@
   --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
   --rise-y: 6px;
   --sheet-y: 16px;
+  --cycle-x: 4px;
 
   /* An enemy felled: the card dims, the bar drains with its trail lagging, then the band fades in and swells */
   --dur-dim: 400ms;
@@ -63,6 +64,7 @@
     --dur-glide: 0ms;
     --rise-y: 0px;
     --sheet-y: 0px;
+    --cycle-x: 0px;
     --swell: 1;
   }
 }

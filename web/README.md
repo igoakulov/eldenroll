@@ -43,22 +43,18 @@ The onboarding card, opened from `Elden Rold` in Start's tagline. Adding the app
 One screen from Start and from the menu. It reopens on the last tab used, so a list edited often stays two taps from the card.
 
 - **General:**
-  - **Bosses:** a row opening `Bosses`, showing how many are felled and skipped, and the `Boss gear locked until felled` toggle, on by default. Off stops the boss filter; `Bosses` stays, because felled and skipped bosses still leave the pool.
+  - **Bosses:** a row opening `Bosses`, and the `Boss gear locked until felled` toggle. Off stops the boss filter; `Bosses` stays, because felled and skipped bosses still leave the pool.
 - **Never roll** searches every gear item and combat rule with `odds > 0`, empty by default; there is no browsing by category. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, without the `None` pieces; typing a piece's name finds every set that holds it. It writes to `neverRoll`.
 - **Shortlist** has the checkbox `Roll Right Hand from shortlist`, off by default, and searches every weapon and greatshield with `odds > 0`, never narrowed by class, since classes can change at any time. Its line: `Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.` The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`.
 - Both lists show the selected entries in card order under `N selected`, with `Clear all`. An unticked entry stays in place until `Save`.
 
 ### Bosses
 
-Every boss instance with `odds > 0`, each its name over its `location`, one line each, cut with `…`. A legend explains the three states, each in two lines:
+Every boss instance with `odds > 0`, under a legend of the three states. `Felled` writes to `deadBosses`, `Skipped` to `skippedBosses`: before a run, the lists `Start run` hands the engine, where every felled boss counts as felled on the way; during one, `Save` applies them through `setBossState`. Marking a boss here decays nothing.
 
-| State | Lines |
-|---|---|
-| `Alive` (default) | `Can be rolled as an objective.` / `Its gear cannot be rolled yet.` |
-| `Felled` | `Felled in an objective or on the way.` / `Its gear can be rolled.` |
-| `Skipped` | `Never rolled as an objective.` / `Its gear cannot be rolled.` |
-
-`Felled` writes to `deadBosses`, `Skipped` to `skippedBosses`. A boss felled with `Done` can't change: it sits in `N felled in objectives`, a numbered list in objective order folded behind `Show all N`. The current objective's boss reads `Current`. Every other boss has a cycler stepping through the three states; one marked by `Felled?` is `Felled` and can change. Without a search the screen lists `N skipped`, then `N felled on the way`, then the folded group; alive bosses show only in search results. A changed row stays in place until `Save`. Marking a boss here decays nothing.
+- A boss felled with `Done` can't change and is listed by objective, folded; the current objective's boss can't change either, since only `Felled?` marks it. One marked by `Felled?` is `Felled` and can change.
+- Alive bosses show only in search results. A changed row keeps its place until `Save`; a new search regroups the rows by their pending states.
+- `Bosses` opens over `Run settings` and saves on its own: its `Save` and `✕` both return there with the settings' own pending edits kept.
 
 ### Current run
 

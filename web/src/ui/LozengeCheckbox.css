@@ -84,3 +84,31 @@
   font-size: 15px;
   color: var(--gold-mute);
 }
+
+.lozenge-row-detail {
+  align-items: flex-start;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.lozenge-row-detail .lozenge-box {
+  margin-top: 8px;
+}
+
+.lozenge-row-detail .lozenge-label {
+  color: var(--text);
+}
+
+.lozenge-name {
+  display: block;
+}
+
+.lozenge-detail {
+  display: block;
+  margin-top: 1px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--text-3);
+}

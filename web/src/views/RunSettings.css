@@ -1,0 +1,9 @@
+/* Rules inset to the gutter, as on a list of rows opening screens */
+.run-settings-bosses {
+  margin: 0 var(--gutter);
+}
+
+.run-settings-bosses .lozenge-row {
+  padding-left: 0;
+  padding-right: 0;
+}

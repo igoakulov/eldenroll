@@ -12,6 +12,7 @@ import {
   objectiveNumber,
   reroll,
   rollNext,
+  setBossState,
   startRun,
   type Engine,
   type Run,
@@ -20,6 +21,8 @@ import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { formatTrace } from "./engine/trace";
 import { loadDatabase } from "./loadDatabase";
 import { Lozenge } from "./ui/Icon";
+import { boardBefore, boardOf, countState, inState } from "./views/bossList";
+import { Bosses } from "./views/Bosses";
 import { Card, type Reveal } from "./views/Card";
 import { Felled } from "./views/Felled";
 import { LevelUp } from "./views/LevelUp";
@@ -54,11 +57,14 @@ function Game({ database }: { readonly database: Database }) {
     () => ({ data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS }),
     [database],
   );
+  const rollableBosses = useMemo(() => database.boss_instance.filter((boss) => boss.odds > 0), [database]);
   // Before a run; once one starts, the run holds its own
   const [settings, setSettings] = useState(() => defaultSettings(database));
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("General");
   const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
   const [regions, setRegions] = useState<readonly string[]>(DEFAULT_REGIONS);
+  const [deadBosses, setDeadBosses] = useState<readonly string[]>([]);
+  const [skippedBosses, setSkippedBosses] = useState<readonly string[]>([]);
   const [problems, setProblems] = useState<readonly string[]>([]);
   const [run, setRun] = useState<Run | null>(() => {
     if (!DEV_RESUME) return null;
@@ -81,6 +87,8 @@ function Game({ database }: { readonly database: Database }) {
     setStats(DEFAULT_STATS);
     setRegions(DEFAULT_REGIONS);
     setSettings(defaultSettings(database));
+    setDeadBosses([]);
+    setSkippedBosses([]);
     setProblems([]);
     setView("start");
   };
@@ -99,13 +107,37 @@ function Game({ database }: { readonly database: Database }) {
   if (view === "rold") return <RoldCard onClose={() => setView("start")} />;
 
   if (view === "settings") {
+    const eyebrow = run === null ? "New run" : `Objective ${objectiveNumber(run)}`;
+    const board = run === null ? boardBefore(deadBosses, skippedBosses) : boardOf(run);
     return (
       <RunSettings
-        eyebrow={run === null ? "New run" : `Objective ${objectiveNumber(run)}`}
+        eyebrow={eyebrow}
         settings={run?.settings ?? settings}
         characterClasses={database.character_class}
         tab={settingsTab}
         onTab={setSettingsTab}
+        bossCounts={{ felled: countState(board, "dead"), skipped: countState(board, "skipped") }}
+        bosses={(back) => (
+          <Bosses
+            eyebrow={eyebrow}
+            bosses={rollableBosses}
+            board={board}
+            onClose={back}
+            onSave={(changes) => {
+              if (run === null) {
+                const states = new Map([...board.states, ...changes]);
+                setDeadBosses(inState(rollableBosses, states, "dead"));
+                setSkippedBosses(inState(rollableBosses, states, "skipped"));
+                setProblems([]);
+              } else {
+                let next = run;
+                for (const [boss, state] of changes) next = setBossState(engine, next, boss, state);
+                setRun(next);
+              }
+              back();
+            }}
+          />
+        )}
         onClose={home}
         onSave={(next) => {
           if (run === null) {
@@ -247,7 +279,11 @@ function Game({ database }: { readonly database: Database }) {
       onOpenCard={() => setView("rold")}
       onRunSettings={() => setView("settings")}
       onStartRun={() => {
-        const result = startRun(engine, { stats, settings, regions, weaponShortlist: [], deadBosses: [] }, newSeed());
+        const result = startRun(
+          engine,
+          { stats, settings, regions, weaponShortlist: [], deadBosses, skippedBosses },
+          newSeed(),
+        );
         if (!result.ok) {
           setProblems(result.problems);
           return;

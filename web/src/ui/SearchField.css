@@ -1,0 +1,56 @@
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  margin: 28px var(--gutter) 0;
+  padding: 0 14px;
+  border: 1px solid rgba(169, 160, 127, 0.24);
+  background: rgba(8, 8, 7, 0.7);
+  color: var(--gold-mute);
+}
+
+.search-field input {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  appearance: none;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.search-field input:focus-visible {
+  outline: none;
+}
+
+/* Keyboard focus rings the whole field, as on the other controls */
+.search-field:has(input:focus-visible) {
+  outline: 1px solid var(--grace);
+  outline-offset: 3px;
+}
+
+.search-field input::placeholder {
+  font-style: italic;
+  color: var(--text-3);
+}
+
+/* The field draws its own clear button */
+.search-field input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.search-field-clear {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gold-mute);
+}
