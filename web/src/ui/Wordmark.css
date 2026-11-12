@@ -1,0 +1,48 @@
+.wordmark {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: var(--type-wordmark);
+  line-height: var(--leading);
+  letter-spacing: var(--tracking-wide);
+  text-indent: var(--tracking-wide);
+  color: var(--grace);
+  text-shadow: var(--glow-quiet);
+}
+
+.wordmark-o {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.94em;
+  margin: 0 0.3em 0 0.08em;
+  vertical-align: -0.1em;
+  filter: drop-shadow(var(--glow-small));
+}
+
+/* As a way home: the letters keep their look, and the tap target reaches past them */
+.wordmark-home {
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.wordmark-loading > span {
+  visibility: hidden;
+}
+
+/* The one motion that runs on its own while the player waits */
+.wordmark-loading .wordmark-o {
+  animation: wordmark-pulse var(--dur-pulse) var(--ease-in-out) infinite;
+}
+
+@keyframes wordmark-pulse {
+  50% {
+    opacity: var(--dimmed);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-loading .wordmark-o {
+    animation: none;
+  }
+}

@@ -1,3 +1,10 @@
+/* Opens under the wordmark, as Start does, so the help reads as the app's own */
+.rold-home {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-6);
+}
+
 .rold-pun {
   margin: 0 0 var(--space-4);
   font-style: italic;

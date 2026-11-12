@@ -1,0 +1,10 @@
+.rule-lozenge {
+  display: block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  background: var(--blood);
+  border: 1px solid var(--blood-text);
+  box-shadow: var(--glow-red);
+}

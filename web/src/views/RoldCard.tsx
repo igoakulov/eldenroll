@@ -2,6 +2,7 @@ import { copy } from "../copy";
 import { SectionHeading, ScreenHead } from "../ui/Headings";
 import { Screen } from "../ui/Screen";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
+import { Wordmark } from "../ui/Wordmark";
 import "./RoldCard.css";
 
 /** A step's text with each `[word]` set apart as the app's own control. */
@@ -24,13 +25,16 @@ function Step({ text }: { readonly text: string }) {
 }
 
 /** The onboarding card `Elden Rold` opens from Start (`web/README.md#Elden Rold card`). */
-export function RoldCard({ onClose }: { readonly onClose: () => void }) {
+export function RoldCard({ onClose, onHome }: { readonly onClose: () => void; readonly onHome: () => void }) {
   const text = copy.rold;
   return (
     <Screen>
       <TopBar eyebrow={copy.common.howItWorks}>
         <FramedIconButton icon="close" label={copy.common.close} onClick={onClose} />
       </TopBar>
+      <header className="rold-home">
+        <Wordmark onHome={onHome} />
+      </header>
       <ScreenHead title={text.title} lede={text.lede}>
         <p className="rold-pun">{text.pun}</p>
       </ScreenHead>

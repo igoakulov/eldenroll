@@ -19,7 +19,7 @@ function LiveSheet({ kit }: KitProps) {
           <RunMenu
             open={open}
             run={run}
-            actions={{ onHowItWorks: noop, onRunSettings: noop, onFinish: () => setOpen(false) }}
+            actions={{ onHome: noop, onHowItWorks: noop, onRunSettings: noop, onFinish: () => setOpen(false) }}
             onClose={() => setOpen(false)}
           />
         }

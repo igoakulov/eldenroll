@@ -6,34 +6,15 @@ import type { Run } from "../engine/run";
 import { derivedLevel, type Stats } from "../engine/settings";
 import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SectionHeading } from "../ui/Headings";
-import { WordmarkO } from "../ui/Icon";
 import { LevelTotal } from "../ui/LevelTotal";
 import { FramedRow, ListRow } from "../ui/Rows";
 import { Screen } from "../ui/Screen";
+import { Wordmark } from "../ui/Wordmark";
 import { NewRunConfirm } from "./RunMenu";
 import { RegionCheck, StatSteppers, byLevel } from "./StatsAndRegions";
 import { Tagline } from "./Tagline";
 import "./Start.css";
 
-
-/** While the game data loads, only the lozenge shows, pulsing, in its place in the wordmark, so Start appears
- * around it without the page moving. */
-function Wordmark({ loading = false }: { readonly loading?: boolean }) {
-  const Tag = loading ? "p" : "h1";
-  return (
-    <Tag
-      className={`wordmark${loading ? " wordmark-loading" : ""}`}
-      role={loading ? "status" : undefined}
-      aria-label={loading ? copy.start.loading : copy.common.appName}
-    >
-      {/* not copy: the wordmark's letters around its O */}
-      <span aria-hidden="true">ELDENR</span>
-      <WordmarkO className="wordmark-o" />
-      {/* not copy: the wordmark's letters around its O */}
-      <span aria-hidden="true">LL</span>
-    </Tag>
-  );
-}
 
 function Hero({ onOpenCard }: { readonly onOpenCard: () => void }) {
   return (

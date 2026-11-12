@@ -1,3 +1,10 @@
+/* The way back to Start, centred over the rows as on Start */
+.run-menu-home {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
 .run-menu {
   margin-top: calc(-1 * var(--space-2));
 }

@@ -108,12 +108,5 @@
 }
 
 .slot-rule-lozenge {
-  flex: none;
-  width: 10px;
-  height: 10px;
   margin-left: var(--space-1);
-  transform: rotate(45deg);
-  background: var(--blood);
-  border: 1px solid var(--blood-text);
-  box-shadow: var(--glow-red);
 }

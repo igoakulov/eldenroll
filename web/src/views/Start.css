@@ -6,26 +6,6 @@
   text-align: center;
 }
 
-.wordmark {
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: var(--type-wordmark);
-  line-height: var(--leading);
-  letter-spacing: var(--tracking-wide);
-  text-indent: var(--tracking-wide);
-  color: var(--grace);
-  text-shadow: var(--glow-quiet);
-}
-
-.wordmark-o {
-  display: inline-block;
-  width: 0.8em;
-  height: 0.94em;
-  margin: 0 0.3em 0 0.08em;
-  vertical-align: -0.1em;
-  filter: drop-shadow(var(--glow-small));
-}
-
 /* Every first line starts where the main tagline does: a box as wide as it, plus a quarter em of slack each side
    for a typing line laying out a hair wider than the whole one, centred. A second line is centred on its own.
    The height is the most lines any variant takes, so nothing below moves. */
@@ -105,27 +85,6 @@
 @keyframes caret-blink {
   50% {
     opacity: 0;
-  }
-}
-
-.wordmark-loading > span {
-  visibility: hidden;
-}
-
-/* The one motion that runs on its own while the player waits */
-.wordmark-loading .wordmark-o {
-  animation: wordmark-pulse var(--dur-pulse) var(--ease-in-out) infinite;
-}
-
-@keyframes wordmark-pulse {
-  50% {
-    opacity: var(--dimmed);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wordmark-loading .wordmark-o {
-    animation: none;
   }
 }
 

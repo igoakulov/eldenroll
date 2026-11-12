@@ -102,6 +102,7 @@ function Game({ database }: { readonly database: Database }) {
     setView("start");
   };
   const menu = (current: Run): RunMenuActions => ({
+    onHome: () => setView("start"),
     onHowItWorks: () => {
       setRoldFromMenu(true);
       setView("rold");
@@ -116,7 +117,8 @@ function Game({ database }: { readonly database: Database }) {
     else showCard("none");
   };
 
-  if (view === "rold") return <RoldCard onClose={() => (roldFromMenu ? home() : setView("start"))} />;
+  if (view === "rold")
+    return <RoldCard onClose={() => (roldFromMenu ? home() : setView("start"))} onHome={() => setView("start")} />;
 
   if (view === "settings") {
     const eyebrow = run === null ? copy.common.newRun : copy.common.objective(objectiveNumber(run));

@@ -1,11 +1,3 @@
 .gear-picker-results .section-heading {
   padding-top: var(--space-7);
 }
-
-.gear-picker-rule {
-  display: block;
-  width: 9px;
-  height: 9px;
-  transform: rotate(45deg);
-  background: var(--blood);
-}

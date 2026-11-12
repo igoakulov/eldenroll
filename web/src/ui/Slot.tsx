@@ -1,4 +1,5 @@
 import { copy } from "../copy";
+import { RuleLozenge } from "./RuleLozenge";
 import { Tile } from "./Tile";
 import { WikiText, type WikiLink } from "./WikiLink";
 import "./Slot.css";
@@ -93,7 +94,7 @@ export function RuleSlot({ name }: { readonly name: SlotName }) {
   }
   return (
     <p className="slot-rule">
-      <span className="slot-rule-lozenge" aria-hidden="true" />
+      <RuleLozenge className="slot-rule-lozenge" />
       {name.name}
     </p>
   );

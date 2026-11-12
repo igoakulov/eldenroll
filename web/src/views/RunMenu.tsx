@@ -6,6 +6,7 @@ import { objectiveNumber, type Run } from "../engine/run";
 import { Confirm, type ConfirmPart } from "../ui/Confirm";
 import { ListRow } from "../ui/Rows";
 import { Sheet } from "../ui/Sheet";
+import { Wordmark } from "../ui/Wordmark";
 import "./RunMenu.css";
 
 /** The run in progress as a row names it: `Objective N` and its boss, without one between objectives. */
@@ -73,6 +74,7 @@ export function FinishRunConfirm({
 }
 
 export interface RunMenuActions {
+  readonly onHome: () => void;
   readonly onHowItWorks: () => void;
   readonly onRunSettings: () => void;
   readonly onFinish: () => void;
@@ -101,6 +103,9 @@ export function RunMenu({
   return (
     <>
       <Sheet open={open && !finishing} eyebrow={copy.common.menu} closeLabel={copy.menu.close} onClose={onClose}>
+        <div className="run-menu-home">
+          <Wordmark onHome={actions.onHome} />
+        </div>
         <div className="run-menu">
           {/* The run's own row, opening its view (9.7), joins the menu once that screen exists */}
           <ListRow

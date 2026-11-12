@@ -252,6 +252,7 @@ export const copy = {
     /** An empty slot, and one whose pick is the player's. */
     none: "none",
     any: "any",
+    toStart: "EldenRoll, to Start",
     onTheWiki: (name: string) => `${name} on the wiki`,
     levelButton: (level: number) => `Level up, level ${level}`,
     /** Between the old level and the new one. */

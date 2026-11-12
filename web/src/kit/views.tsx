@@ -28,7 +28,7 @@ export interface KitView {
 }
 
 const noop = () => {};
-const menu: RunMenuActions = { onHowItWorks: noop, onRunSettings: noop, onFinish: noop };
+const menu: RunMenuActions = { onHome: noop, onHowItWorks: noop, onRunSettings: noop, onFinish: noop };
 
 // Real queries that find rows in several groups, with the match inside names as well as at their start
 const BOSS_QUERY = "dragon";
@@ -131,7 +131,7 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
     "start-resume": { title: "Start, a run in progress", render: startResume },
     "start-loading": { title: "Start, loading", render: () => <StartLoading /> },
     "start-failed": { title: "Start, failed", render: () => <StartFailed onRetry={noop} /> },
-    "rold-card": { title: "Elden Rold card", render: () => <RoldCard onClose={noop} /> },
+    "rold-card": { title: "Elden Rold card", render: () => <RoldCard onClose={noop} onHome={noop} /> },
     "run-settings-general": settingsOn("general"),
     "run-settings-never-roll": settingsOn("neverRoll"),
     "run-settings-never-roll-search": settingsOn("neverRoll", GEAR_QUERY),

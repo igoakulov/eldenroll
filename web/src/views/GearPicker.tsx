@@ -4,6 +4,7 @@ import { copy } from "../copy";
 import { HeadingAction, HeadingCount, SectionHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
 import { LozengeCheckbox } from "../ui/LozengeCheckbox";
+import { RuleLozenge } from "../ui/RuleLozenge";
 import { SearchField, SearchMatch, SearchNone } from "../ui/SearchField";
 import { pickedEntries, searchGear, type FoundEntry, type GearEntry } from "./gearList";
 import "./GearPicker.css";
@@ -40,7 +41,7 @@ export function GearPicker({
         checked={pickedSet.has(entry.key)}
         result={result}
         lead={
-          entry.icon === null ? <span className="gear-picker-rule" /> : <Icon name={`${entry.icon}-22`} size={22} />
+          entry.icon === null ? <RuleLozenge /> : <Icon name={`${entry.icon}-22`} size={22} />
         }
         onChange={(checked) =>
           onChange(checked ? [...picked, entry.key] : picked.filter((key) => key !== entry.key))
