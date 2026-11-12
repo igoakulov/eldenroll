@@ -77,6 +77,8 @@ function Game({ database }: { readonly database: Database }) {
     return result.ok ? result.run : null;
   });
   const [view, setView] = useState<View>("start");
+  // The Elden Rold card closes back to where it opened: Start, or the screen whose menu opened it
+  const [roldFromMenu, setRoldFromMenu] = useState(false);
   // The run as it was before `Done` or `Felled?`, which `Undo` puts back
   const [undoTo, setUndoTo] = useState<Run | null>(null);
   const [reveal, setReveal] = useState<{ readonly kind: Reveal; readonly id: number }>({ kind: "none", id: 0 });
@@ -99,6 +101,10 @@ function Game({ database }: { readonly database: Database }) {
     setView("start");
   };
   const menu = (current: Run): RunMenuActions => ({
+    onHowItWorks: () => {
+      setRoldFromMenu(true);
+      setView("rold");
+    },
     onRunSettings: () => setView("settings"),
     onFinish: () => endRun(finishRun(current)),
   });
@@ -109,7 +115,7 @@ function Game({ database }: { readonly database: Database }) {
     else showCard("none");
   };
 
-  if (view === "rold") return <RoldCard onClose={() => setView("start")} />;
+  if (view === "rold") return <RoldCard onClose={() => (roldFromMenu ? home() : setView("start"))} />;
 
   if (view === "settings") {
     const eyebrow = run === null ? "New run" : `Objective ${objectiveNumber(run)}`;
@@ -269,7 +275,10 @@ function Game({ database }: { readonly database: Database }) {
       <StartResume
         run={run}
         title={runTitle(engine.data, run)}
-        onOpenCard={() => setView("rold")}
+        onOpenCard={() => {
+          setRoldFromMenu(false);
+          setView("rold");
+        }}
         onResume={home}
         onNewRun={() => endRun(finishRun(run))}
       />
@@ -290,7 +299,10 @@ function Game({ database }: { readonly database: Database }) {
         setRegions(next);
         setProblems([]);
       }}
-      onOpenCard={() => setView("rold")}
+      onOpenCard={() => {
+        setRoldFromMenu(false);
+        setView("rold");
+      }}
       onRunSettings={() => setView("settings")}
       onStartRun={() => {
         const result = startRun(

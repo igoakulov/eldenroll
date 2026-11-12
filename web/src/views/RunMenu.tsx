@@ -48,6 +48,7 @@ export function NewRunConfirm({
 }
 
 export interface RunMenuActions {
+  readonly onHowItWorks: () => void;
   readonly onRunSettings: () => void;
   readonly onFinish: () => void;
 }
@@ -77,6 +78,7 @@ export function RunMenu({
       <Sheet open={open && !finishing} eyebrow="Menu" closeLabel="Close menu" onClose={onClose}>
         <div className="run-menu">
           {/* Run history (9.10) and the run's own row, opening its view (9.7), join the menu once those screens exist */}
+          <ListRow title="How it works" detail="What a run asks of you, and keeping it on your phone" onClick={actions.onHowItWorks} />
           <ListRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={actions.onRunSettings} />
           <ListRow
             title="Finish run"
