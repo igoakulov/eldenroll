@@ -107,7 +107,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 ```json
 {
   "schemaVersion": 1,
-  "runId": "...", "seed": "...", "startedAt": "...",
+  "runId": "...", "seed": "...", "startedAt": "...", "updatedAt": "...",
   "settings": {}, "stats": {}, "regions": [],
   "currentObjective": {}, "completedObjectives": [],
   "owned": {}, "ownedAliases": [],
@@ -120,6 +120,8 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 ```
 
 - `schemaVersion` is bumped only when the stored shape changes; it is not a migration system.
+- `runId` is a random UUID and `updatedAt` changes on every save, so runs kept on several devices can later merge into one account: the same run uploaded twice stays one run, and the newer copy wins.
+- The app asks the browser to keep its storage (`navigator.storage.persist()`), so a phone short of space clears it last. Safari deletes a site's storage after seven days of Safari use without a visit; an app added to the Home Screen counts only its own days of use, so playing keeps it.
 - Completed objectives store snapshots with names: boss name and location, item names or alias labels, set and piece names, rule names, stats and level at `Done`. A finished run renders from them: a missing image shows the icon, a missing URL no link, a missing name `unknown item`.
 - An unknown `schemaVersion`, a missing id or an invalid shape keeps stats, settings, regions, felled bosses, the shortlist, owned state and completed objectives, and rerolls the current objective; if that fails, it offers a reset. A shortlisted weapon gone from the data is dropped from the list. Corrupt storage prompts a reset, never a crash.
 - `deadBosses` entries carry `instanceId` and the `objectiveIndex` showing when the boss was marked, `0` before objective 1, in marking order. The timeline draws a boss felled on the way from this index. It stays on the boss rather than becoming an event of its own, so such bosses could later fold into their objective as other kills.
