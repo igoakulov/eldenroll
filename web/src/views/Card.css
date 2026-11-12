@@ -274,6 +274,24 @@
   animation: fade-out var(--dur-swap) var(--ease-in) forwards;
 }
 
+/* Wherever a slot fades in, its icon leads and its text follows (internal/design.md#Sequences) */
+.card {
+  --cascade: 120ms;
+}
+
+.card :is(.small-label, .slot-name:not(.armor > .slot-name), .slot-ash, .armor-piece-name) {
+  animation: fade-in var(--dur-sheet) var(--ease-out) var(--cascade) backwards;
+}
+
+.slot-changed :is(.small-label, .slot-name:not(.armor > .slot-name), .slot-ash, .armor-piece-name) {
+  animation-duration: var(--dur-swap);
+}
+
+.card-revealing .r :is(.small-label, .slot-name:not(.armor > .slot-name), .slot-ash, .armor-piece-name) {
+  animation-duration: var(--dur-rise);
+  animation-delay: calc(var(--d, 0ms) * var(--k) + var(--cascade));
+}
+
 /* A new objective in two phases (internal/design.md#Sequences): the boss, then how to fell it. `--d` is each
    part's start at full speed; a quick reveal halves it. */
 .card {
