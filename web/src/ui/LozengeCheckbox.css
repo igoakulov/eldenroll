@@ -131,3 +131,17 @@
 .lozenge-row-lead .lozenge-label {
   min-width: 0;
 }
+
+.lozenge-row.lozenge-row-framed {
+  min-height: 52px;
+  margin: var(--space-5) var(--gutter) 0;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--frame);
+  border-bottom: 1px solid var(--frame);
+  font-size: var(--type-name);
+  color: var(--text);
+}
+
+.lozenge-row.lozenge-row-result input:not(:checked) ~ .lozenge-label {
+  color: var(--text-3);
+}

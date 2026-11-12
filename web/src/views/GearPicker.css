@@ -2,30 +2,10 @@
   padding-top: var(--space-7);
 }
 
-/* The rest of a result's name dims so the matching letters stand out at the text's own colour; ticking a result
-   brightens it whole */
-.gear-picker-results .lozenge-row input:not(:checked) ~ .lozenge-label {
-  color: var(--text-3);
-}
-
-.gear-picker-match {
-  color: var(--text);
-}
-
 .gear-picker-rule {
   display: block;
   width: 9px;
   height: 9px;
   transform: rotate(45deg);
   background: var(--blood);
-}
-
-.gear-picker-count {
-  font-variant-numeric: lining-nums tabular-nums;
-}
-
-.gear-picker-none {
-  padding: var(--space-6) var(--gutter) 0;
-  font-size: var(--type-body);
-  color: var(--text-3);
 }

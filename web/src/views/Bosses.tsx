@@ -4,15 +4,15 @@ import type { BossInstance } from "../engine/database";
 import type { BossState } from "../engine/run";
 import { BottomBar, GlowBand } from "../ui/BottomBar";
 import { Cycler } from "../ui/Cycler";
-import { ScreenHead, SectionHeading } from "../ui/Headings";
+import { HeadingCount, ScreenHead, SectionHeading } from "../ui/Headings";
 import { Screen } from "../ui/Screen";
-import { SearchField } from "../ui/SearchField";
+import { SearchField, SearchMatch, SearchNone } from "../ui/SearchField";
 import { ShowAll } from "../ui/ShowAll";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
 import { bossSections, type BossBoard, type BossRow, type SectionKind } from "./bossList";
 import "./Bosses.css";
 
-const STATES = [
+export const BOSS_STATES = [
   { value: "alive", label: "Alive", lines: ["Can be rolled as an objective.", "Its gear cannot be rolled yet."] },
   { value: "dead", label: "Felled", lines: ["Felled in an objective or on the way.", "Its gear can be rolled."] },
   { value: "skipped", label: "Skipped", lines: ["Never rolled as an objective.", "Its gear cannot be rolled."] },
@@ -29,23 +29,12 @@ const SEARCH_TITLES: Readonly<Record<SectionKind, string>> = {
   objectives: "Felled in objectives",
 };
 
-function Name({ row }: { readonly row: BossRow }) {
-  const { name } = row.boss;
-  if (row.match === undefined) return <p className="boss-row-name">{name}</p>;
-  const [start, end] = row.match;
-  return (
-    <p className="boss-row-name">
-      {name.slice(0, start)}
-      <span className="boss-row-match">{name.slice(start, end)}</span>
-      {name.slice(end)}
-    </p>
-  );
-}
-
 function BossText({ row }: { readonly row: BossRow }) {
   return (
     <div className="boss-row-text">
-      <Name row={row} />
+      <p className="boss-row-name">
+        <SearchMatch name={row.boss.name} match={row.match} />
+      </p>
       <p className="boss-row-location">{row.boss.location}</p>
     </div>
   );
@@ -59,6 +48,8 @@ export function Bosses({
   board,
   onSave,
   onClose,
+  defaultQuery = "",
+  defaultExpanded = false,
 }: {
   readonly eyebrow: string;
   /** Every boss instance with `odds > 0`, in database order. */
@@ -67,11 +58,15 @@ export function Bosses({
   /** Only the bosses whose state changed. */
   readonly onSave: (changes: ReadonlyMap<string, BossState>) => void;
   readonly onClose: () => void;
+  /** What the search and the objectives' `Show all` open with, so the kit can show them; the app opens both empty
+   * and folded. */
+  readonly defaultQuery?: string;
+  readonly defaultExpanded?: boolean;
 }) {
   const [draft, setDraft] = useState(board.states);
   const [placed, setPlaced] = useState(board.states);
-  const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState(false);
+  const [query, setQuery] = useState(defaultQuery);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const searching = query.trim() !== "";
   const sections = bossSections(bosses, board, placed, query);
 
@@ -81,7 +76,7 @@ export function Bosses({
     return (
       <Cycler
         label={row.boss.name}
-        options={STATES}
+        options={BOSS_STATES}
         value={draft.get(row.boss.id) ?? "alive"}
         onChange={(state) => setDraft(new Map(draft).set(row.boss.id, state))}
       />
@@ -131,7 +126,7 @@ export function Bosses({
       </TopBar>
       <ScreenHead title="Bosses" />
       <dl className="bosses-legend">
-        {STATES.map((state) => (
+        {BOSS_STATES.map((state) => (
           <div key={state.value}>
             <dt>{state.label}</dt>
             <dd>
@@ -151,7 +146,7 @@ export function Bosses({
         }}
       />
 
-      {searching && sections.length === 0 && <p className="bosses-none">No boss by that name.</p>}
+      {searching && sections.length === 0 && <SearchNone>No boss by that name.</SearchNone>}
       {sections.map((section) => {
         if (searching) {
           return (
@@ -161,7 +156,7 @@ export function Bosses({
             </section>
           );
         }
-        const count = <span className="bosses-count">{section.rows.length}</span>;
+        const count = <HeadingCount>{section.rows.length}</HeadingCount>;
         if (section.kind === "objectives") {
           return (
             <section key={section.kind}>

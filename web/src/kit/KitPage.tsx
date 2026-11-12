@@ -1,17 +1,22 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { Database } from "../engine/database";
 import { loadDatabase } from "../loadDatabase";
+import { Blocks, MissingEntries } from "./Blocks";
+import { KitFrame } from "./kit";
+import { kitData, type KitData } from "./kitData";
+import { Sequences } from "./Sequences";
+import { Tokens } from "./Tokens";
 import { VIEW_NAMES, VIEW_PARAM, type ViewName } from "./viewNames";
 import { kitViews, type KitView } from "./views";
 import "./KitPage.css";
 
-// Placeholders until each is built (web/src/ui/README.md#UI kit)
 const SECTIONS = [
   { id: "tokens", title: "Tokens" },
   { id: "controls", title: "Controls" },
   { id: "groups", title: "Groups" },
   { id: "sequences", title: "Sequences" },
+  { id: "views", title: "Views" },
 ] as const;
 
 type Loaded =
@@ -23,40 +28,99 @@ function isViewName(name: string | null): name is ViewName {
   return VIEW_NAMES.some((view) => view === name);
 }
 
-/** One view in a phone-sized screen; `data-kit-ready` tells the screenshot command it has rendered. */
-function ViewBox({ name, view }: { readonly name: ViewName; readonly view: KitView }) {
+/** One view in a phone-sized screen, scrolled to its `scrollTo`. Alone on the page, it carries the id and
+ * `data-kit-ready` the screenshot command waits for. */
+function ViewBox({ name, view, alone = false }: {
+  readonly name: ViewName;
+  readonly view: KitView;
+  readonly alone?: boolean;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  // After the screen scrolls itself to its top as it mounts; the box alone moves, never the page
+  useLayoutEffect(() => {
+    const element = box.current;
+    const target = view.scrollTo === undefined ? null : element?.querySelector(view.scrollTo);
+    if (element === null || target === null || target === undefined) return;
+    element.scrollTop += target.getBoundingClientRect().top - element.getBoundingClientRect().top;
+  }, [view]);
   return (
-    <div id={`view-${name}`} className="kit-view-box" data-kit-ready="">
+    <div ref={box} className="kit-view-box" {...(alone ? { id: `view-${name}`, "data-kit-ready": "" } : {})}>
       {view.render()}
     </div>
   );
 }
 
-function Views({ database, only }: { readonly database: Database; readonly only: ViewName | null }) {
-  const views = useMemo(() => kitViews(database), [database]);
-
-  // Each screen scrolls itself into view as it mounts, which leaves the page at the last one; after them, go back
-  // to the anchor in the address, or the top
-  useLayoutEffect(() => {
-    if (only !== null) return;
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-    const target = window.location.hash === "" ? null : document.getElementById(window.location.hash.slice(1));
-    target?.scrollIntoView({ block: "start", behavior: "instant" });
-  }, [only]);
-
-  if (only !== null) return <ViewBox name={only} view={views[only]} />;
+function Views({ views, sheets }: { readonly views: Readonly<Record<ViewName, KitView>>; readonly sheets: boolean }) {
   return (
     <div className="kit-views">
-      {VIEW_NAMES.map((name) => (
-        <figure key={name} className="kit-view">
+      {VIEW_NAMES.filter((name) => (views[name].sheet ?? false) === sheets).map((name) => (
+        <figure key={name} id={`view-${name}`} className="kit-view">
           <figcaption className="kit-view-title">
             <a href={`#view-${name}`}>{views[name].title}</a>
           </figcaption>
-          <ViewBox name={name} view={views[name]} />
+          {/* A sheet holds the keyboard, so each sits in a page of its own (`KitFrame`) */}
+          {sheets ? (
+            <KitFrame view={name} title={views[name].title} />
+          ) : (
+            <ViewBox name={name} view={views[name]} />
+          )}
         </figure>
       ))}
     </div>
   );
+}
+
+function Sections({ kit }: { readonly kit: KitData }) {
+  const views = useMemo(() => kitViews(kit), [kit]);
+
+  // Each screen scrolls itself into view as it mounts, which leaves the page at the last one; after them, go back
+  // to the anchor in the address, or the top
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    const target = window.location.hash === "" ? null : document.getElementById(window.location.hash.slice(1));
+    target?.scrollIntoView({ block: "start", behavior: "instant" });
+  }, []);
+
+  return (
+    <>
+      <section id="tokens" className="kit-section">
+        <h2 className="kit-section-title">Tokens</h2>
+        <Tokens kit={kit} />
+      </section>
+      <section id="controls" className="kit-section">
+        <h2 className="kit-section-title">Controls</h2>
+        <Blocks kit={kit} section="controls" />
+      </section>
+      <section id="groups" className="kit-section">
+        <h2 className="kit-section-title">Groups</h2>
+        <Blocks kit={kit} section="groups" />
+        <div id="sheets" className="kit-block">
+          <h3 className="kit-block-title">
+            <a href="#sheets">Sheets over their screens</a>
+          </h3>
+          <Views views={views} sheets />
+        </div>
+      </section>
+      <section id="sequences" className="kit-section">
+        <h2 className="kit-section-title">Sequences</h2>
+        <Sequences kit={kit} />
+      </section>
+      <section id="views" className="kit-section">
+        <h2 className="kit-section-title">Views</h2>
+        <Views views={views} sheets={false} />
+      </section>
+    </>
+  );
+}
+
+function Single({ database, name }: { readonly database: Database; readonly name: ViewName }) {
+  const views = useMemo(() => kitViews(kitData(database)), [database]);
+  return <ViewBox name={name} view={views[name]} alone />;
+}
+
+function Page({ database }: { readonly database: Database }) {
+  const kit = useMemo(() => kitData(database), [database]);
+  return <Sections kit={kit} />;
 }
 
 export function KitPage() {
@@ -79,17 +143,16 @@ export function KitPage() {
     };
   }, []);
 
-  const views =
-    state.status === "ready" ? (
-      <Views database={state.database} only={only} />
-    ) : (
+  const waiting =
+    state.status === "ready" ? null : (
       <p className="kit-note" role="status">
         {state.status === "loading" ? "Loading db.json…" : `db.json could not be loaded: ${state.message}`}
       </p>
     );
 
   if (param !== null) {
-    return only === null ? <p className="kit-note">No view named “{param}”.</p> : views;
+    if (only === null) return <p className="kit-note">No view named “{param}”.</p>;
+    return state.status === "ready" ? <Single database={state.database} name={only} /> : waiting;
   }
 
   return (
@@ -102,23 +165,10 @@ export function KitPage() {
               <a href={`#${section.id}`}>{section.title}</a>
             </li>
           ))}
-          <li>
-            <a href="#views">Views</a>
-          </li>
         </ul>
       </nav>
-
-      {SECTIONS.map((section) => (
-        <section key={section.id} id={section.id} className="kit-section">
-          <h2 className="kit-section-title">{section.title}</h2>
-          <p className="kit-note">Not built yet.</p>
-        </section>
-      ))}
-
-      <section id="views" className="kit-section">
-        <h2 className="kit-section-title">Views</h2>
-        {views}
-      </section>
+      <MissingEntries />
+      {state.status === "ready" ? <Page database={state.database} /> : waiting}
     </div>
   );
 }

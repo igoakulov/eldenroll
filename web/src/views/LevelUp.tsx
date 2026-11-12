@@ -29,6 +29,7 @@ export function LevelUp({
   onSave,
   onClose,
   menu,
+  defaultExpanded = false,
 }: {
   readonly mode: "next" | "mid";
   readonly run: Run;
@@ -37,10 +38,12 @@ export function LevelUp({
   readonly onClose: () => void;
   /** The menu, between objectives only. */
   readonly menu?: RunMenuActions;
+  /** Whether the regions open in full, so the kit can show them; the app opens the short list. */
+  readonly defaultExpanded?: boolean;
 }) {
   const [stats, setStats] = useState(run.stats);
   const [selected, setSelected] = useState(run.regions);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [menuOpen, setMenuOpen] = useState(false);
   // The next unticked regions as the screen opened; a ticked one stays in place rather than giving way
   const [next] = useState(() =>
@@ -81,13 +84,14 @@ export function LevelUp({
           <FramedIconButton icon="close" label="Close without saving" onClick={onClose} />
         )}
       </TopBar>
-      <ScreenHead title="Level up">
-        <p className="screen-lede">
-          {mode === "next"
+      <ScreenHead
+        title="Level up"
+        lede={
+          mode === "next"
             ? "Update your stats and regions before you roll next objective."
-            : "Changes apply on the next roll."}
-        </p>
-      </ScreenHead>
+            : "Changes apply on the next roll."
+        }
+      />
 
       <LevelTotal level={derivedLevel(stats)} before={derivedLevel(before)} />
       <StatSteppers

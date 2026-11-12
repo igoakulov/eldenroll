@@ -45,3 +45,21 @@ export function SearchField({
     </label>
   );
 }
+
+/** A name with the letters a search matched at the text's own colour, so they stand out where the rest dims. */
+export function SearchMatch({ name, match }: { readonly name: string; readonly match?: readonly [number, number] | undefined }) {
+  if (match === undefined) return name;
+  const [start, end] = match;
+  return (
+    <>
+      {name.slice(0, start)}
+      <span className="search-field-match">{name.slice(start, end)}</span>
+      {name.slice(end)}
+    </>
+  );
+}
+
+/** What a search that found nothing says, under the field. */
+export function SearchNone({ children }: { readonly children: string }) {
+  return <p className="search-field-none">{children}</p>;
+}

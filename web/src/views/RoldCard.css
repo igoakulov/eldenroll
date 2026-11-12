@@ -6,13 +6,6 @@
   color: var(--gold);
 }
 
-.rold-lede {
-  max-width: 32ch;
-  font-size: var(--type-body);
-  line-height: var(--leading);
-  color: var(--text-2);
-}
-
 .rold-ui {
   color: var(--text);
 }

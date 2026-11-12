@@ -4,7 +4,9 @@ import { Icon } from "./Icon";
 import "./LozengeCheckbox.css";
 
 /** A checkbox row: a lozenge that fills and glows, like a grace being lit. `icons` follow the name, dimmer while
- * unchecked; a `lead` icon goes before it instead. A setting carries a `detail` line under its name. */
+ * unchecked; a `lead` icon goes before it instead. A setting carries a `detail` line under its name. A `framed` one
+ * stands alone between two rules, at a name's size. A search `result`'s name dims until ticked, so the letters it
+ * matched stand out (`SearchMatch`). */
 export function LozengeCheckbox({
   checked,
   onChange,
@@ -13,6 +15,8 @@ export function LozengeCheckbox({
   tag,
   icons,
   lead,
+  framed = false,
+  result = false,
   className,
 }: {
   readonly checked: boolean;
@@ -22,12 +26,16 @@ export function LozengeCheckbox({
   readonly tag?: string;
   readonly icons?: readonly string[];
   readonly lead?: ReactNode;
+  readonly framed?: boolean;
+  readonly result?: boolean;
   readonly className?: string;
 }) {
   const modifier =
     (icons === undefined ? "" : " lozenge-row-icons") +
     (lead === undefined ? "" : " lozenge-row-lead") +
-    (detail === undefined ? "" : " lozenge-row-detail");
+    (detail === undefined ? "" : " lozenge-row-detail") +
+    (framed ? " lozenge-row-framed" : "") +
+    (result ? " lozenge-row-result" : "");
   return (
     <label className={`lozenge-row${modifier}${className === undefined ? "" : ` ${className}`}`}>
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />

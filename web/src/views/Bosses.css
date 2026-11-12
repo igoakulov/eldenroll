@@ -28,16 +28,6 @@
   display: block;
 }
 
-.bosses-count {
-  font-variant-numeric: lining-nums tabular-nums;
-}
-
-.bosses-none {
-  padding: var(--space-6) var(--gutter) 0;
-  font-size: var(--type-body);
-  color: var(--text-3);
-}
-
 .boss-row {
   display: grid;
   grid-template-columns: 1fr 140px;
@@ -93,10 +83,6 @@
 /* While searching, the rest of a name dims so the matching letters stand out at the text's own colour */
 .boss-list-search .boss-row-name {
   color: var(--text-3);
-}
-
-.boss-row-match {
-  color: var(--text);
 }
 
 .boss-fixed {

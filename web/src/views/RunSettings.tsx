@@ -39,6 +39,7 @@ export function RunSettings({
   bosses,
   onSave,
   onClose,
+  defaultQuery = "",
 }: {
   readonly eyebrow: string;
   readonly settings: Settings;
@@ -53,6 +54,8 @@ export function RunSettings({
   readonly bosses: (back: () => void) => ReactNode;
   readonly onSave: (settings: Settings, lists: RunLists) => void;
   readonly onClose: () => void;
+  /** What the open list's search opens with, so the kit can show one; the app opens it empty. */
+  readonly defaultQuery?: string;
 }) {
   const [draft, setDraft] = useState(settings);
   const [listsDraft, setListsDraft] = useState(lists);
@@ -88,9 +91,7 @@ export function RunSettings({
       <TopBar eyebrow={eyebrow}>
         <FramedIconButton icon="close" label="Close without saving" onClick={onClose} />
       </TopBar>
-      <ScreenHead title="Run settings">
-        <p className="screen-lede">Changes apply on the next roll.</p>
-      </ScreenHead>
+      <ScreenHead title="Run settings" lede="Changes apply on the next roll." />
 
       <Tabs
         label="Run settings"
@@ -164,6 +165,7 @@ export function RunSettings({
               onChange={(neverRoll) => setListsDraft({ ...listsDraft, neverRoll })}
               searchLabel="Search Never roll"
               notFound="Nothing by that name."
+              defaultQuery={defaultQuery}
             />
           </>
         )}
@@ -174,7 +176,7 @@ export function RunSettings({
               Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.
             </p>
             <LozengeCheckbox
-              className="run-settings-shortlist-toggle"
+              framed
               checked={draft.weaponShortlistEnabled}
               onChange={(weaponShortlistEnabled) => edit({ weaponShortlistEnabled })}
             >
@@ -187,6 +189,7 @@ export function RunSettings({
               onChange={(weaponShortlist) => setListsDraft({ ...listsDraft, weaponShortlist })}
               searchLabel="Search weapons"
               notFound="No weapon by that name."
+              defaultQuery={defaultQuery}
             />
           </>
         )}

@@ -1,24 +1,11 @@
 import { useState } from "react";
 
-import { HeadingAction, SectionHeading } from "../ui/Headings";
+import { HeadingAction, HeadingCount, SectionHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
 import { LozengeCheckbox } from "../ui/LozengeCheckbox";
-import { SearchField } from "../ui/SearchField";
+import { SearchField, SearchMatch, SearchNone } from "../ui/SearchField";
 import { pickedEntries, searchGear, type FoundEntry, type GearEntry } from "./gearList";
 import "./GearPicker.css";
-
-function Name({ row }: { readonly row: FoundEntry }) {
-  const { name } = row.entry;
-  if (row.match === undefined) return name;
-  const [start, end] = row.match;
-  return (
-    <>
-      {name.slice(0, start)}
-      <span className="gear-picker-match">{name.slice(start, end)}</span>
-      {name.slice(end)}
-    </>
-  );
-}
 
 /** A search over `entries` and the picked ones under `N selected`, for `Never roll` and the `Weapon shortlist`. An
  * unticked entry keeps its place while this stays open. */
@@ -28,6 +15,7 @@ export function GearPicker({
   onChange,
   searchLabel,
   notFound,
+  defaultQuery = "",
 }: {
   /** In card order. */
   readonly entries: readonly GearEntry[];
@@ -35,18 +23,21 @@ export function GearPicker({
   readonly onChange: (picked: readonly string[]) => void;
   readonly searchLabel: string;
   readonly notFound: string;
+  /** What the search opens with, so the kit can show one; the app opens it empty. */
+  readonly defaultQuery?: string;
 }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(defaultQuery);
   const [placed, setPlaced] = useState<ReadonlySet<string>>(() => new Set(picked));
   const searching = query.trim() !== "";
   const pickedSet = new Set(picked);
 
-  const row = (found: FoundEntry) => {
+  const row = (found: FoundEntry, result: boolean) => {
     const { entry } = found;
     return (
       <LozengeCheckbox
         key={entry.key}
         checked={pickedSet.has(entry.key)}
+        result={result}
         lead={
           entry.icon === null ? <span className="gear-picker-rule" /> : <Icon name={`${entry.icon}-22`} size={22} />
         }
@@ -54,7 +45,7 @@ export function GearPicker({
           onChange(checked ? [...picked, entry.key] : picked.filter((key) => key !== entry.key))
         }
       >
-        <Name row={found} />
+        <SearchMatch name={entry.name} match={found.match} />
       </LozengeCheckbox>
     );
   };
@@ -73,11 +64,11 @@ export function GearPicker({
         }}
       />
 
-      {searching && groups.length === 0 && <p className="gear-picker-none">{notFound}</p>}
+      {searching && groups.length === 0 && <SearchNone>{notFound}</SearchNone>}
       {groups.map((group) => (
         <section key={group.kind} className="gear-picker-results">
           <SectionHeading>{group.label}</SectionHeading>
-          <div>{group.rows.map(row)}</div>
+          <div>{group.rows.map((found) => row(found, true))}</div>
         </section>
       ))}
 
@@ -86,10 +77,10 @@ export function GearPicker({
           <SectionHeading
             action={picked.length > 0 && <HeadingAction onClick={() => onChange([])}>Clear all</HeadingAction>}
           >
-            <span className="gear-picker-count">{shown.filter((entry) => pickedSet.has(entry.key)).length}</span>{" "}
+            <HeadingCount>{shown.filter((entry) => pickedSet.has(entry.key)).length}</HeadingCount>{" "}
             selected
           </SectionHeading>
-          <div>{shown.map((entry) => row({ entry }))}</div>
+          <div>{shown.map((entry) => row({ entry }, false))}</div>
         </section>
       )}
     </>

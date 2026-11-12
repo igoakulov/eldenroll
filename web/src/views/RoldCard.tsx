@@ -13,12 +13,11 @@ export function RoldCard({ onClose }: { readonly onClose: () => void }) {
       <TopBar eyebrow="How it works">
         <FramedIconButton icon="close" label="Close" onClick={onClose} />
       </TopBar>
-      <ScreenHead title="Welcome to EldenRoll, Tarnished">
+      <ScreenHead
+        title="Welcome to EldenRoll, Tarnished"
+        lede="A companion to keep open while you play. Each objective rolls a boss to fell and the class and gear to fell it with, so every playthrough feels new again."
+      >
         <p className="rold-pun">Follow fate to become Elden Rold.</p>
-        <p className="rold-lede">
-          A companion to keep open while you play. Each objective rolls a boss to fell and the class and gear to fell
-          it with, so every playthrough feels new again.
-        </p>
       </ScreenHead>
 
       <SectionHeading>A run</SectionHeading>

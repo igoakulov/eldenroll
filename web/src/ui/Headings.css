@@ -15,6 +15,10 @@
   white-space: nowrap;
 }
 
+.section-heading-count {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
 .fading-rule {
   flex: 1;
   height: 1px;
@@ -35,8 +39,7 @@
   background: linear-gradient(to right, var(--frame-lit), transparent 85%);
 }
 
-.slot-heading h3,
-.small-label {
+.slot-heading h3 {
   font-weight: 400;
   font-variant-caps: all-small-caps;
   letter-spacing: var(--tracking-tight);

@@ -47,6 +47,30 @@ export function NewRunConfirm({
   );
 }
 
+export function FinishRunConfirm({
+  open,
+  run,
+  onClose,
+  onConfirm,
+}: {
+  readonly open: boolean;
+  readonly run: Run;
+  readonly onClose: () => void;
+  readonly onConfirm: () => void;
+}) {
+  return (
+    <Confirm
+      open={open}
+      title="Finish run"
+      question="End this run and see its summary?"
+      parts={finishParts(run, "Cannot resume")}
+      action="Finish run"
+      onConfirm={onConfirm}
+      onClose={onClose}
+    />
+  );
+}
+
 export interface RunMenuActions {
   readonly onHowItWorks: () => void;
   readonly onRunSettings: () => void;
@@ -88,15 +112,7 @@ export function RunMenu({
           />
         </div>
       </Sheet>
-      <Confirm
-        open={open && finishing}
-        title="Finish run"
-        question="End this run and see its summary?"
-        parts={finishParts(run, "Cannot resume")}
-        action="Finish run"
-        onConfirm={actions.onFinish}
-        onClose={onClose}
-      />
+      <FinishRunConfirm open={open && finishing} run={run} onConfirm={actions.onFinish} onClose={onClose} />
     </>
   );
 }

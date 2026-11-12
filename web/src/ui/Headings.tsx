@@ -31,12 +31,26 @@ export function SlotHeading({ children }: { readonly children: ReactNode }) {
   );
 }
 
-/** A screen's title and its lede, under the top bar. */
-export function ScreenHead({ title, children }: { readonly title: ReactNode; readonly children?: ReactNode }) {
+/** A count leading a section heading, such as `3 selected`, its digits lined up. */
+export function HeadingCount({ children }: { readonly children: number }) {
+  return <span className="section-heading-count">{children}</span>;
+}
+
+/** A screen's title and its lede, under the top bar; `children` go between them. */
+export function ScreenHead({
+  title,
+  lede,
+  children,
+}: {
+  readonly title: ReactNode;
+  readonly lede?: ReactNode;
+  readonly children?: ReactNode;
+}) {
   return (
     <div className="screen-head">
       <h1 className="screen-title">{title}</h1>
       {children}
+      {lede !== undefined && <p className="screen-lede">{lede}</p>}
     </div>
   );
 }

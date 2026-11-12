@@ -24,18 +24,21 @@ export function RerollPanel({
   onClose,
   onReroll,
   onFelled,
+  opening = OPENING_STOP,
 }: {
   readonly open: boolean;
   readonly felled: boolean;
   readonly onClose: () => void;
   readonly onReroll: (target: RerollTarget) => void;
   readonly onFelled: () => void;
+  /** The stop it opens at, so the kit can show a scope chosen; the app leaves it at `OPENING_STOP`. */
+  readonly opening?: number;
 }) {
   const [wasOpen, setWasOpen] = useState(open);
-  const [scope, setScope] = useState({ stop: OPENING_STOP, from: OPENING_STOP, glide: false });
+  const [scope, setScope] = useState({ stop: opening, from: opening, glide: false });
   if (open !== wasOpen) {
     setWasOpen(open);
-    if (open) setScope({ stop: OPENING_STOP, from: OPENING_STOP, glide: false });
+    if (open) setScope({ stop: opening, from: opening, glide: false });
   }
   const target = REROLL_STOPS[scope.stop]?.target ?? "boss";
 

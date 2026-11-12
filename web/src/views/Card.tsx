@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
-import { ARMOR_PIECES, displaySlots, type SlotDisplay } from "../engine/display";
+import { displaySlots } from "../engine/display";
 import type { EngineData } from "../engine/engineData";
 import { objectiveNumber, type Objective, type RerollTarget, type Run } from "../engine/run";
 import { derivedLevel } from "../engine/settings";
@@ -8,12 +8,13 @@ import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SlotHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
 import { Screen } from "../ui/Screen";
-import { Tile } from "../ui/Tile";
-import { WikiText, type WikiLink } from "../ui/WikiLink";
+import { RuleSlot } from "../ui/Slot";
+import { WikiText } from "../ui/WikiLink";
 import { FramedIconButton, LevelButton, TopBar } from "../ui/TopBar";
-import { ARMOR_PIECE_ICONS, CHARACTER_CLASS_ICONS, EMPTY_SLOT_ICONS, iconKey } from "./icons";
+import { CHARACTER_CLASS_ICONS, EMPTY_SLOT_ICONS } from "./icons";
 import { RerollPanel } from "./RerollPanel";
 import { RunMenu, type RunMenuActions } from "./RunMenu";
+import { Armor, Hand, Small, nameOf } from "./slots";
 import "./Card.css";
 
 /** How a card arrives: a new objective in full, a full-objective reroll quicker, or `Resume` with a fade only. */
@@ -32,44 +33,6 @@ const REVEAL_MS = 1800;
 /** The reveal's start times in ms at full speed, scaled by `--k` for a quick one. */
 function at(ms: number): CSSProperties {
   return { "--d": `${ms}ms` } as CSSProperties;
-}
-
-/** The id the `none` item, the `None` armor pieces' alias and the rule `None` share. */
-const NONE_ALIAS = "none";
-const NONE: SlotDisplay = { kind: "none" };
-
-function nameOf(display: SlotDisplay): string | null {
-  switch (display.kind) {
-    case "item":
-      return display.item.name;
-    case "alias":
-      return display.label;
-    case "rule":
-      return display.rule.name;
-    case "armor_set":
-      return display.set.name;
-    default:
-      return null;
-  }
-}
-
-/** An item, set or alias has a page; `none` and `any` have none. */
-function linkOf(display: SlotDisplay): WikiLink | null {
-  if (display.kind === "alias" && display.url !== null) return { name: display.label, url: display.url };
-  if (display.kind === "item" && display.item.url !== null) return { name: display.item.name, url: display.item.url };
-  if (display.kind === "armor_set" && display.set.url !== null) return { name: display.set.name, url: display.set.url };
-  return null;
-}
-
-function iconOf(display: SlotDisplay): string | null {
-  return display.kind === "item" || display.kind === "alias" ? iconKey(display.item) : null;
-}
-
-/** What a slot shows as its name: the item, `none` in dim small caps, or `any` in gold italics. */
-function SlotName({ display, className }: { readonly display: SlotDisplay; readonly className: string }) {
-  if (display.kind === "none") return <span className={`${className} slot-none`}>none</span>;
-  if (display.kind === "any") return <span className={`${className} slot-any`}>any</span>;
-  return <span className={className}>{nameOf(display)}</span>;
 }
 
 /** Remounts when its key changes, and then fades in, so a reroll shows only what it changed. While `leaving`, it
@@ -119,77 +82,6 @@ function changedParts(from: Objective, to: Objective): ReadonlySet<Part> {
   const before = changeKeys(from);
   const after = changeKeys(to);
   return new Set((Object.keys(before) as Part[]).filter((part) => before[part] !== after[part]));
-}
-
-function Hand({ label, hand, ash, emptyIcon }: {
-  readonly label: string;
-  readonly hand: SlotDisplay;
-  readonly ash: SlotDisplay;
-  readonly emptyIcon: string;
-}) {
-  const empty = hand.kind === "none";
-  return (
-    <div className="hand">
-      <Tile size="lg" icon={empty ? emptyIcon : iconOf(hand)} empty={empty} link={linkOf(hand)} />
-      <span className="small-label">{label}</span>
-      <SlotName display={hand} className="slot-name" />
-      {(ash.kind === "item" || ash.kind === "alias") && (
-        <WikiText url={linkOf(ash)?.url ?? null} className="slot-ash">
-          {nameOf(ash)}
-        </WikiText>
-      )}
-    </div>
-  );
-}
-
-function SmallSlot({ display, emptyIcon }: { readonly display: SlotDisplay; readonly emptyIcon: string }) {
-  const empty = display.kind === "none";
-  return (
-    <div className="small-slot">
-      <Tile size="sm" icon={empty ? emptyIcon : iconOf(display)} empty={empty} link={linkOf(display)} />
-      <SlotName display={display} className="slot-name" />
-    </div>
-  );
-}
-
-function Armor({ display }: { readonly display: SlotDisplay }) {
-  if (display.kind !== "armor_set") return <SmallSlot display={display} emptyIcon={ARMOR_PIECE_ICONS.body} />;
-  return (
-    <div className="armor">
-      <WikiText url={display.set.url} className="slot-name">
-        {display.set.name}
-      </WikiText>
-      <div className="armor-pieces">
-        {ARMOR_PIECES.map((piece) => {
-          // A `None` piece keeps the slot empty, unlike `any` (web/src/engine/README.md#Empty slots and aliases)
-          const rolled = display.pieces[piece];
-          const shown = rolled.kind === "alias" && rolled.item.alias === NONE_ALIAS ? NONE : rolled;
-          return (
-            <div className="armor-piece" key={piece}>
-              <Tile size="sm" icon={ARMOR_PIECE_ICONS[piece]} empty={shown.kind === "none"} link={linkOf(shown)} />
-              <SlotName display={shown} className="armor-piece-name" />
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function Rule({ display }: { readonly display: SlotDisplay }) {
-  if (display.kind !== "rule" || display.rule.id === NONE_ALIAS) {
-    return (
-      <p className="rule">
-        <SlotName display={display.kind === "rule" ? NONE : display} className="rule-name" />
-      </p>
-    );
-  }
-  return (
-    <p className="rule">
-      <span className="rule-lozenge" aria-hidden="true" />
-      {display.rule.name}
-    </p>
-  );
 }
 
 /** The boss bar, broken in the middle by `Felled?`. As the boss arrives a whole bar fills over it, then gives
@@ -351,7 +243,7 @@ export function Card({
       <div className="r" style={at(1100)}>
         <SlotHeading>Spell</SlotHeading>
         <Changed key={keys.spell} {...change("spell")}>
-          <SmallSlot display={slots.spell} emptyIcon={EMPTY_SLOT_ICONS.spell} />
+          <Small display={slots.spell} emptyIcon={EMPTY_SLOT_ICONS.spell} />
         </Changed>
       </div>
 
@@ -359,10 +251,10 @@ export function Card({
         <SlotHeading>Talismans</SlotHeading>
         <div className="talismans">
           <Changed key={keys.talisman_1} {...change("talisman_1")}>
-            <SmallSlot display={slots.talisman_1} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
+            <Small display={slots.talisman_1} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
           </Changed>
           <Changed key={keys.talisman_2} {...change("talisman_2")}>
-            <SmallSlot display={slots.talisman_2} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
+            <Small display={slots.talisman_2} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
           </Changed>
         </div>
       </div>
@@ -377,7 +269,7 @@ export function Card({
       <div className="r" style={at(1250)}>
         <SlotHeading>Item</SlotHeading>
         <Changed key={keys.item} {...change("item")}>
-          <SmallSlot display={slots.item} emptyIcon={EMPTY_SLOT_ICONS.item} />
+          <Small display={slots.item} emptyIcon={EMPTY_SLOT_ICONS.item} />
         </Changed>
       </div>
 
@@ -385,10 +277,10 @@ export function Card({
         <SlotHeading>Combat rules</SlotHeading>
         <div className="rules">
           <Changed key={keys.rule_1} {...change("rule_1")}>
-            <Rule display={slots.rule_1} />
+            <RuleSlot name={nameOf(slots.rule_1)} />
           </Changed>
           <Changed key={keys.rule_2} {...change("rule_2")}>
-            <Rule display={slots.rule_2} />
+            <RuleSlot name={nameOf(slots.rule_2)} />
           </Changed>
         </div>
       </div>

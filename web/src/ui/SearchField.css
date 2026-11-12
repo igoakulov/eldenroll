@@ -54,3 +54,13 @@
   background: none;
   color: var(--gold-mute);
 }
+
+.search-field-match {
+  color: var(--text);
+}
+
+.search-field-none {
+  padding: var(--space-6) var(--gutter) 0;
+  font-size: var(--type-body);
+  color: var(--text-3);
+}

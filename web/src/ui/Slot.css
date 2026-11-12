@@ -1,0 +1,119 @@
+.slot-hand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.slot-hand .tile {
+  margin-bottom: var(--space-5);
+}
+
+.slot-hand-label {
+  font-weight: 400;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--gold-mute);
+}
+
+.slot-name {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--type-name);
+  line-height: var(--leading-tight);
+  color: var(--text);
+}
+
+.slot-ash {
+  display: block;
+  margin-top: var(--space-1);
+  font-style: italic;
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--text-2);
+}
+
+.slot-none {
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-name);
+  color: var(--text-3);
+}
+
+.slot-any {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.slot-small {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--gutter) 0;
+}
+
+.slot-small .slot-name,
+.slot-armor .slot-name {
+  margin-top: 0;
+}
+
+/* A linked name keeps its underline and tap target to the text */
+.slot-ash.wiki-text,
+.slot-armor > .slot-name.wiki-text {
+  display: inline-block;
+}
+
+.slot-armor {
+  padding: var(--space-4) var(--gutter) 0;
+}
+
+.slot-armor-pieces {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.slot-armor-piece {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.slot-armor-piece-name {
+  font-size: var(--type-body);
+  line-height: var(--leading-tight);
+  color: var(--text-2);
+}
+
+.slot-armor-piece-name.slot-none {
+  font-size: var(--type-body);
+  color: var(--text-3);
+}
+
+.slot-armor-piece-name.slot-any {
+  color: var(--gold);
+}
+
+.slot-rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 44px;
+  padding: 0 var(--gutter);
+  font-size: var(--type-name);
+  color: var(--text);
+}
+
+.slot-rule-lozenge {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-left: var(--space-1);
+  transform: rotate(45deg);
+  background: var(--blood);
+  border: 1px solid var(--blood-text);
+  box-shadow: var(--glow-red);
+}
