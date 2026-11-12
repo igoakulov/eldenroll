@@ -29,6 +29,13 @@
   font-weight: 400;
 }
 
+/* Branding, as in the app (src/ui/base.css): never starts a selection or the copy callout */
+.kit-title {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 .kit-wordmark {
   font-family: var(--display);
   font-weight: 600;
