@@ -449,7 +449,8 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
   };
 }
 
-/** Swaps the boss and keeps the loadout, so a modifier read off the old boss may stay; accepted. */
+/** Marks the current boss dead and rerolls the full objective. The player didn't turn the boss down, so this
+ * isn't a reroll: `rerolls` carries over without it. */
 export function alreadyDead(engine: Engine, run: Run): Run {
   const objective = run.current;
   if (objective === null || run.finished) return run;
@@ -460,11 +461,7 @@ export function alreadyDead(engine: Engine, run: Run): Run {
       { instanceId: objective.boss, objectiveIndex: objectiveNumber(run) },
     ],
   };
-  const { random, state } = seededRandom(marked.rngState);
-  const boss = rollBoss(engine, marked, random, null);
-  if (typeof boss === "string") return stopped(marked, boss, state());
-  const trace = [boss.block, ...objective.trace.filter((block) => block.slot !== "boss")];
-  return { ...marked, rngState: state(), current: { ...objective, boss: boss.id, trace } };
+  return rollObjective(engine, marked, objective.rerolls, null);
 }
 
 /** The current objective is discarded unless it was `Done`. */

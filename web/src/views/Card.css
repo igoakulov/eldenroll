@@ -265,14 +265,13 @@
   color: var(--text-2);
 }
 
-/* A reroll's changed slots fade out, stay empty for a beat, and fade back in; the rest stay still. The beat
-   stretches the swap without a curve of its own. */
+/* A reroll's changed slots fade out and back in, slowly enough to follow; the rest stay still */
 .slot-changed {
-  animation: fade-in 240ms var(--ease-out) var(--dur-state) backwards;
+  animation: fade-in var(--dur-swap) var(--ease-out);
 }
 
 .slot-leaving {
-  animation: fade-out var(--dur-sheet) var(--ease-in) forwards;
+  animation: fade-out var(--dur-swap) var(--ease-in) forwards;
 }
 
 /* A new objective in two phases (internal/design.md#Sequences): the boss, then how to fell it. `--d` is each

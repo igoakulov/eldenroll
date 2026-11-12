@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 import "./Countdown.css";
 
-/** A label over a digit counting down a second at a time, the old digit fading out as the new one fades in; no
- * ring or bar. Calls `onZero` as the count runs out, without showing 0. */
+/** A label over a digit counting down a second at a time, the old digit fading out as the new one fades in, inside
+ * a ring that empties over the whole count. Calls `onZero` as the count runs out, without showing 0. */
 export function Countdown({
   from,
   label,
@@ -30,16 +30,29 @@ export function Countdown({
   return (
     <div className="countdown" role="timer" aria-live="off">
       <p className="countdown-label">{label}</p>
-      <b className="countdown-digits">
-        {ticked && (
-          <span key={`old-${left}`} className="countdown-old" aria-hidden="true">
-            {left + 1}
+      <div className="countdown-dial">
+        <svg className="countdown-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle className="countdown-ring-track" cx="56" cy="56" r="54.5" />
+          <circle
+            className="countdown-ring-left"
+            cx="56"
+            cy="56"
+            r="54.5"
+            pathLength={1}
+            style={{ animationDuration: `${from}s` }}
+          />
+        </svg>
+        <b className="countdown-digits">
+          {ticked && (
+            <span key={`old-${left}`} className="countdown-old" aria-hidden="true">
+              {left + 1}
+            </span>
+          )}
+          <span key={left} className={ticked ? "countdown-new" : undefined}>
+            {left}
           </span>
-        )}
-        <span key={left} className={ticked ? "countdown-new" : undefined}>
-          {left}
-        </span>
-      </b>
+        </b>
+      </div>
     </div>
   );
 }

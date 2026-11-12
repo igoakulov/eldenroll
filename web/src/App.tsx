@@ -4,7 +4,7 @@ import type { Database } from "./engine/database";
 import { indexDatabase } from "./engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "./engine/hyperparams";
 import { DEFAULT_REGIONS } from "./engine/regions";
-import { done, editRun, objectiveNumber, reroll, rollNext, startRun, type Engine, type Run } from "./engine/run";
+import { alreadyDead, done, editRun, objectiveNumber, reroll, rollNext, startRun, type Engine, type Run } from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { formatTrace } from "./engine/trace";
 import { loadDatabase } from "./loadDatabase";
@@ -22,7 +22,7 @@ type Loaded =
   | { readonly status: "ready"; readonly database: Database }
   | { readonly status: "failed" };
 
-type View = "start" | "card" | "rold" | "felled" | "level";
+type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level";
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
@@ -51,7 +51,7 @@ function Game({ database }: { readonly database: Database }) {
     return result.ok ? result.run : null;
   });
   const [view, setView] = useState<View>("start");
-  // The run as it was before `Done`, which `Undo` puts back
+  // The run as it was before `Done` or `Felled?`, which `Undo` puts back
   const [undoTo, setUndoTo] = useState<Run | null>(null);
   const [reveal, setReveal] = useState<{ readonly kind: Reveal; readonly id: number }>({ kind: "none", id: 0 });
   const showCard = (kind: Reveal) => {
@@ -61,14 +61,24 @@ function Game({ database }: { readonly database: Database }) {
 
   if (view === "rold") return <RoldCard onClose={() => setView("start")} />;
 
-  if (view === "felled" && run !== null && undoTo !== null) {
+  if ((view === "felled" || view === "rerolling") && run !== null && undoTo !== null) {
     const boss = undoTo.current === null ? undefined : engine.data.bosses.get(undoTo.current.boss);
     const noop = () => {};
     return (
       <Felled
         bossName={boss?.name ?? "unknown boss"}
-        label="Next objective in"
-        behind={<Card data={engine.data} run={undoTo} reveal="none" onReroll={noop} onDone={noop} onLevelUp={noop} />}
+        label={view === "felled" ? "Next objective in" : "Rerolling in"}
+        behind={
+          <Card
+            data={engine.data}
+            run={undoTo}
+            reveal="none"
+            onReroll={noop}
+            onDone={noop}
+            onFelled={noop}
+            onLevelUp={noop}
+          />
+        }
         onUndo={() => {
           setRun(undoTo);
           setUndoTo(null);
@@ -80,7 +90,10 @@ function Game({ database }: { readonly database: Database }) {
           if (run.finished) {
             setRun(null);
             setView("start");
+          } else if (view === "rerolling" && run.current !== null) {
+            showCard("quick");
           } else {
+            // After `Felled?` too, when no boss is left in the regions: `Level up` is where more are ticked
             setView("level");
           }
         }}
@@ -132,6 +145,13 @@ function Game({ database }: { readonly database: Database }) {
           setUndoTo(run);
           setRun(done(engine, run));
           setView("felled");
+        }}
+        onFelled={() => {
+          const next = alreadyDead(engine, run);
+          setUndoTo(run);
+          setRun(next);
+          printTrace(next);
+          setView("rerolling");
         }}
         onLevelUp={() => setView("level")}
       />

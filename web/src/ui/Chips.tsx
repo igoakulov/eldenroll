@@ -19,15 +19,19 @@ export function Chips({
   );
 }
 
-/** A chip in small caps, gold when lit. `at` delays its fade to that share of a slider's glide (`glideAt`), so
- * chips light as the handle passes them. */
-export function Chip({ lit, at = 0, children }: {
+/** A chip in small caps, gold when lit, red for a boss's state. `at` delays its fade to that share of a slider's
+ * glide (`glideAt`), so chips light as the handle passes them. */
+export function Chip({ lit, red = false, at = 0, children }: {
   readonly lit: boolean;
+  readonly red?: boolean;
   readonly at?: number;
   readonly children: ReactNode;
 }) {
   return (
-    <li className={`chip${lit ? " chip-lit" : ""}`} style={{ "--at": at } as CSSProperties}>
+    <li
+      className={`chip${lit ? " chip-lit" : ""}${red ? " chip-red" : ""}`}
+      style={{ "--at": at } as CSSProperties}
+    >
       {children}
     </li>
   );

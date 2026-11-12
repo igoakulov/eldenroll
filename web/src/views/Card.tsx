@@ -171,7 +171,7 @@ function Rule({ display }: { readonly display: SlotDisplay }) {
 
 /** The boss bar, broken in the middle by `Felled?`. As the boss arrives a whole bar fills over it, then gives
  * way as `Felled?` fades into the gap. */
-function BossBar({ onFelled }: { readonly onFelled?: () => void }) {
+function BossBar({ onFelled }: { readonly onFelled: () => void }) {
   return (
     <div className="boss-bar">
       <div className="boss-bar-whole" aria-hidden="true">
@@ -197,6 +197,7 @@ export function Card({
   reveal,
   onReroll,
   onDone,
+  onFelled,
   onLevelUp,
 }: {
   readonly data: EngineData;
@@ -204,10 +205,12 @@ export function Card({
   readonly reveal: Reveal;
   readonly onReroll: (target: RerollTarget) => void;
   readonly onDone: () => void;
+  readonly onFelled: () => void;
   readonly onLevelUp: () => void;
 }) {
   const [revealing, setRevealing] = useState(reveal !== "none");
-  const [panelOpen, setPanelOpen] = useState(false);
+  // `felled` outlives `open`, so the panel keeps its look while it fades out
+  const [panel, setPanel] = useState({ open: false, felled: false });
   const mounted = useRef(false);
   useEffect(() => {
     mounted.current = true;
@@ -257,7 +260,7 @@ export function Card({
       onPointerDown={() => setRevealing(false)}
       bottom={
         <BottomBar className="r" style={at(1350)}>
-          <RuledButton icon="reroll" onClick={() => setPanelOpen(true)}>
+          <RuledButton icon="reroll" onClick={() => setPanel({ open: true, felled: false })}>
             Reroll
           </RuledButton>
           <GlowBand onClick={onDone}>Done</GlowBand>
@@ -265,11 +268,16 @@ export function Card({
       }
       sheet={
         <RerollPanel
-          open={panelOpen}
-          onClose={() => setPanelOpen(false)}
+          open={panel.open}
+          felled={panel.felled}
+          onClose={() => setPanel((last) => ({ ...last, open: false }))}
           onReroll={(target) => {
-            setPanelOpen(false);
+            setPanel((last) => ({ ...last, open: false }));
             onReroll(target);
+          }}
+          onFelled={() => {
+            setPanel((last) => ({ ...last, open: false }));
+            onFelled();
           }}
         />
       }
@@ -283,7 +291,7 @@ export function Card({
           <h1 className="boss-name r" id="boss-name" style={at(80)}>
             {boss?.name ?? "unknown boss"}
           </h1>
-          <BossBar />
+          <BossBar onFelled={() => setPanel({ open: true, felled: true })} />
           <p className="boss-location r" style={at(420)}>
             <Icon name="pin" size={15} />
             <span>{boss?.location}</span>

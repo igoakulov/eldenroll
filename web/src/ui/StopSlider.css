@@ -92,3 +92,12 @@
   font-size: 15px;
   color: var(--text-3);
 }
+
+.stop-slider-locked .stop-slider-track,
+.stop-slider-locked .stop-slider-ends {
+  opacity: 0.4;
+}
+
+.stop-slider-locked .stop-slider-track {
+  cursor: default;
+}

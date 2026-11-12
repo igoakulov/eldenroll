@@ -14,7 +14,7 @@ const INSET = 16;
 /** A slider of a few stops: a real range input, invisible, for the keyboard and assistive tech, under a drawn
  * rail, fill, stops and handle. Pointers are handled here rather than by the input, because iOS lets a range
  * input move only by dragging its thumb. A tap or a key glides the handle to its stop; a drag follows the finger
- * with no lag. `onChange` says which. */
+ * with no lag. `onChange` says which. A `locked` slider is drawn dimmed at its value and can't move or take focus. */
 export function StopSlider({
   stops,
   value,
@@ -22,6 +22,7 @@ export function StopSlider({
   label,
   valueText,
   ends,
+  locked = false,
 }: {
   readonly stops: number;
   readonly value: number;
@@ -29,6 +30,7 @@ export function StopSlider({
   readonly label: string;
   readonly valueText: string;
   readonly ends: readonly [string, string];
+  readonly locked?: boolean;
 }) {
   const last = stops - 1;
   const [motion, setMotion] = useState({ from: value, glide: false });
@@ -52,11 +54,11 @@ export function StopSlider({
   const at = (index: number) => `calc(${INSET}px + (100% - ${2 * INSET}px) * ${index / last})`;
 
   return (
-    <div className={`stop-slider${motion.glide ? " stop-slider-glide" : ""}`}>
+    <div className={`stop-slider${locked ? " stop-slider-locked" : motion.glide ? " stop-slider-glide" : ""}`}>
       <div
         className="stop-slider-track"
         onPointerDown={(event) => {
-          if (event.button !== 0) return;
+          if (locked || event.button !== 0) return;
           event.currentTarget.setPointerCapture(event.pointerId);
           dragging.current = true;
           pick(stopAt(event), true);
@@ -92,6 +94,7 @@ export function StopSlider({
           value={value}
           aria-label={label}
           aria-valuetext={valueText}
+          disabled={locked}
           onChange={(event) => pick(Number(event.target.value), true)}
         />
       </div>

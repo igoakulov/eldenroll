@@ -10,9 +10,49 @@
   color: var(--text-2);
 }
 
+.countdown-dial {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  margin-top: 12px;
+}
+
+/* The ring starts whole at the top and empties clockwise, at an even pace, over the whole count */
+.countdown-ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+  fill: none;
+}
+
+.countdown-ring-track {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.countdown-ring-left {
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  animation: countdown-empty linear forwards;
+}
+
+@keyframes countdown-empty {
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown-ring-left {
+    animation: none;
+  }
+}
+
 .countdown-digits {
   display: grid;
-  margin-top: 4px;
   font-weight: 500;
   font-size: 64px;
   line-height: 1;

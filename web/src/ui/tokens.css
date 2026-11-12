@@ -18,6 +18,7 @@
   --blood-3: #510c08;
   --blood-text: #e0806c;
   --raised: #507bc6;
+  --trail: #a89b34;
   --sheet: #0d0c0a;
   --scrim: rgba(6, 6, 5, 0.72);
 
@@ -36,6 +37,7 @@
   --dur-sheet-out: 150ms;
   --dur-glide: 200ms;
   --dur-rise: 400ms;
+  --dur-swap: 500ms;
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);

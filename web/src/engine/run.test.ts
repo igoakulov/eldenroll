@@ -279,14 +279,30 @@ describe("rerolls", () => {
 });
 
 describe("Already dead and Finish run", () => {
-  it("swaps the boss, keeps the loadout and marks the old boss dead", () => {
-    const run = start();
+  it("marks the boss dead and rerolls the full objective without counting a reroll", () => {
+    const run = reroll(engine, start(), "armor");
     const objective = current(run);
     const next = alreadyDead(engine, run);
     expect(current(next).boss).not.toBe(objective.boss);
-    expect(current(next).slots).toEqual(objective.slots);
+    expect(current(next).trace.map((block) => block.slot).slice(0, 2)).toEqual(["boss", "character_class"]);
+    expect(current(next).rerolls).toEqual(["armor"]);
     expect(next.deadBosses).toEqual([{ instanceId: objective.boss, objectiveIndex: 1 }]);
     expect(next.completed).toHaveLength(0);
+  });
+
+  it("waits, as Done does, when the marked boss was the last one in the regions", () => {
+    const inLimgrave = new Set(
+      realDatabase.location.filter((row) => row.region_id === "limgrave").map((row) => row.id),
+    );
+    const [last, ...others] = realDatabase.boss_instance
+      .filter((row) => row.odds > 0 && inLimgrave.has(row.location_id))
+      .map((row) => row.id);
+    const run = start({ regions: ["limgrave"], deadBosses: others });
+    expect(current(run).boss).toBe(last);
+    const next = alreadyDead(engine, run);
+    expect(next.current).toBeNull();
+    expect(next.waiting).toBe("regions_cleared");
+    expect(next.waiting).toBe(done(engine, run).waiting);
   });
 
   it("discards the current objective", () => {

@@ -29,6 +29,12 @@
   color: var(--gold);
 }
 
+.chip-red {
+  border-color: rgba(169, 56, 37, 0.6);
+  background: rgba(129, 30, 23, 0.16);
+  color: var(--blood-text);
+}
+
 .chips-instant .chip {
   transition: none;
 }

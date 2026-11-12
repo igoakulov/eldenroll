@@ -28,10 +28,19 @@ export function BottomBar({
   );
 }
 
-/** The main action: a band of warm light between two gold rules. One per screen. */
-export function GlowBand({ children, onClick }: { readonly children: ReactNode; readonly onClick?: () => void }) {
+/** The main action: a band of warm light between two gold rules. One per screen. `long` tightens a label too long
+ * for one line at phone width. */
+export function GlowBand({
+  children,
+  long = false,
+  onClick,
+}: {
+  readonly children: ReactNode;
+  readonly long?: boolean;
+  readonly onClick?: () => void;
+}) {
   return (
-    <button type="button" className="glow-band" onClick={onClick}>
+    <button type="button" className={`glow-band${long ? " glow-band-long" : ""}`} onClick={onClick}>
       {children}
     </button>
   );

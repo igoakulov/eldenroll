@@ -88,6 +88,12 @@
   text-shadow: 0 0 14px rgba(227, 207, 152, 0.6);
 }
 
+.glow-band-long {
+  font-size: 17px;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+}
+
 .glow-band::before,
 .glow-band::after {
   background: linear-gradient(to right, transparent, var(--gold) 22%, var(--gold) 78%, transparent);
