@@ -1,0 +1,39 @@
+.show-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--gutter);
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  color: var(--text-2);
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.show-all .icon-svg {
+  color: var(--gold-mute);
+  transform: rotate(90deg);
+  transition: transform var(--dur-state) var(--ease-out);
+}
+
+.show-all[aria-expanded="true"] .icon-svg {
+  transform: rotate(-90deg);
+}
+
+.show-all-label {
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--dotted);
+  text-underline-offset: 3px;
+}
+
+/* A row that appears when the list opens */
+.show-all-new {
+  animation: fade-in var(--dur-sheet) var(--ease-out);
+}

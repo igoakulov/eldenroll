@@ -2,7 +2,8 @@ import { useState } from "react";
 
 import "./Stepper.css";
 
-/** A number field between `−` and `+`. `correct` turns what was typed into an accepted value. */
+/** A number field between `−` and `+`. `correct` turns what was typed into an accepted value. `raised` shows the
+ * value in blue, above where it was. */
 export function Stepper({
   id,
   label,
@@ -10,6 +11,7 @@ export function Stepper({
   min,
   max,
   correct,
+  raised = false,
   onChange,
 }: {
   readonly id: string;
@@ -18,6 +20,7 @@ export function Stepper({
   readonly min: number;
   readonly max: number;
   readonly correct: (entered: string, previous: number) => number;
+  readonly raised?: boolean;
   readonly onChange: (value: number) => void;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
@@ -34,6 +37,7 @@ export function Stepper({
         </button>
         <input
           id={id}
+          className={raised ? "raised" : undefined}
           inputMode="numeric"
           value={draft ?? String(value)}
           onChange={(event) => setDraft(event.target.value)}

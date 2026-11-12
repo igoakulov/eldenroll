@@ -8,14 +8,16 @@ export function LozengeCheckbox({
   onChange,
   children,
   tag,
+  className,
 }: {
   readonly checked: boolean;
   readonly onChange: (checked: boolean) => void;
   readonly children: ReactNode;
   readonly tag?: string;
+  readonly className?: string;
 }) {
   return (
-    <label className="lozenge-row">
+    <label className={`lozenge-row${className === undefined ? "" : ` ${className}`}`}>
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
       <span className="lozenge-box" aria-hidden="true" />
       <span className="lozenge-label">{children}</span>

@@ -4,12 +4,14 @@ import type { Database } from "./engine/database";
 import { indexDatabase } from "./engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "./engine/hyperparams";
 import { DEFAULT_REGIONS } from "./engine/regions";
-import { done, objectiveNumber, reroll, startRun, type Engine, type Run } from "./engine/run";
+import { done, editRun, objectiveNumber, reroll, rollNext, startRun, type Engine, type Run } from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { formatTrace } from "./engine/trace";
 import { loadDatabase } from "./loadDatabase";
 import { Lozenge } from "./ui/Icon";
 import { Card, type Reveal } from "./views/Card";
+import { Felled } from "./views/Felled";
+import { LevelUp } from "./views/LevelUp";
 import { rerollTarget } from "./views/rerollScope";
 import { RoldCard } from "./views/RoldCard";
 import { Start, StartResume } from "./views/Start";
@@ -20,7 +22,7 @@ type Loaded =
   | { readonly status: "ready"; readonly database: Database }
   | { readonly status: "failed" };
 
-type View = "start" | "card" | "rold";
+type View = "start" | "card" | "rold" | "felled" | "level";
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
@@ -49,6 +51,8 @@ function Game({ database }: { readonly database: Database }) {
     return result.ok ? result.run : null;
   });
   const [view, setView] = useState<View>("start");
+  // The run as it was before `Done`, which `Undo` puts back
+  const [undoTo, setUndoTo] = useState<Run | null>(null);
   const [reveal, setReveal] = useState<{ readonly kind: Reveal; readonly id: number }>({ kind: "none", id: 0 });
   const showCard = (kind: Reveal) => {
     setReveal((r) => ({ kind, id: r.id + 1 }));
@@ -56,6 +60,58 @@ function Game({ database }: { readonly database: Database }) {
   };
 
   if (view === "rold") return <RoldCard onClose={() => setView("start")} />;
+
+  if (view === "felled" && run !== null && undoTo !== null) {
+    const boss = undoTo.current === null ? undefined : engine.data.bosses.get(undoTo.current.boss);
+    const noop = () => {};
+    return (
+      <Felled
+        bossName={boss?.name ?? "unknown boss"}
+        label="Next objective in"
+        behind={<Card data={engine.data} run={undoTo} reveal="none" onReroll={noop} onDone={noop} onLevelUp={noop} />}
+        onUndo={() => {
+          setRun(undoTo);
+          setUndoTo(null);
+          showCard("none");
+        }}
+        onZero={() => {
+          setUndoTo(null);
+          // Every boss felled or skipped: until the run's summary (9), the run ends on Start
+          if (run.finished) {
+            setRun(null);
+            setView("start");
+          } else {
+            setView("level");
+          }
+        }}
+      />
+    );
+  }
+
+  if (view === "level" && run !== null) {
+    const mid = run.current !== null;
+    return (
+      <LevelUp
+        mode={mid ? "mid" : "next"}
+        run={run}
+        regions={database.region}
+        onClose={() => showCard("none")}
+        onSave={(changes) => {
+          const edited = editRun(run, changes);
+          if (mid) {
+            setRun(edited);
+            showCard("none");
+            return;
+          }
+          // With no living boss in the selected regions, the run stays here, waiting for more
+          const next = rollNext(engine, edited);
+          setRun(next);
+          printTrace(next);
+          if (next.current !== null) showCard("full");
+        }}
+      />
+    );
+  }
 
   if (view === "card" && run !== null) {
     return (
@@ -72,13 +128,12 @@ function Game({ database }: { readonly database: Database }) {
           // Only a full-objective reroll replays the reveal; any other keeps the card and swaps what changed
           if (target === "boss") showCard("quick");
         }}
-        // A stand-in until the felled sequence with Level up (7.9)
         onDone={() => {
-          const next = done(engine, run);
-          setRun(next);
-          printTrace(next);
-          showCard("full");
+          setUndoTo(run);
+          setRun(done(engine, run));
+          setView("felled");
         }}
+        onLevelUp={() => setView("level")}
       />
     );
   }
@@ -89,7 +144,7 @@ function Game({ database }: { readonly database: Database }) {
       <StartResume
         title={`Objective ${objectiveNumber(run)}${boss === undefined ? "" : `, ${boss.name}`}`}
         onOpenCard={() => setView("rold")}
-        onResume={() => showCard("none")}
+        onResume={() => (run.current === null ? setView("level") : showCard("none"))}
       />
     );
   }

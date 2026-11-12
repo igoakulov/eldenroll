@@ -1,0 +1,31 @@
+.undo-button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 0 24px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  text-transform: uppercase;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--dotted);
+  text-underline-offset: 8px;
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.undo-button .icon-svg {
+  color: var(--gold-mute);
+}
+
+.undo-button:active {
+  color: var(--grace);
+  transition-duration: 0ms;
+}

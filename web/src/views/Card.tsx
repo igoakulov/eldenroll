@@ -197,12 +197,14 @@ export function Card({
   reveal,
   onReroll,
   onDone,
+  onLevelUp,
 }: {
   readonly data: EngineData;
   readonly run: Run;
   readonly reveal: Reveal;
   readonly onReroll: (target: RerollTarget) => void;
   readonly onDone: () => void;
+  readonly onLevelUp: () => void;
 }) {
   const [revealing, setRevealing] = useState(reveal !== "none");
   const [panelOpen, setPanelOpen] = useState(false);
@@ -224,7 +226,7 @@ export function Card({
   const level = derivedLevel(run.stats);
   const top = (
     <TopBar eyebrow={`Objective ${objectiveNumber(run)}`}>
-      <LevelButton level={level} />
+      <LevelButton level={level} onClick={onLevelUp} />
       <FramedIconButton icon="menu" label="Menu" />
     </TopBar>
   );

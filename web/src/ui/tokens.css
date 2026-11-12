@@ -41,6 +41,19 @@
   --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
   --rise-y: 6px;
   --sheet-y: 16px;
+
+  /* An enemy felled: the card dims, the bar drains with its trail lagging, then the band fades in and swells */
+  --dur-dim: 400ms;
+  --drain-at: 150ms;
+  --dur-drain: 700ms;
+  --trail-at: 450ms;
+  --dur-trail: 800ms;
+  --band-at: 600ms;
+  --dur-band: 600ms;
+  --dur-glow: 1000ms;
+  --dur-swell: 4400ms;
+  --swell: 1.04;
+  --dur-digit: 300ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -48,5 +61,6 @@
     --dur-glide: 0ms;
     --rise-y: 0px;
     --sheet-y: 0px;
+    --swell: 1;
   }
 }

@@ -382,10 +382,18 @@ export function done(engine: Engine, run: Run): Run {
     seen: countedOnce(run.seen, seenIn(engine, objective)),
     current: null,
   };
-  return rollObjective(engine, next, [], null);
+  // The next objective waits for `rollNext`, after `Level up`; only whether one can roll is known now
+  const pool = bossPool(
+    engine.data.database,
+    new Set(next.regions),
+    deadSet(next),
+    new Set(next.skippedBosses),
+  );
+  if (pool.status === "all_dead") return { ...next, waiting: null, finished: true };
+  return { ...next, waiting: pool.status === "ready" ? null : pool.status };
 }
 
-/** After the selected regions run out, once the player ticks more. */
+/** The next objective after `Done`, or after the player ticks more regions while the run waits. */
 export function rollNext(engine: Engine, run: Run): Run {
   if (run.finished || run.current !== null) return run;
   return rollObjective(engine, run, [], null);

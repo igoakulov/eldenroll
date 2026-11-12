@@ -105,28 +105,6 @@
   }
 }
 
-.level-total {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin: 40px var(--gutter) 6px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--rule);
-}
-
-.level-total-key {
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 18px;
-  color: var(--gold-mute);
-}
-
-.level-total-value {
-  font-size: 32px;
-  line-height: 1;
-  font-variant-numeric: lining-nums tabular-nums;
-}
-
 .legal {
   margin: 36px var(--gutter) 0;
   font-size: 15px;

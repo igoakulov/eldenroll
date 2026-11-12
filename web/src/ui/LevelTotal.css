@@ -1,0 +1,41 @@
+.level-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 40px var(--gutter) 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.level-total-key {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: 18px;
+  color: var(--gold-mute);
+}
+
+.level-total-value {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 32px;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.level-total-value > * {
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.level-total-was {
+  color: var(--text-3);
+}
+
+.level-total-arrow {
+  font-size: 22px;
+  color: var(--gold-dim);
+}
+
+.level-total-value .raised {
+  color: var(--raised);
+}

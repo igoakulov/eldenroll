@@ -1,0 +1,205 @@
+/* The card stays where it was, so no fade in from the ground; the stage's boss lies exactly over the card's,
+   which hides, so the name greys and the bar drains in place. */
+.screen.felled {
+  animation: none;
+}
+
+.felled > .screen-body {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+.felled-behind {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.1;
+  animation: felled-dim var(--dur-dim) var(--ease-out) backwards;
+}
+
+.felled-behind > .screen {
+  min-height: 100%;
+  animation: none;
+}
+
+.felled-behind .boss {
+  visibility: hidden;
+}
+
+.felled-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 55% at 50% 44%, rgba(6, 6, 5, 0.55) 0%, rgba(6, 6, 5, 0.92) 100%);
+  animation: fade-in var(--dur-dim) var(--ease-out) backwards;
+}
+
+.felled-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0 64px;
+}
+
+.felled-boss {
+  flex: none;
+  width: 100%;
+  padding: 24px var(--gutter) 0;
+}
+
+.felled-name {
+  margin: 0 0 16px;
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 1.08;
+  color: var(--text-3);
+  text-shadow: 0 1px 0 #000;
+  animation: felled-grey var(--dur-dim) var(--ease-out) backwards;
+}
+
+.felled-bar {
+  position: relative;
+  height: 11px;
+  border: 1px solid #4e4838;
+  background: #140605;
+}
+
+/* Both drain from the right; the paler trail lags behind the red, as the game's boss bar shows damage */
+.felled-bar i {
+  position: absolute;
+  inset: 1px;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.felled-fill {
+  background: linear-gradient(180deg, var(--blood) 0%, var(--blood-2) 55%, var(--blood-3) 100%);
+  animation: felled-drain var(--dur-drain) var(--ease-in-out) var(--drain-at) backwards;
+}
+
+.felled-trail {
+  background: var(--blood-text);
+  opacity: 0.55;
+  animation: felled-drain var(--dur-trail) var(--ease-in-out) var(--trail-at) backwards;
+}
+
+.felled-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 32px;
+}
+
+.felled-band {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 176px;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 6, 5, 0) 0%,
+    rgba(4, 4, 3, 0.92) 26%,
+    rgba(4, 4, 3, 0.92) 74%,
+    rgba(6, 6, 5, 0) 100%
+  );
+  animation: fade-in var(--dur-band) var(--ease-out) var(--band-at) backwards;
+}
+
+/* The glow brightens as the words arrive, then they swell slightly while they hold */
+.felled-band h1 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 1.28;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+  color: #e8d49a;
+  text-shadow:
+    0 0 18px rgba(227, 207, 152, 0.55),
+    0 0 46px rgba(214, 180, 96, 0.3);
+  transform: scale(var(--swell));
+  animation:
+    felled-glow var(--dur-glow) var(--ease-out) var(--band-at) backwards,
+    felled-swell var(--dur-swell) var(--ease-out) var(--band-at) backwards;
+}
+
+.felled .countdown {
+  margin-top: 28px;
+}
+
+.felled .countdown,
+.felled .undo-button {
+  animation: fade-in var(--dur-dim) var(--ease-out) backwards;
+}
+
+.felled-settled .felled-behind,
+.felled-settled .felled-veil,
+.felled-settled .felled-name,
+.felled-settled .felled-bar i,
+.felled-settled .felled-band,
+.felled-settled .felled-band h1,
+.felled-settled .countdown,
+.felled-settled .undo-button {
+  animation: none;
+}
+
+@keyframes felled-dim {
+  from {
+    opacity: 1;
+  }
+}
+
+@keyframes felled-grey {
+  from {
+    color: var(--text);
+  }
+}
+
+@keyframes felled-drain {
+  from {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes felled-glow {
+  from {
+    text-shadow:
+      0 0 6px rgba(227, 207, 152, 0.15),
+      0 0 16px rgba(214, 180, 96, 0);
+  }
+}
+
+@keyframes felled-swell {
+  from {
+    transform: scale(1);
+  }
+}
+
+/* No draining: the red fades out where it stands */
+@media (prefers-reduced-motion: reduce) {
+  .felled-bar i {
+    transform: none;
+    opacity: 0;
+  }
+
+  .felled-fill {
+    animation: felled-empty var(--dur-sheet) var(--ease-out) var(--drain-at) backwards;
+  }
+
+  .felled-trail {
+    animation: none;
+  }
+}
+
+@keyframes felled-empty {
+  from {
+    opacity: 1;
+  }
+}

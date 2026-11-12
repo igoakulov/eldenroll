@@ -1,0 +1,36 @@
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countdown-label {
+  font-style: italic;
+  font-size: 18px;
+  color: var(--text-2);
+}
+
+.countdown-digits {
+  display: grid;
+  margin-top: 4px;
+  font-weight: 500;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--grace);
+  text-shadow: 0 0 16px rgba(227, 207, 152, 0.3);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* The old and new digits share one cell while they cross-fade */
+.countdown-digits > span {
+  grid-area: 1 / 1;
+  text-align: center;
+}
+
+.countdown-new {
+  animation: fade-in var(--dur-digit) var(--ease-out);
+}
+
+.countdown-old {
+  animation: fade-out var(--dur-digit) var(--ease-in) forwards;
+}

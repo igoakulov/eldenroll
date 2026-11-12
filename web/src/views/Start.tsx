@@ -1,26 +1,13 @@
 import type { Region } from "../engine/database";
-import { MAX_STAT, MIN_STAT, STATS, correctedStat, derivedLevel, type Stat, type Stats } from "../engine/settings";
+import { derivedLevel, type Stats } from "../engine/settings";
 import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SectionHeading } from "../ui/Headings";
-import { LozengeCheckbox } from "../ui/LozengeCheckbox";
+import { LevelTotal } from "../ui/LevelTotal";
 import { FramedRow, ListRow } from "../ui/Rows";
 import { Screen } from "../ui/Screen";
-import { Stepper } from "../ui/Stepper";
+import { RegionCheck, StatSteppers, byLevel } from "./StatsAndRegions";
 import { Tagline } from "./Tagline";
 import "./Start.css";
-
-export const STAT_NAMES: Readonly<Record<Stat, string>> = {
-  vig: "Vigor",
-  mind: "Mind",
-  end: "Endurance",
-  str: "Strength",
-  dex: "Dexterity",
-  int: "Intelligence",
-  fth: "Faith",
-  arc: "Arcane",
-};
-
-const DLC_PREFIX = "DLC: ";
 
 export const DISCLAIMER =
   "Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.";
@@ -67,9 +54,6 @@ export function Start({
   readonly onOpenCard: () => void;
   readonly onStartRun: () => void;
 }) {
-  const selected = new Set(selectedRegions);
-  const byLevel = [...regions].sort((a, b) => a.region_level - b.region_level);
-
   return (
     <Screen
       mist="centre"
@@ -86,46 +70,20 @@ export function Start({
       <Hero onOpenCard={onOpenCard} />
 
       <div>
-        <div className="level-total">
-          <span className="level-total-key">Level</span>
-          <span className="level-total-value">{derivedLevel(stats)}</span>
-        </div>
-        <div>
-          {STATS.map((stat) => (
-            <Stepper
-              key={stat}
-              id={`stat-${stat}`}
-              label={STAT_NAMES[stat]}
-              value={stats[stat]}
-              min={MIN_STAT}
-              max={MAX_STAT}
-              correct={correctedStat}
-              onChange={(value) => onStats({ ...stats, [stat]: value })}
-            />
-          ))}
-        </div>
+        <LevelTotal level={derivedLevel(stats)} />
+        <StatSteppers stats={stats} onStats={onStats} />
 
         <SectionHeading>Regions</SectionHeading>
         <div>
-          {byLevel.map((region) => {
-            const dlc = region.name.startsWith(DLC_PREFIX);
-            return (
-              <LozengeCheckbox
-                key={region.id}
-                checked={selected.has(region.id)}
-                onChange={(checked) =>
-                  onRegions(
-                    checked
-                      ? byLevel.filter((r) => r.id === region.id || selected.has(r.id)).map((r) => r.id)
-                      : selectedRegions.filter((id) => id !== region.id),
-                  )
-                }
-                {...(dlc ? { tag: "DLC" } : {})}
-              >
-                {dlc ? region.name.slice(DLC_PREFIX.length) : region.name}
-              </LozengeCheckbox>
-            );
-          })}
+          {byLevel(regions).map((region) => (
+            <RegionCheck
+              key={region.id}
+              region={region}
+              regions={regions}
+              selected={selectedRegions}
+              onRegions={onRegions}
+            />
+          ))}
         </div>
       </div>
 

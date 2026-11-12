@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { indexDatabase } from "./engineData";
 import { DEFAULT_HYPERPARAMS } from "./hyperparams";
 import { realDatabase } from "./realDatabase.testing";
-import { done, reroll, startRun, type Engine, type Run, type RunInputs } from "./run";
+import { done, reroll, rollNext, startRun, type Engine, type Run, type RunInputs } from "./run";
 import { DEFAULT_STATS, defaultSettings } from "./settings";
 import { formatMultiplier, formatProbability, formatTrace } from "./trace";
 
@@ -90,7 +90,7 @@ describe("the trace of an objective", () => {
 
   it("shows decay as a repeat line once something was seen", () => {
     let run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
-    run = done(engine, done(engine, run));
+    run = rollNext(engine, done(engine, rollNext(engine, done(engine, run))));
     const characterClass = blocks(run).find((text) => text.startsWith("Class: "));
     expect(characterClass).toContain("  repeat: x0.8^2 = x0.64");
   });

@@ -31,7 +31,8 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 - `displaySlots` returns rows in card order. An `alias` armor piece is a `None` piece: the set keeps that slot empty, so the player wears nothing there, while `any` means they wear what they like. Make the two easy to tell apart.
 - The roll order differs from the card order: compute and show the slots a reroll will change in roll order (#Rerolls), where they always form one run; the panel lists it reversed, to match the slider. In card order a kept slot can sit between two that change.
 - A slot the class has no row for can't be rerolled: `reroll` returns the run unchanged.
-- `done` still rolls the next objective at once, and `alreadyDead` keeps the loadout; both change to #Lifecycle.
+- `done` leaves no current objective and the view calls `rollNext` after `Level up`, so edits made there apply to that roll. It already sets `waiting`, or finishes the run, from the regions as they stand. `Undo` puts back the run from before `Done`: every action returns a new run, so the engine needs no undo.
+- `alreadyDead` keeps the loadout; it changes to #Lifecycle.
 - Print the trace in development only after an action that rolls, from the action handler, not a React effect: `StrictMode` runs effects twice.
 - Keep UI state in plain data, so a save layer can store it.
 

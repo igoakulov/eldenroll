@@ -1,0 +1,26 @@
+.level-up .level-total {
+  margin-top: 28px;
+}
+
+.level-up-regions-sum {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2px var(--gutter) 10px;
+  font-size: 16px;
+}
+
+.level-up-regions-sum > :first-child {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  color: var(--gold-mute);
+}
+
+.level-up-regions-order {
+  color: var(--text-3);
+}
+
+/* Under the count, every row takes a rule, the first included */
+.level-up-regions .lozenge-row:first-child {
+  border-top: 1px solid var(--line);
+}

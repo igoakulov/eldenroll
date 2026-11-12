@@ -42,6 +42,11 @@ function start(changes: Partial<RunInputs> = {}, seed = 7): Run {
   return result.run;
 }
 
+/** `Done`, then `Roll objective N` with nothing changed on `Level up`. */
+function doneAndRoll(run: Run): Run {
+  return rollNext(engine, done(engine, run));
+}
+
 function current(run: Run) {
   if (run.current === null) throw new Error("no current objective");
   return run.current;
@@ -91,12 +96,12 @@ describe("startRun", () => {
 describe("a whole run, one Done per boss", () => {
   it("meets every boss once, waits at the Ashen Capital, then finishes", () => {
     let run = start();
-    while (run.current !== null) run = done(engine, run);
+    while (run.current !== null) run = doneAndRoll(run);
     expect(run.waiting).toBe("regions_cleared");
     expect(run.finished).toBe(false);
 
     run = rollNext(engine, editRun(run, { regions: [...BEFORE_ASHEN, ASHEN] }));
-    while (run.current !== null) run = done(engine, run);
+    while (run.current !== null) run = doneAndRoll(run);
 
     const bosses = run.completed.map((row) => row.boss);
     expect(new Set(bosses).size).toBe(bosses.length);
@@ -116,7 +121,7 @@ describe("a whole run, one Done per boss", () => {
     const play = (seed: number) => {
       let run = start({}, seed);
       for (let step = 0; step < 20; step += 1) {
-        run = step % 3 === 0 ? reroll(engine, run, "lh") : done(engine, run);
+        run = step % 3 === 0 ? reroll(engine, run, "lh") : doneAndRoll(run);
       }
       return run;
     };
@@ -135,7 +140,8 @@ describe("Done", () => {
     expect(next.seen[`character_class:${objective.characterClass}`]).toBe(1);
     expect(next.seen[`rule:${objective.slots.rule_1}`]).toBe(1);
     expect(next.seen[`armor_set:${objective.slots.armor}`]).toBe(1);
-    expect(current(next).boss).not.toBe(objective.boss);
+    expect(next.current).toBeNull();
+    expect(current(rollNext(engine, next)).boss).not.toBe(objective.boss);
   });
 
   it("remembers the hands too, so weapons and shields decay like everything else", () => {
@@ -148,7 +154,7 @@ describe("Done", () => {
 
   it("counts each completed objective once, even when none fills several of its slots", () => {
     let run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["warrior_2h"] } });
-    run = done(engine, done(engine, done(engine, run)));
+    run = done(engine, doneAndRoll(doneAndRoll(run)));
     expect(run.seen["character_class:warrior_2h"]).toBe(3);
     expect(run.seen["item:none"]).toBe(3);
   });
@@ -204,7 +210,7 @@ describe("aliases", () => {
     for (let step = 0; step < 30 && run.current !== null; step += 1) {
       const rh = current(run).slots.rh;
       if (typeof rh === "string") rolled.add(rh);
-      run = done(engine, run);
+      run = doneAndRoll(run);
     }
     expect(rolled.has("meteorite_staff")).toBe(false);
     expect([...rolled].every((id) => staves.includes(id))).toBe(true);
@@ -266,7 +272,7 @@ describe("rerolls", () => {
     run = reroll(engine, run, "character_class");
     run = reroll(engine, run, "rule_2");
     expect(current(run).rerolls).toEqual(["boss", "character_class", "rule_2"]);
-    run = done(engine, run);
+    run = doneAndRoll(run);
     expect(run.completed[0]?.rerolls).toHaveLength(3);
     expect(current(run).rerolls).toEqual([]);
   });
@@ -334,7 +340,7 @@ describe("Weapon shortlist", () => {
     const listed = ["uchigatana", "longsword"];
     let run = start({ settings, weaponShortlist: listed });
     const first = current(run).slots.rh;
-    run = done(engine, run);
+    run = doneAndRoll(run);
     expect(run.seen[`item:${first}`]).toBe(1);
     expect(listed).toContain(current(run).slots.rh);
   });
@@ -359,7 +365,7 @@ describe("the Bosses list", () => {
     expect(bossStatus(run, morgott).state).toBe("skipped");
     for (let step = 0; step < 6 && run.current !== null; step += 1) {
       expect(current(run).boss).not.toBe(morgott);
-      run = done(engine, run);
+      run = doneAndRoll(run);
     }
 
     const bossLocked = (one: Run) => {
@@ -374,7 +380,7 @@ describe("the Bosses list", () => {
   });
 
   it("locks bosses killed by Done and the current boss, and lets the rest change", () => {
-    let run = done(engine, start());
+    let run = doneAndRoll(start());
     const killed = run.completed[0]?.boss as string;
     const now = current(run).boss;
     expect(setBossState(engine, run, killed, "alive")).toBe(run);
@@ -421,7 +427,7 @@ describe("Never roll", () => {
       expect(current(run).slots.rh).not.toBe("uchigatana");
       expect(current(run).slots.rule_1).not.toBe("none");
       expect(current(run).slots.rule_2).not.toBe("none");
-      run = done(engine, run);
+      run = doneAndRoll(run);
     }
     const rh = current(run).trace.find((block) => block.slot === "rh")?.text ?? "";
     expect(rh).toMatch(/never roll: -1/);

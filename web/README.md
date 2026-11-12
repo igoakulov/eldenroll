@@ -24,7 +24,7 @@ The main flows:
 4. **Change things mid-run:** `Level N` → `Level up` → `Save`. Menu → `Run settings` → `General`, `Never roll` or `Shortlist` → `Save`; `Bosses` opens from `General`.
 5. **Check progress:** menu → the run's row → `Summary` and `Timeline`.
 6. **Finish:** menu → `Finish run` → confirmation → the run's view over Start → `✕` → Start.
-7. **Come back later:** reopening the app with a run in progress lands on Start: `Resume` returns to the card; `New run` asks first, finishes the current run, then shows a fresh Start.
+7. **Come back later:** reopening the app with a run in progress lands on Start: `Resume` returns to where the run is, the card or `Level up` between objectives; `New run` asks first, finishes the current run, then shows a fresh Start.
 8. **Look back:** Start or the menu → `Run history` → a run → `Summary` and `Timeline`; `Delete run` at the end of `Summary`.
 
 ### Start
@@ -64,13 +64,13 @@ Every boss instance with `odds > 0`, each its name over its `location`, one line
 
 ### Current run
 
-- **Top bar:** `Objective N` at the left; at the right `Level N`, which opens `Level up` with `Changes apply on the next roll.`, and the menu.
+- **Top bar:** `Objective N` at the left; at the right `Level N`, which opens `Level up` for the next roll, and the menu.
 - **Menu**, one flat list: `Run history`; the run's row, its title over `In progress`, opening its view; `Run settings`; and `Finish run` in red.
 - **Wiki links:** each item tile, a named ash and the armor set name open the item's wiki page where one exists. Names and rows aren't tappable; `none`, `any` and aliases have no link. The card shows no item locations: the wiki covers them better, and the data's placements are sometimes adjusted for balance.
 - **Empty slots:** a `None` armor piece and the rule `None` show as `none`, like any empty slot, so they read apart from `any` and from a rule to obey.
 - **Reroll panel:** its chips run in reverse roll order, `Armor` first, so they read like the slider. The panel hides most of the card on a phone, so the chips carry the whole scope. The lit chips always form one run from the left, growing with the slider's fill and glow, which teaches that a reroll redoes everything from its target on.
 - **Felled?** opens the same panel locked at `Full objective`, titled `Felled on the way?`, with the chips `Boss felled on the way`, `Boss gear unlocked` and `New objective`, and `Confirm and reroll`. Confirming shows the `Rerolling in` countdown. These chips state how things stand after the reroll, so they read as states, unlike the confirmation chips, which name actions.
-- **After `Done`:** the boss name over its emptied bar, `Great enemy felled`, `Next objective in` counting from 5, and `Undo`. Then **Level up**: `Level` before and after, the 8 stats with changed values marked, `N of 17 selected` with the next 3 unticked regions and `Show all 17 regions`, and `Roll objective N`. The waiting messages show here.
+- **After `Done`:** `Undo` puts back the run exactly as it was until the countdown ends. The next objective rolls only from `Level up`, so what changes there counts for it; while the selected regions hold no living boss, the run waits there with the waiting message. `Level up` marks the stats raised since `Done`, and its short region list keeps the unticked regions it opened with, so a ticked one stays in place. Opened from `Level N` mid-objective, it saves for the next roll and closes without saving.
 - The reroll count is kept for the summary but not shown on the card.
 
 ### Confirmations
