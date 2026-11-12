@@ -54,8 +54,8 @@ a {
   color: var(--gold);
 }
 
-/* Controls, tiles and branding are tapped, not read: a press never starts a text selection on them. Names,
-   rules and other reading text stay selectable. */
+/* Controls, tiles and branding are tapped, not read: a press, or a long press on a phone, never starts a text
+   selection or the copy callout on them. Names, rules and other reading text stay selectable. */
 button,
 label,
 [role="tab"],
@@ -69,6 +69,7 @@ input[type="range"],
 .countdown {
   -webkit-user-select: none;
   user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* Keyboard focus: one thin gold outline outside any control */

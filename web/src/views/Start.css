@@ -75,10 +75,8 @@
 }
 
 .tagline-link-typed {
-  text-decoration: underline dotted;
-  text-decoration-thickness: 1px;
-  text-decoration-color: var(--dotted);
-  text-underline-offset: 3px;
+  text-decoration: none;
+  background: var(--dots) 0 100% / 100% 1px no-repeat;
 }
 
 /* An empty inline span drawing its bar outside the flow: an inline-block, even zero wide, would add a place to
@@ -132,17 +130,6 @@
   font-size: 18px;
   text-align: center;
   color: var(--text-2);
-}
-
-.legal {
-  margin: 36px var(--gutter) 0;
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--text-3);
-}
-
-.legal-low {
-  margin-top: 28px;
 }
 
 .in-run {

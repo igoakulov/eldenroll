@@ -75,10 +75,8 @@
 }
 
 .felled-word {
-  text-decoration: underline dotted;
-  text-decoration-thickness: 1px;
-  text-decoration-color: var(--blood);
-  text-underline-offset: 3px;
+  background: repeating-linear-gradient(to right, var(--blood) 0 1.5px, transparent 1.5px 4.5px) 0 100% / 100% 1px
+    no-repeat;
 }
 
 .felled-link::after {
@@ -195,7 +193,7 @@
 }
 
 .boss-name .wiki-text {
-  text-underline-offset: 6px;
+  padding-bottom: 3px;
 }
 
 .talismans {

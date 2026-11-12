@@ -27,10 +27,8 @@
 }
 
 .show-all-label {
-  text-decoration: underline dotted;
-  text-decoration-thickness: 1px;
-  text-decoration-color: var(--dotted);
-  text-underline-offset: 3px;
+  text-decoration: none;
+  background: var(--dots) 0 100% / 100% 1px no-repeat;
 }
 
 /* A row that appears when the list opens */

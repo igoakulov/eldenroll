@@ -8,7 +8,7 @@ export function UndoButton({ onClick, ref }: { readonly onClick: () => void; rea
   return (
     <button ref={ref} type="button" className="undo-button" onClick={onClick}>
       <Icon name="undo" size={22} />
-      Undo
+      <span className="undo-button-label">Undo</span>
     </button>
   );
 }

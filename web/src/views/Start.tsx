@@ -14,8 +14,6 @@ import { RegionCheck, StatSteppers, byLevel } from "./StatsAndRegions";
 import { Tagline } from "./Tagline";
 import "./Start.css";
 
-export const DISCLAIMER =
-  "Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.";
 
 /** While the game data loads, only the lozenge shows, pulsing, in its place in the wordmark, so Start appears
  * around it without the page moving. */
@@ -100,7 +98,6 @@ export function Start({
 
       <FramedRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={onRunSettings} />
 
-      <p className="legal">{DISCLAIMER}</p>
     </Screen>
   );
 }
@@ -138,7 +135,6 @@ export function StartResume({
           <ListRow title={title} detail="In progress" />
         </div>
       </section>
-      <p className="legal legal-low">{DISCLAIMER}</p>
     </Screen>
   );
 }
@@ -170,7 +166,6 @@ export function StartFailed({ onRetry }: { readonly onRetry: () => void }) {
       <p className="start-failed" role="alert">
         The game data could not be loaded. Check your connection, then try again.
       </p>
-      <p className="legal">{DISCLAIMER}</p>
     </Screen>
   );
 }

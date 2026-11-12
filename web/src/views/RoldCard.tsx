@@ -3,6 +3,9 @@ import { Screen } from "../ui/Screen";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
 import "./RoldCard.css";
 
+const DISCLAIMER =
+  "Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.";
+
 /** The onboarding card `Elden Rold` opens from Start (`web/README.md#Elden Rold card`). */
 export function RoldCard({ onClose }: { readonly onClose: () => void }) {
   return (
@@ -53,6 +56,8 @@ export function RoldCard({ onClose }: { readonly onClose: () => void }) {
           <dd>In Chrome, tap ⋮, then Add to Home screen.</dd>
         </div>
       </dl>
+
+      <p className="rold-legal">{DISCLAIMER}</p>
     </Screen>
   );
 }

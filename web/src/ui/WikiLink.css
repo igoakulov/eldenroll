@@ -2,10 +2,8 @@
 .wiki-text {
   position: relative;
   color: inherit;
-  text-decoration: underline dotted;
-  text-decoration-thickness: 1px;
-  text-decoration-color: var(--dotted);
-  text-underline-offset: 3px;
+  text-decoration: none;
+  background: var(--dots) 0 100% / 100% 1px no-repeat;
 }
 
 .wiki-text::after {
@@ -32,5 +30,5 @@
   right: 0;
   bottom: -4px;
   height: 1px;
-  background: repeating-linear-gradient(to right, var(--dotted) 0 1px, transparent 1px 3px);
+  background: var(--dots);
 }

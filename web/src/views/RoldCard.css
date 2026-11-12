@@ -83,3 +83,10 @@
   margin: 0;
   color: var(--text-2);
 }
+
+.rold-legal {
+  margin: 36px var(--gutter) 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text-3);
+}

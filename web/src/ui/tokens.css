@@ -32,6 +32,9 @@
   --rule: rgba(119, 112, 85, 0.5);
   --frame: rgba(169, 160, 127, 0.34);
   --dotted: rgba(169, 160, 127, 0.75);
+  /* A dotted underline drawn as a background, so its dots keep their spacing at any zoom; text-decoration's
+     dots run together when the desktop frame scales the app down */
+  --dots: repeating-linear-gradient(to right, var(--dotted) 0 1.5px, transparent 1.5px 4.5px);
 
   --serif: "EB Garamond", Georgia, serif;
   --display: Cinzel, Georgia, serif;
