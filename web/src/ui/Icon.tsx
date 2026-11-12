@@ -24,12 +24,22 @@ export function Icon({ name, size }: { readonly name: string; readonly size: num
   );
 }
 
-/** The lozenge beside an eyebrow and in the wordmark: our own glyph, never the game's. */
+/** The lozenge beside an eyebrow: our own glyph, never the game's. */
 export function Lozenge({ size = 16 }: { readonly size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true">
       <path d="M12 2.5l6.5 9.5-6.5 9.5L5.5 12z" />
       <path d="M12 7.6l3 4.4-3 4.4-3-4.4z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** The lozenge as the wordmark's O, taller and bolder than `Lozenge`, sized by the text around it. */
+export function WordmarkO({ className }: { readonly className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 20 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+      <path d="M10 1.6L18.4 12 10 22.4 1.6 12z" />
+      <path d="M10 7.4L13.8 12 10 16.6 6.2 12z" fill="currentColor" stroke="none" />
     </svg>
   );
 }

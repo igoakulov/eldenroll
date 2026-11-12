@@ -93,14 +93,12 @@ From the menu or from Start. The run in progress, if any, is pinned on top under
 
 ### Desktop
 
-Most players keep this open on a phone beside a console, so desktop gets no layout of its own: the app runs inside a drawn phone, centred on the page, and every screen inside it is the phone's, unchanged.
+Most players keep this open on a phone beside a console, so desktop gets no layout of its own: the app runs inside a drawn phone, centred on the page, and every screen inside it is the phone's, unchanged. A phone-sized window, a landscape phone included, gets no frame.
 
-- The phone has an iPhone 18 Pro's proportions and corner radius, with a punch hole. It draws no status bar or home bar, so the top bar starts beside the punch hole and the bottom bar keeps only its own margin.
-- It scales as a whole to the window's height, so its content keeps a phone's proportions. Below a minimum scale the page scrolls instead, so browser zoom still enlarges the text.
-- `ELDEN` stands to its left and `ROLL` to its right, in the kit's dimmest gold, sized to the space beside the phone and hidden when they would be too small to read.
-- The mouse wheel scrolls the phone from anywhere on the page. Scrolling, sheets and anything positioned stay inside the phone's screen, so components size themselves to their container, never to the window.
-- Hover states are for desktop; phones ignore them.
-- A phone-sized window gets no frame: the app fills it.
+- The phone scales as a whole to the window's height, so its content keeps a phone's proportions. Below a minimum scale the page scrolls instead, so browser zoom still enlarges the text.
+- The phone is the only thing on the page to scroll, so the mouse wheel scrolls it from anywhere, unless the page itself is scrolling.
+- Scrolling, sheets and anything positioned stay inside the phone's screen, so components size themselves to their container, never to the window: no `100vh`, no `position: fixed`.
+- Hover states sit under `@media (hover: hover)`, so phones ignore them.
 
 ## Saving
 

@@ -22,6 +22,13 @@
   --sheet: #0d0c0a;
   --scrim: rgba(6, 6, 5, 0.72);
 
+  /* The drawn phone on desktop */
+  --device: #030303;
+  --device-inner: #111111;
+  --device-band: #34332f;
+  --device-band-edge: #1a1917;
+  --device-button: #2a2926;
+
   --rule: rgba(119, 112, 85, 0.5);
   --frame: rgba(169, 160, 127, 0.34);
   --dotted: rgba(169, 160, 127, 0.75);

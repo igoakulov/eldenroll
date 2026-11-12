@@ -258,13 +258,6 @@
   box-shadow: 0 0 9px rgba(169, 56, 37, 0.5);
 }
 
-.card-waiting {
-  padding: 48px var(--gutter);
-  font-style: italic;
-  font-size: 18px;
-  color: var(--text-2);
-}
-
 /* A reroll's changed slots fade out and back in, slowly enough to follow; the rest stay still */
 .slot-changed {
   animation: fade-in var(--dur-swap) var(--ease-out);

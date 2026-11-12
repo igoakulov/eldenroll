@@ -1,0 +1,151 @@
+/* A phone-sized window: the app alone, filling it, with the window scrolling. A landscape phone keeps a phone's
+   width. */
+.phone-frame-side,
+.phone-frame-hole {
+  display: none;
+}
+
+.phone-frame-device {
+  display: contents;
+}
+
+.phone-frame-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: 440px;
+  margin: 0 auto;
+  /* Clips without becoming a scroll container, so the bottom bar and sheets still stick to the window */
+  overflow-x: clip;
+}
+
+.phone-frame-screen > .screen {
+  flex: 1 0 auto;
+}
+
+/* Wider and taller than a phone, even a landscape one: the app inside a drawn phone at an iPhone 18 Pro's
+   proportions, a 402 x 874 screen with 62 px corners, bezel and band together 15 px a side and 14 top and bottom.
+   PhoneFrame.tsx sets --phone-scale to fit its height to the window's. */
+@media (min-width: 600px) and (min-height: 480px) {
+  .phone-frame {
+    --phone-scale: 1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    column-gap: calc(56px * var(--phone-scale));
+    min-height: 100dvh;
+    padding: 16px 0;
+    background:
+      radial-gradient(56rem 34rem at 50% 45%, rgba(27, 37, 35, 0.8) 0%, rgba(18, 24, 23, 0.5) 42%, rgba(10, 10, 10, 0) 76%),
+      var(--ground);
+  }
+
+  .phone-frame-device {
+    display: block;
+    position: relative;
+    zoom: var(--phone-scale);
+    padding: 10px 11px;
+    border-radius: 72px;
+    background: var(--device);
+    box-shadow:
+      0 0 0 1px #000,
+      0 0 0 3px var(--device-band),
+      0 0 0 4px var(--device-band-edge),
+      inset 0 0 0 1px var(--device-inner),
+      0 40px 100px rgba(0, 0, 0, 0.7);
+  }
+
+  /* The side buttons */
+  .phone-frame-device::before {
+    content: "";
+    position: absolute;
+    right: -6px;
+    top: 200px;
+    width: 3px;
+    height: 96px;
+    border-radius: 0 2px 2px 0;
+    background: var(--device-button);
+    box-shadow: 0 -64px 0 var(--device-button);
+  }
+
+  .phone-frame-hole {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 21px;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #18201f 0, var(--device) 65%);
+    box-shadow: 0 0 0 1px #000;
+  }
+
+  /* Its own stacking context, so sheets stay under the punch hole; scrolling stays inside it */
+  .phone-frame-screen {
+    position: relative;
+    z-index: 0;
+    width: 402px;
+    height: 874px;
+    min-height: 0;
+    max-width: none;
+    margin: 0;
+    border-radius: 62px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    background: var(--ground);
+  }
+
+  .phone-frame-screen::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* No status bar: the top bar starts beside the punch hole */
+  .phone-frame-screen .screen {
+    padding-top: 18px;
+  }
+
+  .phone-frame-side {
+    display: flex;
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  .phone-frame-left {
+    justify-content: flex-end;
+  }
+
+  /* The phone's 40 px, scaled with it, or smaller where the space beside the phone is narrow */
+  .phone-frame-mark {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: min(calc(40px * var(--phone-scale)), 17cqi);
+    line-height: 1;
+    letter-spacing: 0.3em;
+    white-space: nowrap;
+    color: var(--gold-dim);
+  }
+
+  /* Spaced tighter, so the two halves come out near the same width */
+  .phone-frame-left .phone-frame-mark {
+    letter-spacing: 0.12em;
+    margin-right: -0.12em;
+  }
+
+  .phone-frame-o {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.94em;
+    margin: 0 0.3em 0 0.08em;
+    vertical-align: -0.1em;
+  }
+
+  /* Too small to read */
+  @container (max-width: 119px) {
+    .phone-frame-mark {
+      display: none;
+    }
+  }
+}

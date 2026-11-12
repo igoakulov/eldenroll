@@ -105,6 +105,35 @@
   }
 }
 
+.wordmark-loading > span {
+  visibility: hidden;
+}
+
+/* The one motion that runs on its own while the player waits */
+.wordmark-loading .wordmark-o {
+  animation: wordmark-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes wordmark-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark-loading .wordmark-o {
+    animation: none;
+  }
+}
+
+.start-failed {
+  margin: 48px 28px 0;
+  font-style: italic;
+  font-size: 18px;
+  text-align: center;
+  color: var(--text-2);
+}
+
 .legal {
   margin: 36px var(--gutter) 0;
   font-size: 15px;

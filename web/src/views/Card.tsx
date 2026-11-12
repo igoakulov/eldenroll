@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 
 import { ARMOR_PIECES, displaySlots, type SlotDisplay } from "../engine/display";
 import type { EngineData } from "../engine/engineData";
-import { WAITING_MESSAGES, objectiveNumber, type Objective, type RerollTarget, type Run } from "../engine/run";
+import { objectiveNumber, type Objective, type RerollTarget, type Run } from "../engine/run";
 import { derivedLevel } from "../engine/settings";
 import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SlotHeading } from "../ui/Headings";
@@ -17,6 +17,13 @@ import "./Card.css";
 
 /** How a card arrives: a new objective in full, a full-objective reroll quicker, or `Resume` with a fade only. */
 export type Reveal = "full" | "quick" | "none";
+
+/** A run between objectives shows `Level up` instead of the card. */
+export type RunWithObjective = Run & { readonly current: Objective };
+
+export function hasObjective(run: Run): run is RunWithObjective {
+  return run.current !== null;
+}
 
 /** When the sequence ends at full speed (internal/design.md#Sequences); a tap anywhere ends it early. */
 const REVEAL_MS = 1800;
@@ -98,8 +105,8 @@ function changeKeys(objective: Objective) {
 
 type Part = keyof ReturnType<typeof changeKeys>;
 
-function changedParts(from: Objective | null, to: Objective | null): ReadonlySet<Part> {
-  if (from === null || to === null || from === to) return new Set();
+function changedParts(from: Objective, to: Objective): ReadonlySet<Part> {
+  if (from === to) return new Set();
   const before = changeKeys(from);
   const after = changeKeys(to);
   return new Set((Object.keys(before) as Part[]).filter((part) => before[part] !== after[part]));
@@ -204,7 +211,7 @@ export function Card({
   menu,
 }: {
   readonly data: EngineData;
-  readonly run: Run;
+  readonly run: RunWithObjective;
   readonly reveal: Reveal;
   readonly onReroll: (target: RerollTarget) => void;
   readonly onDone: () => void;
@@ -241,15 +248,6 @@ export function Card({
   const runMenu = menu === undefined ? null : (
     <RunMenu open={menuOpen} run={run} actions={menu} onClose={() => setMenuOpen(false)} />
   );
-
-  if (objective === null) {
-    return (
-      <Screen className="card" sheet={runMenu}>
-        {top}
-        <p className="card-waiting">{run.waiting === null ? "" : WAITING_MESSAGES[run.waiting]}</p>
-      </Screen>
-    );
-  }
 
   const boss = data.bosses.get(objective.boss);
   const characterClass = data.database.character_class.find((row) => row.id === objective.characterClass);

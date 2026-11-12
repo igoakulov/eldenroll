@@ -5,6 +5,7 @@ import type { Run } from "../engine/run";
 import { derivedLevel, type Stats } from "../engine/settings";
 import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SectionHeading } from "../ui/Headings";
+import { WordmarkO } from "../ui/Icon";
 import { LevelTotal } from "../ui/LevelTotal";
 import { FramedRow, ListRow } from "../ui/Rows";
 import { Screen } from "../ui/Screen";
@@ -16,16 +17,20 @@ import "./Start.css";
 export const DISCLAIMER =
   "Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.";
 
-function Wordmark() {
+/** While the game data loads, only the lozenge shows, pulsing, in its place in the wordmark, so Start appears
+ * around it without the page moving. */
+function Wordmark({ loading = false }: { readonly loading?: boolean }) {
+  const Tag = loading ? "p" : "h1";
   return (
-    <h1 className="wordmark" aria-label="EldenRoll">
+    <Tag
+      className={`wordmark${loading ? " wordmark-loading" : ""}`}
+      role={loading ? "status" : undefined}
+      aria-label={loading ? "Loading" : "EldenRoll"}
+    >
       <span aria-hidden="true">ELDENR</span>
-      <svg className="wordmark-o" viewBox="0 0 20 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
-        <path d="M10 1.6L18.4 12 10 22.4 1.6 12z" />
-        <path d="M10 7.4L13.8 12 10 16.6 6.2 12z" fill="currentColor" stroke="none" />
-      </svg>
+      <WordmarkO className="wordmark-o" />
       <span aria-hidden="true">LL</span>
-    </h1>
+    </Tag>
   );
 }
 
@@ -134,6 +139,38 @@ export function StartResume({
         </div>
       </section>
       <p className="legal legal-low">{DISCLAIMER}</p>
+    </Screen>
+  );
+}
+
+export function StartLoading() {
+  return (
+    <Screen mist="centre">
+      <header className="hero">
+        <Wordmark loading />
+      </header>
+    </Screen>
+  );
+}
+
+/** The game data could not load: offline on a first visit, or the server failed. */
+export function StartFailed({ onRetry }: { readonly onRetry: () => void }) {
+  return (
+    <Screen
+      mist="centre"
+      bottom={
+        <BottomBar>
+          <GlowBand onClick={onRetry}>Try again</GlowBand>
+        </BottomBar>
+      }
+    >
+      <header className="hero">
+        <Wordmark />
+      </header>
+      <p className="start-failed" role="alert">
+        The game data could not be loaded. Check your connection, then try again.
+      </p>
+      <p className="legal">{DISCLAIMER}</p>
     </Screen>
   );
 }

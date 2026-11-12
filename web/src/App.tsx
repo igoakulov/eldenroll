@@ -20,10 +20,10 @@ import {
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { formatTrace } from "./engine/trace";
 import { loadDatabase } from "./loadDatabase";
-import { Lozenge } from "./ui/Icon";
+import { PhoneFrame } from "./ui/PhoneFrame";
 import { boardBefore, boardOf, countState, inState } from "./views/bossList";
 import { Bosses } from "./views/Bosses";
-import { Card, type Reveal } from "./views/Card";
+import { Card, hasObjective, type Reveal } from "./views/Card";
 import { Felled } from "./views/Felled";
 import { neverRollEntries, shortlistEntries } from "./views/gearList";
 import { LevelUp } from "./views/LevelUp";
@@ -31,8 +31,7 @@ import { rerollTarget } from "./views/rerollScope";
 import { RoldCard } from "./views/RoldCard";
 import { runTitle, type RunMenuActions } from "./views/RunMenu";
 import { RunSettings, type RunLists, type SettingsTab } from "./views/RunSettings";
-import { Start, StartResume } from "./views/Start";
-import "./App.css";
+import { Start, StartFailed, StartLoading, StartResume } from "./views/Start";
 
 type Loaded =
   | { readonly status: "loading" }
@@ -168,8 +167,8 @@ function Game({ database }: { readonly database: Database }) {
     );
   }
 
-  if ((view === "felled" || view === "rerolling") && run !== null && undoTo !== null) {
-    const boss = undoTo.current === null ? undefined : engine.data.bosses.get(undoTo.current.boss);
+  if ((view === "felled" || view === "rerolling") && run !== null && undoTo !== null && hasObjective(undoTo)) {
+    const boss = engine.data.bosses.get(undoTo.current.boss);
     const noop = () => {};
     return (
       <Felled
@@ -207,7 +206,8 @@ function Game({ database }: { readonly database: Database }) {
     );
   }
 
-  if (view === "level" && run !== null) {
+  // A run with no objective, as after a reroll that finds no class to roll, waits on `Level up`
+  if (run !== null && (view === "level" || (view === "card" && run.current === null))) {
     const mid = run.current !== null;
     return (
       <LevelUp
@@ -233,7 +233,7 @@ function Game({ database }: { readonly database: Database }) {
     );
   }
 
-  if (view === "card" && run !== null) {
+  if (view === "card" && run !== null && hasObjective(run)) {
     return (
       <Card
         key={reveal.id}
@@ -241,7 +241,6 @@ function Game({ database }: { readonly database: Database }) {
         run={run}
         reveal={reveal.kind}
         onReroll={(target) => {
-          if (run.current === null) return;
           const next = reroll(engine, run, rerollTarget(run.current.slots, target));
           setRun(next);
           printTrace(next);
@@ -315,28 +314,37 @@ function Game({ database }: { readonly database: Database }) {
 
 export function App() {
   const [state, setState] = useState<Loaded>({ status: "loading" });
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
+    let current = true;
     loadDatabase()
-      .then((database) => setState({ status: "ready", database }))
-      .catch(() => setState({ status: "failed" }));
-  }, []);
+      .then((database) => {
+        if (current) setState({ status: "ready", database });
+      })
+      .catch((error: unknown) => {
+        console.error(error);
+        if (current) setState({ status: "failed" });
+      });
+    return () => {
+      current = false;
+    };
+  }, [attempt]);
 
   return (
-    <div className="app">
+    <PhoneFrame>
       {state.status === "ready" ? (
         <Game database={state.database} />
+      ) : state.status === "loading" ? (
+        <StartLoading />
       ) : (
-        <div className="app-waiting">
-          {state.status === "loading" ? (
-            <span className="app-loading" role="status" aria-label="Loading">
-              <Lozenge size={28} />
-            </span>
-          ) : (
-            <p>The game data could not be loaded.</p>
-          )}
-        </div>
+        <StartFailed
+          onRetry={() => {
+            setState({ status: "loading" });
+            setAttempt((n) => n + 1);
+          }}
+        />
       )}
-    </div>
+    </PhoneFrame>
   );
 }
