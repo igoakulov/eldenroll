@@ -2,12 +2,41 @@
   padding: var(--space-7) var(--gutter) var(--space-10);
 }
 
+/* The app's wordmark, as Start draws it, over the page's name */
 .kit-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-weight: 400;
+}
+
+.kit-wordmark {
   font-family: var(--display);
   font-weight: 600;
-  font-size: var(--type-large);
-  letter-spacing: var(--tracking-tight);
-  color: var(--gold);
+  font-size: var(--type-wordmark);
+  line-height: var(--leading);
+  letter-spacing: var(--tracking-wide);
+  color: var(--grace);
+  text-shadow: var(--glow-quiet);
+}
+
+.kit-wordmark-o {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.94em;
+  margin: 0 0.3em 0 0.08em;
+  vertical-align: -0.1em;
+  filter: drop-shadow(var(--glow-small));
+}
+
+.kit-subtitle {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--gold-mute);
 }
 
 .kit-contents ul {

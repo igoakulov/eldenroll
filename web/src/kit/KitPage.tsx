@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { Database } from "../engine/database";
 import { loadDatabase } from "../loadDatabase";
+import { WordmarkO } from "../ui/Icon";
 import { Blocks, MissingEntries } from "./Blocks";
 import { KitFrame } from "./kit";
 import { kitData, type KitData } from "./kitData";
@@ -157,7 +158,14 @@ export function KitPage() {
 
   return (
     <div className="kit-page">
-      <h1 className="kit-title">EldenRoll UI kit</h1>
+      <h1 className="kit-title" aria-label="EldenRoll UI kit">
+        <span className="kit-wordmark" aria-hidden="true">
+          ELDENR
+          <WordmarkO className="kit-wordmark-o" />
+          LL
+        </span>
+        <span className="kit-subtitle" aria-hidden="true">UI kit</span>
+      </h1>
       <nav className="kit-contents" aria-label="Contents">
         <ul>
           {SECTIONS.map((section) => (
