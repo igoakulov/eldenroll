@@ -95,8 +95,9 @@ From the public `deliton/eldenring-api` dataset, base game only. Its other files
 
 ## Wiki lookups
 
-- Fextralife links are built from names, not looked up: `pipeline/eldenroll/build/wiki.py` builds each row's page from its name, accents dropped (`Great+Epee`). They are checked by hand in a browser, since Fextralife refuses scripted reads. A page whose name carries a suffix, such as `Beast+Claw+(Weapon)`, or any other miss, gets a row in `data/overrides/wiki_urls.csv`.
-- An Ash of War's page is built as `Ash of War: <name>`. That naming is a lead from reading the wiki, not verified.
+- Fextralife links are built from names, not looked up: `pipeline/eldenroll/build/wiki.py` builds each row's page from its name, accents dropped (`Great+Epee`), and an Ash of War's as `Ash of War: <name>`. They are checked by hand in a browser, since Fextralife refuses scripted reads.
+- A miss gets a row in `data/overrides/wiki_urls.csv`, never a new name: the app shows the game's names, and a variant set we split off shares its base set's page. Misses are pages with a suffix (`Beast+Claw+(Weapon)`), a duo's own page, the wiki's own spelling (`Spirit-Caller Snail`) and group pages. An alias has no name to build from, so its link comes only from that file.
+- `&` doesn't reach a page named with `and`: `Nox+Swordstress+%26+Nox+Monk` misses where `Nox+Swordstress+and+Nox+Monk` lands.
 - Look up only what the data lacks. No wiki is authoritative: Fextralife can be wrong, and existing records are not re-verified against it.
 - wiki.gg marks the same clashes with `(weapon)` and `(spell)`.
 - Fandom's boss count of 238 is not a checkable target: its lists add up to 209.

@@ -13,7 +13,7 @@ export type SlotDisplay =
   | { readonly kind: "none" }
   | { readonly kind: "any" }
   | { readonly kind: "item"; readonly item: Item }
-  | { readonly kind: "alias"; readonly label: string; readonly item: Item }
+  | { readonly kind: "alias"; readonly label: string; readonly url: string | null; readonly item: Item }
   | { readonly kind: "rule"; readonly rule: CombatRule }
   | {
       readonly kind: "armor_set";
@@ -57,8 +57,8 @@ function shown(data: EngineData, slots: RolledSlots, slot: PoolSlot): SlotDispla
 }
 
 function itemShown(data: EngineData, item: Item): SlotDisplay {
-  const label = item.alias === null ? undefined : data.aliasLabels.get(item.alias);
-  return label === undefined ? { kind: "item", item } : { kind: "alias", label, item };
+  const alias = item.alias === null ? undefined : data.aliases.get(item.alias);
+  return alias === undefined ? { kind: "item", item } : { kind: "alias", label: alias.label, url: alias.url, item };
 }
 
 /** The one slot whose missing result shows `any`: the player picks the ash, unless the hand is

@@ -1,3 +1,66 @@
 kind,id,url,reason
 item,beast_claw,https://eldenring.wiki.fextralife.com/Beast+Claw+(Weapon),Fextralife page name carries a suffix
 item,land_of_shadow,https://eldenring.wiki.fextralife.com/Land+of+Shadow+(Incantation),Fextralife page name carries a suffix
+item,finger_robe_high_priest_robe_altered,https://eldenring.wiki.fextralife.com/Finger+Robe,Fextralife covers the altered piece on the base piece's page
+item,beast_claw_incantation,https://eldenring.wiki.fextralife.com/Beast+Claw,Fextralife's page for the incantation; the weapon's carries a suffix
+armor_set,albinaurics_set,https://eldenring.wiki.fextralife.com/Albinauric+Set,Fextralife names the page differently
+armor_set,banished_knight_set_caped,https://eldenring.wiki.fextralife.com/Banished+Knight+Set,Fextralife covers this variant on the base set's page
+armor_set,divine_beast_warrior_set,https://eldenring.wiki.fextralife.com/Divine+Beast+Set,Fextralife names the page differently
+armor_set,divine_bird_warrior_set,https://eldenring.wiki.fextralife.com/Divine+Bird+Set,Fextralife names the page differently
+armor_set,eccentrics_set,https://eldenring.wiki.fextralife.com/Eccentric+Set,Fextralife names the page differently
+armor_set,fire_prelate_set_altered,https://eldenring.wiki.fextralife.com/Fire+Prelate+Set,Fextralife covers this variant on the base set's page
+armor_set,highland_warrior,https://eldenring.wiki.fextralife.com/Highland+Warrior+Set,Fextralife names the page differently
+armor_set,highland_warrior_gloried,https://eldenring.wiki.fextralife.com/Highland+Warrior+Set,Fextralife covers this variant on the base set's page
+armor_set,marais_set,https://eldenring.wiki.fextralife.com/House+Marais+Set,Fextralife names the page differently
+armor_set,nobles_traveling_set,https://eldenring.wiki.fextralife.com/Noble's+Set,Fextralife covers this variant on the base set's page
+armor_set,perfumers_set,https://eldenring.wiki.fextralife.com/Perfumer+Set,Fextralife names the page differently
+armor_set,perfumers_traveling_set,https://eldenring.wiki.fextralife.com/Perfumer+Traveler's+Set,Fextralife covers this variant on the base set's page
+armor_set,raya_lucaria_set,https://eldenring.wiki.fextralife.com/Raya+Lucarian+Sorcerer+Set,Fextralife names the page differently
+armor_set,spellblades_set,https://eldenring.wiki.fextralife.com/Spellblade+Set,Fextralife names the page differently
+armor_set,steel_set,https://eldenring.wiki.fextralife.com/Steel+Armor+Set,Fextralife names the page differently
+armor_set,traveling_surgeon_set,https://eldenring.wiki.fextralife.com/Traveler's+Set,Fextralife covers this variant on the base set's page
+armor_set,leontiels_set,https://eldenring.wiki.fextralife.com/Leontiel%E2%80%99s+Armor+Set,Fextralife names the page differently
+armor_set,ledas_knight_set,https://eldenring.wiki.fextralife.com/Leda's+Armor,Fextralife names the page differently
+armor_set,ledas_surgeon_set,https://eldenring.wiki.fextralife.com/Leda's+Armor,Fextralife covers this variant on the base set's page
+armor_set,hoslows_surgeon_set,https://eldenring.wiki.fextralife.com/Hoslow's+Set,Fextralife covers this variant on the base set's page
+armor_set,finger_surgeon_set,https://eldenring.wiki.fextralife.com/High+Priest+Set,Fextralife covers this variant on the base set's page
+armor_set,twinned_surgeon_set,https://eldenring.wiki.fextralife.com/Twinned+Set,Fextralife covers this variant on the base set's page
+armor_set,snow_surgeon_set,https://eldenring.wiki.fextralife.com/Snow+Witch+Set,Fextralife covers this variant on the base set's page
+armor_set,marais_surgeon_set,https://eldenring.wiki.fextralife.com/House+Marais+Set,Fextralife covers this variant on the base set's page
+armor_set,blue_surgeon_set,https://eldenring.wiki.fextralife.com/Blue+Cloth+Set,Fextralife covers this variant on the base set's page
+armor_set,white_reed_surgeon_set,https://eldenring.wiki.fextralife.com/White+Reed+Set,Fextralife covers this variant on the base set's page
+armor_set,banished_surgeon_set,https://eldenring.wiki.fextralife.com/Banished+Knight+Set,Fextralife covers this variant on the base set's page
+armor_set,naked_set,https://eldenring.wiki.fextralife.com/Blue+Dancer+Charm,the owner's Blue Dancer set; no armor has no page of its own
+armor_set,fell_omen_set,https://eldenring.wiki.fextralife.com/Fell+Omen+Cloak,Fextralife names the page differently
+armor_set,guilty_lite_set,https://eldenring.wiki.fextralife.com/Guilty+Set,Fextralife covers this variant on the base set's page
+armor_set,prisoner_lite_set,https://eldenring.wiki.fextralife.com/Prisoner+Set,Fextralife covers this variant on the base set's page
+armor_set,commoners_lite_set,https://eldenring.wiki.fextralife.com/Commoner's+Set,Fextralife covers this variant on the base set's page
+armor_set,mutated_mushroom_set,https://eldenring.wiki.fextralife.com/Mushroom+Set,Fextralife names the page differently
+armor_set,infected_prophet_set,https://eldenring.wiki.fextralife.com/Prophet+Set,Fextralife covers this variant on the base set's page
+armor_set,infected_fell_omen_set,https://eldenring.wiki.fextralife.com/Fell+Omen+Cloak,Fextralife covers this variant on the base set's page
+armor_set,infected_cleanrot_set,https://eldenring.wiki.fextralife.com/Cleanrot+Set,Fextralife covers this variant on the base set's page
+armor_set,infected_guardian_set,https://eldenring.wiki.fextralife.com/Guardian+Set,Fextralife covers this variant on the base set's page
+boss_instance,misbegotten_warrior_crucible_knight_caelid_redmane_castle,https://eldenring.wiki.fextralife.com/Crucible+Knight+and+Misbegotten+Warrior,Fextralife's page for the duo
+boss_instance,nox_swordstress_nox_monk_caelid_west_sellia_sellia_crystal_tunnel_entrance,https://eldenring.wiki.fextralife.com/Nox+Swordstress+and+Nox+Monk,Fextralife's page for the duo; only 'and' reaches it
+boss_instance,fell_twin_divine_tower_of_east_altus,https://eldenring.wiki.fextralife.com/Fell+Twins,Fextralife's page for the duo
+boss_instance,omenkiller_miranda_the_blighted_bloom_perfumers_grotto,"https://eldenring.wiki.fextralife.com/Omenkiller+and+Miranda,+the+Blighted+Bloom",Fextralife's page for the duo
+boss_instance,spiritcaller_snail_roads_end_catacombs,https://eldenring.wiki.fextralife.com/Spirit-Caller+Snail,Fextralife spells it Spirit-Caller
+boss_instance,putrid_crystalian_sellia_hideaway,https://eldenring.wiki.fextralife.com/Putrid+Crystalians,Fextralife's page for the duo
+boss_instance,nights_cavalry_duo_southwest_mountaintops,https://eldenring.wiki.fextralife.com/Night's+Cavalry,Fextralife has no page for the duo; it is on the shared page
+boss_instance,spiritcaller_snail_spiritcaller_cave,https://eldenring.wiki.fextralife.com/Spirit-Caller+Snail,Fextralife spells it Spirit-Caller
+boss_instance,radagon_elden_beast_stone_platform,https://eldenring.wiki.fextralife.com/Radagon+of+the+Golden+Order,owner's call: Radagon's page covers both phases
+boss_instance,perfumer_tricia_misbegotten_warrior_unsightly_catacombs,https://eldenring.wiki.fextralife.com/Perfumer+Tricia,Fextralife has no page for the duo; it is on Tricia's page
+boss_instance,abductor_virgin_volcano_manor,https://eldenring.wiki.fextralife.com/Abductor+Virgins,Fextralife's page for the duo
+boss_instance,dryleaf_dane_scadu_altus_moorth_ruins_bonny_village_west_entrance,https://eldenring.wiki.fextralife.com/Dryleaf+Dane+(Boss),Fextralife page name carries a suffix
+boss_instance,leda_and_allies_enir_ilim,https://eldenring.wiki.fextralife.com/Leda+and+Allies+Boss,Fextralife page name carries a suffix
+boss_instance,crucible_knight_devonia_ancient_ruins_of_rauh_west_ruins_northeast_cliffside_east_ruins_cave_exit,"https://eldenring.wiki.fextralife.com/Devonia,+Crucible+Knight",Fextralife names the page differently
+alias,any_staff,https://eldenring.wiki.fextralife.com/Glintstone_Staffs,Fextralife's group page for the alias
+alias,any_seal,https://eldenring.wiki.fextralife.com/Sacred_Seals,Fextralife's group page for the alias
+alias,any_torch,https://eldenring.wiki.fextralife.com/Torches,Fextralife's group page for the alias
+alias,any_perfume_bottle,https://eldenring.wiki.fextralife.com/Perfume_Bottles,Fextralife's group page for the alias
+alias,any_parry_ash,https://eldenring.wiki.fextralife.com/Ashes_of_War#tabber-Table,Fextralife's group page for the alias
+alias,any_crucible_talisman,https://eldenring.wiki.fextralife.com/Talismans#tabber-Elden_Ring_Talismans_Gallery,Fextralife's group page for the alias
+alias,any_scorpion_charm,https://eldenring.wiki.fextralife.com/Talismans#tabber-Elden_Ring_Talismans_Gallery,Fextralife's group page for the alias
+alias,any_scarseal_soreseal,https://eldenring.wiki.fextralife.com/Talismans#tabber-Elden_Ring_Talismans_Gallery,Fextralife's group page for the alias
+alias,any_pots_perfumes,https://eldenring.wiki.fextralife.com/Consumables#tabber-Table,Fextralife's group page for the alias
+alias,other_throwables_not_pots_perfumes,https://eldenring.wiki.fextralife.com/Consumables#tabber-Table,Fextralife's group page for the alias

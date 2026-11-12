@@ -13,3 +13,4 @@ from dataclasses import dataclass
 class Alias:
     id: str
     label: str
+    url: str | None = None

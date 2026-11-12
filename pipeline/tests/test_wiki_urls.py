@@ -1,4 +1,4 @@
-"""Tests for the Fextralife links on the item, armor set and boss tables
+"""Tests for the Fextralife links on the item, armor set, boss and alias tables
 (`data/sources/README.md#Wiki lookups`)."""
 
 from __future__ import annotations
@@ -22,12 +22,17 @@ def data() -> GateData:
     return load_gate_data(ROOT)
 
 
-def test_every_rollable_row_links_to_a_fextralife_page(data: GateData) -> None:
-    rollable_items = [row for row in data.database.items if row.odds > 0 and row.category != "none"]
+def _is_none(row: object) -> bool:
+    return "none" in (getattr(row, "category", None), getattr(row, "alias", None))
+
+
+def test_every_rollable_row_and_alias_links_to_a_fextralife_page(data: GateData) -> None:
+    rollable_items = [row for row in data.database.items if row.odds > 0 and not _is_none(row)]
     rollable = [
         *rollable_items,
         *(row for row in data.database.armor_sets if row.odds > 0),
         *(row for row in data.database.bosses if row.odds > 0),
+        *(row for row in data.database.aliases if row.id != "none"),
     ]
     assert rollable_items and data.database.armor_sets and data.database.bosses
     for row in rollable:
@@ -38,10 +43,11 @@ def test_a_row_that_never_rolls_or_is_none_has_no_link(data: GateData) -> None:
     unlinked = [
         row
         for row in (*data.database.items, *data.database.armor_sets, *data.database.bosses)
-        if row.odds <= 0 or getattr(row, "category", None) == "none"
+        if row.odds <= 0 or _is_none(row)
     ]
-    assert unlinked
+    assert any(getattr(row, "alias", None) == "none" for row in unlinked)
     assert all(row.url is None for row in unlinked)
+    assert next(row for row in data.database.aliases if row.id == "none").url is None
 
 
 def test_an_accented_name_gives_plain_letters(data: GateData) -> None:
@@ -75,10 +81,16 @@ def test_a_seeded_override_wins_over_the_built_url(data: GateData) -> None:
     with OVERRIDES.open(encoding="utf-8", newline="") as handle:
         seeded = [row for row in csv.DictReader(handle) if row["url"]]
     assert seeded
+    tables = {
+        "item": data.database.items,
+        "armor_set": data.database.armor_sets,
+        "boss_instance": data.database.bosses,
+        "alias": data.database.aliases,
+    }
     for row in seeded:
-        built = next(item for item in data.database.items if item.id == row["id"])
-        assert built.url == row["url"]
-        assert built.url != wiki_url(built.name)
+        built = next(one for one in tables[row["kind"]] if one.id == row["id"])
+        assert built.url == row["url"], row["id"]
+        assert built.url != wiki_url(getattr(built, "name", "")), row["id"]
 
 
 def test_an_empty_override_means_no_link(data: GateData) -> None:

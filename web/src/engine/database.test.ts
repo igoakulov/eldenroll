@@ -38,7 +38,7 @@ const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number]
   combat_rule: { id: true, name: true, odds: true },
   character_class: { id: true, name: true, odds: true },
   slot_pool: { character_class_id: true, slot: true, selectors: true },
-  alias: { id: true, label: true },
+  alias: { id: true, label: true, url: true },
   item_location: { item_id: true, location_id: true, boss_instance_id: true },
   modifier: { id: true, when: true, target: true, value: true },
 };

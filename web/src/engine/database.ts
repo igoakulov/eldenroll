@@ -120,6 +120,8 @@ export interface SlotPool {
 export interface Alias {
   readonly id: string;
   readonly label: string;
+  /** A group page on the wiki, or `null` for `None`. */
+  readonly url: string | null;
 }
 
 export interface ItemLocation {

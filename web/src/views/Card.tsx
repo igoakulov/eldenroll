@@ -53,8 +53,9 @@ function nameOf(display: SlotDisplay): string | null {
   }
 }
 
-/** Only a real item or set has a page: `none`, `any` and an alias's label have none. */
+/** An item, set or alias has a page; `none` and `any` have none. */
 function linkOf(display: SlotDisplay): WikiLink | null {
+  if (display.kind === "alias" && display.url !== null) return { name: display.label, url: display.url };
   if (display.kind === "item" && display.item.url !== null) return { name: display.item.name, url: display.item.url };
   if (display.kind === "armor_set" && display.set.url !== null) return { name: display.set.name, url: display.set.url };
   return null;

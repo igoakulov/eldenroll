@@ -43,7 +43,7 @@ Notable game data it does not store or use:
 - **`str_bonus_2h`** follows the weapon class, with exceptions in `overrides/str_bonus_2h.csv`. Every ranged class keeps it.
 - **`boss_instance.location`** is the short place the player sees (#Bosses). The sheet's label only builds the id and matches override rows; it never ships.
 - **`image`** stays `null` while the MVP has no item pictures; every item shows its subcategory icon until pictures come back.
-- **`url`** is the row's Fextralife page, built from its name and checked by hand, not by the build (`data/sources/README.md#Wiki lookups`). `none` and rows at `odds = 0` have `null`.
+- **`url`** is the row's Fextralife page, built from its name and checked by hand, not by the build (`data/sources/README.md#Wiki lookups`). An alias links to the wiki's page for the whole group, such as all glintstone staves. `none`, the `None` armor pieces, the `None` alias and rows at `odds = 0` have `null`.
 
 ## Catalog decisions
 

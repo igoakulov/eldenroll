@@ -16,7 +16,12 @@ describe("displaySlots", () => {
 
   it("shows an alias member as its label, and keeps the member it rolled", () => {
     const shown = displaySlots(data, { rh: "astrologers_staff", lh: "brass_shield", lh_ash: "parry" });
-    expect(shown.rh).toEqual({ kind: "alias", label: "Any staff", item: data.items.get("astrologers_staff") });
+    expect(shown.rh).toEqual({
+      kind: "alias",
+      label: "Any staff",
+      url: data.aliases.get("any_staff")?.url,
+      item: data.items.get("astrologers_staff"),
+    });
     expect(shown.lh.kind).toBe("item");
     expect(shown.lh_ash).toMatchObject({ kind: "alias", label: "Any parry ash" });
   });
