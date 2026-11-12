@@ -77,8 +77,8 @@ describe("slot pools on the real data", () => {
     expect(weightOf(pool("knight", "rule_1"), "none")).toBe(4);
   });
 
-  it("gives Jester's empty hand its x4, and only there", () => {
-    expect(weightOf(pool("jester", "rh"), "none")).toBe(4);
+  it("gives Jester's empty hand its x6, and only there", () => {
+    expect(weightOf(pool("jester", "rh"), "none")).toBe(6);
     expect(weightOf(pool("warrior_2h", "lh"), "none")).toBe(1);
   });
 

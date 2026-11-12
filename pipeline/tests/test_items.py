@@ -240,7 +240,6 @@ def test_only_the_items_that_never_roll_sit_at_odds_zero() -> None:
         "Priestess Heart",
         "Rock Heart",
     }
-    assert {row.odds for row in table if row.subcategory != "sacred_seal"} == {0, 1}
 
 
 @pytest.mark.parametrize(

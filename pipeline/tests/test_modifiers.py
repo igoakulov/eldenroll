@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from eldenroll.build.modifiers import build_modifiers
+from eldenroll.build.modifiers import bosses_of_region, build_modifiers
 from eldenroll.build.slot_pools import build_slot_pools
 from eldenroll.errors import BuildError
 from eldenroll.loaders.character_classes import load_slot_pools
@@ -74,12 +74,15 @@ def data() -> PlacementData:
 
 
 @pytest.fixture(scope="module")
-def modifiers() -> tuple[Modifier, ...]:
-    return build_modifiers(load_modifiers(OVERRIDES / "modifiers.csv"))
+def modifiers(data: PlacementData) -> tuple[Modifier, ...]:
+    return build_modifiers(
+        load_modifiers(OVERRIDES / "modifiers.csv"),
+        bosses_of_region(data.bosses, data.region_of_location),
+    )
 
 
 def _validate(rows: tuple[Modifier, ...], data: PlacementData) -> None:
-    rules =[rule.id for rule in load_combat_rules(OVERRIDES / "combat_rules.csv")]
+    rules = [rule.id for rule in load_combat_rules(OVERRIDES / "combat_rules.csv")]
     validate_modifiers(rows, known_ids(data.table, data.armor_sets, data.bosses, rules))
 
 
@@ -251,7 +254,6 @@ def test_a_target_rolled_before_its_condition_fails(data: PlacementData) -> None
     ("talismans", "kind", "targets", "value"),
     [
         (("claw_talisman",), "rule", ("jump_attacks_only",), 1000000),
-        (("claw_talisman",), "armor_set", ("gravebird_set", "raptors_set"), 10000),
         (("shard_of_alexander", "warrior_jar_shard"), "rule", ("l2_only",), 1000000),
         (("axe_talisman",), "rule", ("charged_r2_only", "drink_stonebarb_cracked_tear"), 1000000),
     ],
@@ -275,7 +277,9 @@ def test_jump_attacks_boost_the_jump_sets_from_either_rule(
 ) -> None:
     condition = RolledCondition(slot, Selector("rule", ("jump_attacks_only",)))
     rows = [
-        row for row in modifiers if row.when == (condition,) and row.target.kind == "armor_set"
+        row
+        for row in modifiers
+        if row.when == (condition,) and row.target.kind == "armor_set" and row.value > 0
     ]
     assert [(row.target, row.value) for row in rows] == [
         (Selector("armor_set", ("gravebird_set", "raptors_set")), 10000)
@@ -289,7 +293,9 @@ def test_dancers_weapons_reach_the_set_and_talismans_from_either_hand(
     rows = [
         row
         for row in modifiers
-        if len(row.when) == 1
+        if row.id.startswith("dancers_weapon_")
+        and row.value > 0
+        and len(row.when) == 1
         and isinstance(row.when[0], RolledCondition)
         and row.when[0].slot == hand
         and "hand_of_malenia" in (row.when[0].selector.ids or ())
@@ -329,11 +335,11 @@ def test_blue_dancer_charm_needs_light_hands(modifiers: tuple[Modifier, ...]) ->
 
 
 def test_jester_favours_an_empty_right_hand(modifiers: tuple[Modifier, ...]) -> None:
-    row = next(one for one in modifiers if one.id == "jester_none_x4")
+    row = next(one for one in modifiers if one.id == "jester_none_x6")
     assert (row.when, row.target, row.value) == (
         (CharacterClassCondition(("jester",)),),
         Selector("item", ("none",)),
-        4,
+        6,
     )
 
 

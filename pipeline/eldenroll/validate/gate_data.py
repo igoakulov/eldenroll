@@ -8,7 +8,7 @@ from eldenroll.build.aliases import build_aliases
 from eldenroll.build.boss_table import load_boss_overrides, load_boss_rows
 from eldenroll.build.bosses import BossOverrides
 from eldenroll.build.locations import build_locations
-from eldenroll.build.modifiers import build_modifiers
+from eldenroll.build.modifiers import bosses_of_region, build_modifiers
 from eldenroll.build.placement import DroppedValue, dropped_values, item_locations
 from eldenroll.build.slot_pools import build_slot_pools
 from eldenroll.build.wiki import with_wiki_urls
@@ -61,7 +61,10 @@ def load_gate_data(root: Path) -> GateData:
                 slot_pools=build_slot_pools(load_slot_pools(overrides / "slot_pools.csv")),
                 aliases=build_aliases(alias_rows),
                 item_locations=item_locations(placement.placements),
-                modifiers=build_modifiers(load_modifiers(overrides / "modifiers.csv")),
+                modifiers=build_modifiers(
+                    load_modifiers(overrides / "modifiers.csv"),
+                    bosses_of_region(placement.bosses, placement.region_of_location),
+                ),
             ),
             load_wiki_urls(overrides / "wiki_urls.csv"),
         ),

@@ -262,7 +262,7 @@ describe("class shapes", () => {
 });
 
 describe("armor", () => {
-  it("makes Raptor's or Gravebird nearly certain after a Claw Talisman", () => {
+  it("makes Raptor's or Gravebird nearly certain under Jump attacks only", () => {
     const random = seeded(5);
     const jumpSets = ["raptors_set", "gravebird_set"];
     let hits = 0;
@@ -275,7 +275,7 @@ describe("armor", () => {
         limits: { stats: MAXED, maxStatGap: 0 },
         random,
         from: "armor",
-        kept: { talisman_1: "claw_talisman" },
+        kept: { rule_1: "jump_attacks_only" },
       });
       if (jumpSets.includes(id(loadout, "armor") ?? "")) hits += 1;
     }

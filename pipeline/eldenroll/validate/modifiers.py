@@ -60,7 +60,7 @@ def validate_rolling_order(
 def _rolls_after_conditions(
     row: Modifier, resolved: Mapping[tuple[str, str], AbstractSet[str]], table: tuple[Item, ...]
 ) -> bool:
-    slots = [SLOTS.index(one.slot) for one in row.when if isinstance(one, RolledCondition)]
+    slots = [_order(one.slot) for one in row.when if isinstance(one, RolledCondition)]
     if row.target.kind not in ITEM_KINDS or not slots:
         return True
     character_classes = set(CHARACTER_CLASSES)
@@ -75,12 +75,17 @@ def _rolls_after_conditions(
     )
 
 
+def _order(slot: str) -> int:
+    """The boss rolls before every slot."""
+    return -1 if slot == "boss" else SLOTS.index(slot)
+
+
 def _late(row: Modifier) -> bool:
     """Return whether a rule target's last pool rolls no later than one of its conditions."""
     if row.target.kind != "rule":
         return False
     return any(
-        SLOTS.index(one.slot) >= SLOTS.index(LAST_RULE_SLOT)
+        _order(one.slot) >= SLOTS.index(LAST_RULE_SLOT)
         for one in row.when
         if isinstance(one, RolledCondition)
     )

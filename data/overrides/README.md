@@ -81,11 +81,12 @@ A **selector cell** holds `kind:id id` parts split by `;`. A part with no ids me
 A **modifier** row is `id`, `when`, `target`, `value`:
 
 - `when` holds at least one condition, split by `;` and ANDed: `rule_1=rule:parry_only` when a slot rolled a match, `rh!=subcategory:melee` when it rolled something that doesn't, `character_class=sorcerer jester` for a class. What always holds is base odds, on the option's own row, never a modifier.
+- A `boss=` condition reads the objective's boss, which rolls before every slot; a region id in it, such as `boss=boss:limgrave`, stands for every boss fought in that region.
 - `target` is one selector; `value` multiplies it, and `0` removes it.
 - A condition reads one slot, so a rule about either hand or either talisman is two rows.
 - Rows combine by multiplying: every row whose conditions hold applies once to each option it targets, so two true rows on one option compound. A `0` can't be revived by any other row, and a row whose target is already filtered out does nothing.
 - A rule exclusion is written both ways, and a target must roll after its conditions, or the build fails.
-- A value is a guarantee tier (`data/balance.md#Tiers`) or `0`. `×67`, `×5` and `×4` are off-tier on purpose, until the simulation tunes them.
+- A value is a guarantee tier (`data/balance.md#Tiers`) or `0`. `×67`, `×6`, `×5`, `×3.5`, `×3` and `×0.5` are off-tier on purpose, until the simulation tunes them.
 
 ## Gaps
 

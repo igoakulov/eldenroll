@@ -181,7 +181,7 @@ def test_a_broken_table_is_a_structure_problem(
 
 
 def test_off_tier_values_do_not_fail_the_spacing(data: GateData) -> None:
-    assert {4, 5, 67} <= {row.value for row in data.database.modifiers}
+    assert {0.5, 3, 5, 67} <= {row.value for row in data.database.modifiers}
     change = _add_modifier(_modifier("just_under_a_guarantee", 99))
     assert structure_problems(replace(data, database=change(data.database))) == ()
 
@@ -225,11 +225,11 @@ def test_the_tables_hold_exactly_the_documented_fields(data: GateData) -> None:
 
 def test_a_modifier_writes_both_kinds_of_condition(data: GateData) -> None:
     rows = {str(row["id"]): row for row in database_rows(data.database)["modifier"]}
-    assert rows["jester_none_x4"] == {
-        "id": "jester_none_x4",
+    assert rows["jester_none_x6"] == {
+        "id": "jester_none_x6",
         "when": [{"kind": "character_class", "ids": ["jester"]}],
         "target": {"kind": "item", "ids": ["none"]},
-        "value": 4,
+        "value": 6,
     }
     assert rows["l2_only_needs_a_skill_not_empty"]["when"] == [
         {

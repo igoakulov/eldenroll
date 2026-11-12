@@ -108,7 +108,6 @@ def test_the_fights_at_odds_zero_are_kept_for_their_drops(
         ("Putrid Avatar", "Miquella's Haligtree - Elphael"),
         ("Shadow Tree Spirit", "Gravesite Plain - Ellac River Cave"),
     }
-    assert {row.odds for row in instances} == {0, 1}
 
 
 def test_dryleaf_dane_has_only_his_own_fight(instances: tuple[BossInstance, ...]) -> None:

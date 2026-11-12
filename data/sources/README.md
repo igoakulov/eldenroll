@@ -28,10 +28,11 @@ Read this before changing a loader, a build step or an override file. It holds w
 
 | Source | Origin | Retrieved | Version | License |
 |---|---|---|---|---|
-| PC randomizer mod | unknown | unknown | unknown | unknown |
-| Spreadsheets | unknown, including whether they share one origin | unknown | unknown | unknown |
+| PC randomizer mod | <https://www.nexusmods.com/eldenring/mods/428> | unknown | unknown | unknown |
+| Spreadsheets | the datamined resource collection at <https://www.reddit.com/user/sleepless_sheeple/comments/udlb1k/elden_ring_datamined_resource_collection/> | unknown | unknown | unknown |
 | eldenring-api | the public `deliton/eldenring-api` dataset, base game only. The project calls no API | unknown | unknown | unknown |
 | wiki.gg | <https://eldenring.wiki.gg/wiki/Armor_Sets>, transcribed by a small model | unknown | n/a | unknown |
+| Fextralife | <https://eldenring.wiki.fextralife.com>, read page by page for what the other sources lack (#Wiki lookups); answers land in `data/overrides/`, not here | while building, 2026 | n/a | unknown |
 
 The game's text and data belong to FromSoftware and Bandai Namco. Attribution and licensing are not settled yet.
 

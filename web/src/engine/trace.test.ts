@@ -99,7 +99,7 @@ describe("the trace of an objective", () => {
     let found = false;
     for (let seed = 1; seed <= 40 && !found; seed += 1) {
       const run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["jester"] } }, seed);
-      found = blocks(run).some((text) => text === formatTrace([]) || text.includes("  Jester: x4"));
+      found = blocks(run).some((text) => text === formatTrace([]) || text.includes("  Jester: x2"));
     }
     expect(found).toBe(true);
   });
