@@ -4,7 +4,18 @@ import type { Database } from "./engine/database";
 import { indexDatabase } from "./engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "./engine/hyperparams";
 import { DEFAULT_REGIONS } from "./engine/regions";
-import { alreadyDead, done, editRun, objectiveNumber, reroll, rollNext, startRun, type Engine, type Run } from "./engine/run";
+import {
+  alreadyDead,
+  done,
+  editRun,
+  finishRun,
+  objectiveNumber,
+  reroll,
+  rollNext,
+  startRun,
+  type Engine,
+  type Run,
+} from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { formatTrace } from "./engine/trace";
 import { loadDatabase } from "./loadDatabase";
@@ -14,6 +25,8 @@ import { Felled } from "./views/Felled";
 import { LevelUp } from "./views/LevelUp";
 import { rerollTarget } from "./views/rerollScope";
 import { RoldCard } from "./views/RoldCard";
+import { runTitle, type RunMenuActions } from "./views/RunMenu";
+import { RunSettings, type SettingsTab } from "./views/RunSettings";
 import { Start, StartResume } from "./views/Start";
 import "./App.css";
 
@@ -22,7 +35,7 @@ type Loaded =
   | { readonly status: "ready"; readonly database: Database }
   | { readonly status: "failed" };
 
-type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level";
+type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level" | "settings";
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
@@ -41,7 +54,9 @@ function Game({ database }: { readonly database: Database }) {
     () => ({ data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS }),
     [database],
   );
-  const settings = useMemo(() => defaultSettings(database), [database]);
+  // Before a run; once one starts, the run holds its own
+  const [settings, setSettings] = useState(() => defaultSettings(database));
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>("General");
   const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
   const [regions, setRegions] = useState<readonly string[]>(DEFAULT_REGIONS);
   const [problems, setProblems] = useState<readonly string[]>([]);
@@ -59,7 +74,51 @@ function Game({ database }: { readonly database: Database }) {
     setView("card");
   };
 
+  // Until the finished run's view (9.7) and Run history (9.10) take it, a finished run is dropped and Start is fresh
+  const endRun = (_finished: Run) => {
+    setRun(null);
+    setUndoTo(null);
+    setStats(DEFAULT_STATS);
+    setRegions(DEFAULT_REGIONS);
+    setSettings(defaultSettings(database));
+    setProblems([]);
+    setView("start");
+  };
+  const menu = (current: Run): RunMenuActions => ({
+    title: runTitle(engine.data, current),
+    onRunSettings: () => setView("settings"),
+    onFinish: () => endRun(finishRun(current)),
+  });
+  // Home: the card while a run has an objective, `Level up` between objectives, Start otherwise
+  const home = () => {
+    if (run === null) setView("start");
+    else if (run.current === null) setView("level");
+    else showCard("none");
+  };
+
   if (view === "rold") return <RoldCard onClose={() => setView("start")} />;
+
+  if (view === "settings") {
+    return (
+      <RunSettings
+        eyebrow={run === null ? "New run" : `Objective ${objectiveNumber(run)}`}
+        settings={run?.settings ?? settings}
+        characterClasses={database.character_class}
+        tab={settingsTab}
+        onTab={setSettingsTab}
+        onClose={home}
+        onSave={(next) => {
+          if (run === null) {
+            setSettings(next);
+            setProblems([]);
+          } else {
+            setRun(editRun(run, { settings: next }));
+          }
+          home();
+        }}
+      />
+    );
+  }
 
   if ((view === "felled" || view === "rerolling") && run !== null && undoTo !== null) {
     const boss = undoTo.current === null ? undefined : engine.data.bosses.get(undoTo.current.boss);
@@ -86,10 +145,9 @@ function Game({ database }: { readonly database: Database }) {
         }}
         onZero={() => {
           setUndoTo(null);
-          // Every boss felled or skipped: until the run's summary (9), the run ends on Start
+          // Every boss felled or skipped
           if (run.finished) {
-            setRun(null);
-            setView("start");
+            endRun(run);
           } else if (view === "rerolling" && run.current !== null) {
             showCard("quick");
           } else {
@@ -109,6 +167,7 @@ function Game({ database }: { readonly database: Database }) {
         run={run}
         regions={database.region}
         onClose={() => showCard("none")}
+        menu={menu(run)}
         onSave={(changes) => {
           const edited = editRun(run, changes);
           if (mid) {
@@ -154,17 +213,19 @@ function Game({ database }: { readonly database: Database }) {
           setView("rerolling");
         }}
         onLevelUp={() => setView("level")}
+        menu={menu(run)}
       />
     );
   }
 
   if (run !== null) {
-    const boss = run.current === null ? undefined : engine.data.bosses.get(run.current.boss);
     return (
       <StartResume
-        title={`Objective ${objectiveNumber(run)}${boss === undefined ? "" : `, ${boss.name}`}`}
+        run={run}
+        title={runTitle(engine.data, run)}
         onOpenCard={() => setView("rold")}
-        onResume={() => (run.current === null ? setView("level") : showCard("none"))}
+        onResume={home}
+        onNewRun={() => endRun(finishRun(run))}
       />
     );
   }
@@ -184,6 +245,7 @@ function Game({ database }: { readonly database: Database }) {
         setProblems([]);
       }}
       onOpenCard={() => setView("rold")}
+      onRunSettings={() => setView("settings")}
       onStartRun={() => {
         const result = startRun(engine, { stats, settings, regions, weaponShortlist: [], deadBosses: [] }, newSeed());
         if (!result.ok) {

@@ -16,6 +16,24 @@
   color: var(--text);
 }
 
+.stepper-text {
+  flex: 1;
+  min-width: 0;
+  padding-right: 14px;
+}
+
+.stepper-text label {
+  display: block;
+}
+
+.stepper-detail {
+  display: block;
+  margin-top: 1px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--text-3);
+}
+
 .stepper {
   display: flex;
   align-items: center;

@@ -25,15 +25,19 @@ function trapTab(event: KeyboardEvent, sheet: HTMLElement) {
 
 /** A sheet over the dimmed screen: an eyebrow and a close button over its content. It holds the keyboard while
  * open (`web/README.md#Navigation`) and stays drawn while it fades out. Place it with `Screen`'s `sheet`, so it
- * sizes to the screen rather than the window. */
+ * sizes to the screen rather than the window. `alert` marks a confirmation. */
 export function Sheet({
   open,
   eyebrow,
+  alert = false,
+  closeLabel = "Cancel",
   onClose,
   children,
 }: {
   readonly open: boolean;
   readonly eyebrow: string;
+  readonly alert?: boolean;
+  readonly closeLabel?: string;
   readonly onClose: () => void;
   readonly children: ReactNode;
 }) {
@@ -88,7 +92,7 @@ export function Sheet({
         <div
           ref={ref}
           className={`sheet${state}`}
-          role="dialog"
+          role={alert ? "alertdialog" : "dialog"}
           aria-modal="true"
           aria-labelledby={titleId}
           tabIndex={-1}
@@ -100,7 +104,7 @@ export function Sheet({
             <p className="eyebrow" id={titleId}>
               {eyebrow}
             </p>
-            <button type="button" className="sheet-close" aria-label="Cancel" onClick={onClose}>
+            <button type="button" className="sheet-close" aria-label={closeLabel} onClick={onClose}>
               <Icon name="close" size={20} />
             </button>
           </div>

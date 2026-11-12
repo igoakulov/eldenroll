@@ -40,11 +40,9 @@ The onboarding card, opened from `Elden Rold` in Start's tagline. Adding the app
 
 ### Run settings
 
-One screen from Start and from the menu, with three tabs: `General`, `Never roll` and `Shortlist`. `Changes apply on the next roll.`, one `Save` for every tab, and a close button that discards every change. It reopens on the last tab used, so a list edited often stays two taps from the card.
+One screen from Start and from the menu. It reopens on the last tab used, so a list edited often stays two taps from the card.
 
 - **General:**
-  - **Classes:** one checkbox per class.
-  - **Gear:** `Max stat gap`.
   - **Bosses:** a row opening `Bosses`, showing how many are felled and skipped, and the `Boss gear locked until felled` toggle, on by default. Off stops the boss filter; `Bosses` stays, because felled and skipped bosses still leave the pool.
 - **Never roll** searches every gear item and combat rule with `odds > 0`, empty by default; there is no browsing by category. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, without the `None` pieces; typing a piece's name finds every set that holds it. It writes to `neverRoll`.
 - **Shortlist** has the checkbox `Roll Right Hand from shortlist`, off by default, and searches every weapon and greatshield with `odds > 0`, never narrowed by class, since classes can change at any time. Its line: `Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.` The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`.
@@ -65,7 +63,7 @@ Every boss instance with `odds > 0`, each its name over its `location`, one line
 ### Current run
 
 - **Top bar:** `Objective N` at the left; at the right `Level N`, which opens `Level up` for the next roll, and the menu.
-- **Menu**, one flat list: `Run history`; the run's row, its title over `In progress`, opening its view; `Run settings`; and `Finish run` in red.
+- **Menu:** the run's row opens its view, and `Run history` shows how many runs are finished.
 - **Wiki links:** each item tile, a named ash and the armor set name open the item's wiki page where one exists. Names and rows aren't tappable; `none`, `any` and aliases have no link. The card shows no item locations: the wiki covers them better, and the data's placements are sometimes adjusted for balance.
 - **Empty slots:** a `None` armor piece and the rule `None` show as `none`, like any empty slot, so they read apart from `any` and from a rule to obey.
 - **Reroll panel:** its chips run in reverse roll order, `Armor` first, so they read like the slider. The panel hides most of the card on a phone, so the chips carry the whole scope. The lit chips always form one run from the left, growing with the slider's fill and glow, which teaches that a reroll redoes everything from its target on.
@@ -75,7 +73,7 @@ Every boss instance with `odds > 0`, each its name over its `location`, one line
 
 ### Confirmations
 
-`Finish run`, `New run` and `Delete run` share one sheet over the screen: a question, chips for what happens, red for what is lost and gold for what is kept, and the action in the glow band. Chips are in the active voice with no contractions: `Abandon objective N`, `Cannot resume`, `Save to Run history`, `Cannot undo`. A run with no completed objective isn't saved, so its sheet doesn't offer `Save to Run history`.
+`Finish run`, `New run` and `Delete run` share one sheet. Its chips are in the active voice with no contractions; `Delete run`'s is `Cannot undo`.
 
 ### Run view
 

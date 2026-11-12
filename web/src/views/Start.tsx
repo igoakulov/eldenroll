@@ -1,10 +1,14 @@
+import { useState } from "react";
+
 import type { Region } from "../engine/database";
+import type { Run } from "../engine/run";
 import { derivedLevel, type Stats } from "../engine/settings";
 import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SectionHeading } from "../ui/Headings";
 import { LevelTotal } from "../ui/LevelTotal";
 import { FramedRow, ListRow } from "../ui/Rows";
 import { Screen } from "../ui/Screen";
+import { NewRunConfirm } from "./RunMenu";
 import { RegionCheck, StatSteppers, byLevel } from "./StatsAndRegions";
 import { Tagline } from "./Tagline";
 import "./Start.css";
@@ -43,6 +47,7 @@ export function Start({
   onStats,
   onRegions,
   onOpenCard,
+  onRunSettings,
   onStartRun,
 }: {
   readonly regions: readonly Region[];
@@ -52,6 +57,7 @@ export function Start({
   readonly onStats: (stats: Stats) => void;
   readonly onRegions: (regions: readonly string[]) => void;
   readonly onOpenCard: () => void;
+  readonly onRunSettings: () => void;
   readonly onStartRun: () => void;
 }) {
   return (
@@ -87,7 +93,7 @@ export function Start({
         </div>
       </div>
 
-      <FramedRow title="Run settings" detail="Classes, never roll, shortlist, bosses" />
+      <FramedRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={onRunSettings} />
 
       <p className="legal">{DISCLAIMER}</p>
     </Screen>
@@ -96,20 +102,26 @@ export function Start({
 
 /** Start with a run in progress: stats, regions and settings belong to the run, so they stay hidden. */
 export function StartResume({
+  run,
   title,
   onOpenCard,
   onResume,
+  onNewRun,
 }: {
+  readonly run: Run;
   readonly title: string;
   readonly onOpenCard: () => void;
   readonly onResume: () => void;
+  readonly onNewRun: () => void;
 }) {
+  const [confirming, setConfirming] = useState(false);
   return (
     <Screen
       mist="centre"
+      sheet={<NewRunConfirm open={confirming} run={run} onClose={() => setConfirming(false)} onConfirm={onNewRun} />}
       bottom={
         <BottomBar>
-          <RuledButton>New run</RuledButton>
+          <RuledButton onClick={() => setConfirming(true)}>New run</RuledButton>
           <GlowBand onClick={onResume}>Resume</GlowBand>
         </BottomBar>
       }

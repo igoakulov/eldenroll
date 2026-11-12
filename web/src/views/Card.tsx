@@ -12,6 +12,7 @@ import { Tile } from "../ui/Tile";
 import { FramedIconButton, LevelButton, TopBar } from "../ui/TopBar";
 import { ARMOR_PIECE_ICONS, CHARACTER_CLASS_ICONS, EMPTY_SLOT_ICONS, iconKey } from "./icons";
 import { RerollPanel } from "./RerollPanel";
+import { RunMenu, type RunMenuActions } from "./RunMenu";
 import "./Card.css";
 
 /** How a card arrives: a new objective in full, a full-objective reroll quicker, or `Resume` with a fade only. */
@@ -190,7 +191,8 @@ function BossBar({ onFelled }: { readonly onFelled: () => void }) {
   );
 }
 
-/** The current objective: the boss as the hero, then the class and the loadout to fell it with. */
+/** The current objective: the boss as the hero, then the class and the loadout to fell it with. Without `menu`, as
+ * behind `Great enemy felled`, the menu button does nothing. */
 export function Card({
   data,
   run,
@@ -199,6 +201,7 @@ export function Card({
   onDone,
   onFelled,
   onLevelUp,
+  menu,
 }: {
   readonly data: EngineData;
   readonly run: Run;
@@ -207,10 +210,12 @@ export function Card({
   readonly onDone: () => void;
   readonly onFelled: () => void;
   readonly onLevelUp: () => void;
+  readonly menu?: RunMenuActions;
 }) {
   const [revealing, setRevealing] = useState(reveal !== "none");
   // `felled` outlives `open`, so the panel keeps its look while it fades out
   const [panel, setPanel] = useState({ open: false, felled: false });
+  const [menuOpen, setMenuOpen] = useState(false);
   const mounted = useRef(false);
   useEffect(() => {
     mounted.current = true;
@@ -230,13 +235,16 @@ export function Card({
   const top = (
     <TopBar eyebrow={`Objective ${objectiveNumber(run)}`}>
       <LevelButton level={level} onClick={onLevelUp} />
-      <FramedIconButton icon="menu" label="Menu" />
+      <FramedIconButton icon="menu" label="Menu" onClick={() => setMenuOpen(true)} />
     </TopBar>
+  );
+  const runMenu = menu === undefined ? null : (
+    <RunMenu open={menuOpen} run={run} actions={menu} onClose={() => setMenuOpen(false)} />
   );
 
   if (objective === null) {
     return (
-      <Screen className="card">
+      <Screen className="card" sheet={runMenu}>
         {top}
         <p className="card-waiting">{run.waiting === null ? "" : WAITING_MESSAGES[run.waiting]}</p>
       </Screen>
@@ -267,19 +275,22 @@ export function Card({
         </BottomBar>
       }
       sheet={
-        <RerollPanel
-          open={panel.open}
-          felled={panel.felled}
-          onClose={() => setPanel((last) => ({ ...last, open: false }))}
-          onReroll={(target) => {
-            setPanel((last) => ({ ...last, open: false }));
-            onReroll(target);
-          }}
-          onFelled={() => {
-            setPanel((last) => ({ ...last, open: false }));
-            onFelled();
-          }}
-        />
+        <>
+          <RerollPanel
+            open={panel.open}
+            felled={panel.felled}
+            onClose={() => setPanel((last) => ({ ...last, open: false }))}
+            onReroll={(target) => {
+              setPanel((last) => ({ ...last, open: false }));
+              onReroll(target);
+            }}
+            onFelled={() => {
+              setPanel((last) => ({ ...last, open: false }));
+              onFelled();
+            }}
+          />
+          {runMenu}
+        </>
       }
     >
       <div className="r" style={at(0)}>

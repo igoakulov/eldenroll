@@ -57,6 +57,24 @@
   color: var(--text);
 }
 
+.lozenge-row-icons .lozenge-label {
+  flex: 0 1 auto;
+  font-size: 19px;
+}
+
+.lozenge-icons {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--gold-mute);
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.lozenge-row input:not(:checked) ~ .lozenge-icons {
+  color: var(--gold-dim);
+}
+
 .lozenge-tag {
   flex: none;
   padding: 1px 6px 2px;

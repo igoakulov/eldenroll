@@ -83,6 +83,16 @@ div.list-row {
   color: var(--text-3);
 }
 
+.list-row-cut .row-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.list-row-danger .row-title {
+  color: var(--blood-text);
+}
+
 .list-row-value {
   font-size: 17px;
   color: var(--text-3);

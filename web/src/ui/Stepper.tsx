@@ -2,11 +2,12 @@ import { useState } from "react";
 
 import "./Stepper.css";
 
-/** A number field between `−` and `+`. `correct` turns what was typed into an accepted value. `raised` shows the
- * value in blue, above where it was. */
+/** A number field between `−` and `+`, its label over an optional detail. `correct` turns what was typed into an
+ * accepted value. `raised` shows the value in blue, above where it was. */
 export function Stepper({
   id,
   label,
+  detail,
   value,
   min,
   max,
@@ -16,6 +17,7 @@ export function Stepper({
 }: {
   readonly id: string;
   readonly label: string;
+  readonly detail?: string;
   readonly value: number;
   readonly min: number;
   readonly max: number;
@@ -30,7 +32,14 @@ export function Stepper({
   };
   return (
     <div className="stepper-row">
-      <label htmlFor={id}>{label}</label>
+      {detail === undefined ? (
+        <label htmlFor={id}>{label}</label>
+      ) : (
+        <span className="stepper-text">
+          <label htmlFor={id}>{label}</label>
+          <span className="stepper-detail">{detail}</span>
+        </span>
+      )}
       <div className="stepper">
         <button type="button" aria-label={`Lower ${label}`} onClick={() => onChange(Math.max(min, value - 1))}>
           −

@@ -9,6 +9,7 @@ import { LevelTotal } from "../ui/LevelTotal";
 import { Screen } from "../ui/Screen";
 import { ShowAll } from "../ui/ShowAll";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
+import { RunMenu, type RunMenuActions } from "./RunMenu";
 import { RegionCheck, StatSteppers, byLevel } from "./StatsAndRegions";
 import "./LevelUp.css";
 
@@ -27,16 +28,20 @@ export function LevelUp({
   regions,
   onSave,
   onClose,
+  menu,
 }: {
   readonly mode: "next" | "mid";
   readonly run: Run;
   readonly regions: readonly Region[];
   readonly onSave: (changes: LevelUpChanges) => void;
   readonly onClose: () => void;
+  /** The menu, between objectives only. */
+  readonly menu?: RunMenuActions;
 }) {
   const [stats, setStats] = useState(run.stats);
   const [selected, setSelected] = useState(run.regions);
   const [expanded, setExpanded] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   // The next unticked regions as the screen opened; a ticked one stays in place rather than giving way
   const [next] = useState(() =>
     byLevel(regions)
@@ -56,6 +61,11 @@ export function LevelUp({
   return (
     <Screen
       className="level-up"
+      sheet={
+        mode === "next" && menu !== undefined ? (
+          <RunMenu open={menuOpen} run={run} actions={menu} onClose={() => setMenuOpen(false)} />
+        ) : null
+      }
       bottom={
         <BottomBar {...(notice === null ? {} : { notice: `${notice}.` })}>
           <GlowBand onClick={() => onSave({ stats, regions: selected })}>
@@ -66,7 +76,7 @@ export function LevelUp({
     >
       <TopBar eyebrow={eyebrow}>
         {mode === "next" ? (
-          <FramedIconButton icon="menu" label="Menu" />
+          <FramedIconButton icon="menu" label="Menu" onClick={() => setMenuOpen(true)} />
         ) : (
           <FramedIconButton icon="close" label="Close without saving" onClick={onClose} />
         )}
