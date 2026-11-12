@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 
 import { ARMOR_PIECES, displaySlots, type SlotDisplay } from "../engine/display";
 import type { EngineData } from "../engine/engineData";
-import { WAITING_MESSAGES, objectiveNumber, type Run } from "../engine/run";
+import { WAITING_MESSAGES, objectiveNumber, type Objective, type RerollTarget, type Run } from "../engine/run";
 import { derivedLevel } from "../engine/settings";
 import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SlotHeading } from "../ui/Headings";
@@ -11,6 +11,7 @@ import { Screen } from "../ui/Screen";
 import { Tile } from "../ui/Tile";
 import { FramedIconButton, LevelButton, TopBar } from "../ui/TopBar";
 import { ARMOR_PIECE_ICONS, CHARACTER_CLASS_ICONS, EMPTY_SLOT_ICONS, iconKey } from "./icons";
+import { RerollPanel } from "./RerollPanel";
 import "./Card.css";
 
 /** How a card arrives: a new objective in full, a full-objective reroll quicker, or `Resume` with a fade only. */
@@ -54,10 +55,53 @@ function SlotName({ display, className }: { readonly display: SlotDisplay; reado
   return <span className={className}>{nameOf(display)}</span>;
 }
 
-/** Remounts when its `id` changes, and then fades in, so a reroll shows only what it changed. */
-function Changed({ fade, children }: { readonly fade: boolean; readonly children: ReactNode }) {
+/** Remounts when its key changes, and then fades in, so a reroll shows only what it changed. While `leaving`, it
+ * fades out first and calls `onLeft` once gone. */
+function Changed({ fade, leaving, onLeft, children }: {
+  readonly fade: boolean;
+  readonly leaving: boolean;
+  readonly onLeft: () => void;
+  readonly children: ReactNode;
+}) {
   const [animate] = useState(fade);
-  return <div className={animate ? "slot-changed" : undefined}>{children}</div>;
+  return (
+    <div
+      className={leaving ? "slot-leaving" : animate ? "slot-changed" : undefined}
+      onAnimationEnd={(event) => {
+        if (leaving && event.target === event.currentTarget) onLeft();
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** One key per part of the card that fades as a whole when a reroll changes it. */
+function changeKeys(objective: Objective) {
+  const { slots } = objective;
+  const key = (...ids: (string | null | undefined)[]) => ids.map((id) => id ?? "-").join("|");
+  return {
+    boss: objective.boss,
+    characterClass: objective.characterClass,
+    lh: key(slots.lh, slots.lh_ash),
+    rh: key(slots.rh, slots.rh_ash),
+    spell: key(slots.spell),
+    talisman_1: key(slots.talisman_1),
+    talisman_2: key(slots.talisman_2),
+    armor: key(slots.armor),
+    item: key(slots.item),
+    rule_1: key(slots.rule_1),
+    rule_2: key(slots.rule_2),
+  };
+}
+
+type Part = keyof ReturnType<typeof changeKeys>;
+
+function changedParts(from: Objective | null, to: Objective | null): ReadonlySet<Part> {
+  if (from === null || to === null || from === to) return new Set();
+  const before = changeKeys(from);
+  const after = changeKeys(to);
+  return new Set((Object.keys(before) as Part[]).filter((part) => before[part] !== after[part]));
 }
 
 function Hand({ label, hand, ash, emptyIcon }: {
@@ -157,10 +201,11 @@ export function Card({
   readonly data: EngineData;
   readonly run: Run;
   readonly reveal: Reveal;
-  readonly onReroll: () => void;
+  readonly onReroll: (target: RerollTarget) => void;
   readonly onDone: () => void;
 }) {
   const [revealing, setRevealing] = useState(reveal !== "none");
+  const [panelOpen, setPanelOpen] = useState(false);
   const mounted = useRef(false);
   useEffect(() => {
     mounted.current = true;
@@ -171,7 +216,11 @@ export function Card({
     return () => window.clearTimeout(timer);
   }, [revealing, reveal]);
 
-  const objective = run.current;
+  // A reroll keeps the card: the parts it changed fade out, then the new ones fade in, and the rest stay still
+  const [objective, setShown] = useState(run.current);
+  const changing = changedParts(objective, run.current);
+  if (objective !== run.current && changing.size === 0) setShown(run.current);
+
   const level = derivedLevel(run.stats);
   const top = (
     <TopBar eyebrow={`Objective ${objectiveNumber(run)}`}>
@@ -192,9 +241,13 @@ export function Card({
   const boss = data.bosses.get(objective.boss);
   const characterClass = data.database.character_class.find((row) => row.id === objective.characterClass);
   const slots = displaySlots(data, objective.slots);
-  const fade = mounted.current;
   const classIcons = CHARACTER_CLASS_ICONS[objective.characterClass] ?? [];
-  const keyOf = (...ids: (string | null | undefined)[]) => ids.map((id) => id ?? "-").join("|");
+  const keys = changeKeys(objective);
+  const change = (part: Part) => ({
+    fade: mounted.current,
+    leaving: changing.has(part),
+    onLeft: () => setShown(run.current),
+  });
 
   return (
     <Screen
@@ -202,11 +255,21 @@ export function Card({
       onPointerDown={() => setRevealing(false)}
       bottom={
         <BottomBar className="r" style={at(1350)}>
-          <RuledButton icon="reroll" onClick={onReroll}>
+          <RuledButton icon="reroll" onClick={() => setPanelOpen(true)}>
             Reroll
           </RuledButton>
           <GlowBand onClick={onDone}>Done</GlowBand>
         </BottomBar>
+      }
+      sheet={
+        <RerollPanel
+          open={panelOpen}
+          onClose={() => setPanelOpen(false)}
+          onReroll={(target) => {
+            setPanelOpen(false);
+            onReroll(target);
+          }}
+        />
       }
     >
       <div className="r" style={at(0)}>
@@ -214,7 +277,7 @@ export function Card({
       </div>
 
       <section className="boss" aria-labelledby="boss-name">
-        <Changed fade={fade} key={objective.boss}>
+        <Changed key={keys.boss} {...change("boss")}>
           <h1 className="boss-name r" id="boss-name" style={at(80)}>
             {boss?.name ?? "unknown boss"}
           </h1>
@@ -226,7 +289,7 @@ export function Card({
         </Changed>
       </section>
 
-      <Changed fade={fade} key={keyOf(objective.characterClass)}>
+      <Changed key={keys.characterClass} {...change("characterClass")}>
         <div className="class-head r" style={at(1000)}>
           <h2>{characterClass?.name ?? "unknown class"}</h2>
           <span className="class-icons" aria-hidden="true">
@@ -240,10 +303,10 @@ export function Card({
       <div className="r weapons" style={at(1050)}>
         <SlotHeading>Weapons</SlotHeading>
         <div className="hands">
-          <Changed fade={fade} key={keyOf(objective.slots.lh, objective.slots.lh_ash)}>
+          <Changed key={keys.lh} {...change("lh")}>
             <Hand label="Left hand" hand={slots.lh} ash={slots.lh_ash} emptyIcon={EMPTY_SLOT_ICONS.lh} />
           </Changed>
-          <Changed fade={fade} key={keyOf(objective.slots.rh, objective.slots.rh_ash)}>
+          <Changed key={keys.rh} {...change("rh")}>
             <Hand label="Right hand" hand={slots.rh} ash={slots.rh_ash} emptyIcon={EMPTY_SLOT_ICONS.rh} />
           </Changed>
         </div>
@@ -251,7 +314,7 @@ export function Card({
 
       <div className="r" style={at(1100)}>
         <SlotHeading>Spell</SlotHeading>
-        <Changed fade={fade} key={keyOf(objective.slots.spell)}>
+        <Changed key={keys.spell} {...change("spell")}>
           <SmallSlot display={slots.spell} emptyIcon={EMPTY_SLOT_ICONS.spell} />
         </Changed>
       </div>
@@ -259,10 +322,10 @@ export function Card({
       <div className="r" style={at(1150)}>
         <SlotHeading>Talismans</SlotHeading>
         <div className="talismans">
-          <Changed fade={fade} key={keyOf(objective.slots.talisman_1)}>
+          <Changed key={keys.talisman_1} {...change("talisman_1")}>
             <SmallSlot display={slots.talisman_1} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
           </Changed>
-          <Changed fade={fade} key={keyOf(objective.slots.talisman_2)}>
+          <Changed key={keys.talisman_2} {...change("talisman_2")}>
             <SmallSlot display={slots.talisman_2} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
           </Changed>
         </div>
@@ -270,14 +333,14 @@ export function Card({
 
       <div className="r" style={at(1200)}>
         <SlotHeading>Armor</SlotHeading>
-        <Changed fade={fade} key={keyOf(objective.slots.armor)}>
+        <Changed key={keys.armor} {...change("armor")}>
           <Armor display={slots.armor} />
         </Changed>
       </div>
 
       <div className="r" style={at(1250)}>
         <SlotHeading>Item</SlotHeading>
-        <Changed fade={fade} key={keyOf(objective.slots.item)}>
+        <Changed key={keys.item} {...change("item")}>
           <SmallSlot display={slots.item} emptyIcon={EMPTY_SLOT_ICONS.item} />
         </Changed>
       </div>
@@ -285,10 +348,10 @@ export function Card({
       <div className="r" style={at(1300)}>
         <SlotHeading>Combat rules</SlotHeading>
         <div className="rules">
-          <Changed fade={fade} key={keyOf(objective.slots.rule_1)}>
+          <Changed key={keys.rule_1} {...change("rule_1")}>
             <Rule display={slots.rule_1} />
           </Changed>
-          <Changed fade={fade} key={keyOf(objective.slots.rule_2)}>
+          <Changed key={keys.rule_2} {...change("rule_2")}>
             <Rule display={slots.rule_2} />
           </Changed>
         </div>

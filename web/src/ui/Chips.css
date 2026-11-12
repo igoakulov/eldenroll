@@ -1,0 +1,34 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 4px;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  flex: none;
+  padding: 1px 7px 2px;
+  border: 1px solid rgba(119, 112, 85, 0.22);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: 15px;
+  line-height: 20px;
+  white-space: nowrap;
+  color: var(--text-3);
+  transition-property: color, background, border-color;
+  transition-duration: var(--dur-state);
+  transition-timing-function: var(--ease-out);
+  transition-delay: calc(var(--dur-glide) * var(--at, 0));
+}
+
+.chip-lit {
+  border-color: rgba(200, 178, 122, 0.6);
+  background: rgba(200, 178, 122, 0.08);
+  color: var(--gold);
+}
+
+.chips-instant .chip {
+  transition: none;
+}

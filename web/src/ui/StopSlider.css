@@ -1,0 +1,94 @@
+.stop-slider-track {
+  position: relative;
+  height: 44px;
+  margin: 12px 0 2px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.stop-slider-track input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stop-slider-rail {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 21px;
+  height: 1px;
+  background: var(--gold-dim);
+}
+
+.stop-slider-fill {
+  position: absolute;
+  left: 16px;
+  top: 20px;
+  height: 3px;
+  background: linear-gradient(to right, rgba(200, 178, 122, 0.35), var(--gold));
+  box-shadow: 0 0 8px rgba(227, 207, 152, 0.35);
+}
+
+.stop-slider-stop {
+  position: absolute;
+  top: 18px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  transform: rotate(45deg);
+  border: 1px solid var(--gold-dim);
+  background: var(--sheet);
+}
+
+.stop-slider-stop-in {
+  border-color: var(--gold);
+  background: var(--gold);
+}
+
+.stop-slider-thumb {
+  position: absolute;
+  top: 11px;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  transform: rotate(45deg);
+  border: 1px solid #f3e4b8;
+  background: var(--grace);
+  box-shadow: 0 0 14px rgba(227, 207, 152, 0.65);
+}
+
+/* The input is invisible, so its keyboard focus rings the handle */
+.stop-slider-track:has(input:focus-visible) .stop-slider-thumb {
+  outline: 1px solid var(--grace);
+  outline-offset: 4px;
+}
+
+/* A tap or a key glides; a drag follows the finger, so it has no transitions at all */
+.stop-slider-glide .stop-slider-fill {
+  transition: width var(--dur-glide) var(--ease-out);
+}
+
+.stop-slider-glide .stop-slider-thumb {
+  transition: left var(--dur-glide) var(--ease-out);
+}
+
+.stop-slider-glide .stop-slider-stop {
+  transition-property: background, border-color;
+  transition-duration: var(--dur-state);
+  transition-timing-function: var(--ease-out);
+  transition-delay: calc(var(--dur-glide) * var(--at, 0));
+}
+
+.stop-slider-ends {
+  display: flex;
+  justify-content: space-between;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: 15px;
+  color: var(--text-3);
+}

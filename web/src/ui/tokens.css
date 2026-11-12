@@ -18,6 +18,8 @@
   --blood-3: #510c08;
   --blood-text: #e0806c;
   --raised: #507bc6;
+  --sheet: #0d0c0a;
+  --scrim: rgba(6, 6, 5, 0.72);
 
   --rule: rgba(119, 112, 85, 0.5);
   --frame: rgba(169, 160, 127, 0.34);
@@ -31,15 +33,20 @@
   /* internal/design.md#Motion: fades easing to a stop, no bounce */
   --dur-state: 120ms;
   --dur-sheet: 200ms;
+  --dur-sheet-out: 150ms;
+  --dur-glide: 200ms;
   --dur-rise: 400ms;
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
   --rise-y: 6px;
+  --sheet-y: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
+    --dur-glide: 0ms;
     --rise-y: 0px;
+    --sheet-y: 0px;
   }
 }

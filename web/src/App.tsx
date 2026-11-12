@@ -10,6 +10,7 @@ import { formatTrace } from "./engine/trace";
 import { loadDatabase } from "./loadDatabase";
 import { Lozenge } from "./ui/Icon";
 import { Card, type Reveal } from "./views/Card";
+import { rerollTarget } from "./views/rerollScope";
 import { RoldCard } from "./views/RoldCard";
 import { Start, StartResume } from "./views/Start";
 import "./App.css";
@@ -23,6 +24,11 @@ type View = "start" | "card" | "rold";
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
+}
+
+/** Called from the action that rolled, not an effect, which `StrictMode` runs twice. */
+function printTrace(run: Run) {
+  if (import.meta.env.DEV && run.current !== null) console.log(formatTrace(run.current.trace));
 }
 
 /** Until saving (9.1), `?resume` in development starts a run and lands on Start with it in progress. */
@@ -49,11 +55,6 @@ function Game({ database }: { readonly database: Database }) {
     setView("card");
   };
 
-  const current = run?.current ?? null;
-  useEffect(() => {
-    if (import.meta.env.DEV && current !== null) console.log(formatTrace(current.trace));
-  }, [current]);
-
   if (view === "rold") return <RoldCard onClose={() => setView("start")} />;
 
   if (view === "card" && run !== null) {
@@ -63,13 +64,19 @@ function Game({ database }: { readonly database: Database }) {
         data={engine.data}
         run={run}
         reveal={reveal.kind}
-        // Stand-ins until the reroll panel (7.4) and the felled sequence with Level up (7.9)
-        onReroll={() => {
-          setRun(reroll(engine, run, "boss"));
-          showCard("quick");
+        onReroll={(target) => {
+          if (run.current === null) return;
+          const next = reroll(engine, run, rerollTarget(run.current.slots, target));
+          setRun(next);
+          printTrace(next);
+          // Only a full-objective reroll replays the reveal; any other keeps the card and swaps what changed
+          if (target === "boss") showCard("quick");
         }}
+        // A stand-in until the felled sequence with Level up (7.9)
         onDone={() => {
-          setRun(done(engine, run));
+          const next = done(engine, run);
+          setRun(next);
+          printTrace(next);
           showCard("full");
         }}
       />
@@ -110,6 +117,7 @@ function Game({ database }: { readonly database: Database }) {
         }
         setProblems([]);
         setRun(result.run);
+        printTrace(result.run);
         showCard("full");
       }}
     />
