@@ -42,23 +42,18 @@ export function StopSlider({
     onChange(next, glide);
   };
 
-  // The stop whose drawn centre is nearest the pointer. Both are measured on screen, so the desktop frame's zoom
-  // never has to be converted; a pointer beyond either end picks that end.
+  // The stop under the pointer, found by the browser's own hit testing: each stop owns an invisible zone reaching
+  // halfway to its neighbours. Measuring boxes against the pointer breaks under the desktop frame's CSS `zoom` in
+  // Safari, which reports the two in different scales. Off the track, the value stays.
   const stopAt = (event: PointerEvent<HTMLDivElement>) => {
-    let nearest = 0;
-    let distance = Infinity;
-    event.currentTarget.querySelectorAll<HTMLElement>(".stop-slider-stop").forEach((stop, index) => {
-      const box = stop.getBoundingClientRect();
-      const gap = Math.abs(event.clientX - (box.left + box.width / 2));
-      if (gap < distance) {
-        distance = gap;
-        nearest = index;
-      }
-    });
-    return nearest;
+    const zone = document
+      .elementsFromPoint(event.clientX, event.clientY)
+      .find((element) => element instanceof HTMLElement && element.dataset.stop !== undefined);
+    return zone instanceof HTMLElement ? Number(zone.dataset.stop) : value;
   };
 
   const at = (index: number) => `calc(${INSET}px + (100% - ${2 * INSET}px) * ${index / last})`;
+  const half = `(100% - ${2 * INSET}px) / ${2 * last}`;
 
   return (
     <div className={`stop-slider${locked ? " stop-slider-locked" : motion.glide ? " stop-slider-glide" : ""}`}>
@@ -93,6 +88,17 @@ export function StopSlider({
           />
         ))}
         <span className="stop-slider-thumb" style={{ left: at(value) }} />
+        {Array.from({ length: stops }, (_, index) => (
+          <span
+            key={index}
+            className="stop-slider-zone"
+            data-stop={index}
+            style={{
+              left: index === 0 ? 0 : `calc(${at(index)} - ${half})`,
+              right: index === last ? 0 : `calc(100% - ${at(index)} - ${half})`,
+            }}
+          />
+        ))}
         <input
           type="range"
           min={0}

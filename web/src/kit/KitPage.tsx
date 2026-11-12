@@ -171,7 +171,9 @@ export function KitPage() {
           <ul>
             {SECTIONS.map((section) => (
               <li key={section.id}>
-                <a href={`#${section.id}`}>{section.title}</a>
+                <a className="wiki-text" href={`#${section.id}`}>
+                  {section.title}
+                </a>
               </li>
             ))}
           </ul>

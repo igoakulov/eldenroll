@@ -64,6 +64,11 @@
   color: var(--gold-mute);
 }
 
+/* The app's link: a dotted underline (src/ui/WikiLink.css) */
+.kit-contents a {
+  color: var(--text-2);
+}
+
 .kit-contents ul {
   display: flex;
   flex-wrap: wrap;

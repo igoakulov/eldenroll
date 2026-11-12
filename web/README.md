@@ -33,7 +33,7 @@ The main flows:
 - The tagline types itself in a flowing rhythm, each key a little different, a short breath between words and a longer one after punctuation; holds it for a fixed beat plus a share of the time reading it takes, so every line gets a moment and a longer one stays longer, since the reader has followed most of it as it typed but may have started late; deletes it a word at a time, `Elden Rold` in one go; and types the next, in a loop, without pausing while the player sets up. The main tagline, the first variant, is one line; any other breaks where its first line would outgrow the main one and takes two lines at most, which the development build checks in the console. Each holds `Elden Rold`, which opens the `Elden Rold` card.
   - Nothing jumps while it types: every first line starts where the centred main tagline does, a second line is centred under it, the height is always the most lines any variant takes, and the untyped rest already holds its place.
 - **No run in progress:** a `Past runs` row with how many there are, under the tagline and above the stats, so a returning player sees it without scrolling; it shows once a run is saved. Then stats, regions and `Run settings`.
-- **A run in progress:** `Current run` with `Resume`, then the `Past runs` row. Stats, regions and settings belong to the run, so they stay hidden until `New run`.
+- **A run in progress:** `Current run`, whose row opens the run as `Resume` does, then the `Past runs` row. Stats, regions and settings belong to the run, so they stay hidden until `New run`.
 
 ### Elden Rold card
 

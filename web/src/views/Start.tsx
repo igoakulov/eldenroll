@@ -135,7 +135,7 @@ export function StartResume({
       <section className="in-run" aria-label={copy.start.runInProgress}>
         <SectionHeading>{copy.start.currentRun}</SectionHeading>
         <div className="in-run-rows">
-          <ListRow title={title} detail={copy.start.inProgress} />
+          <ListRow title={title} detail={copy.start.inProgress} onClick={onResume} />
         </div>
       </section>
     </Screen>

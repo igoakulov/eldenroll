@@ -16,6 +16,13 @@
   pointer-events: none;
 }
 
+/* Hit areas only: each stop's share of the track */
+.stop-slider-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
 .stop-slider-rail {
   position: absolute;
   left: 16px;
