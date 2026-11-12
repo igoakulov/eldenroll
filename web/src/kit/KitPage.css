@@ -1,0 +1,76 @@
+.kit-page {
+  padding: 32px var(--gutter) 64px;
+}
+
+.kit-title {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 24px;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+
+.kit-contents ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.kit-section {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.kit-section-title {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold-mute);
+}
+
+.kit-note {
+  margin-top: 12px;
+  font-style: italic;
+  color: var(--text-3);
+}
+
+.kit-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px 32px;
+  margin-top: 24px;
+}
+
+.kit-view {
+  margin: 0;
+}
+
+.kit-view-title {
+  margin-bottom: 10px;
+  color: var(--text-2);
+}
+
+.kit-view-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* A phone's screen at zoom 1, so screenshots are pixel-stable; a scroll container, as the desktop frame's screen
+   is, so the bottom bar and sheets stick to its bottom */
+.kit-view-box {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  overflow: hidden;
+  background: var(--ground);
+}
+
+.kit-view .kit-view-box {
+  outline: 1px solid var(--rule);
+}

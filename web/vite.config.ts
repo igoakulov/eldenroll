@@ -14,6 +14,15 @@ if (!existsSync(databasePath)) {
 
 export default defineConfig({
   plugins: [react()],
+  // The UI kit is a second page with its own bundle (web/src/ui/README.md#UI kit)
+  build: {
+    rolldownOptions: {
+      input: {
+        main: fileURLToPath(new URL("index.html", import.meta.url)),
+        kit: fileURLToPath(new URL("kit/index.html", import.meta.url)),
+      },
+    },
+  },
   server: { fs: { allow: [".."] } },
   test: { include: ["src/**/*.test.ts", "src/**/*.test.tsx"] },
 });

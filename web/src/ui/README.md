@@ -62,7 +62,7 @@ The game's menus fade and nothing in them bounces; ours follow. Motion shows wha
 
 ## UI kit
 
-Until it is built, this section is its spec.
+The views and the screenshots are built; for the rest, this section is the spec.
 
 The kit page shows every token and component as the app renders them, so a change can be judged without playing a run. It is a second Vite page, `web/kit/index.html`, with its own bundle: the app never loads its code, and the installed app doesn't keep it offline. It is published with the app at `https://eldenroll.com/kit/`, marked `noindex` and linked from nothing; in development it is at `/kit/` on the dev server.
 
@@ -71,4 +71,4 @@ The kit page shows every token and component as the app renders them, so a chang
 - **One entry per component,** `<Name>.kit.tsx` beside `<Name>.tsx`, collected automatically; a component with no entry is listed at the top of the page. Every block has an anchor, such as `/kit/#chip`.
 - **No page controls.** Reduced motion is checked through the browser's own setting.
 - **No raw values in views.** A colour, size or duration in `src/views/*.css` comes from a token, and control styling lives only in this folder; a check flags a hex colour or a millisecond value in a view's CSS.
-- **Screenshots catch what moved.** One command (Playwright, development only) captures every view at a fixed seed from the last commit and from the working copy, compares them and names the views that changed. Nothing is committed: an intended change needs no baseline to approve.
+- **Screenshots catch what moved.** `pnpm screenshots` captures every view at a fixed seed from the working copy and from the last commit, as a phone shows it rather than inside the desktop frame, with reduced motion and the clock stopped, and names the views that changed with how many pixels did; `--only` captures the working copy alone. Each capture is `/kit/?view=<name>`, which shows that one view and nothing else. Both sides read the current `data/build/db.json`, so only UI code differs. The images, and a diff for each changed view, go to `web/screenshots/`, which is git-ignored. It drives the installed Google Chrome through Playwright, so no browser is downloaded. Nothing is committed: an intended change needs no baseline to approve.
