@@ -1,6 +1,6 @@
 # Web app
 
-The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are designed and being built; saving, the finished run, run history and installing come after them. The look is in `design/README.md`. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
+The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are designed and being built; saving, the finished run, run history and installing come after them. The look lives in `src/ui/`, the design tokens and shared controls, and every screen in `src/views/` is built only from them; the icons are drawn by `design/icons/`. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
 
 Scripts are in `package.json`. The app and the engine tests read `../data/build/db.json`, which is git-ignored, so build the database first (`pipeline/README.md`); without it they stop and say so. Vitest hides `console.log` unless run with `--reporter=verbose`. There is no Prettier config: `npx prettier --write` would reformat every file, so format by hand.
 
@@ -29,17 +29,14 @@ The main flows:
 
 ### Start
 
-- The wordmark and a tagline that types itself: behind a thin gold caret it types one variant, holds it long enough to read, deletes it about twice as fast and types the next, in a loop. Each variant is at most two lines and holds `Elden Rold`, underlined as links are, which opens the `Elden Rold` card. The first variants are `Follow fate to become Elden Rold.` and `Roll objectives, gather your gear, and fell your foes to become Elden Rold.`
-  - The tagline keeps the height of its longest variant, so nothing below it moves while it types.
-  - It pauses while a field on Start has focus or it is scrolled out of view, so it doesn't pull the eye while the player sets up.
-  - Screen readers get the first variant as plain text; with reduced motion the variants cross-fade.
-- **No run in progress:** read-only `Level`, then the 8 stats, each a number field between `−` and `+`; `Regions`, 17 checkboxes by `region_level`, a DLC region showing a `DLC` tag in place of its `DLC: ` prefix; `Run settings`, with the menu's line, then `Run history` once a run is saved, so everything that sets up the run comes before navigation; `Start run`.
-- **A run in progress:** `Current run` with the run's title and `In progress`, `Run history`, and `New run` beside `Resume`. Stats, regions and settings belong to the run then, so they stay hidden until `New run`.
-- The disclaimer.
+- The tagline types itself in a flowing rhythm, each key a little different, a short breath between words and a longer one after punctuation; holds it for a fixed beat plus a share of the time reading it takes, so every line gets a moment and a longer one stays longer, since the reader has followed most of it as it typed but may have started late; deletes it a word at a time, `Elden Rold` in one go; and types the next, in a loop, without pausing while the player sets up. The main tagline, the first variant, is one line; any other breaks where its first line would outgrow the main one and takes two lines at most, which the development build checks in the console. Each holds `Elden Rold`, which opens the `Elden Rold` card.
+  - Nothing jumps while it types: every first line starts where the centred main tagline does, a second line is centred under it, the height is always the most lines any variant takes, and the untyped rest already holds its place.
+- **No run in progress:** `Run history` shows once a run is saved, after `Run settings`, so everything that sets up the run comes before navigation.
+- **A run in progress:** stats, regions and settings belong to the run, so they stay hidden until `New run`.
 
 ### Elden Rold card
 
-The onboarding card, opened from `Elden Rold` in Start's tagline, full screen with `✕` back to Start. It greets the player with `Welcome to EldenRoll, Tarnished` over the tagline's first variant, says the app is a companion kept open while playing that rolls a boss and the gear to fell it with, so every playthrough feels new again, then gives a run in five numbered steps and how to add the app to the Home Screen, one line each for iPhone and Android. The Home Screen comes before the first run because iPhone keeps a home-screen app's storage apart from Safari's: a run started in Safari stays there.
+The onboarding card, opened from `Elden Rold` in Start's tagline. Adding the app to the Home Screen comes before the first run because iPhone keeps a home-screen app's storage apart from Safari's: a run started in Safari stays there.
 
 ### Run settings
 
@@ -69,14 +66,8 @@ Every boss instance with `odds > 0`, each its name over its `location`, one line
 
 - **Top bar:** `Objective N` at the left; at the right `Level N`, which opens `Level up` with `Changes apply on the next roll.`, and the menu.
 - **Menu**, one flat list: `Run history`; the run's row, its title over `In progress`, opening its view; `Run settings`; and `Finish run` in red.
-- **Card:**
-  - The boss name, a bar with `Felled?` on it, and the location with a pin.
-  - The class name as the loadout heading, with a small group of icons for its typical loadout.
-  - `Weapons`: LH and RH side by side, LH on the left. Each shows a large icon, its label, the name, and the ash under the name only when one is named.
-  - `Spell`, `Talismans` (1 and 2), `Armor` (the set name, then each piece) and `Item`, each a small icon and the name.
-  - `Combat rules`: each name beside a red lozenge.
-  - Wiki links: each item tile, a named ash and the armor set name open the item's wiki page where one exists. Names and rows aren't tappable; `none`, `any` and aliases have no link. The card shows no item locations: the wiki covers them better, and the data's placements are sometimes adjusted for balance.
-- **Bottom bar:** `Reroll` and `Done`.
+- **Wiki links:** each item tile, a named ash and the armor set name open the item's wiki page where one exists. Names and rows aren't tappable; `none`, `any` and aliases have no link. The card shows no item locations: the wiki covers them better, and the data's placements are sometimes adjusted for balance.
+- **Empty slots:** a `None` armor piece and the rule `None` show as `none`, like any empty slot, so they read apart from `any` and from a rule to obey.
 - **Reroll panel** opens over the dimmed card, as every sheet does: read-only chips for every slot in reverse roll order, `Armor` first, so they read like the slider; lit where the reroll will change them; the 9-stop slider; `Reroll`; a close button. The panel hides most of the card on a phone, so the chips carry the whole scope. The lit chips always form one run from the left, growing with the slider's fill and glow, which teaches that a reroll redoes everything from its target on.
 - **Felled?** opens the same panel locked at `Full objective`, titled `Felled on the way?`, with the chips `Boss felled on the way`, `Boss gear unlocked` and `New objective`, and `Confirm and reroll`. Confirming shows the `Rerolling in` countdown. These chips state how things stand after the reroll, so they read as states, unlike the confirmation chips, which name actions.
 - **After `Done`:** the boss name over its emptied bar, `Great enemy felled`, `Next objective in` counting from 5, and `Undo`. Then **Level up**: `Level` before and after, the 8 stats with changed values marked, `N of 17 selected` with the next 3 unticked regions and `Show all 17 regions`, and `Roll objective N`. The waiting messages show here.

@@ -1,0 +1,45 @@
+/* Every colour, typeface and motion value the views use; copied once from the canvas style kit. */
+:root {
+  --ground: #0a0a0a;
+  --panel: #13110d;
+  --mist: #1b2523;
+  --mist-2: #121817;
+  --line: #24221d;
+  --bronze: #514c3e;
+  --gold-dim: #777055;
+  --gold-mute: #a9a07f;
+  --gold: #c8b27a;
+  --grace: #e3cf98;
+  --text: #e9e4d4;
+  --text-2: #b9b3a2;
+  --text-3: #8c877a;
+  --blood: #a93825;
+  --blood-2: #811e17;
+  --blood-3: #510c08;
+  --blood-text: #e0806c;
+  --raised: #507bc6;
+
+  --rule: rgba(119, 112, 85, 0.5);
+  --frame: rgba(169, 160, 127, 0.34);
+  --dotted: rgba(169, 160, 127, 0.75);
+
+  --serif: "EB Garamond", Georgia, serif;
+  --display: Cinzel, Georgia, serif;
+
+  --gutter: 20px;
+
+  /* internal/design.md#Motion: fades easing to a stop, no bounce */
+  --dur-state: 120ms;
+  --dur-sheet: 200ms;
+  --dur-rise: 400ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --rise-y: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --rise-y: 0px;
+  }
+}

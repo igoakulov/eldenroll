@@ -1,0 +1,59 @@
+.stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  padding: 4px 14px 4px var(--gutter);
+  border-top: 1px solid var(--line);
+}
+
+.stepper-row:first-child {
+  border-top: 0;
+}
+
+.stepper-row label {
+  font-size: 19px;
+  color: var(--text);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+}
+
+.stepper button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(169, 160, 127, 0.24);
+  background: rgba(19, 17, 13, 0.85);
+  color: var(--gold-mute);
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.stepper button:active {
+  color: var(--grace);
+  transition-duration: 0ms;
+}
+
+.stepper input {
+  width: 58px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid rgba(169, 160, 127, 0.24);
+  border-bottom: 1px solid rgba(169, 160, 127, 0.24);
+  border-radius: 0;
+  background: rgba(8, 8, 7, 0.7);
+  text-align: center;
+  font-size: 22px;
+  color: var(--text);
+  font-variant-numeric: lining-nums tabular-nums;
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.stepper input.raised {
+  color: var(--raised);
+}

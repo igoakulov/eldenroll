@@ -9,6 +9,7 @@ import { bossPool, selectedLocations, type BossPool } from "./regions";
 import {
   derivedLevel,
   settingsProblems,
+  statsProblems,
   type Settings,
   type Stats,
 } from "./settings";
@@ -259,7 +260,7 @@ function rollObjective(
 }
 
 export function startRun(engine: Engine, inputs: RunInputs, seed: number): StartResult {
-  const problems = [...settingsProblems(inputs.settings)];
+  const problems = [...statsProblems(inputs.stats), ...settingsProblems(inputs.settings)];
   const pool = bossPool(
     engine.data.database,
     new Set(inputs.regions),

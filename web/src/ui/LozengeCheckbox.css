@@ -1,0 +1,68 @@
+.lozenge-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 47px;
+  padding: 8px var(--gutter);
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 17.5px;
+  line-height: 1.25;
+  color: var(--text-2);
+}
+
+.lozenge-row:first-child {
+  border-top: 0;
+}
+
+.lozenge-row input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.lozenge-box {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin: 0 3px;
+  transform: rotate(45deg);
+  border: 1px solid var(--gold-dim);
+  transition:
+    background var(--dur-state) var(--ease-out),
+    border-color var(--dur-state) var(--ease-out),
+    box-shadow var(--dur-state) var(--ease-out);
+}
+
+.lozenge-row input:checked + .lozenge-box {
+  background: var(--gold);
+  border-color: var(--grace);
+  box-shadow: 0 0 8px rgba(227, 207, 152, 0.45);
+}
+
+.lozenge-row input:focus-visible + .lozenge-box {
+  outline: 1px solid var(--grace);
+  outline-offset: 3px;
+}
+
+.lozenge-label {
+  flex: 1;
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.lozenge-row input:checked ~ .lozenge-label {
+  color: var(--text);
+}
+
+.lozenge-tag {
+  flex: none;
+  padding: 1px 6px 2px;
+  border: 1px solid rgba(169, 160, 127, 0.32);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: 15px;
+  color: var(--gold-mute);
+}

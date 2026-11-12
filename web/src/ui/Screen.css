@@ -1,0 +1,23 @@
+.screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  background-color: var(--ground);
+  background-repeat: no-repeat;
+  animation: fade-in var(--dur-sheet) var(--ease-out);
+}
+
+.screen.mist-centre {
+  background-image: radial-gradient(150% 470px at 50% -40px, var(--mist) 0%, var(--mist-2) 44%, rgba(10, 10, 10, 0) 78%);
+}
+
+.screen.mist-left {
+  background-image: radial-gradient(130% 460px at 24% -30px, var(--mist) 0%, var(--mist-2) 44%, rgba(10, 10, 10, 0) 76%);
+}
+
+.screen-body {
+  flex: 1;
+  padding-bottom: 28px;
+}

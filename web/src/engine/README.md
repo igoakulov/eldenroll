@@ -81,7 +81,7 @@ Every input and setting stays editable; changes apply on the next roll and never
 
 ## Inputs
 
-- **Stats** are typed by hand and impossible builds are accepted; the level isn't clamped. Gear, Great Runes and buffs are ignored; two-handing is the only adjustment.
+- **Stats** are typed by hand and impossible builds are accepted, but a run can't start below level 1. Gear, Great Runes and buffs are ignored; two-handing is the only adjustment.
 - **Regions** are the only progression input: no boss level or rune filter. Region 1 is the default, because region 2 bundles Mohgwyn and region 3 is a higher level band. Selecting the Ashen Capital drops the Royal Capital silently, except the Shunning-Grounds, which both reach. A felled Maliketh drops the Royal Capital the same way without selecting the Ashen Capital's areas.
 - **`Max stat gap`** is per item, never a shared loadout budget.
 - **Weapon shortlist** is in #Weapon shortlist; **`Boss gear locked until felled`** in #Eligibility.

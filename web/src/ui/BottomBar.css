@@ -1,0 +1,159 @@
+/* The backdrop turns solid above the buttons and thins to a dimmed strip below them, so a screen that goes on
+   shows it under the bar. */
+.bottom-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 32px var(--gutter) max(30px, calc(env(safe-area-inset-bottom, 0px) + 14px));
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0) 0,
+    rgba(10, 10, 10, 0.94) 22px,
+    var(--ground) 32px,
+    var(--ground) calc(100% - 26px),
+    rgba(10, 10, 10, 0.68) calc(100% - 8px),
+    rgba(10, 10, 10, 0.68) 100%
+  );
+}
+
+.bottom-bar-notice {
+  margin: 0 0 14px;
+  font-style: italic;
+  font-size: 17px;
+  text-align: center;
+  color: var(--blood-text);
+  animation: fade-in var(--dur-sheet) var(--ease-out);
+}
+
+/* One problem per line */
+.bottom-bar-notice > span {
+  display: block;
+}
+
+.bottom-bar-row {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 8px;
+}
+
+.glow-band,
+.ruled-button {
+  position: relative;
+  min-height: 48px;
+  border: 0;
+  text-transform: uppercase;
+  transition:
+    background var(--dur-state) var(--ease-out),
+    color var(--dur-state) var(--ease-out);
+}
+
+.glow-band::before,
+.glow-band::after,
+.ruled-button::before,
+.ruled-button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  transition: opacity var(--dur-state) var(--ease-out);
+}
+
+.glow-band::before,
+.ruled-button::before {
+  top: 0;
+}
+
+.glow-band::after,
+.ruled-button::after {
+  bottom: 0;
+}
+
+.glow-band {
+  display: block;
+  width: 100%;
+  background: radial-gradient(
+    60% 130% at 50% 50%,
+    rgba(227, 207, 152, 0.3) 0%,
+    rgba(200, 178, 122, 0.11) 50%,
+    rgba(200, 178, 122, 0) 80%
+  );
+  color: var(--grace);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-shadow: 0 0 14px rgba(227, 207, 152, 0.6);
+}
+
+.glow-band::before,
+.glow-band::after {
+  background: linear-gradient(to right, transparent, var(--gold) 22%, var(--gold) 78%, transparent);
+}
+
+.ruled-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  background: none;
+  color: var(--text-2);
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 12.5px;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+}
+
+.ruled-button .icon-svg {
+  color: var(--gold-mute);
+}
+
+.ruled-button::before,
+.ruled-button::after {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(169, 160, 127, 0.5) 22%,
+    rgba(169, 160, 127, 0.5) 78%,
+    transparent
+  );
+}
+
+/* Pressed: the glow brightens for an instant, in place of the phone's grey tap flash */
+.glow-band:active {
+  background: radial-gradient(
+    60% 130% at 50% 50%,
+    rgba(227, 207, 152, 0.46) 0%,
+    rgba(200, 178, 122, 0.18) 50%,
+    rgba(200, 178, 122, 0) 80%
+  );
+  transition-duration: 0ms;
+}
+
+.ruled-button:active {
+  color: var(--text);
+  transition-duration: 0ms;
+}
+
+.ruled-button:active::before,
+.ruled-button:active::after {
+  filter: brightness(1.6);
+}
+
+@media (hover: hover) {
+  .glow-band:hover {
+    background: radial-gradient(
+      60% 130% at 50% 50%,
+      rgba(227, 207, 152, 0.36) 0%,
+      rgba(200, 178, 122, 0.14) 50%,
+      rgba(200, 178, 122, 0) 80%
+    );
+  }
+
+  .ruled-button:hover {
+    color: var(--text);
+  }
+}

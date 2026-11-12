@@ -1,0 +1,85 @@
+.rold-pun {
+  margin: 0 0 14px;
+  font-style: italic;
+  font-size: 18.5px;
+  line-height: 1.4;
+  color: var(--gold);
+}
+
+.rold-lede {
+  max-width: 32ch;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.rold-ui {
+  color: var(--text);
+}
+
+/* The run in five steps: numbered, since it is one sequence */
+.rold-steps {
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.rold-steps li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: baseline;
+  padding: 11px var(--gutter);
+  border-top: 1px solid var(--line);
+  font-size: 18px;
+  line-height: 1.38;
+  color: var(--text-2);
+  counter-increment: step;
+}
+
+.rold-steps li:first-child {
+  border-top: 0;
+}
+
+.rold-steps li::before {
+  content: counter(step);
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--gold-mute);
+  font-variant-numeric: lining-nums;
+}
+
+/* The steps' own markup sits in the second column */
+.rold-steps li > * {
+  grid-column: 2;
+}
+
+.rold-body {
+  padding: 0 var(--gutter) 6px;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.rold-how {
+  margin: 8px 0 0;
+}
+
+.rold-how div {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  column-gap: 10px;
+  padding: 11px var(--gutter);
+  border-top: 1px solid var(--line);
+  font-size: 18px;
+  line-height: 1.38;
+}
+
+.rold-how dt {
+  color: var(--text);
+}
+
+.rold-how dd {
+  margin: 0;
+  color: var(--text-2);
+}

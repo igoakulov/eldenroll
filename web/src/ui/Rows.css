@@ -1,0 +1,96 @@
+.framed-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 2 * var(--gutter));
+  margin: 44px var(--gutter) 0;
+  padding: 14px 4px 14px 16px;
+  border: 1px solid rgba(169, 160, 127, 0.22);
+  background: rgba(19, 17, 13, 0.7);
+  text-align: left;
+  transition: border-color var(--dur-state) var(--ease-out);
+}
+
+.framed-row + .framed-row {
+  margin-top: 12px;
+}
+
+.framed-row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.framed-row .icon-svg,
+.list-row .icon-svg {
+  color: var(--gold-mute);
+}
+
+.framed-row .icon-svg {
+  margin-right: 10px;
+}
+
+.framed-row .row-title {
+  display: block;
+  font-size: 19px;
+  color: var(--text);
+}
+
+.framed-row .row-detail {
+  display: block;
+  margin-top: 2px;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--text-3);
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  text-align: left;
+}
+
+.list-row:first-child {
+  border-top: 0;
+}
+
+div.list-row {
+  cursor: default;
+}
+
+.list-row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-row .row-title {
+  display: block;
+  font-size: 19px;
+  color: var(--text);
+}
+
+.list-row .row-detail {
+  display: block;
+  margin-top: 1px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--text-3);
+}
+
+.list-row-value {
+  font-size: 17px;
+  color: var(--text-3);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+@media (hover: hover) {
+  .framed-row:hover {
+    border-color: rgba(169, 160, 127, 0.4);
+  }
+}

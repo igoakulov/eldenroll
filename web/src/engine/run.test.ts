@@ -56,6 +56,14 @@ describe("startRun", () => {
     });
   });
 
+  it("refuses a character below level 1", () => {
+    const stats = Object.fromEntries(STATS.map((stat) => [stat, 1])) as Stats;
+    expect(startRun(engine, inputs({ stats }), 1)).toEqual({
+      ok: false,
+      problems: ["Raise your stats to level 1 or above"],
+    });
+  });
+
   it("refuses a run when the selected regions' bosses are all dead already", () => {
     const inLimgrave = new Set(
       realDatabase.location.filter((row) => row.region_id === "limgrave").map((row) => row.id),
@@ -284,7 +292,8 @@ describe("Already dead and Finish run", () => {
 });
 
 describe("Weapon shortlist", () => {
-  const weak = { ...DEFAULT_STATS, str: 1, dex: 1 };
+  // Level 1, too weak for the listed weapon
+  const weak = { ...DEFAULT_STATS, vig: 28, str: 1, dex: 1 };
   const settings = { ...defaultSettings(realDatabase), characterClasses: ["knight"], weaponShortlistEnabled: true };
 
   it("rolls a listed weapon, whatever the region, boss status and stats", () => {
