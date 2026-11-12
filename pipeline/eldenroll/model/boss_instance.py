@@ -17,3 +17,4 @@ class BossInstance:
     location_label: str
     odds: float = 1
     location: str = ""
+    url: str | None = None

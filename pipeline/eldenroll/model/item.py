@@ -40,6 +40,7 @@ class Item:
     req_fth: int
     req_arc: int
     odds: float = 1
+    url: str | None = None
 
     def to_row(self) -> dict[str, object]:
         """Return the row as stored in `db.json`, in `model/` field order."""
@@ -58,4 +59,5 @@ class Item:
             "fth": self.req_fth,
             "arc": self.req_arc,
             "odds": self.odds,
+            "url": self.url,
         }

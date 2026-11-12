@@ -31,6 +31,7 @@ function fixture(bosses: readonly Pick<BossInstance, "id" | "odds">[]): Pick<
       name: row.id,
       location_id: "here",
       location: "Here",
+      url: null,
     })),
   };
 }

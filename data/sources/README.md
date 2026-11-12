@@ -95,9 +95,10 @@ From the public `deliton/eldenring-api` dataset, base game only. Its other files
 
 ## Wiki lookups
 
-- Lookups are kept outside the repository, with a working Fextralife URL per looked-up item for the card's wiki links. A small model read the pages, so a value is a lead until an override holds it.
+- Fextralife links are built from names, not looked up: `pipeline/eldenroll/build/wiki.py` builds each row's page from its name, accents dropped (`Great+Epee`). They are checked by hand in a browser, since Fextralife refuses scripted reads. A page whose name carries a suffix, such as `Beast+Claw+(Weapon)`, or any other miss, gets a row in `data/overrides/wiki_urls.csv`.
+- An Ash of War's page is built as `Ash of War: <name>`. That naming is a lead from reading the wiki, not verified.
 - Look up only what the data lacks. No wiki is authoritative: Fextralife can be wrong, and existing records are not re-verified against it.
-- Fextralife URLs sometimes need a suffix: `Beast+Claw+(Weapon)`, `Land+of+Shadow+(Incantation)`; accented names use plain spelling (`Great+Epee`). wiki.gg uses `(weapon)` and `(spell)`.
+- wiki.gg marks the same clashes with `(weapon)` and `(spell)`.
 - Fandom's boss count of 238 is not a checkable target: its lists add up to 209.
 - The armor sets start from the wiki.gg page above. It is a starting point, not a contract.
 

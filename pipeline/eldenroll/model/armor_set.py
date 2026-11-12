@@ -13,3 +13,4 @@ class ArmorSet:
     name: str
     pieces: tuple[str, ...]
     odds: float = 1
+    url: str | None = None

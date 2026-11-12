@@ -204,6 +204,7 @@ describe("on a small database", () => {
     str_bonus_2h: null,
     alias: null,
     image: null,
+    url: null,
     str: 0,
     dex: 0,
     int: 0,

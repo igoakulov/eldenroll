@@ -15,7 +15,7 @@ import { realDatabase as database } from "./realDatabase.testing";
 const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number], true> } = {
   region: { id: true, name: true, region_level: true },
   location: { id: true, name: true, region_id: true },
-  boss_instance: { id: true, name: true, location_id: true, location: true, odds: true },
+  boss_instance: { id: true, name: true, location_id: true, location: true, odds: true, url: true },
   item: {
     id: true,
     name: true,
@@ -31,8 +31,9 @@ const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number]
     fth: true,
     arc: true,
     odds: true,
+    url: true,
   },
-  armor_set: { id: true, name: true, pieces: true, odds: true },
+  armor_set: { id: true, name: true, pieces: true, odds: true, url: true },
   ash_compatibility: { ash_id: true, category: true, subcategory: true },
   combat_rule: { id: true, name: true, odds: true },
   character_class: { id: true, name: true, odds: true },

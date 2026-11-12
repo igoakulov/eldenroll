@@ -9,6 +9,7 @@ import { SlotHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
 import { Screen } from "../ui/Screen";
 import { Tile } from "../ui/Tile";
+import { WikiText, type WikiLink } from "../ui/WikiLink";
 import { FramedIconButton, LevelButton, TopBar } from "../ui/TopBar";
 import { ARMOR_PIECE_ICONS, CHARACTER_CLASS_ICONS, EMPTY_SLOT_ICONS, iconKey } from "./icons";
 import { RerollPanel } from "./RerollPanel";
@@ -50,6 +51,13 @@ function nameOf(display: SlotDisplay): string | null {
     default:
       return null;
   }
+}
+
+/** Only a real item or set has a page: `none`, `any` and an alias's label have none. */
+function linkOf(display: SlotDisplay): WikiLink | null {
+  if (display.kind === "item" && display.item.url !== null) return { name: display.item.name, url: display.item.url };
+  if (display.kind === "armor_set" && display.set.url !== null) return { name: display.set.name, url: display.set.url };
+  return null;
 }
 
 function iconOf(display: SlotDisplay): string | null {
@@ -121,10 +129,14 @@ function Hand({ label, hand, ash, emptyIcon }: {
   const empty = hand.kind === "none";
   return (
     <div className="hand">
-      <Tile size="lg" icon={empty ? emptyIcon : iconOf(hand)} empty={empty} />
+      <Tile size="lg" icon={empty ? emptyIcon : iconOf(hand)} empty={empty} link={linkOf(hand)} />
       <span className="small-label">{label}</span>
       <SlotName display={hand} className="slot-name" />
-      {(ash.kind === "item" || ash.kind === "alias") && <span className="slot-ash">{nameOf(ash)}</span>}
+      {(ash.kind === "item" || ash.kind === "alias") && (
+        <WikiText url={linkOf(ash)?.url ?? null} className="slot-ash">
+          {nameOf(ash)}
+        </WikiText>
+      )}
     </div>
   );
 }
@@ -133,7 +145,7 @@ function SmallSlot({ display, emptyIcon }: { readonly display: SlotDisplay; read
   const empty = display.kind === "none";
   return (
     <div className="small-slot">
-      <Tile size="sm" icon={empty ? emptyIcon : iconOf(display)} empty={empty} />
+      <Tile size="sm" icon={empty ? emptyIcon : iconOf(display)} empty={empty} link={linkOf(display)} />
       <SlotName display={display} className="slot-name" />
     </div>
   );
@@ -143,7 +155,9 @@ function Armor({ display }: { readonly display: SlotDisplay }) {
   if (display.kind !== "armor_set") return <SmallSlot display={display} emptyIcon={ARMOR_PIECE_ICONS.body} />;
   return (
     <div className="armor">
-      <span className="slot-name">{display.set.name}</span>
+      <WikiText url={display.set.url} className="slot-name">
+        {display.set.name}
+      </WikiText>
       <div className="armor-pieces">
         {ARMOR_PIECES.map((piece) => {
           // A `None` piece keeps the slot empty, unlike `any` (web/src/engine/README.md#Empty slots and aliases)
@@ -151,7 +165,7 @@ function Armor({ display }: { readonly display: SlotDisplay }) {
           const shown = rolled.kind === "alias" && rolled.item.alias === NONE_ALIAS ? NONE : rolled;
           return (
             <div className="armor-piece" key={piece}>
-              <Tile size="sm" icon={ARMOR_PIECE_ICONS[piece]} empty={shown.kind === "none"} />
+              <Tile size="sm" icon={ARMOR_PIECE_ICONS[piece]} empty={shown.kind === "none"} link={linkOf(shown)} />
               <SlotName display={shown} className="armor-piece-name" />
             </div>
           );
@@ -298,7 +312,9 @@ export function Card({
       <section className="boss" aria-labelledby="boss-name">
         <Changed key={keys.boss} {...change("boss")}>
           <h1 className="boss-name r" id="boss-name" style={at(80)}>
-            {boss?.name ?? "unknown boss"}
+            <WikiText url={boss?.url ?? null} className="boss-name-text">
+              {boss?.name ?? "unknown boss"}
+            </WikiText>
           </h1>
           <BossBar onFelled={() => setPanel({ open: true, felled: true })} />
           <p className="boss-location r" style={at(420)}>

@@ -18,7 +18,7 @@ Row = Mapping[str, object]
 TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
     "region": ("id", "name", "region_level"),
     "location": ("id", "name", "region_id"),
-    "boss_instance": ("id", "name", "location_id", "location", "odds"),
+    "boss_instance": ("id", "name", "location_id", "location", "odds", "url"),
     "item": (
         "id",
         "name",
@@ -34,8 +34,9 @@ TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
         "fth",
         "arc",
         "odds",
+        "url",
     ),
-    "armor_set": ("id", "name", "pieces", "odds"),
+    "armor_set": ("id", "name", "pieces", "odds", "url"),
     "ash_compatibility": ("ash_id", "category", "subcategory"),
     "combat_rule": ("id", "name", "odds"),
     "character_class": ("id", "name", "odds"),
@@ -63,12 +64,19 @@ def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
                 "location_id": row.location_id,
                 "location": row.location,
                 "odds": _number(row.odds),
+                "url": row.url,
             }
             for row in database.bosses
         ],
         "item": [{**row.to_row(), "odds": _number(row.odds)} for row in database.items],
         "armor_set": [
-            {"id": row.id, "name": row.name, "pieces": list(row.pieces), "odds": _number(row.odds)}
+            {
+                "id": row.id,
+                "name": row.name,
+                "pieces": list(row.pieces),
+                "odds": _number(row.odds),
+                "url": row.url,
+            }
             for row in database.armor_sets
         ],
         "ash_compatibility": [

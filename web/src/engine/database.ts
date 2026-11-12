@@ -64,6 +64,7 @@ export interface BossInstance {
   readonly location_id: string;
   readonly location: string;
   readonly odds: number;
+  readonly url: string | null;
 }
 
 export interface Item {
@@ -81,6 +82,7 @@ export interface Item {
   readonly fth: number;
   readonly arc: number;
   readonly odds: number;
+  readonly url: string | null;
 }
 
 export interface ArmorSet {
@@ -88,6 +90,7 @@ export interface ArmorSet {
   readonly name: string;
   readonly pieces: readonly string[];
   readonly odds: number;
+  readonly url: string | null;
 }
 
 export interface AshCompatibility {

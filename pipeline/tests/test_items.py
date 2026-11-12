@@ -35,6 +35,7 @@ SECTION_2_FIELDS = [
     "fth",
     "arc",
     "odds",
+    "url",
 ]
 
 
@@ -98,6 +99,7 @@ def test_new_item_defaults_are_the_non_weapon_row() -> None:
         "fth": 0,
         "arc": 0,
         "odds": 1,
+        "url": None,
     }
 
 
@@ -201,6 +203,7 @@ def test_the_none_row_holds_exactly_the_documented_values() -> None:
         "fth": 0,
         "arc": 0,
         "odds": 1,
+        "url": None,
     }
 
 

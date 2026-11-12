@@ -6,7 +6,7 @@ import { indexDatabase } from "./engineData";
 import { realDatabase } from "./realDatabase.testing";
 
 function boss(id: string, odds = 1): [string, BossInstance] {
-  return [id, { id, name: id, location_id: "tile", location: "Tile", odds }];
+  return [id, { id, name: id, location_id: "tile", location: "Tile", odds, url: null }];
 }
 
 const BOSSES = new Map([boss("alive"), boss("dead"), boss("zero", 0)]);

@@ -1,0 +1,36 @@
+/* A link reads as a dotted underline, and its tap target reaches past the text */
+.wiki-text {
+  position: relative;
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--dotted);
+  text-underline-offset: 3px;
+}
+
+.wiki-text::after {
+  content: "";
+  position: absolute;
+  inset: -12px -4px;
+}
+
+.tile-link {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tile-link::before {
+  content: "";
+  position: absolute;
+  inset: -3px -3px -8px;
+}
+
+.tile-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: repeating-linear-gradient(to right, var(--dotted) 0 1px, transparent 1px 3px);
+}

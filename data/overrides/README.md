@@ -30,6 +30,7 @@ Each file's name and header say what it holds. What they don't say:
 | `boss_slot_links.csv`, `placement_areas.csv` | several rows for one item and area give it one row per boss or area; any one counts |
 | `aliases.csv` | `members` are selectors, never name matches; an item in two aliases stops the build |
 | `combat_rules.csv` | a rule has no description: its name says the whole rule |
+| `wiki_urls.csv` | the Fextralife page a name doesn't reach; an empty `url` means no link (`data/sources/README.md#Wiki lookups`) |
 
 ## Regions
 

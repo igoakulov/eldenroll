@@ -188,6 +188,16 @@
   margin-top: 0;
 }
 
+/* A linked name keeps its underline and tap target to the text */
+.slot-ash.wiki-text,
+.armor > .slot-name.wiki-text {
+  display: inline-block;
+}
+
+.boss-name .wiki-text {
+  text-underline-offset: 6px;
+}
+
 .talismans {
   display: flex;
   flex-direction: column;
