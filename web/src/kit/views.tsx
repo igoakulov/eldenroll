@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { copy } from "../copy";
 import { DEFAULT_REGIONS } from "../engine/regions";
 import { objectiveNumber } from "../engine/run";
 import { DEFAULT_STATS } from "../engine/settings";
@@ -41,10 +42,10 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
   const rollableBosses = database.boss_instance.filter((boss) => boss.odds > 0);
   const before = boardBefore([], []);
   const settingsOn = (tab: SettingsTab, query = ""): KitView => ({
-    title: `Run settings, ${tab}${query === "" ? "" : `, searching “${query}”`}`,
+    title: `Run settings, ${copy.runSettings.tabs[tab]}${query === "" ? "" : `, searching “${query}”`}`,
     render: () => (
       <RunSettings
-        eyebrow="New run"
+        eyebrow={copy.common.newRun}
         settings={settings}
         lists={{ neverRoll: [], weaponShortlist: [] }}
         gear={gear}
@@ -73,7 +74,7 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
   );
   const felled = (undoTo: RunWithObjective, label: string) => (
     <Felled
-      bossName={engine.data.bosses.get(undoTo.current.boss)?.name ?? "unknown boss"}
+      bossName={engine.data.bosses.get(undoTo.current.boss)?.name ?? copy.common.unknownBoss}
       label={label}
       behind={card(undoTo, false)}
       onZero={noop}
@@ -82,7 +83,7 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
   );
   const bosses = (extra: { readonly defaultQuery?: string; readonly defaultExpanded?: boolean }) => (
     <Bosses
-      eyebrow={`Objective ${objectiveNumber(runs.progressed)}`}
+      eyebrow={copy.common.objective(objectiveNumber(runs.progressed))}
       bosses={rollableBosses}
       board={boardOf(runs.progressed)}
       onSave={noop}
@@ -131,22 +132,22 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
     "start-loading": { title: "Start, loading", render: () => <StartLoading /> },
     "start-failed": { title: "Start, failed", render: () => <StartFailed onRetry={noop} /> },
     "rold-card": { title: "Elden Rold card", render: () => <RoldCard onClose={noop} /> },
-    "run-settings-general": settingsOn("General"),
-    "run-settings-never-roll": settingsOn("Never roll"),
-    "run-settings-never-roll-search": settingsOn("Never roll", GEAR_QUERY),
-    "run-settings-shortlist": settingsOn("Shortlist"),
+    "run-settings-general": settingsOn("general"),
+    "run-settings-never-roll": settingsOn("neverRoll"),
+    "run-settings-never-roll-search": settingsOn("neverRoll", GEAR_QUERY),
+    "run-settings-shortlist": settingsOn("shortlist"),
     bosses: { title: "Bosses", render: () => bosses({}) },
     "bosses-search": { title: `Bosses, searching “${BOSS_QUERY}”`, render: () => bosses({ defaultQuery: BOSS_QUERY }) },
     "bosses-all": { title: "Bosses, objectives shown in full", render: () => bosses({ defaultExpanded: true }) },
     card: { title: "Card", render: () => card(runs.first, true) },
     "felled-next": {
       title: "Great enemy felled, next objective",
-      render: () => felled(runs.first, "Next objective in"),
+      render: () => felled(runs.first, copy.felled.nextObjectiveIn),
     },
     "felled-rerolling": {
       title: "Great enemy felled, rerolling",
       // As after `Felled?`: the card behind is the run before the reroll
-      render: () => felled(runs.toReroll, "Rerolling in"),
+      render: () => felled(runs.toReroll, copy.felled.rerollingIn),
     },
     "level-up-next": {
       title: "Level up, next objective",

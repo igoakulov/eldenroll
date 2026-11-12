@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
+import { copy } from "../copy";
 import { Icon } from "./Icon";
 import "./Sheet.css";
 import "./TopBar.css";
@@ -30,7 +31,7 @@ export function Sheet({
   open,
   eyebrow,
   alert = false,
-  closeLabel = "Cancel",
+  closeLabel = copy.controls.cancel,
   onClose,
   children,
 }: {

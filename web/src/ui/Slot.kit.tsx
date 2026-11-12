@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import { displaySlots, type RolledSlots } from "../engine/display";
 import type { KitBlock } from "../kit/kit";
 import type { KitData } from "../kit/kitData";
@@ -28,8 +29,8 @@ function Hands({ kit }: { readonly kit: KitData }) {
   const slots = shown(kit, { lh: null, rh: kit.samples.weapon.id, rh_ash: kit.samples.ash.id });
   return (
     <div className="kit-hands">
-      <Hand label="Left hand" hand={slots.lh} ash={slots.lh_ash} emptyIcon={EMPTY_SLOT_ICONS.lh} />
-      <Hand label="Right hand" hand={slots.rh} ash={slots.rh_ash} emptyIcon={EMPTY_SLOT_ICONS.rh} />
+      <Hand label={copy.card.leftHand} hand={slots.lh} ash={slots.lh_ash} emptyIcon={EMPTY_SLOT_ICONS.lh} />
+      <Hand label={copy.card.rightHand} hand={slots.rh} ash={slots.rh_ash} emptyIcon={EMPTY_SLOT_ICONS.rh} />
     </div>
   );
 }

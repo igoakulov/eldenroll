@@ -1,5 +1,6 @@
 import type { Ref } from "react";
 
+import { copy } from "../copy";
 import { Icon } from "./Icon";
 import "./UndoButton.css";
 
@@ -8,7 +9,7 @@ export function UndoButton({ onClick, ref }: { readonly onClick: () => void; rea
   return (
     <button ref={ref} type="button" className="undo-button" onClick={onClick}>
       <Icon name="undo" size={22} />
-      <span className="undo-button-label">Undo</span>
+      <span className="undo-button-label">{copy.controls.undo}</span>
     </button>
   );
 }

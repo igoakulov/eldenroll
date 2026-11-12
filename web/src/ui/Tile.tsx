@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import { Icon } from "./Icon";
 import type { WikiLink } from "./WikiLink";
 import "./Tile.css";
@@ -22,7 +23,7 @@ export function Tile({
   const glyph = icon !== null && <Icon name={`${icon}${file.suffix}`} size={file.size} />;
   if (link === undefined || link === null) return <span className={className}>{glyph}</span>;
   return (
-    <a className={`${className} tile-link`} href={link.url} target="_blank" rel="noopener" aria-label={`${link.name} on the wiki`}>
+    <a className={`${className} tile-link`} href={link.url} target="_blank" rel="noopener" aria-label={copy.controls.onTheWiki(link.name)}>
       {glyph}
     </a>
   );

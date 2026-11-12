@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { copy } from "../copy";
 import { Icon, Lozenge } from "./Icon";
 import "./TopBar.css";
 
@@ -36,8 +37,8 @@ export function FramedIconButton({
 
 export function LevelButton({ level, onClick }: { readonly level: number; readonly onClick?: () => void }) {
   return (
-    <button type="button" className="level-button" aria-label={`Level up, level ${level}`} onClick={onClick}>
-      <span>Level</span>
+    <button type="button" className="level-button" aria-label={copy.controls.levelButton(level)} onClick={onClick}>
+      <span>{copy.common.level}</span>
       {level}
     </button>
   );

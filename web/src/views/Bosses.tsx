@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { BossInstance } from "../engine/database";
 import type { BossState } from "../engine/run";
 import { BottomBar, GlowBand } from "../ui/BottomBar";
@@ -13,21 +14,16 @@ import { bossSections, type BossBoard, type BossRow, type SectionKind } from "./
 import "./Bosses.css";
 
 export const BOSS_STATES = [
-  { value: "alive", label: "Alive", lines: ["Can be rolled as an objective.", "Its gear cannot be rolled yet."] },
-  { value: "dead", label: "Felled", lines: ["Felled in an objective or on the way.", "Its gear can be rolled."] },
-  { value: "skipped", label: "Skipped", lines: ["Never rolled as an objective.", "Its gear cannot be rolled."] },
+  { value: "alive", ...copy.bosses.states.alive },
+  { value: "dead", ...copy.bosses.states.dead },
+  { value: "skipped", ...copy.bosses.states.skipped },
 ] as const satisfies readonly {
   readonly value: BossState;
   readonly label: string;
   readonly lines: readonly string[];
 }[];
 
-const SEARCH_TITLES: Readonly<Record<SectionKind, string>> = {
-  alive: "Alive",
-  skipped: "Skipped",
-  dead: "Felled on the way",
-  objectives: "Felled in objectives",
-};
+const SEARCH_TITLES: Readonly<Record<SectionKind, string>> = copy.bosses.searchTitles;
 
 function BossText({ row }: { readonly row: BossRow }) {
   return (
@@ -72,7 +68,7 @@ export function Bosses({
 
   const control = (row: BossRow) => {
     if (row.objective !== undefined) return null;
-    if (row.boss.id === board.current) return <span className="boss-fixed">Current</span>;
+    if (row.boss.id === board.current) return <span className="boss-fixed">{copy.bosses.current}</span>;
     return (
       <Cycler
         label={row.boss.name}
@@ -116,15 +112,15 @@ export function Bosses({
               )
             }
           >
-            Save
+            {copy.common.save}
           </GlowBand>
         </BottomBar>
       }
     >
       <TopBar eyebrow={eyebrow}>
-        <FramedIconButton icon="close" label="Close without saving" onClick={onClose} />
+        <FramedIconButton icon="close" label={copy.common.closeWithoutSaving} onClick={onClose} />
       </TopBar>
-      <ScreenHead title="Bosses" />
+      <ScreenHead title={copy.common.bosses} />
       <dl className="bosses-legend">
         {BOSS_STATES.map((state) => (
           <div key={state.value}>
@@ -138,7 +134,7 @@ export function Bosses({
         ))}
       </dl>
       <SearchField
-        label="Search bosses"
+        label={copy.bosses.search}
         value={query}
         onChange={(next) => {
           setQuery(next);
@@ -146,7 +142,7 @@ export function Bosses({
         }}
       />
 
-      {searching && sections.length === 0 && <SearchNone>No boss by that name.</SearchNone>}
+      {searching && sections.length === 0 && <SearchNone>{copy.bosses.notFound}</SearchNone>}
       {sections.map((section) => {
         if (searching) {
           return (
@@ -160,10 +156,10 @@ export function Bosses({
         if (section.kind === "objectives") {
           return (
             <section key={section.kind}>
-              <SectionHeading>{count} felled in objectives</SectionHeading>
+              <SectionHeading>{count} {copy.bosses.countedInObjectives}</SectionHeading>
               {expanded && rows(section.rows, true)}
               <ShowAll expanded={expanded} onToggle={() => setExpanded(!expanded)}>
-                {expanded ? "Show less" : `Show all ${section.rows.length}`}
+                {expanded ? copy.bosses.showLess : copy.bosses.showAll(section.rows.length)}
               </ShowAll>
             </section>
           );
@@ -171,7 +167,7 @@ export function Bosses({
         return (
           <section key={section.kind}>
             <SectionHeading>
-              {count} {section.kind === "skipped" ? "skipped" : "felled on the way"}
+              {count} {section.kind === "skipped" ? copy.bosses.countedSkipped : copy.bosses.countedOnTheWay}
             </SectionHeading>
             {rows(section.rows)}
           </section>

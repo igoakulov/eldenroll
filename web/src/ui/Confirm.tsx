@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import { GlowBand } from "./BottomBar";
 import { Chip, Chips } from "./Chips";
 import { Sheet } from "./Sheet";
@@ -30,7 +31,7 @@ export function Confirm({
   return (
     <Sheet open={open} eyebrow={title} alert onClose={onClose}>
       <p className="confirm-ask">{question}</p>
-      <Chips label="What happens">
+      <Chips label={copy.confirm.chipsLabel}>
         {parts.map((part) => (
           <Chip key={part.text} lit={!part.lost} red={part.lost}>
             {part.text}

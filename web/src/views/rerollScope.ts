@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import type { RolledSlots } from "../engine/display";
 import { LOADOUT_ORDER } from "../engine/loadout";
 import type { RerollTarget } from "../engine/run";
@@ -5,15 +6,15 @@ import type { RerollTarget } from "../engine/run";
 /** The reroll panel's stops left to right, in reverse roll order, each with the chip naming its target
  * (`web/src/engine/README.md#Rerolls`). A stop lights its own chip and every chip to its left. */
 export const REROLL_STOPS: readonly { readonly target: RerollTarget; readonly chip: string }[] = [
-  { target: "armor", chip: "Armor" },
-  { target: "rule_1", chip: "Rules" },
-  { target: "talisman_1", chip: "Talismans" },
-  { target: "item", chip: "Item" },
-  { target: "spell", chip: "Spell" },
-  { target: "lh", chip: "Left hand" },
-  { target: "rh", chip: "Right hand" },
-  { target: "character_class", chip: "Class" },
-  { target: "boss", chip: "Boss" },
+  { target: "armor", chip: copy.reroll.chips.armor },
+  { target: "rule_1", chip: copy.reroll.chips.rules },
+  { target: "talisman_1", chip: copy.reroll.chips.talismans },
+  { target: "item", chip: copy.reroll.chips.item },
+  { target: "spell", chip: copy.reroll.chips.spell },
+  { target: "lh", chip: copy.reroll.chips.leftHand },
+  { target: "rh", chip: copy.reroll.chips.rightHand },
+  { target: "character_class", chip: copy.reroll.chips.characterClass },
+  { target: "boss", chip: copy.reroll.chips.boss },
 ];
 
 export const OPENING_STOP = REROLL_STOPS.findIndex((stop) => stop.target === "character_class");

@@ -1,18 +1,10 @@
+import { copy } from "../copy";
 import type { Region } from "../engine/database";
 import { MAX_STAT, MIN_STAT, STATS, correctedStat, type Stat, type Stats } from "../engine/settings";
 import { LozengeCheckbox } from "../ui/LozengeCheckbox";
 import { Stepper } from "../ui/Stepper";
 
-export const STAT_NAMES: Readonly<Record<Stat, string>> = {
-  vig: "Vigor",
-  mind: "Mind",
-  end: "Endurance",
-  str: "Strength",
-  dex: "Dexterity",
-  int: "Intelligence",
-  fth: "Faith",
-  arc: "Arcane",
-};
+export const STAT_NAMES: Readonly<Record<Stat, string>> = copy.statsAndRegions.stats;
 
 const DLC_PREFIX = "DLC: ";
 
@@ -76,7 +68,7 @@ export function RegionCheck({
             : selected.filter((id) => id !== region.id),
         )
       }
-      {...(dlc ? { tag: "DLC" } : {})}
+      {...(dlc ? { tag: copy.statsAndRegions.dlc } : {})}
       {...(className === undefined ? {} : { className })}
     >
       {dlc ? region.name.slice(DLC_PREFIX.length) : region.name}

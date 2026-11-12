@@ -1,12 +1,13 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import { KitPad, type KitBlock } from "../kit/kit";
 import { OPENING_STOP, REROLL_STOPS } from "../views/rerollScope";
 import { StopSlider } from "./StopSlider";
 
 const noop = () => {};
 const LAST = REROLL_STOPS.length - 1;
-const ENDS = ["Armor only", "Full objective"] as const;
+const ENDS = [copy.reroll.armorOnly, copy.reroll.fullObjective] as const;
 
 function at(stop: number, locked = false) {
   return (
@@ -15,7 +16,7 @@ function at(stop: number, locked = false) {
         stops={REROLL_STOPS.length}
         value={stop}
         onChange={noop}
-        label="Reroll scope"
+        label={copy.reroll.slider}
         valueText={REROLL_STOPS[stop]?.chip ?? ""}
         ends={ENDS}
         locked={locked}
@@ -32,7 +33,7 @@ function LiveSlider() {
         stops={REROLL_STOPS.length}
         value={stop}
         onChange={setStop}
-        label="Reroll scope"
+        label={copy.reroll.slider}
         valueText={REROLL_STOPS[stop]?.chip ?? ""}
         ends={ENDS}
       />

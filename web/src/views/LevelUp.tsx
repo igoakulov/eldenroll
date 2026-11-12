@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { Region } from "../engine/database";
 import { WAITING_MESSAGES, objectiveNumber, type Run } from "../engine/run";
 import { derivedLevel, type Stats } from "../engine/settings";
@@ -59,7 +60,8 @@ export function LevelUp({
   const shown = expanded ? byLevel(regions) : next;
   const nextIds = new Set(next.map((region) => region.id));
   const notice = mode === "next" && run.waiting !== null && editedAt !== run ? WAITING_MESSAGES[run.waiting] : null;
-  const eyebrow = mode === "next" ? `Objective ${run.completed.length} complete` : `Objective ${objectiveNumber(run)}`;
+  const eyebrow =
+    mode === "next" ? copy.levelUp.complete(run.completed.length) : copy.common.objective(objectiveNumber(run));
 
   return (
     <Screen
@@ -70,27 +72,23 @@ export function LevelUp({
         ) : null
       }
       bottom={
-        <BottomBar {...(notice === null ? {} : { notice: `${notice}.` })}>
+        <BottomBar {...(notice === null ? {} : { notice })}>
           <GlowBand onClick={() => onSave({ stats, regions: selected })}>
-            {mode === "next" ? `Roll objective ${objectiveNumber(run)}` : "Save"}
+            {mode === "next" ? copy.levelUp.rollObjective(objectiveNumber(run)) : copy.common.save}
           </GlowBand>
         </BottomBar>
       }
     >
       <TopBar eyebrow={eyebrow}>
         {mode === "next" ? (
-          <FramedIconButton icon="menu" label="Menu" onClick={() => setMenuOpen(true)} />
+          <FramedIconButton icon="menu" label={copy.common.menu} onClick={() => setMenuOpen(true)} />
         ) : (
-          <FramedIconButton icon="close" label="Close without saving" onClick={onClose} />
+          <FramedIconButton icon="close" label={copy.common.closeWithoutSaving} onClick={onClose} />
         )}
       </TopBar>
       <ScreenHead
-        title="Level up"
-        lede={
-          mode === "next"
-            ? "Update your stats and regions before you roll next objective."
-            : "Changes apply on the next roll."
-        }
+        title={copy.common.levelUp}
+        lede={mode === "next" ? copy.levelUp.ledeNext : copy.common.changesApplyOnNextRoll}
       />
 
       <LevelTotal level={derivedLevel(stats)} before={derivedLevel(before)} />
@@ -103,12 +101,10 @@ export function LevelUp({
         }}
       />
 
-      <SectionHeading>Regions</SectionHeading>
+      <SectionHeading>{copy.common.regions}</SectionHeading>
       <p className="level-up-regions-sum">
-        <span>
-          {selected.length} of {regions.length} selected
-        </span>
-        {!expanded && next.length > 0 && <span className="level-up-regions-order">Next in order</span>}
+        <span>{copy.levelUp.regionsSelected(selected.length, regions.length)}</span>
+        {!expanded && next.length > 0 && <span className="level-up-regions-order">{copy.levelUp.nextInOrder}</span>}
       </p>
       <div className="level-up-regions">
         {shown.map((region) => (
@@ -126,7 +122,7 @@ export function LevelUp({
         ))}
       </div>
       <ShowAll expanded={expanded} onToggle={() => setExpanded(!expanded)}>
-        {expanded ? "Show fewer regions" : `Show all ${regions.length} regions`}
+        {expanded ? copy.levelUp.showFewerRegions : copy.levelUp.showAllRegions(regions.length)}
       </ShowAll>
     </Screen>
   );

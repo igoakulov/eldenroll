@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { copy } from "../copy";
 import { indexDatabase } from "./engineData";
 import { DEFAULT_HYPERPARAMS } from "./hyperparams";
 import { realDatabase } from "./realDatabase.testing";
@@ -57,7 +58,7 @@ describe("startRun", () => {
     const settings = { ...defaultSettings(realDatabase), characterClasses: [] };
     expect(startRun(engine, inputs({ regions: [], settings }), 1)).toEqual({
       ok: false,
-      problems: ["Select at least one class", "Select at least one region"],
+      problems: [copy.notices.noClass, copy.notices.noRegion],
     });
   });
 
@@ -65,7 +66,7 @@ describe("startRun", () => {
     const stats = Object.fromEntries(STATS.map((stat) => [stat, 1])) as Stats;
     expect(startRun(engine, inputs({ stats }), 1)).toEqual({
       ok: false,
-      problems: ["Raise your stats to level 1 or above"],
+      problems: [copy.notices.lowLevel],
     });
   });
 

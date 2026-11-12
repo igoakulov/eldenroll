@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import { KitPad, type KitBlock } from "../kit/kit";
 import { OPENING_STOP, REROLL_STOPS } from "../views/rerollScope";
 import { Chip, Chips } from "./Chips";
@@ -9,7 +10,7 @@ function LiveChips() {
   const [scope, setScope] = useState({ stop: OPENING_STOP, from: OPENING_STOP, glide: false });
   return (
     <KitPad>
-      <Chips label="Lit slots will change" instant={!scope.glide}>
+      <Chips label={copy.reroll.chipsLabel} instant={!scope.glide}>
         {REROLL_STOPS.map((stop, index) => (
           <Chip key={stop.target} lit={index <= scope.stop} at={glideAt(index, scope.from, scope.stop)}>
             {stop.chip}
@@ -20,9 +21,9 @@ function LiveChips() {
         stops={REROLL_STOPS.length}
         value={scope.stop}
         onChange={(stop, glide) => setScope((last) => ({ stop, from: last.stop, glide }))}
-        label="Reroll scope"
+        label={copy.reroll.slider}
         valueText={REROLL_STOPS[scope.stop]?.chip ?? ""}
-        ends={["Armor only", "Full objective"]}
+        ends={[copy.reroll.armorOnly, copy.reroll.fullObjective]}
       />
     </KitPad>
   );
@@ -39,7 +40,7 @@ export const kit: readonly KitBlock[] = [
         label: "lit",
         render: () => (
           <Chips label="lit">
-            <Chip lit>New objective</Chip>
+            <Chip lit>{copy.reroll.newObjective}</Chip>
           </Chips>
         ),
       },
@@ -47,7 +48,7 @@ export const kit: readonly KitBlock[] = [
         label: "grey",
         render: () => (
           <Chips label="grey">
-            <Chip lit={false}>Boss</Chip>
+            <Chip lit={false}>{copy.reroll.chips.boss}</Chip>
           </Chips>
         ),
       },
@@ -56,7 +57,7 @@ export const kit: readonly KitBlock[] = [
         render: () => (
           <Chips label="red">
             <Chip lit={false} red>
-              Cannot resume
+              {copy.confirm.finishCannotResume}
             </Chip>
           </Chips>
         ),

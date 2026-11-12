@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { Region } from "../engine/database";
 import type { Run } from "../engine/run";
 import { derivedLevel, type Stats } from "../engine/settings";
@@ -23,10 +24,12 @@ function Wordmark({ loading = false }: { readonly loading?: boolean }) {
     <Tag
       className={`wordmark${loading ? " wordmark-loading" : ""}`}
       role={loading ? "status" : undefined}
-      aria-label={loading ? "Loading" : "EldenRoll"}
+      aria-label={loading ? copy.start.loading : copy.common.appName}
     >
+      {/* not copy: the wordmark's letters around its O */}
       <span aria-hidden="true">ELDENR</span>
       <WordmarkO className="wordmark-o" />
+      {/* not copy: the wordmark's letters around its O */}
       <span aria-hidden="true">LL</span>
     </Tag>
   );
@@ -69,10 +72,10 @@ export function Start({
       bottom={
         <BottomBar
           {...(problems.length > 0
-            ? { notice: problems.map((problem) => <span key={problem}>{problem}.</span>) }
+            ? { notice: problems.map((problem) => <span key={problem}>{problem}</span>) }
             : {})}
         >
-          <GlowBand onClick={onStartRun}>Start run</GlowBand>
+          <GlowBand onClick={onStartRun}>{copy.start.startRun}</GlowBand>
         </BottomBar>
       }
     >
@@ -82,7 +85,7 @@ export function Start({
         <LevelTotal level={derivedLevel(stats)} />
         <StatSteppers stats={stats} onStats={onStats} />
 
-        <SectionHeading>Regions</SectionHeading>
+        <SectionHeading>{copy.common.regions}</SectionHeading>
         <div>
           {byLevel(regions).map((region) => (
             <RegionCheck
@@ -96,7 +99,7 @@ export function Start({
         </div>
       </div>
 
-      <FramedRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={onRunSettings} />
+      <FramedRow title={copy.common.runSettings} detail={copy.common.runSettingsDetail} onClick={onRunSettings} />
 
     </Screen>
   );
@@ -123,16 +126,16 @@ export function StartResume({
       sheet={<NewRunConfirm open={confirming} run={run} onClose={() => setConfirming(false)} onConfirm={onNewRun} />}
       bottom={
         <BottomBar>
-          <RuledButton onClick={() => setConfirming(true)}>New run</RuledButton>
-          <GlowBand onClick={onResume}>Resume</GlowBand>
+          <RuledButton onClick={() => setConfirming(true)}>{copy.common.newRun}</RuledButton>
+          <GlowBand onClick={onResume}>{copy.start.resume}</GlowBand>
         </BottomBar>
       }
     >
       <Hero onOpenCard={onOpenCard} />
-      <section className="in-run" aria-label="Run in progress">
-        <SectionHeading>Current run</SectionHeading>
+      <section className="in-run" aria-label={copy.start.runInProgress}>
+        <SectionHeading>{copy.start.currentRun}</SectionHeading>
         <div className="in-run-rows">
-          <ListRow title={title} detail="In progress" />
+          <ListRow title={title} detail={copy.start.inProgress} />
         </div>
       </section>
     </Screen>
@@ -156,7 +159,7 @@ export function StartFailed({ onRetry }: { readonly onRetry: () => void }) {
       mist="centre"
       bottom={
         <BottomBar>
-          <GlowBand onClick={onRetry}>Try again</GlowBand>
+          <GlowBand onClick={onRetry}>{copy.start.tryAgain}</GlowBand>
         </BottomBar>
       }
     >
@@ -164,7 +167,7 @@ export function StartFailed({ onRetry }: { readonly onRetry: () => void }) {
         <Wordmark />
       </header>
       <p className="start-failed" role="alert">
-        The game data could not be loaded. Check your connection, then try again.
+        {copy.start.loadFailed}
       </p>
     </Screen>
   );

@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 
+import { copy } from "../copy";
 import type { CharacterClass } from "../engine/database";
 import { MAX_STAT, correctedMaxStatGap, settingsProblems, type Settings } from "../engine/settings";
 import { BottomBar, GlowBand } from "../ui/BottomBar";
@@ -15,7 +16,7 @@ import { GearPicker } from "./GearPicker";
 import { CHARACTER_CLASS_ICONS } from "./icons";
 import "./RunSettings.css";
 
-export const SETTINGS_TABS = ["General", "Never roll", "Shortlist"] as const;
+export const SETTINGS_TABS = ["general", "neverRoll", "shortlist"] as const;
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 /** Run state rather than settings (`Settings`), edited on this screen all the same. */
@@ -73,7 +74,7 @@ export function RunSettings({
       bottom={
         <BottomBar
           {...(problems.length > 0
-            ? { notice: problems.map((problem) => <span key={problem}>{problem}.</span>) }
+            ? { notice: problems.map((problem) => <span key={problem}>{problem}</span>) }
             : {})}
         >
           <GlowBand
@@ -83,25 +84,25 @@ export function RunSettings({
               else onSave(draft, listsDraft);
             }}
           >
-            Save
+            {copy.common.save}
           </GlowBand>
         </BottomBar>
       }
     >
       <TopBar eyebrow={eyebrow}>
-        <FramedIconButton icon="close" label="Close without saving" onClick={onClose} />
+        <FramedIconButton icon="close" label={copy.common.closeWithoutSaving} onClick={onClose} />
       </TopBar>
-      <ScreenHead title="Run settings" lede="Changes apply on the next roll." />
+      <ScreenHead title={copy.common.runSettings} lede={copy.common.changesApplyOnNextRoll} />
 
       <Tabs
-        label="Run settings"
-        tabs={SETTINGS_TABS}
+        label={copy.common.runSettings}
+        tabs={SETTINGS_TABS.map((one) => copy.runSettings.tabs[one])}
         selected={SETTINGS_TABS.indexOf(tab)}
-        onSelect={(index) => onTab(SETTINGS_TABS[index] ?? "General")}
+        onSelect={(index) => onTab(SETTINGS_TABS[index] ?? "general")}
       >
-        {tab === "General" && (
+        {tab === "general" && (
           <>
-            <SectionHeading>Classes</SectionHeading>
+            <SectionHeading>{copy.runSettings.classes}</SectionHeading>
             <div>
               {characterClasses.map((row) => (
                 <LozengeCheckbox
@@ -123,12 +124,12 @@ export function RunSettings({
               ))}
             </div>
 
-            <SectionHeading>Gear</SectionHeading>
+            <SectionHeading>{copy.runSettings.gear}</SectionHeading>
             <div>
               <Stepper
                 id="max-stat-gap"
-                label="Max stat gap"
-                detail="Points an item may need above your stats"
+                label={copy.runSettings.maxStatGap}
+                detail={copy.runSettings.maxStatGapDetail}
                 value={draft.maxStatGap}
                 min={0}
                 max={MAX_STAT}
@@ -137,58 +138,56 @@ export function RunSettings({
               />
             </div>
 
-            <SectionHeading>Bosses</SectionHeading>
+            <SectionHeading>{copy.common.bosses}</SectionHeading>
             <div className="run-settings-bosses">
               <ListRow
-                title="Bosses"
-                detail={`${bossCounts.felled} felled, ${bossCounts.skipped} skipped`}
+                title={copy.common.bosses}
+                detail={copy.runSettings.bossCounts(bossCounts.felled, bossCounts.skipped)}
                 onClick={() => setBossesOpen(true)}
               />
               <LozengeCheckbox
                 checked={draft.bossGearLockedUntilDead}
-                detail="Must fell boss first to roll their gear"
+                detail={copy.runSettings.bossGearLockedDetail}
                 onChange={(bossGearLockedUntilDead) => edit({ bossGearLockedUntilDead })}
               >
-                Boss gear locked until felled
+                {copy.runSettings.bossGearLocked}
               </LozengeCheckbox>
             </div>
           </>
         )}
 
-        {tab === "Never roll" && (
+        {tab === "neverRoll" && (
           <>
-            <p className="run-settings-note">Anything selected here never rolls again.</p>
+            <p className="run-settings-note">{copy.runSettings.neverRollNote}</p>
             <GearPicker
               key="never-roll"
               entries={gear.neverRoll}
               picked={listsDraft.neverRoll}
               onChange={(neverRoll) => setListsDraft({ ...listsDraft, neverRoll })}
-              searchLabel="Search Never roll"
-              notFound="Nothing by that name."
+              searchLabel={copy.runSettings.searchNeverRoll}
+              notFound={copy.runSettings.neverRollNotFound}
               defaultQuery={defaultQuery}
             />
           </>
         )}
 
-        {tab === "Shortlist" && (
+        {tab === "shortlist" && (
           <>
-            <p className="run-settings-note">
-              Add your favorite or upgraded weapons. Classes will first roll their Right Hand from your shortlist.
-            </p>
+            <p className="run-settings-note">{copy.runSettings.shortlistNote}</p>
             <LozengeCheckbox
               framed
               checked={draft.weaponShortlistEnabled}
               onChange={(weaponShortlistEnabled) => edit({ weaponShortlistEnabled })}
             >
-              Roll Right Hand from shortlist
+              {copy.runSettings.shortlistEnabled}
             </LozengeCheckbox>
             <GearPicker
               key="shortlist"
               entries={gear.shortlist}
               picked={listsDraft.weaponShortlist}
               onChange={(weaponShortlist) => setListsDraft({ ...listsDraft, weaponShortlist })}
-              searchLabel="Search weapons"
-              notFound="No weapon by that name."
+              searchLabel={copy.runSettings.searchShortlist}
+              notFound={copy.runSettings.shortlistNotFound}
               defaultQuery={defaultQuery}
             />
           </>

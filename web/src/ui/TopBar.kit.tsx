@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import { derivedLevel } from "../engine/settings";
 import { objectiveNumber } from "../engine/run";
 import type { KitBlock } from "../kit/kit";
@@ -12,10 +13,10 @@ export const kit: readonly KitBlock[] = [
     section: "controls",
     size: "small",
     states: [
-      { label: "menu", render: () => <FramedIconButton icon="menu" label="Menu" onClick={noop} /> },
-      { label: "close", render: () => <FramedIconButton icon="close" label="Close" onClick={noop} /> },
+      { label: "menu", render: () => <FramedIconButton icon="menu" label={copy.common.menu} onClick={noop} /> },
+      { label: "close", render: () => <FramedIconButton icon="close" label={copy.common.close} onClick={noop} /> },
     ],
-    Live: () => <FramedIconButton icon="menu" label="Menu" onClick={noop} />,
+    Live: () => <FramedIconButton icon="menu" label={copy.common.menu} onClick={noop} />,
     note: "On desktop, hover brightens the frame.",
   },
   {
@@ -35,17 +36,17 @@ export const kit: readonly KitBlock[] = [
       {
         label: "on the card",
         render: ({ runs }) => (
-          <TopBar eyebrow={`Objective ${objectiveNumber(runs.first)}`}>
+          <TopBar eyebrow={copy.common.objective(objectiveNumber(runs.first))}>
             <LevelButton level={derivedLevel(runs.first.stats)} onClick={noop} />
-            <FramedIconButton icon="menu" label="Menu" onClick={noop} />
+            <FramedIconButton icon="menu" label={copy.common.menu} onClick={noop} />
           </TopBar>
         ),
       },
       {
         label: "on a screen",
         render: () => (
-          <TopBar eyebrow="New run">
-            <FramedIconButton icon="close" label="Close without saving" onClick={noop} />
+          <TopBar eyebrow={copy.common.newRun}>
+            <FramedIconButton icon="close" label={copy.common.closeWithoutSaving} onClick={noop} />
           </TopBar>
         ),
       },

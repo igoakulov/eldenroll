@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import { objectiveNumber } from "../engine/run";
 import { KitScreen, type KitBlock, type KitProps } from "../kit/kit";
 import { RunMenu } from "../views/RunMenu";
@@ -23,8 +24,8 @@ function LiveSheet({ kit }: KitProps) {
           />
         }
       >
-        <TopBar eyebrow={`Objective ${objectiveNumber(run)}`}>
-          <FramedIconButton icon="menu" label="Menu" onClick={() => setOpen(true)} />
+        <TopBar eyebrow={copy.common.objective(objectiveNumber(run))}>
+          <FramedIconButton icon="menu" label={copy.common.menu} onClick={() => setOpen(true)} />
         </TopBar>
       </Screen>
     </KitScreen>

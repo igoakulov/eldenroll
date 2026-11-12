@@ -1,5 +1,6 @@
 import { useRef } from "react";
 
+import { copy } from "../copy";
 import { Icon } from "./Icon";
 import "./SearchField.css";
 
@@ -8,7 +9,7 @@ export function SearchField({
   label,
   value,
   onChange,
-  placeholder = "Search by name",
+  placeholder = copy.controls.searchPlaceholder,
 }: {
   readonly label: string;
   readonly value: string;
@@ -33,7 +34,7 @@ export function SearchField({
         <button
           type="button"
           className="search-field-clear"
-          aria-label="Clear search"
+          aria-label={copy.controls.clearSearch}
           onClick={() => {
             onChange("");
             input.current?.focus();

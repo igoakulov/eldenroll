@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { KitBlock, KitProps } from "../kit/kit";
 import { CHARACTER_CLASS_ICONS, iconKey } from "../views/icons";
 import { findMatch } from "../views/search";
@@ -74,8 +75,8 @@ export const kit: readonly KitBlock[] = [
       {
         label: "a setting",
         render: () => (
-          <LozengeCheckbox checked detail="Must fell boss first to roll their gear" onChange={noop}>
-            Boss gear locked until felled
+          <LozengeCheckbox checked detail={copy.runSettings.bossGearLockedDetail} onChange={noop}>
+            {copy.runSettings.bossGearLocked}
           </LozengeCheckbox>
         ),
       },
@@ -104,7 +105,7 @@ export const kit: readonly KitBlock[] = [
         label: "framed",
         render: () => (
           <LozengeCheckbox framed checked={false} onChange={noop}>
-            Roll Right Hand from shortlist
+            {copy.runSettings.shortlistEnabled}
           </LozengeCheckbox>
         ),
       },

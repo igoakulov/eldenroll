@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { KitBlock, KitProps } from "../kit/kit";
 import { RegionCheck, byLevel } from "../views/StatsAndRegions";
 import { ShowAll } from "./ShowAll";
@@ -24,7 +25,7 @@ function LiveShowAll({ kit }: KitProps) {
         />
       ))}
       <ShowAll expanded={expanded} onToggle={() => setExpanded(!expanded)}>
-        {expanded ? "Show fewer regions" : `Show all ${regions.length} regions`}
+        {expanded ? copy.levelUp.showFewerRegions : copy.levelUp.showAllRegions(regions.length)}
       </ShowAll>
     </>
   );
@@ -41,7 +42,7 @@ export const kit: readonly KitBlock[] = [
         label: "folded",
         render: ({ database }) => (
           <ShowAll expanded={false} onToggle={noop}>
-            {`Show all ${database.region.length} regions`}
+            {copy.levelUp.showAllRegions(database.region.length)}
           </ShowAll>
         ),
       },
@@ -49,7 +50,7 @@ export const kit: readonly KitBlock[] = [
         label: "open",
         render: () => (
           <ShowAll expanded onToggle={noop}>
-            Show fewer regions
+            {copy.levelUp.showFewerRegions}
           </ShowAll>
         ),
       },

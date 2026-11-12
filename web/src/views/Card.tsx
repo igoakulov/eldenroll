@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
+import { copy } from "../copy";
 import { displaySlots } from "../engine/display";
 import type { EngineData } from "../engine/engineData";
 import { objectiveNumber, type Objective, type RerollTarget, type Run } from "../engine/run";
@@ -96,7 +97,7 @@ function BossBar({ onFelled }: { readonly onFelled: () => void }) {
         <i />
       </div>
       <button type="button" className="felled-link" onClick={onFelled}>
-        <span className="felled-word">Felled</span>?
+        <span className="felled-word">{copy.card.felled}</span>?
       </button>
       <div className="boss-bar-half boss-bar-right" aria-hidden="true">
         <i />
@@ -147,9 +148,9 @@ export function Card({
 
   const level = derivedLevel(run.stats);
   const top = (
-    <TopBar eyebrow={`Objective ${objectiveNumber(run)}`}>
+    <TopBar eyebrow={copy.common.objective(objectiveNumber(run))}>
       <LevelButton level={level} onClick={onLevelUp} />
-      <FramedIconButton icon="menu" label="Menu" onClick={() => setMenuOpen(true)} />
+      <FramedIconButton icon="menu" label={copy.common.menu} onClick={() => setMenuOpen(true)} />
     </TopBar>
   );
   const runMenu = menu === undefined ? null : (
@@ -174,9 +175,9 @@ export function Card({
       bottom={
         <BottomBar className="r" style={at(1350)}>
           <RuledButton icon="reroll" onClick={() => setPanel({ open: true, felled: false })}>
-            Reroll
+            {copy.common.reroll}
           </RuledButton>
-          <GlowBand onClick={onDone}>Done</GlowBand>
+          <GlowBand onClick={onDone}>{copy.common.done}</GlowBand>
         </BottomBar>
       }
       sheet={
@@ -206,7 +207,7 @@ export function Card({
         <Changed key={keys.boss} {...change("boss")}>
           <h1 className="boss-name r" id="boss-name" style={at(80)}>
             <WikiText url={boss?.url ?? null} className="boss-name-text">
-              {boss?.name ?? "unknown boss"}
+              {boss?.name ?? copy.common.unknownBoss}
             </WikiText>
           </h1>
           <BossBar onFelled={() => setPanel({ open: true, felled: true })} />
@@ -219,7 +220,7 @@ export function Card({
 
       <Changed key={keys.characterClass} {...change("characterClass")}>
         <div className="class-head r" style={at(1000)}>
-          <h2>{characterClass?.name ?? "unknown class"}</h2>
+          <h2>{characterClass?.name ?? copy.common.unknownClass}</h2>
           <span className="class-icons" aria-hidden="true">
             {classIcons.map((icon, index) => (
               <Icon key={index} name={`${icon}-22`} size={20} />
@@ -229,26 +230,26 @@ export function Card({
       </Changed>
 
       <div className="r weapons" style={at(1050)}>
-        <SlotHeading>Weapons</SlotHeading>
+        <SlotHeading>{copy.card.weapons}</SlotHeading>
         <div className="hands">
           <Changed key={keys.lh} {...change("lh")}>
-            <Hand label="Left hand" hand={slots.lh} ash={slots.lh_ash} emptyIcon={EMPTY_SLOT_ICONS.lh} />
+            <Hand label={copy.card.leftHand} hand={slots.lh} ash={slots.lh_ash} emptyIcon={EMPTY_SLOT_ICONS.lh} />
           </Changed>
           <Changed key={keys.rh} {...change("rh")}>
-            <Hand label="Right hand" hand={slots.rh} ash={slots.rh_ash} emptyIcon={EMPTY_SLOT_ICONS.rh} />
+            <Hand label={copy.card.rightHand} hand={slots.rh} ash={slots.rh_ash} emptyIcon={EMPTY_SLOT_ICONS.rh} />
           </Changed>
         </div>
       </div>
 
       <div className="r" style={at(1100)}>
-        <SlotHeading>Spell</SlotHeading>
+        <SlotHeading>{copy.card.spell}</SlotHeading>
         <Changed key={keys.spell} {...change("spell")}>
           <Small display={slots.spell} emptyIcon={EMPTY_SLOT_ICONS.spell} />
         </Changed>
       </div>
 
       <div className="r" style={at(1150)}>
-        <SlotHeading>Talismans</SlotHeading>
+        <SlotHeading>{copy.card.talismans}</SlotHeading>
         <div className="talismans">
           <Changed key={keys.talisman_1} {...change("talisman_1")}>
             <Small display={slots.talisman_1} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
@@ -260,21 +261,21 @@ export function Card({
       </div>
 
       <div className="r" style={at(1200)}>
-        <SlotHeading>Armor</SlotHeading>
+        <SlotHeading>{copy.card.armor}</SlotHeading>
         <Changed key={keys.armor} {...change("armor")}>
           <Armor display={slots.armor} />
         </Changed>
       </div>
 
       <div className="r" style={at(1250)}>
-        <SlotHeading>Item</SlotHeading>
+        <SlotHeading>{copy.card.item}</SlotHeading>
         <Changed key={keys.item} {...change("item")}>
           <Small display={slots.item} emptyIcon={EMPTY_SLOT_ICONS.item} />
         </Changed>
       </div>
 
       <div className="r" style={at(1300)}>
-        <SlotHeading>Combat rules</SlotHeading>
+        <SlotHeading>{copy.card.combatRules}</SlotHeading>
         <div className="rules">
           <Changed key={keys.rule_1} {...change("rule_1")}>
             <RuleSlot name={nameOf(slots.rule_1)} />

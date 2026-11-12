@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import { KitScreen, type KitBlock } from "../kit/kit";
 import { ScreenHead } from "./Headings";
 import { Screen } from "./Screen";
@@ -22,7 +23,7 @@ export const kit: readonly KitBlock[] = [
         render: () => (
           <KitScreen short>
             <Screen>
-              <ScreenHead title="Bosses" />
+              <ScreenHead title={copy.common.bosses} />
             </Screen>
           </KitScreen>
         ),

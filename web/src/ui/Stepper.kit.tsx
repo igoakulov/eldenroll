@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import { DEFAULT_STATS, MAX_STAT, MIN_STAT, correctedMaxStatGap, correctedStat } from "../engine/settings";
 import type { KitBlock } from "../kit/kit";
 import { STAT_NAMES } from "../views/StatsAndRegions";
@@ -64,8 +65,8 @@ export const kit: readonly KitBlock[] = [
         render: ({ settings }) => (
           <Stepper
             id="kit-stepper-setting"
-            label="Max stat gap"
-            detail="Points an item may need above your stats"
+            label={copy.runSettings.maxStatGap}
+            detail={copy.runSettings.maxStatGapDetail}
             value={settings.maxStatGap}
             min={0}
             max={MAX_STAT}

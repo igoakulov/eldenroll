@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { RerollTarget } from "../engine/run";
 import { GlowBand } from "../ui/BottomBar";
 import { Chip, Chips } from "../ui/Chips";
@@ -11,9 +12,9 @@ import "./RerollPanel.css";
 const LAST = REROLL_STOPS.length - 1;
 
 function valueText(stop: number): string {
-  if (stop === 0) return "Armor only";
-  if (stop === LAST) return "Full objective";
-  return `Rerolls from ${REROLL_STOPS[stop]?.chip ?? ""}`;
+  if (stop === 0) return copy.reroll.armorOnly;
+  if (stop === LAST) return copy.reroll.fullObjective;
+  return copy.reroll.rerollsFrom(REROLL_STOPS[stop]?.chip ?? "");
 }
 
 /** The reroll panel (`web/README.md#Current run`): it opens at `New class` every time. `felled` locks it at
@@ -43,19 +44,19 @@ export function RerollPanel({
   const target = REROLL_STOPS[scope.stop]?.target ?? "boss";
 
   return (
-    <Sheet open={open} eyebrow={felled ? "Felled on the way?" : "Reroll"} onClose={onClose}>
+    <Sheet open={open} eyebrow={felled ? copy.reroll.felledEyebrow : copy.common.reroll} onClose={onClose}>
       {felled ? (
-        <Chips label="After the reroll">
+        <Chips label={copy.reroll.felledChipsLabel}>
           <Chip lit={false} red>
-            Boss felled on the way
+            {copy.reroll.felledOnTheWay}
           </Chip>
           <Chip lit={false} red>
-            Boss gear unlocked
+            {copy.reroll.gearUnlocked}
           </Chip>
-          <Chip lit>New objective</Chip>
+          <Chip lit>{copy.reroll.newObjective}</Chip>
         </Chips>
       ) : (
-        <Chips label="Lit slots will change" instant={!scope.glide}>
+        <Chips label={copy.reroll.chipsLabel} instant={!scope.glide}>
           {REROLL_STOPS.map((stop, index) => (
             <Chip key={stop.target} lit={index <= scope.stop} at={glideAt(index, scope.from, scope.stop)}>
               {stop.chip}
@@ -67,18 +68,18 @@ export function RerollPanel({
         stops={REROLL_STOPS.length}
         value={felled ? LAST : scope.stop}
         onChange={(stop, glide) => setScope((last) => ({ stop, from: last.stop, glide }))}
-        label="Reroll scope"
-        valueText={felled ? "Rerolls the full objective" : valueText(scope.stop)}
-        ends={["Armor only", "Full objective"]}
+        label={copy.reroll.slider}
+        valueText={felled ? copy.reroll.rerollsFullObjective : valueText(scope.stop)}
+        ends={[copy.reroll.armorOnly, copy.reroll.fullObjective]}
         locked={felled}
       />
       <div className="reroll-panel-action">
         {felled ? (
           <GlowBand long onClick={onFelled}>
-            Confirm and reroll
+            {copy.reroll.confirm}
           </GlowBand>
         ) : (
-          <GlowBand onClick={() => onReroll(target)}>Reroll</GlowBand>
+          <GlowBand onClick={() => onReroll(target)}>{copy.common.reroll}</GlowBand>
         )}
       </div>
     </Sheet>

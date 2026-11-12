@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { KitBlock, KitProps } from "../kit/kit";
 import { findMatch } from "../views/search";
 import { SearchField, SearchMatch, SearchNone } from "./SearchField";
@@ -16,7 +17,7 @@ function Found({ kit, query }: KitProps & { readonly query: string }) {
     .map((boss) => ({ name: boss.name, match: findMatch(boss.name, query) }))
     .filter((row) => row.match !== null)
     .slice(0, SHOWN);
-  if (found.length === 0) return <SearchNone>No boss by that name.</SearchNone>;
+  if (found.length === 0) return <SearchNone>{copy.bosses.notFound}</SearchNone>;
   return (
     <ul className="kit-found">
       {found.map((row) => (
@@ -32,7 +33,7 @@ function LiveSearch({ kit }: KitProps) {
   const [query, setQuery] = useState("");
   return (
     <>
-      <SearchField label="Search bosses" value={query} onChange={setQuery} />
+      <SearchField label={copy.bosses.search} value={query} onChange={setQuery} />
       {query.trim() !== "" && <Found kit={kit} query={query} />}
     </>
   );
@@ -45,12 +46,12 @@ export const kit: readonly KitBlock[] = [
     section: "groups",
     size: "phone",
     states: [
-      { label: "empty", render: () => <SearchField label="Search bosses" value="" onChange={noop} /> },
+      { label: "empty", render: () => <SearchField label={copy.bosses.search} value="" onChange={noop} /> },
       {
         label: "searching",
         render: (kit) => (
           <>
-            <SearchField label="Search bosses" value={QUERY} onChange={noop} />
+            <SearchField label={copy.bosses.search} value={QUERY} onChange={noop} />
             <Found kit={kit} query={QUERY} />
           </>
         ),
@@ -59,8 +60,8 @@ export const kit: readonly KitBlock[] = [
         label: "nothing found",
         render: () => (
           <>
-            <SearchField label="Search bosses" value="Tarnished" onChange={noop} />
-            <SearchNone>No boss by that name.</SearchNone>
+            <SearchField label={copy.bosses.search} value="Tarnished" onChange={noop} />
+            <SearchNone>{copy.bosses.notFound}</SearchNone>
           </>
         ),
       },

@@ -1,21 +1,23 @@
+import { copy } from "../copy";
 import type { Database, Item } from "../engine/database";
 import { iconKey } from "./icons";
 import { findMatch } from "./search";
 
 /** In card order: a list of picks reads like the card. */
-export const GEAR_GROUPS = [
-  { kind: "weapon", label: "Weapons" },
-  { kind: "shield", label: "Shields" },
-  { kind: "ash", label: "Ashes of War" },
-  { kind: "sorcery", label: "Sorceries" },
-  { kind: "incantation", label: "Incantations" },
-  { kind: "talisman", label: "Talismans" },
-  { kind: "armor_set", label: "Armor" },
-  { kind: "tool", label: "Tools" },
-  { kind: "consumable", label: "Consumables" },
-  { kind: "rule", label: "Combat rules" },
+const GEAR_KINDS = [
+  "weapon",
+  "shield",
+  "ash",
+  "sorcery",
+  "incantation",
+  "talisman",
+  "armor_set",
+  "tool",
+  "consumable",
+  "rule",
 ] as const;
-export type GearGroup = (typeof GEAR_GROUPS)[number]["kind"];
+export type GearGroup = (typeof GEAR_KINDS)[number];
+export const GEAR_GROUPS = GEAR_KINDS.map((kind) => ({ kind, label: copy.runSettings.gearGroups[kind] }));
 
 export interface GearEntry {
   /** What the list stores: an `optionKey` for `Never roll`, an item id for the `Weapon shortlist`. */

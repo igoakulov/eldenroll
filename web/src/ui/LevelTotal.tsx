@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import "./LevelTotal.css";
 
 /** The level over the stats. Given `before`, a changed level reads before → after, in blue when raised. */
@@ -5,7 +6,7 @@ export function LevelTotal({ level, before }: { readonly level: number; readonly
   const changed = before !== undefined && before !== level;
   return (
     <div className="level-total">
-      <span className="level-total-key">Level</span>
+      <span className="level-total-key">{copy.common.level}</span>
       <span className="level-total-value">
         {changed && (
           <>
@@ -13,7 +14,7 @@ export function LevelTotal({ level, before }: { readonly level: number; readonly
             <span className="level-total-arrow" aria-hidden="true">
               →
             </span>
-            <span className="sr-only">to</span>
+            <span className="sr-only">{copy.controls.levelTo}</span>
           </>
         )}
         <span className={changed && level > before ? "raised" : undefined}>{level}</span>

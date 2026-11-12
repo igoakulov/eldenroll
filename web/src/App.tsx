@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { copy } from "./copy";
 import type { Database } from "./engine/database";
 import { indexDatabase } from "./engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "./engine/hyperparams";
@@ -64,7 +65,7 @@ function Game({ database }: { readonly database: Database }) {
   );
   // Before a run; once one starts, the run holds its own
   const [settings, setSettings] = useState(() => defaultSettings(database));
-  const [settingsTab, setSettingsTab] = useState<SettingsTab>("General");
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
   const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
   const [regions, setRegions] = useState<readonly string[]>(DEFAULT_REGIONS);
   const [deadBosses, setDeadBosses] = useState<readonly string[]>([]);
@@ -118,7 +119,7 @@ function Game({ database }: { readonly database: Database }) {
   if (view === "rold") return <RoldCard onClose={() => (roldFromMenu ? home() : setView("start"))} />;
 
   if (view === "settings") {
-    const eyebrow = run === null ? "New run" : `Objective ${objectiveNumber(run)}`;
+    const eyebrow = run === null ? copy.common.newRun : copy.common.objective(objectiveNumber(run));
     const board = run === null ? boardBefore(deadBosses, skippedBosses) : boardOf(run);
     return (
       <RunSettings
@@ -177,8 +178,8 @@ function Game({ database }: { readonly database: Database }) {
     const noop = () => {};
     return (
       <Felled
-        bossName={boss?.name ?? "unknown boss"}
-        label={view === "felled" ? "Next objective in" : "Rerolling in"}
+        bossName={boss?.name ?? copy.common.unknownBoss}
+        label={view === "felled" ? copy.felled.nextObjectiveIn : copy.felled.rerollingIn}
         behind={
           <Card
             data={engine.data}

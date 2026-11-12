@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import { KitScreen, type KitBlock, type KitProps } from "../kit/kit";
 import { NewRunConfirm } from "../views/RunMenu";
 import { BottomBar, GlowBand, RuledButton } from "./BottomBar";
@@ -22,8 +23,8 @@ function LiveConfirm({ kit }: KitProps) {
         }
         bottom={
           <BottomBar>
-            <RuledButton onClick={() => setOpen(true)}>New run</RuledButton>
-            <GlowBand onClick={noop}>Resume</GlowBand>
+            <RuledButton onClick={() => setOpen(true)}>{copy.common.newRun}</RuledButton>
+            <GlowBand onClick={noop}>{copy.start.resume}</GlowBand>
           </BottomBar>
         }
       >

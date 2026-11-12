@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import { Icon } from "./Icon";
 import "./Cycler.css";
 
@@ -28,15 +29,15 @@ export function Cycler<T extends string>({
   };
   return (
     <div className="cycler" role="group" aria-label={`${label}: ${word}`}>
-      <button type="button" className="cycler-back" aria-label="Previous state" onClick={() => go("back")}>
+      <button type="button" className="cycler-back" aria-label={copy.controls.previousState} onClick={() => go("back")}>
         <Icon name="chevron" size={14} />
       </button>
-      <button type="button" className="cycler-word" aria-label="Next state" onClick={() => go("on")}>
+      <button type="button" className="cycler-word" aria-label={copy.controls.nextState} onClick={() => go("on")}>
         <span key={step?.id ?? 0} className={step === null ? undefined : `cycler-stepped-${step.way}`}>
           {word}
         </span>
       </button>
-      <button type="button" aria-label="Next state" onClick={() => go("on")}>
+      <button type="button" aria-label={copy.controls.nextState} onClick={() => go("on")}>
         <Icon name="chevron" size={14} />
       </button>
     </div>

@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 
+import { copy } from "../copy";
 import { Card } from "../views/Card";
 import { Felled } from "../views/Felled";
 import type { KitData } from "./kitData";
@@ -50,8 +51,8 @@ export function Sequences({ kit }: { readonly kit: KitData }) {
       <Sequence id="sequence-felled" title="An enemy felled">
         {() => (
           <Felled
-            bossName={engine.data.bosses.get(runs.first.current.boss)?.name ?? "unknown boss"}
-            label="Next objective in"
+            bossName={engine.data.bosses.get(runs.first.current.boss)?.name ?? copy.common.unknownBoss}
+            label={copy.felled.nextObjectiveIn}
             behind={card("none")}
             onZero={noop}
             onUndo={noop}

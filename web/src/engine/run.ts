@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import type { LoadoutSlot } from "./database";
 import type { RolledSlots } from "./display";
 import { countedItems } from "./eligibility";
@@ -54,9 +55,9 @@ export interface CompletedObjective extends Objective {
 export type Waiting = "no_region" | "no_bosses" | "regions_cleared";
 
 export const WAITING_MESSAGES: Readonly<Record<Waiting, string>> = {
-  no_region: "Select at least one region",
-  no_bosses: "No bosses available for the selected regions",
-  regions_cleared: "No bosses left in your selected regions",
+  no_region: copy.notices.noRegion,
+  no_bosses: copy.notices.noBosses,
+  regions_cleared: copy.notices.regionsCleared,
 };
 
 /** Plain data throughout, so a run can be saved and restored as JSON. */
@@ -93,8 +94,6 @@ export interface RunInputs {
 export type StartResult =
   | { readonly ok: true; readonly run: Run }
   | { readonly ok: false; readonly problems: readonly string[] };
-
-const ALL_DEAD_MESSAGE = "Every boss is already dead";
 
 function characterClassKey(characterClass: string): string {
   return `character_class:${characterClass}`;
@@ -267,7 +266,7 @@ export function startRun(engine: Engine, inputs: RunInputs, seed: number): Start
     new Set(inputs.deadBosses),
     new Set(inputs.skippedBosses ?? []),
   );
-  if (pool.status === "all_dead") problems.push(ALL_DEAD_MESSAGE);
+  if (pool.status === "all_dead") problems.push(copy.notices.allDead);
   else if (pool.status !== "ready") problems.push(WAITING_MESSAGES[pool.status]);
   if (problems.length > 0) return { ok: false, problems };
 

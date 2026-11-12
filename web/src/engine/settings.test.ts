@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { copy } from "../copy";
 import {
   DEFAULT_STATS,
   STATS,
@@ -92,6 +93,6 @@ describe("settingsProblems", () => {
   });
 
   it("asks for a class when none is selected", () => {
-    expect(settingsProblems({ ...SETTINGS, characterClasses: [] })).toEqual(["Select at least one class"]);
+    expect(settingsProblems({ ...SETTINGS, characterClasses: [] })).toEqual([copy.notices.noClass]);
   });
 });

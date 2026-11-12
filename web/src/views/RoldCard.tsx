@@ -1,62 +1,61 @@
+import { copy } from "../copy";
 import { SectionHeading, ScreenHead } from "../ui/Headings";
 import { Screen } from "../ui/Screen";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
 import "./RoldCard.css";
 
-const DISCLAIMER =
-  "Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.";
+/** A step's text with each `[word]` set apart as the app's own control. */
+function Step({ text }: { readonly text: string }) {
+  // Splitting on a capturing group puts each bracketed word at an odd index
+  const parts = text.split(/\[([^\]]+)\]/);
+  return (
+    <span>
+      {parts.map((part, index) =>
+        index % 2 === 1 ? (
+          <span key={index} className="rold-ui">
+            {part}
+          </span>
+        ) : (
+          part
+        ),
+      )}
+    </span>
+  );
+}
 
 /** The onboarding card `Elden Rold` opens from Start (`web/README.md#Elden Rold card`). */
 export function RoldCard({ onClose }: { readonly onClose: () => void }) {
+  const text = copy.rold;
   return (
     <Screen>
-      <TopBar eyebrow="How it works">
-        <FramedIconButton icon="close" label="Close" onClick={onClose} />
+      <TopBar eyebrow={copy.common.howItWorks}>
+        <FramedIconButton icon="close" label={copy.common.close} onClick={onClose} />
       </TopBar>
-      <ScreenHead
-        title="Welcome to EldenRoll, Tarnished"
-        lede="A companion to keep open while you play. Each objective rolls a boss to fell and the class and gear to fell it with, so every playthrough feels new again."
-      >
-        <p className="rold-pun">Follow fate to become Elden Rold.</p>
+      <ScreenHead title={text.title} lede={text.lede}>
+        <p className="rold-pun">{text.pun}</p>
       </ScreenHead>
 
-      <SectionHeading>A run</SectionHeading>
+      <SectionHeading>{text.aRun}</SectionHeading>
       <ol className="rold-steps">
-        <li>
-          <span>Set your stats and the regions you can reach, then start a run.</span>
-        </li>
-        <li>
-          <span>Fell the rolled boss with only the rolled class, gear and combat rules.</span>
-        </li>
-        <li>
-          <span>Not for you? <span className="rold-ui">Reroll</span> the whole objective, or only from one slot on, as often
-          as you like.</span>
-        </li>
-        <li>
-          <span>Tap <span className="rold-ui">Done</span>, level up, and roll the next objective.</span>
-        </li>
-        <li>
-          <span>Felled that boss already? Tap <span className="rold-ui">Felled?</span> on its health bar for a new one.</span>
-        </li>
+        {text.steps.map((step) => (
+          <li key={step}>
+            <Step text={step} />
+          </li>
+        ))}
       </ol>
 
-      <SectionHeading>On your phone</SectionHeading>
-      <p className="rold-body">
-        Add EldenRoll to your Home Screen before your first run, and it opens full screen, like an app. On iPhone a run
-        started in Safari stays in Safari.
-      </p>
+      <SectionHeading>{text.onYourPhone}</SectionHeading>
+      <p className="rold-body">{text.homeScreen}</p>
       <dl className="rold-how">
-        <div>
-          <dt>iPhone</dt>
-          <dd>In Safari, tap Share, then Add to Home Screen.</dd>
-        </div>
-        <div>
-          <dt>Android</dt>
-          <dd>In Chrome, tap ⋮, then Add to Home screen.</dd>
-        </div>
+        {text.howTo.map((row) => (
+          <div key={row.device}>
+            <dt>{row.device}</dt>
+            <dd>{row.how}</dd>
+          </div>
+        ))}
       </dl>
 
-      <p className="rold-legal">{DISCLAIMER}</p>
+      <p className="rold-legal">{text.disclaimer}</p>
     </Screen>
   );
 }

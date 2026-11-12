@@ -1,10 +1,8 @@
-/** Each holds `Elden Rold` once, the link to the onboarding card, and fits two lines on a phone. */
-export const TAGLINES: readonly string[] = [
-  "Follow fate to become Elden Rold.",
-  "Roll objectives, gather your gear, and fell your foes to become Elden Rold.",
-];
+import { copy } from "../copy";
 
-export const TAGLINE_LINK = "Elden Rold";
+export const TAGLINES: readonly string[] = copy.start.taglines;
+
+export const TAGLINE_LINK: string = copy.start.taglineLink;
 
 /** A person's rhythm rather than a constant beat, but flowing: keys vary a little, a word's first letter comes a
  * touch slower, and a space or punctuation adds a short breath rather than a stop. Deleting goes a word at a

@@ -51,6 +51,7 @@ export function PhoneFrame({ children }: { readonly children: ReactNode }) {
   return (
     <div ref={frame} className="phone-frame">
       <div className="phone-frame-side phone-frame-left" aria-hidden="true">
+        {/* not copy: the wordmark's letters */}
         <p className="phone-frame-mark">ELDEN</p>
       </div>
       <div className="phone-frame-device">
@@ -61,8 +62,8 @@ export function PhoneFrame({ children }: { readonly children: ReactNode }) {
       </div>
       <div className="phone-frame-side phone-frame-right" aria-hidden="true">
         <p className="phone-frame-mark">
-          R<WordmarkO className="phone-frame-o" />
-          LL
+          {/* not copy: the wordmark's letters around its O */}
+          R<WordmarkO className="phone-frame-o" />LL
         </p>
       </div>
     </div>

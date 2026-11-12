@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import "./Stepper.css";
 
 /** A number field between `−` and `+`, its label over an optional detail. `correct` turns what was typed into an
@@ -41,7 +42,7 @@ export function Stepper({
         </span>
       )}
       <div className="stepper">
-        <button type="button" aria-label={`Lower ${label}`} onClick={() => onChange(Math.max(min, value - 1))}>
+        <button type="button" aria-label={copy.controls.lower(label)} onClick={() => onChange(Math.max(min, value - 1))}>
           −
         </button>
         <input
@@ -55,7 +56,7 @@ export function Stepper({
             if (event.key === "Enter") event.currentTarget.blur();
           }}
         />
-        <button type="button" aria-label={`Raise ${label}`} onClick={() => onChange(Math.min(max, value + 1))}>
+        <button type="button" aria-label={copy.controls.raise(label)} onClick={() => onChange(Math.min(max, value + 1))}>
           +
         </button>
       </div>

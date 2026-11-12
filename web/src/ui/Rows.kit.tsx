@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import { objectiveNumber } from "../engine/run";
 import type { KitBlock } from "../kit/kit";
 import { FramedRow, ListRow } from "./Rows";
@@ -13,13 +14,13 @@ export const kit: readonly KitBlock[] = [
     states: [
       {
         label: "framed",
-        render: () => <FramedRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={noop} />,
+        render: () => <FramedRow title={copy.common.runSettings} detail={copy.common.runSettingsDetail} onClick={noop} />,
       },
       {
         label: "opening a screen",
         render: () => (
           <div className="kit-pad">
-            <ListRow title="How it works" detail="What a run asks of you, and keeping it on your phone" onClick={noop} />
+            <ListRow title={copy.common.howItWorks} detail={copy.menu.howItWorksDetail} onClick={noop} />
           </div>
         ),
       },
@@ -27,7 +28,7 @@ export const kit: readonly KitBlock[] = [
         label: "red",
         render: () => (
           <div className="kit-pad">
-            <ListRow title="Finish run" detail="Ends this run and shows its summary" danger onClick={noop} />
+            <ListRow title={copy.common.finishRun} detail={copy.menu.finishRunDetail} danger onClick={noop} />
           </div>
         ),
       },
@@ -35,7 +36,7 @@ export const kit: readonly KitBlock[] = [
         label: "read only, cut to one line",
         render: ({ runs, samples }) => (
           <div className="kit-pad">
-            <ListRow title={`Objective ${objectiveNumber(runs.progressed)}, ${samples.boss.name}`} detail="In progress" cut />
+            <ListRow title={copy.common.runTitle(objectiveNumber(runs.progressed), samples.boss.name)} detail={copy.start.inProgress} cut />
           </div>
         ),
       },
@@ -50,10 +51,10 @@ export const kit: readonly KitBlock[] = [
     ],
     Live: () => (
       <>
-        <FramedRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={noop} />
+        <FramedRow title={copy.common.runSettings} detail={copy.common.runSettingsDetail} onClick={noop} />
         <div className="kit-pad">
-          <ListRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={noop} />
-          <ListRow title="Finish run" detail="Ends this run and shows its summary" danger onClick={noop} />
+          <ListRow title={copy.common.runSettings} detail={copy.common.runSettingsDetail} onClick={noop} />
+          <ListRow title={copy.common.finishRun} detail={copy.menu.finishRunDetail} danger onClick={noop} />
         </div>
       </>
     ),

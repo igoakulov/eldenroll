@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import { copy } from "../copy";
 import { Countdown } from "../ui/Countdown";
 import { Screen } from "../ui/Screen";
 import { UndoButton } from "../ui/UndoButton";
@@ -45,9 +46,9 @@ export function Felled({
         <div className="felled-main">
           <div className="felled-band" role="status">
             <h1>
-              Great enemy
+              {copy.felled.title[0]}
               <br />
-              felled
+              {copy.felled.title[1]}
             </h1>
           </div>
           <Countdown from={5} label={label} onZero={onZero} />

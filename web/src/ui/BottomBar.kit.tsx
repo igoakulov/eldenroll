@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { WAITING_MESSAGES } from "../engine/run";
+import { copy } from "../copy";
 import { KitScreen, type KitBlock, type KitProps } from "../kit/kit";
 import { StatSteppers } from "../views/StatsAndRegions";
 import { BottomBar, GlowBand, RuledButton } from "./BottomBar";
@@ -16,9 +16,9 @@ function LiveBar({ kit }: KitProps) {
         bottom={
           <BottomBar>
             <RuledButton icon="reroll" onClick={noop}>
-              Reroll
+              {copy.common.reroll}
             </RuledButton>
-            <GlowBand onClick={noop}>Done</GlowBand>
+            <GlowBand onClick={noop}>{copy.common.done}</GlowBand>
           </BottomBar>
         }
       >
@@ -35,10 +35,10 @@ export const kit: readonly KitBlock[] = [
     section: "controls",
     size: "phone",
     states: [
-      { label: "lit", render: () => <GlowBand>Start run</GlowBand> },
-      { label: "long", render: () => <GlowBand long>Confirm and reroll</GlowBand> },
+      { label: "lit", render: () => <GlowBand>{copy.start.startRun}</GlowBand> },
+      { label: "long", render: () => <GlowBand long>{copy.reroll.confirm}</GlowBand> },
     ],
-    Live: () => <GlowBand onClick={noop}>Done</GlowBand>,
+    Live: () => <GlowBand onClick={noop}>{copy.common.done}</GlowBand>,
     note: "Pressed, the glow brightens for an instant; on desktop, hover brightens it a little. Both show on the live one.",
   },
   {
@@ -51,15 +51,15 @@ export const kit: readonly KitBlock[] = [
         label: "with an icon",
         render: () => (
           <RuledButton icon="reroll" onClick={noop}>
-            Reroll
+            {copy.common.reroll}
           </RuledButton>
         ),
       },
-      { label: "plain", render: () => <RuledButton onClick={noop}>New run</RuledButton> },
+      { label: "plain", render: () => <RuledButton onClick={noop}>{copy.common.newRun}</RuledButton> },
     ],
     Live: () => (
       <RuledButton icon="reroll" onClick={noop}>
-        Reroll
+        {copy.common.reroll}
       </RuledButton>
     ),
     note: "Pressed or hovered, its label and rules brighten.",
@@ -74,7 +74,7 @@ export const kit: readonly KitBlock[] = [
         label: "one action",
         render: () => (
           <BottomBar>
-            <GlowBand onClick={noop}>Start run</GlowBand>
+            <GlowBand onClick={noop}>{copy.start.startRun}</GlowBand>
           </BottomBar>
         ),
       },
@@ -82,16 +82,16 @@ export const kit: readonly KitBlock[] = [
         label: "two actions",
         render: () => (
           <BottomBar>
-            <RuledButton onClick={noop}>New run</RuledButton>
-            <GlowBand onClick={noop}>Resume</GlowBand>
+            <RuledButton onClick={noop}>{copy.common.newRun}</RuledButton>
+            <GlowBand onClick={noop}>{copy.start.resume}</GlowBand>
           </BottomBar>
         ),
       },
       {
         label: "a notice",
         render: () => (
-          <BottomBar notice={`${WAITING_MESSAGES.no_bosses}.`}>
-            <GlowBand onClick={noop}>Roll objective 2</GlowBand>
+          <BottomBar notice={copy.notices.noBosses}>
+            <GlowBand onClick={noop}>{copy.levelUp.rollObjective(2)}</GlowBand>
           </BottomBar>
         ),
       },

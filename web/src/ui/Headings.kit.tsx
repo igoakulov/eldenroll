@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { KitBlock, KitProps } from "../kit/kit";
 import { HeadingAction, HeadingCount, ScreenHead, SectionHeading, SlotHeading } from "./Headings";
 import { LozengeCheckbox } from "./LozengeCheckbox";
@@ -11,8 +12,8 @@ function LiveSection({ kit }: KitProps) {
   const [picked, setPicked] = useState(classes.map((row) => row.id).slice(0, 3));
   return (
     <>
-      <SectionHeading action={picked.length > 0 && <HeadingAction onClick={() => setPicked([])}>Clear all</HeadingAction>}>
-        <HeadingCount>{picked.length}</HeadingCount> selected
+      <SectionHeading action={picked.length > 0 && <HeadingAction onClick={() => setPicked([])}>{copy.runSettings.clearAll}</HeadingAction>}>
+        <HeadingCount>{picked.length}</HeadingCount> {copy.runSettings.selected}
       </SectionHeading>
       {classes.slice(0, 3).map((row) => (
         <LozengeCheckbox
@@ -34,12 +35,12 @@ export const kit: readonly KitBlock[] = [
     section: "controls",
     size: "phone",
     states: [
-      { label: "plain", render: () => <SectionHeading>Regions</SectionHeading> },
+      { label: "plain", render: () => <SectionHeading>{copy.common.regions}</SectionHeading> },
       {
         label: "a count and an action",
         render: () => (
-          <SectionHeading action={<HeadingAction onClick={noop}>Clear all</HeadingAction>}>
-            <HeadingCount>{3}</HeadingCount> selected
+          <SectionHeading action={<HeadingAction onClick={noop}>{copy.runSettings.clearAll}</HeadingAction>}>
+            <HeadingCount>{3}</HeadingCount> {copy.runSettings.selected}
           </SectionHeading>
         ),
       },
@@ -51,7 +52,7 @@ export const kit: readonly KitBlock[] = [
     title: "Slot heading",
     section: "controls",
     size: "phone",
-    states: [{ label: "plain", render: () => <SlotHeading>Combat rules</SlotHeading> }],
+    states: [{ label: "plain", render: () => <SlotHeading>{copy.card.combatRules}</SlotHeading> }],
   },
   {
     id: "screen-head",
@@ -59,8 +60,8 @@ export const kit: readonly KitBlock[] = [
     section: "controls",
     size: "phone",
     states: [
-      { label: "with a lede", render: () => <ScreenHead title="Run settings" lede="Changes apply on the next roll." /> },
-      { label: "over two lines", render: () => <ScreenHead title="Welcome to EldenRoll, Tarnished" /> },
+      { label: "with a lede", render: () => <ScreenHead title={copy.common.runSettings} lede={copy.common.changesApplyOnNextRoll} /> },
+      { label: "over two lines", render: () => <ScreenHead title={copy.rold.title} /> },
     ],
   },
 ];

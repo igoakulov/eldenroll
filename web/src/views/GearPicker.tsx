@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import { HeadingAction, HeadingCount, SectionHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
 import { LozengeCheckbox } from "../ui/LozengeCheckbox";
@@ -75,10 +76,10 @@ export function GearPicker({
       {shown.length > 0 && (
         <section>
           <SectionHeading
-            action={picked.length > 0 && <HeadingAction onClick={() => onChange([])}>Clear all</HeadingAction>}
+            action={picked.length > 0 && <HeadingAction onClick={() => onChange([])}>{copy.runSettings.clearAll}</HeadingAction>}
           >
             <HeadingCount>{shown.filter((entry) => pickedSet.has(entry.key)).length}</HeadingCount>{" "}
-            selected
+            {copy.runSettings.selected}
           </SectionHeading>
           <div>{shown.map((entry) => row({ entry }, false))}</div>
         </section>

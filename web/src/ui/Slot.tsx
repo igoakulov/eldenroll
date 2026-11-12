@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import { Tile } from "./Tile";
 import { WikiText, type WikiLink } from "./WikiLink";
 import "./Slot.css";
@@ -13,8 +14,8 @@ export interface SlotTile {
 
 /** The name, `none` in dim small caps, or `any` in gold italics. */
 function Name({ name, className }: { readonly name: SlotName; readonly className: string }) {
-  if (name.kind === "none") return <span className={`${className} slot-none`}>none</span>;
-  if (name.kind === "any") return <span className={`${className} slot-any`}>any</span>;
+  if (name.kind === "none") return <span className={`${className} slot-none`}>{copy.controls.none}</span>;
+  if (name.kind === "any") return <span className={`${className} slot-any`}>{copy.controls.any}</span>;
   return <span className={className}>{name.name}</span>;
 }
 

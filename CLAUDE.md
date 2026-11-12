@@ -23,7 +23,7 @@ Run both before and after a change, and expect them clean with no skips:
 
 ## Naming
 
-- A rename reaches everything in one pass: UI text, docs, code identifiers and tests. Grep every spelling of the old name.
+- A rename reaches everything in one pass: UI text (`web/src/copy.ts`), docs, code identifiers and tests. Grep every spelling of the old name.
 - "Class" alone means the character class; code says `character_class` and `CharacterClass`. A weapon's class is `weapon_class` in code and `subcategory` as a field. "Build" means only the pipeline step (`eldenroll.build`, `data/build/`), never a character. The game's own classes are "starting classes".
 - UI text uses the game's word where one exists: a boss is *felled*. Code and stored data keep `dead`.
 

@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import type { Database } from "./database";
 import { DEFAULT_HYPERPARAMS, type Hyperparams } from "./hyperparams";
 
@@ -60,9 +61,9 @@ export function correctedMaxStatGap(entered: string, previous: number): number {
 
 /** Stats are typed by hand and impossible builds are accepted, but a run starts at level 1 or above. */
 export function statsProblems(stats: Stats): readonly string[] {
-  return derivedLevel(stats) < 1 ? ["Raise your stats to level 1 or above"] : [];
+  return derivedLevel(stats) < 1 ? [copy.notices.lowLevel] : [];
 }
 
 export function settingsProblems(settings: Settings): readonly string[] {
-  return settings.characterClasses.length === 0 ? ["Select at least one class"] : [];
+  return settings.characterClasses.length === 0 ? [copy.notices.noClass] : [];
 }

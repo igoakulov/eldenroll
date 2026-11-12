@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { copy } from "../copy";
 import type { EngineData } from "../engine/engineData";
 import { objectiveNumber, type Run } from "../engine/run";
 import { Confirm, type ConfirmPart } from "../ui/Confirm";
@@ -10,16 +11,16 @@ import "./RunMenu.css";
 /** The run in progress as a row names it: `Objective N` and its boss, without one between objectives. */
 export function runTitle(data: EngineData, run: Run): string {
   const boss = run.current === null ? undefined : data.bosses.get(run.current.boss);
-  return `Objective ${objectiveNumber(run)}${boss === undefined ? "" : `, ${boss.name}`}`;
+  return copy.common.runTitle(objectiveNumber(run), boss?.name);
 }
 
 /** What finishing `run` does. Each sheet words `Cannot resume` its own way. */
 function finishParts(run: Run, cannotResume: string): readonly ConfirmPart[] {
   return [
-    ...(run.current === null ? [] : [{ text: `Abandon objective ${objectiveNumber(run)}`, lost: true }]),
+    ...(run.current === null ? [] : [{ text: copy.confirm.abandonObjective(objectiveNumber(run)), lost: true }]),
     { text: cannotResume, lost: true },
     // A run with no completed objective is not saved (web/README.md#Run history)
-    ...(run.completed.length === 0 ? [] : [{ text: "Save to Run history", lost: false }]),
+    ...(run.completed.length === 0 ? [] : [{ text: copy.confirm.saveToHistory, lost: false }]),
   ];
 }
 
@@ -37,10 +38,10 @@ export function NewRunConfirm({
   return (
     <Confirm
       open={open}
-      title="New run"
-      question="Finish the current run and start a new one?"
-      parts={finishParts(run, "Cannot resume current run")}
-      action="Start new run"
+      title={copy.common.newRun}
+      question={copy.confirm.newRunQuestion}
+      parts={finishParts(run, copy.confirm.newRunCannotResume)}
+      action={copy.confirm.newRunAction}
       onConfirm={onConfirm}
       onClose={onClose}
     />
@@ -61,10 +62,10 @@ export function FinishRunConfirm({
   return (
     <Confirm
       open={open}
-      title="Finish run"
-      question="End this run and see its summary?"
-      parts={finishParts(run, "Cannot resume")}
-      action="Finish run"
+      title={copy.common.finishRun}
+      question={copy.confirm.finishQuestion}
+      parts={finishParts(run, copy.confirm.finishCannotResume)}
+      action={copy.common.finishRun}
       onConfirm={onConfirm}
       onClose={onClose}
     />
@@ -99,14 +100,22 @@ export function RunMenu({
 
   return (
     <>
-      <Sheet open={open && !finishing} eyebrow="Menu" closeLabel="Close menu" onClose={onClose}>
+      <Sheet open={open && !finishing} eyebrow={copy.common.menu} closeLabel={copy.menu.close} onClose={onClose}>
         <div className="run-menu">
           {/* Run history (9.10) and the run's own row, opening its view (9.7), join the menu once those screens exist */}
-          <ListRow title="How it works" detail="What a run asks of you, and keeping it on your phone" onClick={actions.onHowItWorks} />
-          <ListRow title="Run settings" detail="Classes, never roll, shortlist, bosses" onClick={actions.onRunSettings} />
           <ListRow
-            title="Finish run"
-            detail="Ends this run and shows its summary"
+            title={copy.common.howItWorks}
+            detail={copy.menu.howItWorksDetail}
+            onClick={actions.onHowItWorks}
+          />
+          <ListRow
+            title={copy.common.runSettings}
+            detail={copy.common.runSettingsDetail}
+            onClick={actions.onRunSettings}
+          />
+          <ListRow
+            title={copy.common.finishRun}
+            detail={copy.menu.finishRunDetail}
             danger
             onClick={() => setFinishing(true)}
           />
