@@ -27,6 +27,11 @@
    proportions, a 402 x 874 screen with 62 px corners, bezel and band together 15 px a side and 14 top and bottom.
    PhoneFrame.tsx sets --phone-scale to fit its height to the window's. */
 @media (min-width: 600px) and (min-height: 480px) {
+  /* The page around the phone pulls to the backdrop's own edge colour; only the phone's screen shows a screen's */
+  :root {
+    background: var(--ground);
+  }
+
   .phone-frame {
     --phone-scale: 1;
     display: grid;
@@ -92,7 +97,8 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: none;
-    background: var(--ground);
+    /* Fixed to the box, so a pull past either end shows the screen's own colour at that edge */
+    background: linear-gradient(var(--overscroll-top) 50%, var(--overscroll-bottom) 50%);
   }
 
   .phone-frame-screen::-webkit-scrollbar {

@@ -1,9 +1,8 @@
-/* Tight enough that Regions starts above the bottom bar on a phone, so the screen shows it goes on */
 .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-9) var(--space-6) 0;
+  padding: calc(var(--space-10) + var(--space-6)) var(--space-6) var(--space-2);
   text-align: center;
 }
 
@@ -34,7 +33,7 @@
   position: relative;
   width: 100%;
   min-height: calc(var(--lines) * var(--leading) * 1em);
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
   font-style: italic;
   font-size: var(--type-name);
   line-height: var(--leading);
