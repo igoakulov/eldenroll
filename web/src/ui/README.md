@@ -52,7 +52,7 @@ The game's menus fade and nothing in them bounces; ours follow. Motion shows wha
 ### Controls
 
 - **Sheets** (the menu, the reroll panel, `Felled?`, confirmations): the screen behind dims while the sheet fades in, rising a short way to show where it came from; closing is a little faster.
-- **Full screens** (`Run settings`, `Bosses`, `Level up`, the run view, `Run history`) cross-fade, with no sideways push: `✕` returns home rather than back.
+- **Full screens** (`Run settings`, `Bosses`, `Level up`, the run view) cross-fade, with no sideways push: `✕` returns home rather than back.
 - **Tabs:** the gold underline glides to the new tab and the content cross-fades.
 - **The glow band** brightens for an instant when pressed, in place of the phone's grey tap flash; the dimmed button beside it brightens its rules. On desktop, hover brightens them a little.
 - **The reroll slider's** fill, glow and lit chips follow the finger with no lag; tapping a stop glides the handle there, and each chip lights quickly, so the scope visibly grows from the left.

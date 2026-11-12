@@ -1,6 +1,6 @@
 # Web app
 
-The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar the run view and `Run history`, which come with saving; installing comes last. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
+The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar the run view and the past runs on Start, which come with saving; installing comes last. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
 
 Scripts are in `package.json`. The app and the engine tests read `../data/build/db.json`, which is git-ignored, so build the database first (`pipeline/README.md`); without it they stop and say so. Vitest hides `console.log` unless run with `--reporter=verbose`. There is no Prettier config: `npx prettier --write` would reformat every file, so format by hand.
 
@@ -12,7 +12,7 @@ There are no item pictures. Every image slot shows our own icon for the item's s
 
 ### Navigation
 
-Home is the current objective's card while a run is in progress, and Start otherwise. Every other screen opens over home and its `✕` returns there; only a run opened from `Run history` closes back to the list. There is no separate `Resume` inside the app: closing is enough.
+Home is the current objective's card while a run is in progress, and Start otherwise. Every other screen opens over home and its `✕` returns there; only a run opened from Start's `Past runs` closes back to Start. There is no separate `Resume` inside the app: closing is enough.
 
 A sheet (the menu, the reroll panel, `Felled?` and the confirmations) holds the keyboard while it is open: `Esc` closes it, `Tab` stays inside it, and closing returns focus to the control that opened it. Keyboard focus shows on every control as one thin gold outline; on the reroll slider, whose input is invisible, it rings the handle.
 
@@ -25,18 +25,19 @@ The main flows:
 5. **Check progress:** menu → the run's row → `Summary` and `Timeline`.
 6. **Finish:** menu → `Finish run` → confirmation → the run's view over Start → `✕` → Start.
 7. **Come back later:** reopening the app with a run in progress lands on Start: `Resume` returns to where the run is, the card or `Level up` between objectives; `New run` asks first, finishes the current run, then shows a fresh Start.
-8. **Look back:** Start or the menu → `Run history` → a run → `Summary` and `Timeline`; `Delete run` at the end of `Summary`.
+8. **Look back:** Start → `Past runs` → a run → `Summary` and `Timeline`; `Delete run` at the end of `Summary`. Past runs sit on Start, where a returning player lands, so looking back never means resuming a run first.
+9. **Back to Start mid-run:** the wordmark at the top of the menu → Start with the run in progress → `Resume`.
 
 ### Start
 
 - The tagline types itself in a flowing rhythm, each key a little different, a short breath between words and a longer one after punctuation; holds it for a fixed beat plus a share of the time reading it takes, so every line gets a moment and a longer one stays longer, since the reader has followed most of it as it typed but may have started late; deletes it a word at a time, `Elden Rold` in one go; and types the next, in a loop, without pausing while the player sets up. The main tagline, the first variant, is one line; any other breaks where its first line would outgrow the main one and takes two lines at most, which the development build checks in the console. Each holds `Elden Rold`, which opens the `Elden Rold` card.
   - Nothing jumps while it types: every first line starts where the centred main tagline does, a second line is centred under it, the height is always the most lines any variant takes, and the untyped rest already holds its place.
-- **No run in progress:** `Run history` shows once a run is saved, after `Run settings`, so everything that sets up the run comes before navigation.
-- **A run in progress:** stats, regions and settings belong to the run, so they stay hidden until `New run`.
+- **No run in progress:** stats, regions, `Run settings`, then `Past runs` (#Past runs) at the bottom, so everything that sets up a run comes first. A first-time player has none, so the section doesn't show.
+- **A run in progress:** `Current run` with `Resume`, then `Past runs`. Stats, regions and settings belong to the run, so they stay hidden until `New run`.
 
 ### Elden Rold card
 
-The onboarding card, opened from `Elden Rold` in Start's tagline. Adding the app to the Home Screen comes before the first run because iPhone keeps a home-screen app's storage apart from Safari's: a run started in Safari stays there.
+The onboarding card, opened from `Elden Rold` in Start's tagline and from the menu's `How it works`. It opens under the wordmark, as Start does, so the help reads as the app's own. Adding the app to the Home Screen comes before the first run because iPhone keeps a home-screen app's storage apart from Safari's: a run started in Safari stays there.
 
 ### Run settings
 
@@ -59,7 +60,7 @@ Every boss instance with `odds > 0`, under a legend of the three states. `Felled
 ### Current run
 
 - **Top bar:** `Objective N` at the left; at the right `Level N`, which opens `Level up` for the next roll, and the menu.
-- **Menu:** `How it works` opens the `Elden Rold` card, otherwise only reachable from Start, and closes back to the screen it opened from. Once saving exists, the run's row opens its view and `Run history` shows how many runs are finished.
+- **Menu:** `How it works` opens the `Elden Rold` card, otherwise only reachable from Start, and closes back to the screen it opened from. The wordmark at its top opens Start with the run in progress, the way home for a player who wants the branded screen or `New run`. Once saving exists, the run's row opens its view.
 - **Wiki links:** each item tile, a named ash, the armor set name and the boss's name open its wiki page where one exists. Item names and rows aren't tappable; an alias opens the wiki's page for its group, and `none` and `any` have no link. The card shows no item locations: the wiki covers them better, and the data's placements are sometimes adjusted for balance.
 - **Empty slots:** a `None` armor piece and the rule `None` show as `none`, like any empty slot, so they read apart from `any` and from a rule to obey.
 - **Reroll panel:** its chips run in reverse roll order, `Armor` first, so they read like the slider. The panel hides most of the card on a phone, so the chips carry the whole scope. The lit chips always form one run from the left, growing with the slider's fill and glow, which teaches that a reroll redoes everything from its target on.
@@ -87,9 +88,9 @@ The same view for the run in progress and a finished one, read-only. Its title i
   - **Search** picks one entry from this run: a boss, a class, an item, a set or a rule. Skipped bosses are never in it, since they're never in the timeline. A pick shows `N of M objectives` and only the matching entries, each showing the line that matched; `✕` in the field clears it.
 - The unfinished objective is never shown as completed.
 
-### Run history
+### Past runs
 
-From the menu or from Start. The run in progress, if any, is pinned on top under `Current run`, its title over `In progress`, opening its view. Then the finished runs, newest first, each its title over `Finished <date>`, cut with `…`, opening its run view. A run finished with no completed objective isn't saved, so trying the app leaves no clutter; any saved run can be deleted from its view. One run is active at a time, and nothing from a finished run reaches the engine.
+A section on Start, under `Current run` when a run is in progress and at the bottom otherwise; there is no separate history screen. The finished runs, newest first, each its title over `Finished <date>`, cut with `…`, opening its run view; the first 3, then `Show all N`. A run finished with no completed objective isn't saved, so trying the app leaves no clutter; any saved run can be deleted from its view. One run is active at a time, and nothing from a finished run reaches the engine.
 
 ### Desktop
 
