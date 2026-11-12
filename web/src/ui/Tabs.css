@@ -36,8 +36,25 @@
   transition: transform var(--dur-glide) var(--ease-out);
 }
 
+/* One grid cell for every panel: a hidden panel keeps its height, and visibility keeps it out of focus and the
+   accessibility tree */
+.tab-panels {
+  display: grid;
+}
+
 .tab-panel {
-  animation: fade-in var(--dur-sheet) var(--ease-out);
+  grid-area: 1 / 1;
+  min-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dur-sheet) var(--ease-out),
+    visibility var(--dur-sheet) var(--ease-out);
+}
+
+.tab-panel-selected {
+  opacity: 1;
+  visibility: visible;
 }
 
 @media (hover: hover) {

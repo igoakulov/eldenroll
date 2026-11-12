@@ -2,20 +2,22 @@ import { useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode }
 
 import "./Tabs.css";
 
-/** Tabs over one panel, which holds the selected tab's content. The arrow keys, `Home` and `End` move between tabs
- * and select as they go; the gold underline glides to the new tab and the panel fades in. */
+/** Tabs over their panels, one per tab. Every panel is laid out in one stack and only the selected one shows, so the
+ * page is as tall as its tallest tab and choosing another never moves what is above the panels. The arrow keys,
+ * `Home` and `End` move between tabs and select as they go; the gold underline glides to the new tab and the panel
+ * fades in. */
 export function Tabs({
   label,
   tabs,
   selected,
   onSelect,
-  children,
+  panels,
 }: {
   readonly label: string;
   readonly tabs: readonly string[];
   readonly selected: number;
   readonly onSelect: (index: number) => void;
-  readonly children: ReactNode;
+  readonly panels: readonly ReactNode[];
 }) {
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -55,7 +57,7 @@ export function Tabs({
             role="tab"
             id={`${id}-tab-${index}`}
             aria-selected={index === selected}
-            aria-controls={`${id}-panel`}
+            aria-controls={`${id}-panel-${index}`}
             tabIndex={index === selected ? 0 : -1}
             onClick={() => onSelect(index)}
           >
@@ -64,14 +66,18 @@ export function Tabs({
         ))}
         <span className="tabs-underline" aria-hidden="true" />
       </div>
-      <div
-        key={selected}
-        className="tab-panel"
-        role="tabpanel"
-        id={`${id}-panel`}
-        aria-labelledby={`${id}-tab-${selected}`}
-      >
-        {children}
+      <div className="tab-panels">
+        {tabs.map((tab, index) => (
+          <div
+            key={tab}
+            className={`tab-panel${index === selected ? " tab-panel-selected" : ""}`}
+            role="tabpanel"
+            id={`${id}-panel-${index}`}
+            aria-labelledby={`${id}-tab-${index}`}
+          >
+            {panels[index]}
+          </div>
+        ))}
       </div>
     </>
   );

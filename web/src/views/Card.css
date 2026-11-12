@@ -39,7 +39,7 @@
   height: 11px;
   padding: 1px; /* raw: the hairline between the frame and the red, as thin as the frame */
   border: 1px solid var(--bronze);
-  background: var(--ground);
+  background: var(--blood-4);
 }
 
 .boss-bar-whole i,
@@ -135,7 +135,7 @@
 }
 
 .boss-name .wiki-text {
-  padding-bottom: var(--space-1);
+  padding-bottom: var(--underline-gap);
 }
 
 .talismans {

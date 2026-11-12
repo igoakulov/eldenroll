@@ -56,20 +56,31 @@
   transition-duration: 0ms;
 }
 
+/* Between the buttons and never wider than its box, so the number and its selection stay clear of them */
 .stepper input {
+  flex: none;
   width: 58px;
   height: 44px;
+  min-width: 0;
+  margin: 0;
   padding: 0;
   border: 0;
   border-top: 1px solid var(--edge);
   border-bottom: 1px solid var(--edge);
   border-radius: 0;
+  overflow: hidden;
   background: var(--ground);
   text-align: center;
   font-size: var(--type-large);
   color: var(--text);
   font-variant-numeric: lining-nums tabular-nums;
   transition: color var(--dur-state) var(--ease-out);
+}
+
+/* Drawn inside the box, so the ring doesn't spill over the buttons either side */
+.stepper input:focus-visible {
+  outline: 1px solid var(--grace);
+  outline-offset: -1px;
 }
 
 .stepper input.raised {

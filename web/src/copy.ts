@@ -204,7 +204,7 @@ export const copy = {
     felledOnTheWay: "Boss felled on the way",
     gearUnlocked: "Boss gear unlocked",
     newObjective: "New objective",
-    confirm: "Confirm and reroll",
+    confirm: "Accept and reroll",
   },
 
   // Great enemy felled, after `Done` or `Felled?`
@@ -237,7 +237,7 @@ export const copy = {
   confirm: {
     chipsLabel: "What happens",
     abandonObjective: (number: number) => `Abandon objective ${number}`,
-    saveToHistory: "Save to Run history",
+    saveToPastRuns: "Save to Past runs",
     finishQuestion: "End this run and see its summary?",
     finishCannotResume: "Cannot resume",
     newRunQuestion: "Finish the current run and start a new one?",

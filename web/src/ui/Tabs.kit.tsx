@@ -11,11 +11,17 @@ const TABS = SETTINGS_TABS.map((tab) => copy.runSettings.tabs[tab]);
 function LiveTabs() {
   const [selected, setSelected] = useState(0);
   return (
-    <Tabs label={copy.common.runSettings} tabs={TABS} selected={selected} onSelect={setSelected}>
-      <KitPad>
-        <p className="kit-note">{TABS[selected]}</p>
-      </KitPad>
-    </Tabs>
+    <Tabs
+      label={copy.common.runSettings}
+      tabs={TABS}
+      selected={selected}
+      onSelect={setSelected}
+      panels={TABS.map((tab) => (
+        <KitPad key={tab}>
+          <p className="kit-note">{tab}</p>
+        </KitPad>
+      ))}
+    />
   );
 }
 
@@ -28,9 +34,7 @@ export const kit: readonly KitBlock[] = [
     states: TABS.map((tab, index) => ({
       label: `${tab} selected`,
       render: () => (
-        <Tabs label={copy.common.runSettings} tabs={TABS} selected={index} onSelect={noop}>
-          {null}
-        </Tabs>
+        <Tabs label={copy.common.runSettings} tabs={TABS} selected={index} onSelect={noop} panels={TABS.map(() => null)} />
       ),
     })),
     Live: LiveTabs,

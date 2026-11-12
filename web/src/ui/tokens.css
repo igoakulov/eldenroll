@@ -18,9 +18,13 @@
   --blood: #a93825;
   --blood-2: #811e17;
   --blood-3: #510c08;
+  --blood-4: #140605;
   --blood-text: #e0806c;
   --raised: #507bc6;
   --trail: #a89b34;
+  /* What a screen shows at its top and bottom edges, where a pulled page overscrolls (ui/base.css) */
+  --overscroll-top: #161e1c;
+  --overscroll-bottom: #030303;
 
   /* See-through strengths of the palette */
   --edge: color-mix(in srgb, var(--gold-mute) 24%, transparent);
@@ -34,12 +38,16 @@
   --blood-faint: color-mix(in srgb, var(--blood-2) 16%, transparent);
   --blood-soft: color-mix(in srgb, var(--blood) 50%, transparent);
   --veil: color-mix(in srgb, var(--ground) 92%, transparent);
+  /* The dimmed strip under a bottom bar's buttons, where what the screen goes on with still shows through */
+  --strip: color-mix(in srgb, var(--ground) 68%, transparent);
   /* Dims what lies under a sheet, and darkens every shadow */
   --scrim: rgb(0 0 0 / 0.72);
 
   /* A dotted underline drawn as a background, so its dots keep their spacing at any zoom; text-decoration's
      dots run together when the desktop frame scales the app down */
   --dots: repeating-linear-gradient(to right, var(--gold-dim) 0 1.5px, transparent 1.5px 4.5px);
+  /* Between a dotted link's text and its dots: the boss name's underline sits this far below the letters */
+  --underline-gap: 3px;
 
   /* The one glow per screen and the glow band's handle; large type's quiet halo; a lit control; a rule */
   --glow: 0 0 14px var(--grace-strong);

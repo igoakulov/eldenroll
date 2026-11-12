@@ -53,6 +53,11 @@
   animation: fade-in var(--dur-rise) var(--ease-out);
 }
 
+/* A line never wraps: a wrapped row would leave the caret on a row of its own when a space ends one */
+.tagline-line {
+  white-space: nowrap;
+}
+
 .tagline-line-1 {
   width: calc(var(--first-line) + 0.5em);
   max-width: 100%;

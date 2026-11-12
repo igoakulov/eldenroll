@@ -1,7 +1,8 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  row-gap: var(--space-3);
+  column-gap: var(--space-2);
   margin: var(--space-4) 0 var(--space-2);
   padding: 0;
   list-style: none;
@@ -9,8 +10,9 @@
 
 .chip {
   flex: none;
-  /* Less on the right, where the last letter's spacing already adds some */
-  padding: var(--space-1) calc(var(--space-3) - var(--tracking-tight)) var(--space-1) var(--space-3);
+  /* The capitals sit low in their line, so the bottom padding is the larger one; less on the right, where the last
+     letter's spacing already adds some */
+  padding: 0 calc(var(--space-3) - var(--tracking-tight)) var(--space-1) var(--space-3);
   border: 1px solid var(--edge);
   font-variant-caps: all-small-caps;
   letter-spacing: var(--tracking-tight);

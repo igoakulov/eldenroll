@@ -19,8 +19,8 @@ function finishParts(run: Run, cannotResume: string): readonly ConfirmPart[] {
   return [
     ...(run.current === null ? [] : [{ text: copy.confirm.abandonObjective(objectiveNumber(run)), lost: true }]),
     { text: cannotResume, lost: true },
-    // A run with no completed objective is not saved (web/README.md#Run history)
-    ...(run.completed.length === 0 ? [] : [{ text: copy.confirm.saveToHistory, lost: false }]),
+    // A run with no completed objective is not saved (web/README.md#Past runs)
+    ...(run.completed.length === 0 ? [] : [{ text: copy.confirm.saveToPastRuns, lost: false }]),
   ];
 }
 
@@ -102,7 +102,7 @@ export function RunMenu({
     <>
       <Sheet open={open && !finishing} eyebrow={copy.common.menu} closeLabel={copy.menu.close} onClose={onClose}>
         <div className="run-menu">
-          {/* Run history (9.10) and the run's own row, opening its view (9.7), join the menu once those screens exist */}
+          {/* The run's own row, opening its view (9.7), joins the menu once that screen exists */}
           <ListRow
             title={copy.common.howItWorks}
             detail={copy.menu.howItWorksDetail}

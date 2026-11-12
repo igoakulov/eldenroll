@@ -8,6 +8,11 @@
   padding-right: 0;
 }
 
+/* The tab row's rule already tops this checkbox; its lower rule frames it from the note below */
+.lozenge-row.run-settings-shortlist-toggle {
+  border-top: 0;
+}
+
 .run-settings-note {
   margin: var(--space-5) var(--gutter) 0;
   font-size: var(--type-body);

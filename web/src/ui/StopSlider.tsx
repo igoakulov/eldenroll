@@ -42,13 +42,20 @@ export function StopSlider({
     onChange(next, glide);
   };
 
+  // The stop whose drawn centre is nearest the pointer. Both are measured on screen, so the desktop frame's zoom
+  // never has to be converted; a pointer beyond either end picks that end.
   const stopAt = (event: PointerEvent<HTMLDivElement>) => {
-    const track = event.currentTarget;
-    const rect = track.getBoundingClientRect();
-    // The desktop frame may scale the app, so the inset is measured in the same units as the pointer
-    const inset = INSET * (rect.width / track.offsetWidth);
-    const share = (event.clientX - rect.left - inset) / (rect.width - 2 * inset);
-    return Math.min(last, Math.max(0, Math.round(share * last)));
+    let nearest = 0;
+    let distance = Infinity;
+    event.currentTarget.querySelectorAll<HTMLElement>(".stop-slider-stop").forEach((stop, index) => {
+      const box = stop.getBoundingClientRect();
+      const gap = Math.abs(event.clientX - (box.left + box.width / 2));
+      if (gap < distance) {
+        distance = gap;
+        nearest = index;
+      }
+    });
+    return nearest;
   };
 
   const at = (index: number) => `calc(${INSET}px + (100% - ${2 * INSET}px) * ${index / last})`;

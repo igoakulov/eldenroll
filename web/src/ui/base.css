@@ -11,8 +11,11 @@
   box-sizing: border-box;
 }
 
+/* The root's background is repeated past both ends of the page, so a pulled page shows the top colour above it and
+   the bottom colour below: the gradient runs from the bottom colour at the top of the page to the top colour at its
+   foot, so the repeat above the page is its foot */
 html {
-  background: var(--ground);
+  background: linear-gradient(to bottom, var(--overscroll-bottom), var(--overscroll-top)) var(--ground);
   color-scheme: dark;
   -webkit-text-size-adjust: 100%;
 }

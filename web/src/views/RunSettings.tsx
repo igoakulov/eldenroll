@@ -99,8 +99,7 @@ export function RunSettings({
         tabs={SETTINGS_TABS.map((one) => copy.runSettings.tabs[one])}
         selected={SETTINGS_TABS.indexOf(tab)}
         onSelect={(index) => onTab(SETTINGS_TABS[index] ?? "general")}
-      >
-        {tab === "general" && (
+        panels={[
           <>
             <SectionHeading>{copy.runSettings.classes}</SectionHeading>
             <div>
@@ -153,10 +152,7 @@ export function RunSettings({
                 {copy.runSettings.bossGearLocked}
               </LozengeCheckbox>
             </div>
-          </>
-        )}
-
-        {tab === "neverRoll" && (
+          </>,
           <>
             <p className="run-settings-note">{copy.runSettings.neverRollNote}</p>
             <GearPicker
@@ -168,19 +164,17 @@ export function RunSettings({
               notFound={copy.runSettings.neverRollNotFound}
               defaultQuery={defaultQuery}
             />
-          </>
-        )}
-
-        {tab === "shortlist" && (
+          </>,
           <>
-            <p className="run-settings-note">{copy.runSettings.shortlistNote}</p>
             <LozengeCheckbox
               framed
+              className="run-settings-shortlist-toggle"
               checked={draft.weaponShortlistEnabled}
               onChange={(weaponShortlistEnabled) => edit({ weaponShortlistEnabled })}
             >
               {copy.runSettings.shortlistEnabled}
             </LozengeCheckbox>
+            <p className="run-settings-note">{copy.runSettings.shortlistNote}</p>
             <GearPicker
               key="shortlist"
               entries={gear.shortlist}
@@ -190,9 +184,9 @@ export function RunSettings({
               notFound={copy.runSettings.shortlistNotFound}
               defaultQuery={defaultQuery}
             />
-          </>
-        )}
-      </Tabs>
+          </>,
+        ]}
+      />
     </Screen>
   );
 }

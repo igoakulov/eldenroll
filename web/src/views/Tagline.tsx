@@ -71,14 +71,12 @@ export function Tagline({ onOpen }: { readonly onOpen: () => void }) {
     });
   }, []);
 
-  // A second line wider than the screen would wrap to a third; say so while writing variants
+  // A line wider than the screen would overhang its edges, since lines never wrap; say so while writing variants
   useEffect(() => {
     if (!import.meta.env.DEV || layout === null || box.current === null) return;
-    const lineHeight = parseFloat(getComputedStyle(box.current).lineHeight);
+    const width = box.current.clientWidth;
     for (const line of box.current.querySelectorAll<HTMLElement>(".tagline-line")) {
-      if (line.getBoundingClientRect().height / zoomOf(line) > lineHeight * 1.5) {
-        console.warn(`A tagline line wraps; shorten it: "${line.textContent}"`);
-      }
+      if (line.scrollWidth > width) console.warn(`A tagline line is wider than the screen; shorten it: "${line.textContent}"`);
     }
   }, [layout, state.variant]);
 

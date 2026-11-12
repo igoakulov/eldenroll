@@ -11,8 +11,8 @@
     var(--veil) 22px,
     var(--ground) var(--space-7),
     var(--ground) calc(100% - 26px),
-    var(--scrim) calc(100% - 8px),
-    var(--scrim) 100%
+    var(--strip) calc(100% - 8px),
+    var(--strip) 100%
   );
 }
 

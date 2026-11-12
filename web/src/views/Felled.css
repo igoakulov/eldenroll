@@ -63,7 +63,7 @@
   position: relative;
   height: 11px;
   border: 1px solid var(--bronze);
-  background: var(--ground);
+  background: var(--blood-4);
 }
 
 /* Both drain from the right; the yellow trail lags behind the red, as the game's boss bar shows damage */
