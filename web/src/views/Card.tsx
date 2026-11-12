@@ -26,7 +26,7 @@ export function hasObjective(run: Run): run is RunWithObjective {
   return run.current !== null;
 }
 
-/** When the sequence ends at full speed (internal/design.md#Sequences); a tap anywhere ends it early. */
+/** When the sequence ends at full speed (web/src/ui/README.md#Sequences); a tap anywhere ends it early. */
 const REVEAL_MS = 1800;
 
 /** The reveal's start times in ms at full speed, scaled by `--k` for a quick one. */

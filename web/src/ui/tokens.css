@@ -41,7 +41,7 @@
 
   --gutter: 20px;
 
-  /* internal/design.md#Motion: fades easing to a stop, no bounce */
+  /* web/src/ui/README.md#Motion: fades easing to a stop, no bounce */
   --dur-state: 120ms;
   --dur-sheet: 200ms;
   --dur-sheet-out: 150ms;

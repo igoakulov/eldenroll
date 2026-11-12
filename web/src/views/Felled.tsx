@@ -5,7 +5,7 @@ import { Screen } from "../ui/Screen";
 import { UndoButton } from "../ui/UndoButton";
 import "./Felled.css";
 
-/** The one big moment (internal/design.md#Sequences): over the dimmed card, `behind`, the boss's bar drains and
+/** The one big moment (web/src/ui/README.md#Sequences): over the dimmed card, `behind`, the boss's bar drains and
  * `Great enemy felled` holds while `label` counts down to `onZero`. A tap anywhere ends the entrance, never the
  * count. */
 export function Felled({

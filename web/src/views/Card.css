@@ -275,7 +275,7 @@
   animation: fade-out var(--dur-swap) var(--ease-in) forwards;
 }
 
-/* Wherever a slot fades in, its icon leads and its text follows (internal/design.md#Sequences) */
+/* Wherever a slot fades in, its icon leads and its text follows (web/src/ui/README.md#Sequences) */
 .card {
   --cascade: 120ms;
 }
@@ -293,7 +293,7 @@
   animation-delay: calc(var(--d, 0ms) * var(--k) + var(--cascade));
 }
 
-/* A new objective in two phases (internal/design.md#Sequences): the boss, then how to fell it. `--d` is each
+/* A new objective in two phases (web/src/ui/README.md#Sequences): the boss, then how to fell it. `--d` is each
    part's start at full speed; a quick reveal halves it. */
 .card {
   --k: 1;

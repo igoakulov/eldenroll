@@ -1,6 +1,6 @@
 # Web app
 
-The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar the run view and `Run history`, which come with saving; installing comes last. The look lives in `src/ui/`, the design tokens and shared controls, and every screen in `src/views/` is built only from them; the icons are drawn by `design/icons/`. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
+The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar the run view and `Run history`, which come with saving; installing comes last. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
 
 Scripts are in `package.json`. The app and the engine tests read `../data/build/db.json`, which is git-ignored, so build the database first (`pipeline/README.md`); without it they stop and say so. Vitest hides `console.log` unless run with `--reporter=verbose`. There is no Prettier config: `npx prettier --write` would reformat every file, so format by hand.
 

@@ -1,0 +1,74 @@
+# Look and UI kit
+
+How the app looks and moves, and the rules a change must not undo by accident. The code in this folder is the design source: `tokens.css` holds every colour, size and timing, each shared control is one component here, and every screen in `src/views/` is built only from them. What each view holds is `web/README.md#Views`; the icons are drawn by `design/icons/`.
+
+## What we may use from the game
+
+Elden Ring has no published brand guidelines or fan-content policy; Bandai Namco's and FromSoftware's policies cover gameplay videos and screenshots only. So:
+
+- **The name** only to say what the tool is for (nominative use).
+- **No logo, sigil, key art or the logo's big-initial lettering:** trademarks, FromSoftware's since March 2023, and copyrighted art. Our wordmark is plain even-height caps with our own lozenge glyph for the O.
+- **No game fonts:** reportedly Agmena (Linotype) for menus and a customised Mantinia (Carter & Cone) for the logo, neither confirmed by FromSoftware, both commercial and licensed to them. We use Cinzel and EB Garamond (SIL Open Font License), self-hosted so they work offline and nothing calls Google.
+- **No item or boss pictures:** FromSoftware's art, and the scraped set carries `FEXTRALIFE` watermarks and has gaps. Our own icons stand in (`design/icons/README.md`).
+- **Colours, layout ideas and short game phrases** (`Great enemy felled`, `Level up`, *felled*) are fine: not protectable, used sparingly.
+- The `Elden Rold` card carries, rather than every page: `Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.` The credit line `©Bandai Namco Entertainment Inc. / ©2026 FromSoftware, Inc.` is needed only if their art is ever shown.
+
+## Direction
+
+The pause menu at a Site of Grace: near-black warm ground, teal mist, thin bronze rules, serif type, warm gold light only where the eye should go. Dark only.
+
+- **One hero per screen.** On the current run it is the boss, a large name over a framed blood-red bar, as in a boss fight.
+- **One glow per screen.** The main action is a band of warm light, like the game's highlighted menu line; nothing else glows.
+- **Structure only where it says something.** No cards, shadows or rounded corners; square corners and the lozenge everywhere.
+- **States change items, not the layout.** Choosing a reroll scope lights the panel's chips; nothing moves or reflows. Every sheet, the reroll panel included, dims what is behind it.
+- **By how often it changes.** The two frequent actions sit in the bottom bar under the thumb; stats and regions sit on `Level up`, one tap away; rare settings sit in `Run settings`. Every layout works with no images.
+- **The bottom bar.** A secondary action beside the glow band takes the band's two rules, dimmed, never a box: a box's square corners clash with a phone's round ones. Two buttons of one style split the bar evenly, so their labels sit symmetrically; the glow alone marks the main one. The backdrop turns solid above the buttons and thins to a dimmed strip below them, so a screen that goes on shows it under the bar.
+- **Talismans before armor on the card,** though the game's equipment screen lists armor first: the owner's choice, reasons not recorded.
+- **Red means irreversible.** Only the boss bar, rule lozenges and actions that can't be undone are red.
+- **The phone is the product everywhere.** Desktop shows the app inside a drawn phone (`web/README.md#Desktop`), and nothing inside the frame is desktop-only, so every screen is designed once.
+- **Tabs only where one screen holds two long views or several lists edited together:** the run view and `Run settings`. The card has none: a tab bar would compete with the boss and the bottom bar, and `Level up` is already one tap away.
+
+## Motion
+
+The game's menus fade and nothing in them bounces; ours follow. Motion shows what the player's action changed, and spends its drama on one moment.
+
+- **Motion answers the player.** Nothing moves on its own but a running countdown, the loading pulse and Start's tagline. The app stays open beside the console for hours, so idle motion would pull the eye and drain the battery; Start is seen at the start of a session, not during play.
+- **Fades, not slides,** easing to a stop with no bounce: about 120 ms for a control's state, 200 ms for sheets and screens. Nothing reflows to animate; a change shows in place, as in #Direction.
+- **One big moment: an enemy felled.** Everything else stays short and quiet.
+- **Anything long is skippable.** A tap anywhere finishes a sequence; the buttons work at once.
+- **Reduced motion** drops movement, scaling and draining and keeps short fades; numbers show their final value, and the tagline's variants cross-fade.
+- **CSS only, no animation library,** so the offline app stays small. Durations and easings are tokens in `tokens.css`, beside the colours.
+
+### Sequences
+
+- **A new objective** (`Start run`, `Roll objective N`) comes in two phases: the boss, then how to fell it. First `Objective N`, the boss name fading in and settling, the red bar filling whole from the left, and the location. As the bar finishes filling, `Felled?` fades into its middle, and a beat of under half a second lets the player read the boss and take in the question before the loadout comes; a bar shown already broken by the question read oddly. Then the class with its icons and the sections top to bottom, the bottom bar last. The card's order, not the roll order: armor rolls last but sits mid-card, so roll order would make the eye jump. Only what is on screen is staged; the rest simply appears. About 1.8 s in all, the loadout starting at 1 s; since it plays every objective, often over a hundred times a run, a tap anywhere ends it. A full-objective reroll plays a quicker version; `Resume` and returning from another screen only fade.
+- **A slot fades in icon first,** its name and any line under it following a beat later, wherever it appears: a new objective, a reroll, `Resume`, `Undo` or returning to the card. Rules and the class line arrive whole.
+- **A reroll** fades out and back in only the slots it changed, slowly enough to follow; the rest stay still, so the eye finds what is new.
+- **An enemy felled** (after `Done`, and after `Confirm and reroll` on `Felled?`): the card dims behind the veil; the red bar drains from the right with a yellow trail lagging behind, as the game's boss bar shows damage; `Great enemy felled` fades in on its dark band, its glow brightening, swelling slightly while it holds; the countdown's digit cross-fades each second inside a thin gold ring that empties clockwise over the count, so the time left reads at a glance. `Undo` returns to the card with a plain quick fade and the bar full. We echo the game's rhythm, not its art or type (#What we may use from the game).
+- **The run view's counts** count up on data rows when the view opens, all rows starting and ending together in about 0.7 s, like runes ticking up after a kill; not again on switching back to `Summary`. Section headings (`8 top classes`), `Level` and the 8 stats don't count: they are read, not earned.
+- **Loading** pulses the wordmark's lozenge slowly while the player waits.
+- **Start's tagline** types itself out (`web/README.md#Start`).
+
+### Controls
+
+- **Sheets** (the menu, the reroll panel, `Felled?`, confirmations): the screen behind dims while the sheet fades in, rising a short way to show where it came from; closing is a little faster.
+- **Full screens** (`Run settings`, `Bosses`, `Level up`, the run view, `Run history`) cross-fade, with no sideways push: `✕` returns home rather than back.
+- **Tabs:** the gold underline glides to the new tab and the content cross-fades.
+- **The glow band** brightens for an instant when pressed, in place of the phone's grey tap flash; the dimmed button beside it brightens its rules. On desktop, hover brightens them a little.
+- **The reroll slider's** fill, glow and lit chips follow the finger with no lag; tapping a stop glides the handle there, and each chip lights quickly, so the scope visibly grows from the left.
+- **The lozenge checkbox** fills and glows, like a grace being lit. **The boss cycler's** word shifts a few pixels the way it stepped. **A raised stat** on `Level up` turns blue with a short fade; numbers there never count.
+- **`Show all N`** and timeline entries: the chevron turns and new rows fade in; the height jumps, since sliding height stutters on phones and drags the rows below.
+- **Not animated:** search results, the stepper's numbers, scrolling (no reveal on scroll) and the desktop frame.
+
+## UI kit
+
+Until it is built, this section is its spec.
+
+The kit page shows every token and component as the app renders them, so a change can be judged without playing a run. It is a second Vite page, `web/kit/index.html`, with its own bundle: the app never loads its code, and the installed app doesn't keep it offline. It is published with the app at `https://eldenroll.com/kit/`, marked `noindex` and linked from nothing; in development it is at `/kit/` on the dev server.
+
+- **Live code and real data only.** The page imports the same components the views use, and its sample text is the longest real labels in `db.json`, so it can't drift from the app and stresses the layout the way the longest names do.
+- **Top to bottom:** the tokens, read from `tokens.css` itself, so a new token appears without being added; each control as a labelled grid of every state it has (lit, grey, red, locked, `none`, `any`) beside one live instance to tap; the groups (sheet, rows, tabs, search field, top and bottom bars, countdown); the new objective and the enemy felled sequences, replayable on the real card at a fixed seed; each view at a fixed seed.
+- **One entry per component,** `<Name>.kit.tsx` beside `<Name>.tsx`, collected automatically; a component with no entry is listed at the top of the page. Every block has an anchor, such as `/kit/#chip`.
+- **No page controls.** Reduced motion is checked through the browser's own setting.
+- **No raw values in views.** A colour, size or duration in `src/views/*.css` comes from a token, and control styling lives only in this folder; a check flags a hex colour or a millisecond value in a view's CSS.
+- **Screenshots catch what moved.** One command (Playwright, development only) captures every view at a fixed seed from the last commit and from the working copy, compares them and names the views that changed. Nothing is committed: an intended change needs no baseline to approve.

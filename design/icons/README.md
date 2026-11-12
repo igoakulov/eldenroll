@@ -12,7 +12,7 @@ Each item icon is written at three sizes, tuned for its tile: `<key>.svg` for th
 
 ## Drawing rules
 
-Each icon is the generic shape of an item subcategory, drawn from a reference picture of a real in-game item of that class, never a trace of one item's art. The style is a gold outline in `currentColor` with a faint fill, on a 48 grid, with round joins and caps.
+Each icon is the generic shape of an item subcategory, drawn from a reference picture of a real in-game item of that class, never a trace of one item's art: the app shows no game art (`web/src/ui/README.md#What we may use from the game`). The style is a gold outline in `currentColor` with a faint fill, on a 48 grid, with round joins and caps. The glyph fills most of its tile, so icons are easy to tell apart at the slot size. A class name shows a small group of its typical loadout's icons; bosses get no icon.
 
 - Icons are viewed zoomed in: every join must be clean. Run `audit.py --sheets` and look at the 5x sheets, not only the lint.
 - Grips stay short against the blade.
