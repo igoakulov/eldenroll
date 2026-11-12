@@ -90,12 +90,13 @@
   color: var(--text-3);
 }
 
+/* While searching, the rest of a name dims so the matching letters stand out at the text's own colour */
 .boss-list-search .boss-row-name {
-  color: var(--text-2);
+  color: var(--text-3);
 }
 
 .boss-row-match {
-  color: var(--grace);
+  color: var(--text);
 }
 
 .boss-fixed {

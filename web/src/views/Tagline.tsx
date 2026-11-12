@@ -35,11 +35,18 @@ interface Layout {
   readonly breaks: readonly (number | null)[];
 }
 
+/** The CSS zoom an element is drawn at: the desktop phone frame scales the app with `zoom`, and a measured box
+ * comes back scaled, while a width set in CSS gets scaled again. */
+function zoomOf(element: Element): number {
+  return (element as Element & { readonly currentCSSZoom?: number }).currentCSSZoom ?? 1;
+}
+
 /** Measures the main tagline and breaks every other variant where its first line would outgrow it. */
 function measure(probe: HTMLElement): Layout {
+  const zoom = zoomOf(probe);
   const widthOf = (line: string) => {
     probe.textContent = line.trimEnd();
-    return probe.getBoundingClientRect().width;
+    return probe.getBoundingClientRect().width / zoom;
   };
   const width = widthOf(MAIN);
   const breaks = TAGLINES.map((tagline, index) =>
@@ -69,7 +76,7 @@ export function Tagline({ onOpen }: { readonly onOpen: () => void }) {
     if (!import.meta.env.DEV || layout === null || box.current === null) return;
     const lineHeight = parseFloat(getComputedStyle(box.current).lineHeight);
     for (const line of box.current.querySelectorAll<HTMLElement>(".tagline-line")) {
-      if (line.getBoundingClientRect().height > lineHeight * 1.5) {
+      if (line.getBoundingClientRect().height / zoomOf(line) > lineHeight * 1.5) {
         console.warn(`A tagline line wraps; shorten it: "${line.textContent}"`);
       }
     }

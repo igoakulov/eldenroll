@@ -2,8 +2,14 @@
   padding-top: 32px;
 }
 
+/* The rest of a result's name dims so the matching letters stand out at the text's own colour; ticking a result
+   brightens it whole */
+.gear-picker-results .lozenge-row input:not(:checked) ~ .lozenge-label {
+  color: var(--text-3);
+}
+
 .gear-picker-match {
-  color: var(--grace);
+  color: var(--text);
 }
 
 .gear-picker-rule {
