@@ -32,31 +32,25 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    column-gap: calc(56px * var(--phone-scale));
+    column-gap: calc(var(--space-9) * var(--phone-scale));
     min-height: 100dvh;
-    padding: 16px 0;
-    background:
-      radial-gradient(56rem 34rem at 50% 45%, rgba(27, 37, 35, 0.8) 0%, rgba(18, 24, 23, 0.5) 42%, rgba(10, 10, 10, 0) 76%),
-      var(--ground);
+    padding: var(--space-5) 0;
+    background: radial-gradient(56rem 34rem at 50% 45%, var(--mist) 0%, var(--mist-2) 42%, transparent 76%), var(--ground);
   }
 
   .phone-frame-device {
     display: block;
     position: relative;
     zoom: var(--phone-scale);
-    padding: 10px 11px;
+    padding: 10px 11px; /* raw: the bezel, drawn to the phone's measurements */
     border-radius: 72px;
     background: var(--device);
-    box-shadow:
-      0 0 0 1px #000,
-      0 0 0 3px var(--device-band),
-      0 0 0 4px var(--device-band-edge),
-      inset 0 0 0 1px var(--device-inner),
-      0 40px 100px rgba(0, 0, 0, 0.7);
+    box-shadow: var(--device-shadow);
   }
 
   /* The side buttons */
-  .phone-frame-device::before {
+  .phone-frame-device::before,
+  .phone-frame-device::after {
     content: "";
     position: absolute;
     right: -6px;
@@ -65,7 +59,10 @@
     height: 96px;
     border-radius: 0 2px 2px 0;
     background: var(--device-button);
-    box-shadow: 0 -64px 0 var(--device-button);
+  }
+
+  .phone-frame-device::after {
+    top: 136px;
   }
 
   .phone-frame-hole {
@@ -76,10 +73,10 @@
     top: 21px;
     width: 12px;
     height: 12px;
-    margin-left: -6px;
+    translate: -50% 0;
     border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #18201f 0, var(--device) 65%);
-    box-shadow: 0 0 0 1px #000;
+    background: radial-gradient(circle at 40% 35%, var(--mist) 0, var(--device) 65%);
+    outline: 1px solid var(--device);
   }
 
   /* Its own stacking context, so sheets stay under the punch hole; scrolling stays inside it */
@@ -104,7 +101,7 @@
 
   /* No status bar: the top bar starts beside the punch hole */
   .phone-frame-screen .screen {
-    padding-top: 18px;
+    padding-top: var(--space-5);
   }
 
   .phone-frame-side {
@@ -117,21 +114,24 @@
     justify-content: flex-end;
   }
 
-  /* The phone's 40 px, scaled with it, or smaller where the space beside the phone is narrow */
+  /* Scaled with the phone, or smaller where the space beside the phone is narrow */
   .phone-frame-mark {
     font-family: var(--display);
     font-weight: 600;
-    font-size: min(calc(40px * var(--phone-scale)), 17cqi);
-    line-height: 1;
-    letter-spacing: 0.3em;
+    font-size: min(
+      calc(var(--type-frame-mark) * var(--phone-scale)),
+      17cqi /* raw: the share of the space beside the phone it may take */
+    );
+    line-height: var(--leading-none);
+    letter-spacing: var(--tracking-wide);
     white-space: nowrap;
     color: var(--gold-dim);
   }
 
   /* Spaced tighter, so the two halves come out near the same width */
   .phone-frame-left .phone-frame-mark {
-    letter-spacing: 0.12em;
-    margin-right: -0.12em;
+    letter-spacing: var(--tracking-tight);
+    margin-right: calc(-1 * var(--tracking-tight));
   }
 
   .phone-frame-o {

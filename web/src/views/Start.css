@@ -2,19 +2,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 88px 28px 6px;
+  padding: calc(var(--space-10) + var(--space-6)) var(--space-6) var(--space-2);
   text-align: center;
 }
 
 .wordmark {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 27px;
-  line-height: 1.4;
-  letter-spacing: 0.3em;
-  text-indent: 0.3em;
+  font-size: var(--type-wordmark);
+  line-height: var(--leading);
+  letter-spacing: var(--tracking-wide);
+  text-indent: var(--tracking-wide);
   color: var(--grace);
-  text-shadow: 0 0 22px rgba(227, 207, 152, 0.35);
+  text-shadow: var(--glow-quiet);
 }
 
 .wordmark-o {
@@ -23,7 +23,7 @@
   height: 0.94em;
   margin: 0 0.3em 0 0.08em;
   vertical-align: -0.1em;
-  filter: drop-shadow(0 0 8px rgba(227, 207, 152, 0.45));
+  filter: drop-shadow(var(--glow-small));
 }
 
 /* Every first line starts where the main tagline does: a box as wide as it, plus a quarter em of slack each side
@@ -32,11 +32,11 @@
 .tagline {
   position: relative;
   width: 100%;
-  min-height: calc(var(--lines) * 1.4em);
-  margin-top: 16px;
+  min-height: calc(var(--lines) * var(--leading) * 1em);
+  margin-top: var(--space-5);
   font-style: italic;
-  font-size: 18.5px;
-  line-height: 1.4;
+  font-size: var(--type-name);
+  line-height: var(--leading);
   color: var(--text-2);
 }
 
@@ -50,7 +50,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: fade-in 400ms var(--ease-out);
+  animation: fade-in var(--dur-rise) var(--ease-out);
 }
 
 .tagline-line-1 {
@@ -83,7 +83,7 @@
    break the line, so the line would rewrap as the caret moved */
 .tagline-caret {
   position: relative;
-  animation: caret-blink 1.06s steps(1) infinite;
+  animation: caret-blink var(--dur-caret) steps(1) infinite;
 }
 
 .tagline-caret::after {
@@ -94,7 +94,7 @@
   width: 1px;
   height: 1.05em;
   background: var(--grace);
-  box-shadow: 0 0 6px rgba(227, 207, 152, 0.5);
+  box-shadow: var(--glow-small);
 }
 
 @keyframes caret-blink {
@@ -109,12 +109,12 @@
 
 /* The one motion that runs on its own while the player waits */
 .wordmark-loading .wordmark-o {
-  animation: wordmark-pulse 1.6s ease-in-out infinite;
+  animation: wordmark-pulse var(--dur-pulse) var(--ease-in-out) infinite;
 }
 
 @keyframes wordmark-pulse {
   50% {
-    opacity: 0.35;
+    opacity: var(--dimmed);
   }
 }
 
@@ -125,17 +125,17 @@
 }
 
 .start-failed {
-  margin: 48px 28px 0;
+  margin: var(--space-9) var(--space-6) 0;
   font-style: italic;
-  font-size: 18px;
+  font-size: var(--type-body);
   text-align: center;
   color: var(--text-2);
 }
 
 .in-run {
-  margin: 56px var(--gutter) 0;
+  margin: var(--space-9) var(--gutter) 0;
 }
 
 .in-run .section-heading {
-  padding: 0 0 10px;
+  padding: 0 0 var(--space-4);
 }

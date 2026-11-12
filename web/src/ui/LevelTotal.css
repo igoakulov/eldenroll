@@ -2,24 +2,24 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 40px var(--gutter) 6px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--rule);
+  margin: var(--space-8) var(--gutter) var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--frame);
 }
 
 .level-total-key {
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 18px;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-body);
   color: var(--gold-mute);
 }
 
 .level-total-value {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  font-size: 32px;
-  line-height: 1;
+  gap: var(--space-4);
+  font-size: var(--type-display);
+  line-height: var(--leading-none);
   font-variant-numeric: lining-nums tabular-nums;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .level-total-arrow {
-  font-size: 22px;
+  font-size: var(--type-large);
   color: var(--gold-dim);
 }
 

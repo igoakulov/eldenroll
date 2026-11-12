@@ -2,13 +2,13 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-5);
   min-height: 47px;
-  padding: 8px var(--gutter);
+  padding: var(--space-3) var(--gutter);
   border-top: 1px solid var(--line);
   cursor: pointer;
-  font-size: 17.5px;
-  line-height: 1.25;
+  font-size: var(--type-body);
+  line-height: var(--leading-tight);
   color: var(--text-2);
 }
 
@@ -28,7 +28,7 @@
   flex: none;
   width: 12px;
   height: 12px;
-  margin: 0 3px;
+  margin: 0 var(--space-1);
   transform: rotate(45deg);
   border: 1px solid var(--gold-dim);
   transition:
@@ -40,7 +40,7 @@
 .lozenge-row input:checked + .lozenge-box {
   background: var(--gold);
   border-color: var(--grace);
-  box-shadow: 0 0 8px rgba(227, 207, 152, 0.45);
+  box-shadow: var(--glow-small);
 }
 
 .lozenge-row input:focus-visible + .lozenge-box {
@@ -59,14 +59,14 @@
 
 .lozenge-row-icons .lozenge-label {
   flex: 0 1 auto;
-  font-size: 19px;
+  font-size: var(--type-name);
 }
 
 .lozenge-icons {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-2);
   color: var(--gold-mute);
   transition: color var(--dur-state) var(--ease-out);
 }
@@ -77,24 +77,26 @@
 
 .lozenge-tag {
   flex: none;
-  padding: 1px 6px 2px;
-  border: 1px solid rgba(169, 160, 127, 0.32);
+  /* Less on the right, where the last letter's spacing already adds some */
+  padding: var(--space-1) calc(var(--space-3) - var(--tracking-tight)) var(--space-1) var(--space-3);
+  border: 1px solid var(--frame);
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 15px;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
   color: var(--gold-mute);
 }
 
 .lozenge-row-detail {
   align-items: flex-start;
-  padding-top: 14px;
-  padding-bottom: 14px;
-  font-size: 19px;
-  line-height: 1.4;
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+  font-size: var(--type-name);
+  line-height: var(--leading);
 }
 
 .lozenge-row-detail .lozenge-box {
-  margin-top: 8px;
+  margin-top: var(--space-3);
 }
 
 .lozenge-row-detail .lozenge-label {
@@ -107,14 +109,14 @@
 
 .lozenge-detail {
   display: block;
-  margin-top: 1px;
-  font-size: 15px;
-  line-height: 1.35;
+  margin-top: var(--space-1);
+  font-size: var(--type-small);
+  line-height: var(--leading);
   color: var(--text-3);
 }
 
 .lozenge-row-lead {
-  gap: 14px;
+  gap: var(--space-4);
 }
 
 .lozenge-lead {

@@ -20,10 +20,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 22px var(--gutter) max(30px, calc(env(safe-area-inset-bottom, 0px) + 14px));
-  border-top: 1px solid rgba(169, 160, 127, 0.3);
+  padding: var(--space-6) var(--gutter) max(var(--space-7), calc(env(safe-area-inset-bottom, 0px) + var(--space-4)));
+  border-top: 1px solid var(--frame);
   background: var(--sheet);
-  box-shadow: 0 -24px 40px rgba(0, 0, 0, 0.75);
+  box-shadow: var(--shadow-sheet);
   animation: sheet-in var(--dur-sheet) var(--ease-out);
 }
 
@@ -48,7 +48,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-right: -12px;
+  margin-right: calc(-1 * var(--space-4));
 }
 
 .sheet-close {

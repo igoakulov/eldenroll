@@ -1,25 +1,25 @@
-/* Spacing: 8 within a group, 12 from a heading to its items, 32 between groups, 48 between major blocks */
+/* Spacing: --space-3 within a group, --space-4 from a heading to its items, --space-7 between groups, --space-8 between
+   major blocks */
 
 .boss {
-  padding: 24px var(--gutter) 4px;
+  padding: var(--space-6) var(--gutter) var(--space-2);
 }
 
 .boss-name {
-  margin: 0 0 16px;
+  margin: 0 0 var(--space-5);
   font-weight: 500;
-  font-size: 36px;
-  line-height: 1.08;
+  font-size: var(--type-hero);
+  line-height: var(--leading-title);
   color: var(--text);
-  text-shadow: 0 1px 0 #000;
 }
 
 /* Felled? sits in the middle of the bar, in its top red; the halves lose their inner frame and fade 12px,
-   4px from the word */
+   4px from the word. A mask reads only alpha, so any opaque colour does. */
 .boss-bar {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-2);
   height: 11px;
 }
 
@@ -37,9 +37,9 @@
 .boss-bar-whole,
 .boss-bar-half {
   height: 11px;
-  padding: 1px;
-  border: 1px solid #4e4838;
-  background: #140605;
+  padding: 1px; /* raw: the hairline between the frame and the red, as thin as the frame */
+  border: 1px solid var(--bronze);
+  background: var(--ground);
 }
 
 .boss-bar-whole i,
@@ -53,13 +53,13 @@
 .boss-bar-left {
   border-right: 0;
   padding-right: 0;
-  mask-image: linear-gradient(to right, #000 calc(100% - 12px), transparent);
+  mask-image: linear-gradient(to right, var(--ground) calc(100% - 12px), transparent);
 }
 
 .boss-bar-right {
   border-left: 0;
   padding-left: 0;
-  mask-image: linear-gradient(to left, #000 calc(100% - 12px), transparent);
+  mask-image: linear-gradient(to left, var(--ground) calc(100% - 12px), transparent);
 }
 
 .felled-link {
@@ -69,7 +69,7 @@
   padding: 0;
   border: 0;
   background: none;
-  font-size: 15px;
+  font-size: var(--type-small);
   color: var(--blood);
   white-space: nowrap;
 }
@@ -86,16 +86,16 @@
 }
 
 .boss-location {
-  margin-top: 10px;
+  margin-top: var(--space-4);
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 17px;
-  line-height: 1.55;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-body);
+  line-height: var(--leading);
   color: var(--text-2);
 }
 
 .boss-location .icon-svg {
-  margin-right: 7px;
+  margin-right: var(--space-3);
   vertical-align: -2px;
   color: var(--gold-mute);
 }
@@ -103,15 +103,15 @@
 .class-head {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 40px var(--gutter) 0;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--gutter) 0;
 }
 
 .class-head h2 {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.22em;
+  font-size: var(--type-body);
+  letter-spacing: var(--tracking);
   text-transform: uppercase;
   color: var(--gold);
 }
@@ -119,18 +119,18 @@
 .class-icons {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   color: var(--gold-mute);
 }
 
 .weapons .slot-heading {
-  padding-top: 16px;
+  padding-top: var(--space-5);
 }
 
 .hands {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 18px;
+  gap: 0 var(--space-5);
   padding: 0 var(--gutter);
 }
 
@@ -138,34 +138,34 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 12px 0 4px;
+  padding: var(--space-4) 0 var(--space-2);
 }
 
 .hand .tile {
-  margin-bottom: 15px;
+  margin-bottom: var(--space-5);
 }
 
 .slot-name {
   display: block;
-  margin-top: 4px;
-  font-size: 19px;
-  line-height: 1.22;
+  margin-top: var(--space-2);
+  font-size: var(--type-name);
+  line-height: var(--leading-tight);
   color: var(--text);
 }
 
 .slot-ash {
   display: block;
-  margin-top: 3px;
+  margin-top: var(--space-1);
   font-style: italic;
-  font-size: 15px;
-  line-height: 1.25;
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
   color: var(--text-2);
 }
 
 .slot-none {
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 18px;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-name);
   color: var(--text-3);
 }
 
@@ -177,8 +177,8 @@
 .small-slot {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px var(--gutter) 0;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--gutter) 0;
 }
 
 .small-slot .slot-name,
@@ -193,7 +193,7 @@
 }
 
 .boss-name .wiki-text {
-  padding-bottom: 3px;
+  padding-bottom: var(--space-1);
 }
 
 .talismans {
@@ -202,38 +202,38 @@
 }
 
 .talismans .small-slot {
-  gap: 12px;
+  gap: var(--space-4);
 }
 
 .talismans > * + * .small-slot {
-  padding-top: 14px;
+  padding-top: var(--space-4);
 }
 
 .armor {
-  padding: 12px var(--gutter) 0;
+  padding: var(--space-4) var(--gutter) 0;
 }
 
 .armor-pieces {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 12px;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
 }
 
 .armor-piece {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-4);
 }
 
 .armor-piece-name {
-  font-size: 17px;
-  line-height: 1.3;
+  font-size: var(--type-body);
+  line-height: var(--leading-tight);
   color: var(--text-2);
 }
 
 .armor-piece-name.slot-none {
-  font-size: 18px;
+  font-size: var(--type-body);
   color: var(--text-3);
 }
 
@@ -242,16 +242,16 @@
 }
 
 .rules {
-  margin-top: 6px;
+  margin-top: var(--space-3);
 }
 
 .rule {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-5);
   min-height: 44px;
   padding: 0 var(--gutter);
-  font-size: 20px;
+  font-size: var(--type-name);
   color: var(--text);
 }
 
@@ -259,11 +259,11 @@
   flex: none;
   width: 10px;
   height: 10px;
-  margin-left: 2px;
+  margin-left: var(--space-1);
   transform: rotate(45deg);
   background: var(--blood);
   border: 1px solid var(--blood-text);
-  box-shadow: 0 0 9px rgba(169, 56, 37, 0.5);
+  box-shadow: var(--glow-red);
 }
 
 /* A reroll's changed slots fade out and back in, slowly enough to follow; the rest stay still */
@@ -276,10 +276,6 @@
 }
 
 /* Wherever a slot fades in, its icon leads and its text follows (web/src/ui/README.md#Sequences) */
-.card {
-  --cascade: 120ms;
-}
-
 .card :is(.small-label, .slot-name:not(.armor > .slot-name), .slot-ash, .armor-piece-name) {
   animation: fade-in var(--dur-sheet) var(--ease-out) var(--cascade) backwards;
 }
@@ -313,18 +309,18 @@
    last moments, and Felled? starts there rather than at the very end. */
 .card-revealing .boss-bar-whole {
   display: block;
-  animation: fade-out 200ms var(--ease-in-out) forwards;
-  animation-delay: calc(400ms * var(--k));
+  animation: fade-out var(--dur-sheet) var(--ease-in-out) forwards;
+  animation-delay: calc(var(--question-at) * var(--k));
 }
 
 .card-revealing .boss-bar-whole i {
-  animation: bar-fill 360ms var(--ease-out) backwards;
-  animation-delay: calc(180ms * var(--k));
+  animation: bar-fill var(--dur-bar) var(--ease-out) backwards;
+  animation-delay: calc(var(--bar-at) * var(--k));
 }
 
 .card-revealing .felled-link {
-  animation: fade-in 200ms var(--ease-in-out) backwards;
-  animation-delay: calc(400ms * var(--k));
+  animation: fade-in var(--dur-sheet) var(--ease-in-out) backwards;
+  animation-delay: calc(var(--question-at) * var(--k));
 }
 
 @keyframes bar-fill {

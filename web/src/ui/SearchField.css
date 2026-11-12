@@ -1,12 +1,12 @@
 .search-field {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-4);
   height: 48px;
-  margin: 28px var(--gutter) 0;
-  padding: 0 14px;
-  border: 1px solid rgba(169, 160, 127, 0.24);
-  background: rgba(8, 8, 7, 0.7);
+  margin: var(--space-6) var(--gutter) 0;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--edge);
+  background: var(--ground);
   color: var(--gold-mute);
 }
 
@@ -19,7 +19,7 @@
   border-radius: 0;
   background: none;
   appearance: none;
-  font-size: 18px;
+  font-size: var(--type-body);
   color: var(--text);
 }
 
@@ -48,7 +48,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  margin-right: -12px;
+  margin-right: calc(-1 * var(--space-4));
   padding: 0;
   border: 0;
   background: none;

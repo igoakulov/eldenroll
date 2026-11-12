@@ -9,22 +9,22 @@
 }
 
 .run-settings-note {
-  margin: 18px var(--gutter) 0;
-  font-size: 17px;
-  line-height: 1.4;
+  margin: var(--space-5) var(--gutter) 0;
+  font-size: var(--type-body);
+  line-height: var(--leading);
   color: var(--text-2);
 }
 
 .run-settings-note + .search-field {
-  margin-top: 20px;
+  margin-top: var(--space-5);
 }
 
 .lozenge-row.run-settings-shortlist-toggle {
   min-height: 52px;
-  margin: 20px var(--gutter) 0;
-  padding: 8px 0;
-  border-top: 1px solid rgba(119, 112, 85, 0.5);
-  border-bottom: 1px solid rgba(119, 112, 85, 0.5);
-  font-size: 19px;
+  margin: var(--space-5) var(--gutter) 0;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--frame);
+  border-bottom: 1px solid var(--frame);
+  font-size: var(--type-name);
   color: var(--text);
 }

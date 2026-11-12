@@ -1,20 +1,21 @@
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 4px;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 var(--space-2);
   padding: 0;
   list-style: none;
 }
 
 .chip {
   flex: none;
-  padding: 1px 7px 2px;
-  border: 1px solid rgba(119, 112, 85, 0.22);
+  /* Less on the right, where the last letter's spacing already adds some */
+  padding: var(--space-1) calc(var(--space-3) - var(--tracking-tight)) var(--space-1) var(--space-3);
+  border: 1px solid var(--edge);
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 15px;
-  line-height: 20px;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
   white-space: nowrap;
   color: var(--text-3);
   transition-property: color, background, border-color;
@@ -24,14 +25,14 @@
 }
 
 .chip-lit {
-  border-color: rgba(200, 178, 122, 0.6);
-  background: rgba(200, 178, 122, 0.08);
+  border-color: var(--gold-dim);
+  background: var(--gold-faint);
   color: var(--gold);
 }
 
 .chip-red {
-  border-color: rgba(169, 56, 37, 0.6);
-  background: rgba(129, 30, 23, 0.16);
+  border-color: var(--blood-2);
+  background: var(--blood-faint);
   color: var(--blood-text);
 }
 

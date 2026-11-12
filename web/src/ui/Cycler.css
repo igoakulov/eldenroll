@@ -3,8 +3,8 @@
   grid-template-columns: 34px 1fr 34px;
   align-items: center;
   height: 36px;
-  border: 1px solid rgba(169, 160, 127, 0.28);
-  background: rgba(8, 8, 7, 0.7);
+  border: 1px solid var(--edge);
+  background: var(--ground);
 }
 
 .cycler button {
@@ -30,7 +30,7 @@
 }
 
 .cycler .cycler-word {
-  font-size: 16px;
+  font-size: var(--type-body);
   color: var(--text);
 }
 
@@ -48,14 +48,14 @@
 
 @keyframes cycler-on {
   from {
-    opacity: 0.4;
+    opacity: var(--dimmed);
     transform: translateX(calc(-1 * var(--cycle-x)));
   }
 }
 
 @keyframes cycler-back {
   from {
-    opacity: 0.4;
+    opacity: var(--dimmed);
     transform: translateX(var(--cycle-x));
   }
 }

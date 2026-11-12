@@ -1,9 +1,9 @@
 .bosses-legend {
   display: grid;
   grid-template-columns: auto 1fr;
-  column-gap: 16px;
-  row-gap: 10px;
-  margin: 18px var(--gutter) 0;
+  column-gap: var(--space-5);
+  row-gap: var(--space-4);
+  margin: var(--space-5) var(--gutter) 0;
 }
 
 .bosses-legend div {
@@ -11,16 +11,16 @@
 }
 
 .bosses-legend dt {
-  font-size: 16px;
-  line-height: 1.35;
+  font-size: var(--type-body);
+  line-height: var(--leading);
   color: var(--text-2);
   white-space: nowrap;
 }
 
 .bosses-legend dd {
   margin: 0;
-  font-size: 15px;
-  line-height: 1.35;
+  font-size: var(--type-small);
+  line-height: var(--leading);
   color: var(--text-3);
 }
 
@@ -33,18 +33,18 @@
 }
 
 .bosses-none {
-  padding: 28px var(--gutter) 0;
-  font-size: 17px;
+  padding: var(--space-6) var(--gutter) 0;
+  font-size: var(--type-body);
   color: var(--text-3);
 }
 
 .boss-row {
   display: grid;
   grid-template-columns: 1fr 140px;
-  column-gap: 12px;
+  column-gap: var(--space-4);
   align-items: center;
   min-height: 58px;
-  padding: 8px var(--gutter);
+  padding: var(--space-3) var(--gutter);
   border-top: 1px solid var(--line);
 }
 
@@ -56,12 +56,12 @@
   grid-template-columns: 30px 1fr;
   column-gap: 0;
   min-height: 52px;
-  padding-top: 7px;
-  padding-bottom: 7px;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
 }
 
 .boss-number {
-  font-size: 16px;
+  font-size: var(--type-small);
   color: var(--text-3);
   font-variant-numeric: lining-nums tabular-nums;
 }
@@ -78,15 +78,15 @@
 }
 
 .boss-row-name {
-  font-size: 18px;
-  line-height: 1.25;
+  font-size: var(--type-name);
+  line-height: var(--leading-tight);
   color: var(--text);
 }
 
 .boss-row-location {
-  margin-top: 2px;
-  font-size: 15px;
-  line-height: 1.3;
+  margin-top: var(--space-1);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
   color: var(--text-3);
 }
 
@@ -100,8 +100,8 @@
 }
 
 .boss-fixed {
-  font-size: 16px;
-  line-height: 1.3;
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
   text-align: center;
   color: var(--text-2);
 }

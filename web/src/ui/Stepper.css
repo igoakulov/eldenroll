@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   min-height: 54px;
-  padding: 4px 14px 4px var(--gutter);
+  padding: var(--space-1) var(--gutter);
   border-top: 1px solid var(--line);
 }
 
@@ -12,14 +12,14 @@
 }
 
 .stepper-row label {
-  font-size: 19px;
+  font-size: var(--type-name);
   color: var(--text);
 }
 
 .stepper-text {
   flex: 1;
   min-width: 0;
-  padding-right: 14px;
+  padding-right: var(--space-4);
 }
 
 .stepper-text label {
@@ -28,9 +28,9 @@
 
 .stepper-detail {
   display: block;
-  margin-top: 1px;
-  font-size: 15px;
-  line-height: 1.35;
+  margin-top: var(--space-1);
+  font-size: var(--type-small);
+  line-height: var(--leading);
   color: var(--text-3);
 }
 
@@ -45,8 +45,8 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 1px solid rgba(169, 160, 127, 0.24);
-  background: rgba(19, 17, 13, 0.85);
+  border: 1px solid var(--edge);
+  background: var(--panel);
   color: var(--gold-mute);
   transition: color var(--dur-state) var(--ease-out);
 }
@@ -61,12 +61,12 @@
   height: 44px;
   padding: 0;
   border: 0;
-  border-top: 1px solid rgba(169, 160, 127, 0.24);
-  border-bottom: 1px solid rgba(169, 160, 127, 0.24);
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
   border-radius: 0;
-  background: rgba(8, 8, 7, 0.7);
+  background: var(--ground);
   text-align: center;
-  font-size: 22px;
+  font-size: var(--type-large);
   color: var(--text);
   font-variant-numeric: lining-nums tabular-nums;
   transition: color var(--dur-state) var(--ease-out);

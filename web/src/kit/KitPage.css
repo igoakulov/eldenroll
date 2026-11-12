@@ -1,41 +1,41 @@
 .kit-page {
-  padding: 32px var(--gutter) 64px;
+  padding: var(--space-7) var(--gutter) var(--space-10);
 }
 
 .kit-title {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 24px;
-  letter-spacing: 0.12em;
+  font-size: var(--type-large);
+  letter-spacing: var(--tracking-tight);
   color: var(--gold);
 }
 
 .kit-contents ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 20px;
-  margin-top: 16px;
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-5);
   padding: 0;
   list-style: none;
 }
 
 .kit-section {
-  margin-top: 48px;
-  padding-top: 16px;
-  border-top: 1px solid var(--rule);
+  margin-top: var(--space-9);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--frame);
 }
 
 .kit-section-title {
   font-family: var(--display);
   font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 0.28em;
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--gold-mute);
 }
 
 .kit-note {
-  margin-top: 12px;
+  margin-top: var(--space-4);
   font-style: italic;
   color: var(--text-3);
 }
@@ -43,8 +43,8 @@
 .kit-views {
   display: flex;
   flex-wrap: wrap;
-  gap: 40px 32px;
-  margin-top: 24px;
+  gap: var(--space-8) var(--space-7);
+  margin-top: var(--space-6);
 }
 
 .kit-view {
@@ -52,7 +52,7 @@
 }
 
 .kit-view-title {
-  margin-bottom: 10px;
+  margin-bottom: var(--space-3);
   color: var(--text-2);
 }
 
@@ -72,5 +72,5 @@
 }
 
 .kit-view .kit-view-box {
-  outline: 1px solid var(--rule);
+  outline: 1px solid var(--frame);
 }

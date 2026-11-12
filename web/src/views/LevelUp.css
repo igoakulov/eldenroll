@@ -1,18 +1,18 @@
 .level-up .level-total {
-  margin-top: 28px;
+  margin-top: var(--space-7);
 }
 
 .level-up-regions-sum {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 2px var(--gutter) 10px;
-  font-size: 16px;
+  padding: var(--space-1) var(--gutter) var(--space-3);
+  font-size: var(--type-small);
 }
 
 .level-up-regions-sum > :first-child {
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--tracking-tight);
   color: var(--gold-mute);
 }
 

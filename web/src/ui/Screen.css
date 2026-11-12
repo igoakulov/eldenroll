@@ -10,14 +10,14 @@
 }
 
 .screen.mist-centre {
-  background-image: radial-gradient(150% 470px at 50% -40px, var(--mist) 0%, var(--mist-2) 44%, rgba(10, 10, 10, 0) 78%);
+  background-image: radial-gradient(150% 470px at 50% -40px, var(--mist) 0%, var(--mist-2) 44%, transparent 78%);
 }
 
 .screen.mist-left {
-  background-image: radial-gradient(130% 460px at 24% -30px, var(--mist) 0%, var(--mist-2) 44%, rgba(10, 10, 10, 0) 76%);
+  background-image: radial-gradient(130% 460px at 24% -30px, var(--mist) 0%, var(--mist-2) 44%, transparent 76%);
 }
 
 .screen-body {
   flex: 1;
-  padding-bottom: 28px;
+  padding-bottom: var(--space-6);
 }

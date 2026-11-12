@@ -6,7 +6,7 @@
 
 .countdown-label {
   font-style: italic;
-  font-size: 18px;
+  font-size: var(--type-body);
   color: var(--text-2);
 }
 
@@ -16,7 +16,7 @@
   place-items: center;
   width: 112px;
   height: 112px;
-  margin-top: 12px;
+  margin-top: var(--space-4);
 }
 
 /* The ring starts whole at the top and empties clockwise, at an even pace, over the whole count */
@@ -28,7 +28,7 @@
 }
 
 .countdown-ring-track {
-  stroke: var(--rule);
+  stroke: var(--frame);
   stroke-width: 1;
 }
 
@@ -54,10 +54,10 @@
 .countdown-digits {
   display: grid;
   font-weight: 500;
-  font-size: 64px;
-  line-height: 1;
+  font-size: var(--type-count);
+  line-height: var(--leading-none);
   color: var(--grace);
-  text-shadow: 0 0 16px rgba(227, 207, 152, 0.3);
+  text-shadow: var(--glow-quiet);
   font-variant-numeric: lining-nums tabular-nums;
 }
 

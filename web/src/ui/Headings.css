@@ -1,15 +1,15 @@
 .section-heading {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 44px var(--gutter) 10px;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--gutter) var(--space-4);
 }
 
 .section-heading h2 {
   font-family: var(--display);
   font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.28em;
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--gold-mute);
   white-space: nowrap;
@@ -24,43 +24,43 @@
 .slot-heading {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 32px var(--gutter) 0;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--gutter) 0;
 }
 
 .slot-heading::after {
   content: "";
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, rgba(119, 112, 85, 0.7), rgba(119, 112, 85, 0) 85%);
+  background: linear-gradient(to right, var(--frame-lit), transparent 85%);
 }
 
 .slot-heading h3,
 .small-label {
   font-weight: 400;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 15px;
-  line-height: 1.2;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
   color: var(--gold-mute);
 }
 
 .screen-head {
-  padding: 24px var(--gutter) 0;
+  padding: var(--space-6) var(--gutter) 0;
 }
 
 .screen-title {
-  margin: 0 0 10px;
+  margin: 0 0 var(--space-4);
   font-weight: 500;
-  font-size: 36px;
-  line-height: 1.08;
+  font-size: var(--type-hero);
+  line-height: var(--leading-title);
   color: var(--text);
 }
 
 .screen-lede {
   max-width: 32ch;
-  font-size: 18px;
-  line-height: 1.4;
+  font-size: var(--type-body);
+  line-height: var(--leading);
   color: var(--text-2);
 }
 
@@ -69,15 +69,15 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  margin: -14px -8px -14px 0;
-  padding: 0 8px;
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-3)) calc(-1 * var(--space-4)) 0;
+  padding: 0 var(--space-3);
   border: 0;
   background: none;
   color: var(--text-2);
   font-family: var(--display);
   font-weight: 500;
-  font-size: 11.5px;
-  letter-spacing: 0.17em;
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking);
   text-transform: uppercase;
 }
 

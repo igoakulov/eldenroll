@@ -1,15 +1,15 @@
 .rold-pun {
-  margin: 0 0 14px;
+  margin: 0 0 var(--space-4);
   font-style: italic;
-  font-size: 18.5px;
-  line-height: 1.4;
+  font-size: var(--type-name);
+  line-height: var(--leading);
   color: var(--gold);
 }
 
 .rold-lede {
   max-width: 32ch;
-  font-size: 18px;
-  line-height: 1.4;
+  font-size: var(--type-body);
+  line-height: var(--leading);
   color: var(--text-2);
 }
 
@@ -28,10 +28,10 @@
   display: grid;
   grid-template-columns: 28px 1fr;
   align-items: baseline;
-  padding: 11px var(--gutter);
+  padding: var(--space-4) var(--gutter);
   border-top: 1px solid var(--line);
-  font-size: 18px;
-  line-height: 1.38;
+  font-size: var(--type-body);
+  line-height: var(--leading);
   color: var(--text-2);
   counter-increment: step;
 }
@@ -44,7 +44,7 @@
   content: counter(step);
   font-family: var(--display);
   font-weight: 500;
-  font-size: 15px;
+  font-size: var(--type-small);
   color: var(--gold-mute);
   font-variant-numeric: lining-nums;
 }
@@ -55,24 +55,24 @@
 }
 
 .rold-body {
-  padding: 0 var(--gutter) 6px;
-  font-size: 18px;
-  line-height: 1.4;
+  padding: 0 var(--gutter) var(--space-2);
+  font-size: var(--type-body);
+  line-height: var(--leading);
   color: var(--text-2);
 }
 
 .rold-how {
-  margin: 8px 0 0;
+  margin: var(--space-3) 0 0;
 }
 
 .rold-how div {
   display: grid;
   grid-template-columns: 78px 1fr;
-  column-gap: 10px;
-  padding: 11px var(--gutter);
+  column-gap: var(--space-3);
+  padding: var(--space-4) var(--gutter);
   border-top: 1px solid var(--line);
-  font-size: 18px;
-  line-height: 1.38;
+  font-size: var(--type-body);
+  line-height: var(--leading);
 }
 
 .rold-how dt {
@@ -85,8 +85,8 @@
 }
 
 .rold-legal {
-  margin: 36px var(--gutter) 0;
-  font-size: 15px;
-  line-height: 1.45;
+  margin: var(--space-8) var(--gutter) 0;
+  font-size: var(--type-small);
+  line-height: var(--leading);
   color: var(--text-3);
 }

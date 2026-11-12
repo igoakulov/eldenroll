@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
+  height: var(--top-bar);
   padding: 0 var(--gutter);
 }
 
@@ -13,7 +13,7 @@
 }
 
 .top-bar-left {
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .top-bar-glyph {
@@ -27,8 +27,8 @@
   top: 1.5px;
   font-family: var(--display);
   font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.3em;
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--gold-mute);
 }
@@ -60,18 +60,18 @@
 .level-button {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   height: 30px;
-  margin-right: 8px;
-  padding: 0 10px;
+  margin-right: var(--space-3);
+  padding: 0 var(--space-3);
   color: var(--text);
-  font-size: 17px;
+  font-size: var(--type-body);
   font-variant-numeric: lining-nums tabular-nums;
 }
 
 .level-button span {
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--tracking-tight);
   color: var(--gold-mute);
 }
 
@@ -82,6 +82,6 @@
 @media (hover: hover) {
   .framed-icon:hover,
   .level-button:hover {
-    border-color: rgba(169, 160, 127, 0.6);
+    border-color: var(--frame-lit);
   }
 }

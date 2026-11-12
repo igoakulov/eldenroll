@@ -4,22 +4,22 @@
   position: sticky;
   bottom: 0;
   z-index: 2;
-  padding: 32px var(--gutter) max(30px, calc(env(safe-area-inset-bottom, 0px) + 14px));
+  padding: var(--space-7) var(--gutter) max(var(--space-7), calc(env(safe-area-inset-bottom, 0px) + var(--space-4)));
   background: linear-gradient(
     180deg,
-    rgba(10, 10, 10, 0) 0,
-    rgba(10, 10, 10, 0.94) 22px,
-    var(--ground) 32px,
+    transparent 0,
+    var(--veil) 22px,
+    var(--ground) var(--space-7),
     var(--ground) calc(100% - 26px),
-    rgba(10, 10, 10, 0.68) calc(100% - 8px),
-    rgba(10, 10, 10, 0.68) 100%
+    var(--scrim) calc(100% - 8px),
+    var(--scrim) 100%
   );
 }
 
 .bottom-bar-notice {
-  margin: 0 0 14px;
+  margin: 0 0 var(--space-4);
   font-style: italic;
-  font-size: 17px;
+  font-size: var(--type-body);
   text-align: center;
   color: var(--blood-text);
   animation: fade-in var(--dur-sheet) var(--ease-out);
@@ -34,7 +34,7 @@
   display: grid;
   grid-auto-columns: 1fr;
   grid-auto-flow: column;
-  gap: 8px;
+  gap: var(--space-3);
 }
 
 .glow-band,
@@ -73,25 +73,20 @@
 .glow-band {
   display: block;
   width: 100%;
-  background: radial-gradient(
-    60% 130% at 50% 50%,
-    rgba(227, 207, 152, 0.3) 0%,
-    rgba(200, 178, 122, 0.11) 50%,
-    rgba(200, 178, 122, 0) 80%
-  );
+  --glow-centre: var(--grace-soft);
+  background: radial-gradient(60% 130% at 50% 50%, var(--glow-centre) 0%, var(--gold-faint) 50%, transparent 80%);
   color: var(--grace);
   font-family: var(--display);
   font-weight: 600;
-  font-size: 18px;
-  letter-spacing: 0.42em;
-  text-indent: 0.42em;
-  text-shadow: 0 0 14px rgba(227, 207, 152, 0.6);
+  font-size: var(--type-body);
+  letter-spacing: var(--tracking-glow);
+  text-indent: var(--tracking-glow);
+  text-shadow: var(--glow);
 }
 
 .glow-band-long {
-  font-size: 17px;
-  letter-spacing: 0.34em;
-  text-indent: 0.34em;
+  letter-spacing: var(--tracking-wide);
+  text-indent: var(--tracking-wide);
 }
 
 .glow-band::before,
@@ -103,13 +98,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: var(--space-3);
   background: none;
   color: var(--text-2);
   font-family: var(--display);
   font-weight: 500;
-  font-size: 12.5px;
-  letter-spacing: 0.2em;
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking);
   white-space: nowrap;
 }
 
@@ -119,23 +114,12 @@
 
 .ruled-button::before,
 .ruled-button::after {
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(169, 160, 127, 0.5) 22%,
-    rgba(169, 160, 127, 0.5) 78%,
-    transparent
-  );
+  background: linear-gradient(to right, transparent, var(--frame-lit) 22%, var(--frame-lit) 78%, transparent);
 }
 
 /* Pressed: the glow brightens for an instant, in place of the phone's grey tap flash */
 .glow-band:active {
-  background: radial-gradient(
-    60% 130% at 50% 50%,
-    rgba(227, 207, 152, 0.46) 0%,
-    rgba(200, 178, 122, 0.18) 50%,
-    rgba(200, 178, 122, 0) 80%
-  );
+  --glow-centre: var(--grace-strong);
   transition-duration: 0ms;
 }
 
@@ -151,12 +135,7 @@
 
 @media (hover: hover) {
   .glow-band:hover {
-    background: radial-gradient(
-      60% 130% at 50% 50%,
-      rgba(227, 207, 152, 0.36) 0%,
-      rgba(200, 178, 122, 0.14) 50%,
-      rgba(200, 178, 122, 0) 80%
-    );
+    --glow-centre: var(--grace-mid);
   }
 
   .ruled-button:hover {

@@ -1,7 +1,7 @@
 .stop-slider-track {
   position: relative;
   height: 44px;
-  margin: 12px 0 2px;
+  margin: var(--space-4) 0 var(--space-1);
   cursor: pointer;
   touch-action: none;
 }
@@ -30,8 +30,8 @@
   left: 16px;
   top: 20px;
   height: 3px;
-  background: linear-gradient(to right, rgba(200, 178, 122, 0.35), var(--gold));
-  box-shadow: 0 0 8px rgba(227, 207, 152, 0.35);
+  background: linear-gradient(to right, var(--gold-soft), var(--gold));
+  box-shadow: var(--glow-small);
 }
 
 .stop-slider-stop {
@@ -39,7 +39,7 @@
   top: 18px;
   width: 8px;
   height: 8px;
-  margin-left: -4px;
+  translate: -50% 0;
   transform: rotate(45deg);
   border: 1px solid var(--gold-dim);
   background: var(--sheet);
@@ -55,11 +55,11 @@
   top: 11px;
   width: 22px;
   height: 22px;
-  margin-left: -11px;
+  translate: -50% 0;
   transform: rotate(45deg);
-  border: 1px solid #f3e4b8;
+  border: 1px solid var(--text);
   background: var(--grace);
-  box-shadow: 0 0 14px rgba(227, 207, 152, 0.65);
+  box-shadow: var(--glow);
 }
 
 /* The input is invisible, so its keyboard focus rings the handle */
@@ -88,14 +88,14 @@
   display: flex;
   justify-content: space-between;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.12em;
-  font-size: 15px;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
   color: var(--text-3);
 }
 
 .stop-slider-locked .stop-slider-track,
 .stop-slider-locked .stop-slider-ends {
-  opacity: 0.4;
+  opacity: var(--dimmed);
 }
 
 .stop-slider-locked .stop-slider-track {

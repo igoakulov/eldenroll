@@ -1,7 +1,9 @@
-/* Every colour, typeface and motion value the views use; copied once from the canvas style kit. */
+/* Every colour, size, space, shadow and timing the app's CSS uses (web/src/ui/README.md#UI kit); the palette is
+   the canvas style kit's. */
 :root {
   --ground: #0a0a0a;
   --panel: #13110d;
+  --sheet: #0d0c0a;
   --mist: #1b2523;
   --mist-2: #121817;
   --line: #24221d;
@@ -19,27 +21,85 @@
   --blood-text: #e0806c;
   --raised: #507bc6;
   --trail: #a89b34;
-  --sheet: #0d0c0a;
-  --scrim: rgba(6, 6, 5, 0.72);
+
+  /* See-through strengths of the palette */
+  --edge: color-mix(in srgb, var(--gold-mute) 24%, transparent);
+  --frame: color-mix(in srgb, var(--gold-mute) 34%, transparent);
+  --frame-lit: color-mix(in srgb, var(--gold-mute) 50%, transparent);
+  --gold-faint: color-mix(in srgb, var(--gold) 10%, transparent);
+  --gold-soft: color-mix(in srgb, var(--gold) 35%, transparent);
+  --grace-soft: color-mix(in srgb, var(--grace) 30%, transparent);
+  --grace-mid: color-mix(in srgb, var(--grace) 45%, transparent);
+  --grace-strong: color-mix(in srgb, var(--grace) 60%, transparent);
+  --blood-faint: color-mix(in srgb, var(--blood-2) 16%, transparent);
+  --blood-soft: color-mix(in srgb, var(--blood) 50%, transparent);
+  --veil: color-mix(in srgb, var(--ground) 92%, transparent);
+  /* Dims what lies under a sheet, and darkens every shadow */
+  --scrim: rgb(0 0 0 / 0.72);
+
+  /* A dotted underline drawn as a background, so its dots keep their spacing at any zoom; text-decoration's
+     dots run together when the desktop frame scales the app down */
+  --dots: repeating-linear-gradient(to right, var(--gold-dim) 0 1.5px, transparent 1.5px 4.5px);
+
+  /* The one glow per screen and the glow band's handle; large type's quiet halo; a lit control; a rule */
+  --glow: 0 0 14px var(--grace-strong);
+  --glow-quiet: 0 0 20px var(--grace-soft);
+  --glow-small: 0 0 8px var(--grace-mid);
+  --glow-red: 0 0 8px var(--blood-soft);
+  --glow-felled: 0 0 18px var(--grace-strong), 0 0 46px var(--gold-soft);
+  --shadow-sheet: 0 -24px 40px var(--scrim);
+  --shadow-tile: inset 0 0 14px var(--scrim), inset 0 1px 0 var(--gold-faint);
 
   /* The drawn phone on desktop */
   --device: #030303;
-  --device-inner: #111111;
   --device-band: #34332f;
   --device-band-edge: #1a1917;
   --device-button: #2a2926;
-
-  --rule: rgba(119, 112, 85, 0.5);
-  --frame: rgba(169, 160, 127, 0.34);
-  --dotted: rgba(169, 160, 127, 0.75);
-  /* A dotted underline drawn as a background, so its dots keep their spacing at any zoom; text-decoration's
-     dots run together when the desktop frame scales the app down */
-  --dots: repeating-linear-gradient(to right, var(--dotted) 0 1.5px, transparent 1.5px 4.5px);
+  --device-shadow:
+    0 0 0 1px var(--device), 0 0 0 3px var(--device-band), 0 0 0 4px var(--device-band-edge),
+    inset 0 0 0 1px var(--panel), 0 40px 100px var(--scrim);
 
   --serif: "EB Garamond", Georgia, serif;
   --display: Cinzel, Georgia, serif;
 
+  /* Type by role (web/src/ui/README.md#UI kit) */
+  --type-caps: 12px;
+  --type-small: 15px;
+  --type-body: 17px;
+  --type-name: 19px;
+  --type-large: 22px;
+  --type-display: 32px;
+  --type-hero: 36px;
+  --type-count: 64px;
+  --type-wordmark: 27px;
+  --type-frame-mark: 40px;
+
+  --leading-none: 1;
+  --leading-title: 1.08;
+  --leading-tight: 1.25;
+  --leading: 1.4;
+
+  /* Small caps; Cinzel on controls; headings and the wordmark; the glow band */
+  --tracking-tight: 0.12em;
+  --tracking: 0.2em;
+  --tracking-wide: 0.3em;
+  --tracking-glow: 0.42em;
+
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
   --gutter: 20px;
+  --top-bar: 60px;
+
+  /* Locked controls, and what fades while it changes */
+  --dimmed: 0.4;
 
   /* web/src/ui/README.md#Motion: fades easing to a stop, no bounce */
   --dur-state: 120ms;
@@ -55,6 +115,12 @@
   --sheet-y: 16px;
   --cycle-x: 4px;
 
+  /* A new objective: a slot's text follows its icon; the boss bar fills, then gives way to Felled? */
+  --cascade: 120ms;
+  --bar-at: 180ms;
+  --dur-bar: 360ms;
+  --question-at: 400ms;
+
   /* An enemy felled: the card dims, the bar drains with its trail lagging, then the band fades in and swells */
   --dur-dim: 400ms;
   --drain-at: 150ms;
@@ -67,6 +133,10 @@
   --dur-swell: 4400ms;
   --swell: 1.04;
   --dur-digit: 300ms;
+
+  /* Start: the caret's blink and the loading pulse, the only motion that runs on its own */
+  --dur-caret: 1060ms;
+  --dur-pulse: 1600ms;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -2,8 +2,8 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--tabs), 1fr);
-  margin: 24px var(--gutter) 0;
-  border-bottom: 1px solid var(--rule);
+  margin: var(--space-6) var(--gutter) 0;
+  border-bottom: 1px solid var(--frame);
 }
 
 .tab {
@@ -13,9 +13,9 @@
   background: none;
   font-family: var(--display);
   font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-indent: 0.14em;
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking);
+  text-indent: var(--tracking);
   text-transform: uppercase;
   color: var(--text-3);
   transition: color var(--dur-state) var(--ease-out);
