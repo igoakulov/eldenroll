@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import type { Database } from "../engine/database";
 import { loadDatabase } from "../loadDatabase";
@@ -158,25 +158,57 @@ export function KitPage() {
 
   return (
     <div className="kit-page">
-      <h1 className="kit-title" aria-label="EldenRoll UI kit">
-        <span className="kit-wordmark" aria-hidden="true">
-          ELDENR
-          <WordmarkO className="kit-wordmark-o" />
-          LL
-        </span>
-        <span className="kit-subtitle" aria-hidden="true">UI kit</span>
-      </h1>
-      <nav className="kit-contents" aria-label="Contents">
-        <ul>
-          {SECTIONS.map((section) => (
-            <li key={section.id}>
-              <a href={`#${section.id}`}>{section.title}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <KitHeader>
+        <h1 className="kit-title" aria-label="EldenRoll UI kit">
+          <span className="kit-wordmark" aria-hidden="true">
+            ELDENR
+            <WordmarkO className="kit-wordmark-o" />
+            LL
+          </span>
+          <span className="kit-subtitle" aria-hidden="true">UI kit</span>
+        </h1>
+        <nav className="kit-contents" aria-label="Contents">
+          <ul>
+            {SECTIONS.map((section) => (
+              <li key={section.id}>
+                <a href={`#${section.id}`}>{section.title}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </KitHeader>
       <MissingEntries />
       {state.status === "ready" ? <Page database={state.database} /> : waiting}
     </div>
   );
+}
+
+/** Sticks to the top, hides while the page scrolls down and comes back as soon as it scrolls up, so the
+ * contents are a short scroll away on a long page. A jump to a section keeps it hidden, so it never covers the
+ * heading it landed on. */
+function KitHeader({ children }: { readonly children: ReactNode }) {
+  const [hidden, setHidden] = useState(false);
+  const last = useRef(0);
+  const jumping = useRef(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (jumping.current) {
+        jumping.current = false;
+        setHidden(y > 0);
+      } else if (y <= 0) setHidden(false);
+      else if (Math.abs(y - last.current) > 4) setHidden(y > last.current);
+      last.current = y;
+    };
+    const onClick = (event: MouseEvent) => {
+      if (event.target instanceof Element && event.target.closest('a[href^="#"]') !== null) jumping.current = true;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("click", onClick);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("click", onClick);
+    };
+  }, []);
+  return <header className={`kit-header${hidden ? " kit-header-hidden" : ""}`}>{children}</header>;
 }
