@@ -3,6 +3,7 @@ import { matchesOption } from "./selectors";
 import type { RolledSlots } from "./display";
 import type { EngineData } from "./engineData";
 import {
+  decayRateOf,
   repeatKey,
   type Removed,
   type Repetition,
@@ -53,8 +54,9 @@ export function formatProbability(probability: number): string {
 function repeatLine(key: string, repetition: Repetition): string | null {
   const count = repetition.seen[key] ?? 0;
   if (count === 0) return null;
-  const total = formatMultiplier(repetition.decay ** count);
-  return `  repeat: x${repetition.decay}^${count} = ${total}`;
+  const rate = decayRateOf(key, repetition);
+  const total = formatMultiplier(rate ** count);
+  return `  repeat: x${Number(rate.toPrecision(2))}^${count} = ${total}`;
 }
 
 export interface RolledContext {
@@ -155,10 +157,6 @@ export function pickTrace(slot: "boss" | "character_class", pick: PickTrace): Tr
   if (pick.repeat !== null) lines.push(pick.repeat);
   lines.push(`  prob: ${formatProbability(pick.probability)}`);
   return { slot, text: lines.join("\n") };
-}
-
-export function characterClassRepeatLine(characterClass: string, repetition: Repetition): string | null {
-  return repeatLine(`character_class:${characterClass}`, repetition);
 }
 
 export function formatTrace(blocks: readonly TraceBlock[]): string {

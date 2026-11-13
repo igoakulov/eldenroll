@@ -6,12 +6,12 @@ Plays whole runs the way a player would, from `Start run` until every boss is fe
 cd web && pnpm sim --runs 50
 ```
 
-`pnpm sim --help` lists the arguments. It writes to `data/build/sim/`: `report.md`, plus `objectives.csv` and `rolls.csv`, the row dump to parse for any question the report doesn't answer. Fifty runs per scenario take about two minutes.
+`pnpm sim --help` lists the arguments. Each run writes to its own timestamped folder under `data/build/sim/`: `report.md`, plus `objectives.csv` and `rolls.csv`, the row dump to parse for any question the report doesn't answer. An earlier run's folder is never overwritten. Fifty runs per scenario take about two minutes.
 
 ## A run
 
 - Every class is on, the boss setting is on, the weapon shortlist is off.
-- Regions open one at a time by region level: the next is ticked when the open ones hold no living boss.
+- Regions open one at a time, by region level with one exception: nobody clears a region before moving on, so the next opens once this one is half felled (rounding up), not when it's fully clear. The DLC plays out of level order too: `Gravesite Plain`, `Shadow Keep` and `Abyssal Woods` open after Farum Azula and before Haligtree and the Ashen Capital; `Jagged Peak` (its dragons) and `Enir-Ilim` open only after those two.
 - Every third objective is rerolled once with `Full objective`; the replaced roll is in the dump with `kept` false and counts nowhere in the report.
 - The player never uses `Felled?`: it adds nothing to roll statistics.
 - Each scenario plays its own seeds, so scenarios are independent samples.
@@ -33,18 +33,19 @@ The other levels go to the item stats, by scenario:
 | DEX | a Dexterity build: 20 Str, 80 Dex, 25 Fth |
 | INT | a sorcerer: 80 Int |
 | FTH | an incantation build: 80 Fth |
+| ARC | a bleed and status build, sometimes played by `Spellblade` with Arcane incantations: 25 Dex, then 16 Str with 60 Arc, then 25 Fth, then Dex and Str evenly |
 | ALL | someone who wants to wield everything and cares less about damage: every item stat evenly |
 
 Once its targets are met, a scenario spreads the rest evenly over the item stats.
 
 ## Report
 
-The predefined questions, each answered for all scenarios together and for each one:
+Structured per class: each has its own right hand, left hand (left out for a class whose pool is always `none`), spell (left out the same way), ash, item, talisman, rule and armor tables. A slot with a stat requirement (a weapon, shield, sorcery or incantation) keeps a column per scenario; nothing else depends on the build, so those tables carry one combined column. Then, for all classes together:
 
-- how often each class, right- and left-hand weapon class, talisman, ash, sorcery, incantation, item and armor set shows, and what never shows
+- what never shows anywhere, and what no pool offers at all
 - combat rules, and how many rule slots show `None` on an objective
 - how soon a repeat comes back
-- empty results by class and slot
+- empty results by class and slot; a class and slot whose only possible roll is `none` is left out, since that's a bare pick, not a gap
 - `Dual-Wield Warrior`: paired weapons, same-class pairs against the 75% aim, and the commonest mixed pairs. Which hand is heavier can't be told: the database holds no weights
 - `Jester`'s right hand before Altus Plateau opens, before Leyndell opens, and over the whole run
 - how far decay pulls `none` down in each pool that holds it, the rule `None` included

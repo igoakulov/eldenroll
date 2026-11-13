@@ -52,8 +52,6 @@ export function buildReport(data: EngineData, results: readonly RunResult[]): st
     ["All", objectives],
     ...scenarios.map((scenario) => [scenario, objectives.filter((one) => one.scenario === scenario)] as [string, Obj[]]),
   ];
-  const columns = groups.map(([name]) => name);
-
   const name = (key: string | null): string => {
     if (key === null) return "(empty)";
     const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
@@ -69,14 +67,18 @@ export function buildReport(data: EngineData, results: readonly RunResult[]): st
   const item = (roll: RollRow | undefined) =>
     roll?.chosen === null || roll?.chosen === undefined ? undefined : data.items.get(roll.chosen);
 
-  /** Share of objectives showing each key, counted once per objective, by group. */
+  /** Share of objectives showing each key, counted once per objective, by group. A slot with no
+   * stat requirement (anything but a weapon, shield, sorcery or incantation) reads the same
+   * whatever the player builds, so its table takes `singleColumn` to drop the per-scenario split. */
   const shares = (
     keysOf: (one: Obj) => readonly string[],
     limit = 25,
     filter: (one: Obj) => boolean = () => true,
     label: (key: string) => string = name,
+    singleColumn = false,
   ): string => {
-    const counts = groups.map(([, list]) => {
+    const cols = singleColumn ? [groups[0]!] : groups;
+    const counts = cols.map(([, list]) => {
       const counted = new Map<string, number>();
       const kept = list.filter(filter);
       for (const one of kept) for (const key of new Set(keysOf(one))) counted.set(key, (counted.get(key) ?? 0) + 1);
@@ -87,7 +89,7 @@ export function buildReport(data: EngineData, results: readonly RunResult[]): st
     const shown = limit > 0 ? keys.slice(0, limit) : keys;
     const rows = shown.map((key) => [label(key), ...counts.map(({ counted, total }) => pct(counted.get(key) ?? 0, total))]);
     const more = keys.length > shown.length ? `\n\n${keys.length - shown.length} more below the top ${limit}; the row dump has them.` : "";
-    return `Out of ${all.total} objectives.\n\n${table(["", ...columns], rows)}${more}`;
+    return `Out of ${all.total} objectives.\n\n${table(["", ...cols.map(([one]) => one)], rows)}${more}`;
   };
 
   const chosenKey = (slot: LoadoutSlot) => (one: Obj) => {
@@ -99,8 +101,6 @@ export function buildReport(data: EngineData, results: readonly RunResult[]): st
       const roll = one.rolls.get(slot);
       return roll !== undefined && roll.chosenKey !== null && test(roll) ? [roll.chosenKey] : [];
     });
-  const category = (value: string) => (roll: RollRow) => data.items.get(roll.chosen ?? "")?.category === value;
-
   const out: string[] = ["# Simulation report", ""];
   const section = (title: string, ...body: string[]) => out.push(`## ${title}`, "", ...body.flatMap((one) => [one, ""]));
 
@@ -126,28 +126,108 @@ export function buildReport(data: EngineData, results: readonly RunResult[]): st
     ),
   );
 
-  section("Classes", shares((one) => [`character_class:${one.row.characterClass}`], 0));
+  section(
+    "Classes",
+    "Classes don't decay, and no stat gates them, so one column.",
+    shares((one) => [`character_class:${one.row.characterClass}`], 0, undefined, name, true),
+  );
 
   const weaponClass = (slot: LoadoutSlot) => (one: Obj) => {
     const found = item(one.rolls.get(slot));
     return found === undefined ? [] : [found.subcategory ?? found.category];
   };
-  section("Right-hand weapon classes", shares(weaponClass("rh"), 30, undefined, (key) => key));
-  section("Left-hand classes", shares(weaponClass("lh"), 30, undefined, (key) => key));
-  section("Talismans, either slot", shares(keysIn(["talisman_1", "talisman_2"]), 0));
-  section("Ashes, either hand", shares(keysIn(["rh_ash", "lh_ash"]), 30));
-  section("Sorceries", shares(keysIn(["spell"], category("sorcery")), 30));
-  section("Incantations", shares(keysIn(["spell"], category("incantation")), 30));
-  section("Item slot", shares(chosenKey("item"), 30));
+
+  /** Pools whose only possible result is `none`, whatever rolls: a bare pick, not an empty one,
+   * so it needs no per-scenario split and no flag in "Empty results". */
+  const alwaysNone = (characterClass: string, slot: LoadoutSlot): boolean => {
+    const options = slotOptions(data, characterClass, slot);
+    return options.length === 1 && options[0]!.row.id === "none";
+  };
+
+  /** Items in the class's own RH or LH pool, by subcategory: how many weapons compete for each
+   * share, so "a bigger pool shows up more" can be told from "something else moved it". */
+  const subcategoryCounts = (characterClass: string, slot: LoadoutSlot): ReadonlyMap<string, number> => {
+    const counts = new Map<string, number>();
+    for (const option of slotOptions(data, characterClass, slot)) {
+      if (option.kind !== "item" || option.row.odds <= 0) continue;
+      const key = option.row.subcategory ?? option.row.category;
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return counts;
+  };
+
+  /** Every row, uncut, as `N% / M%`: `N%` is the observed share, `M%` the share it would have if
+   * every subcategory held the same number of weapons — so a skew from pool size reads apart from
+   * one from decay, stat gates or a modifier. */
+  const weaponShares = (characterClass: string, slot: LoadoutSlot): string => {
+    const counts = subcategoryCounts(characterClass, slot);
+    const inClass = (one: Obj) => one.row.characterClass === characterClass;
+    const columns = groups.map(([label, list]) => {
+      const kept = list.filter(inClass);
+      const counted = new Map<string, number>();
+      for (const one of kept) {
+        const key = weaponClass(slot)(one)[0];
+        if (key !== undefined) counted.set(key, (counted.get(key) ?? 0) + 1);
+      }
+      const perItem = new Map(
+        [...new Set([...counted.keys(), ...counts.keys()])].map((key) => [
+          key,
+          (counted.get(key) ?? 0) / Math.max(1, counts.get(key) ?? 1),
+        ]),
+      );
+      const perItemTotal = [...perItem.values()].reduce((sum, value) => sum + value, 0);
+      return { label, counted, total: kept.length, perItem, perItemTotal };
+    });
+    const all = columns[0]!;
+    const keys = [...all.counted.keys()].sort((a, b) => all.counted.get(b)! - all.counted.get(a)!);
+    const rows = keys.map((key) => [
+      key,
+      ...columns.map(({ counted, total, perItem, perItemTotal }) => {
+        const n = pct(counted.get(key) ?? 0, total);
+        if ((counts.get(key) ?? 0) === 0 || perItemTotal === 0) return n;
+        const m = ((perItem.get(key) ?? 0) / perItemTotal) * 100;
+        return `${n} / ${m.toFixed(1)}%`;
+      }),
+    ]);
+    return `Out of ${all.total} objectives.\n\n${table(["", ...columns.map((one) => one.label)], rows)}`;
+  };
+
+  out.push("## By class", "");
+  for (const characterClass of data.database.character_class) {
+    const inClass = (one: Obj) => one.row.characterClass === characterClass.id;
+    const heading = (title: string) => out.push(`#### ${title}`, "");
+    out.push(`### ${characterClass.name}`, "");
+
+    heading("Right hand");
+    out.push(weaponShares(characterClass.id, "rh"), "");
+    if (!alwaysNone(characterClass.id, "lh")) {
+      heading("Left hand");
+      out.push(weaponShares(characterClass.id, "lh"), "");
+    }
+    if (!alwaysNone(characterClass.id, "spell")) {
+      heading("Spell");
+      out.push(shares(chosenKey("spell"), 0, inClass), "");
+    }
+    heading("Talismans, either slot");
+    out.push(shares(keysIn(["talisman_1", "talisman_2"]), 0, inClass, name, true), "");
+    heading("Combat rules, either slot");
+    out.push(shares(keysIn(["rule_1", "rule_2"]), 0, inClass, name, true), "");
+  }
+
+  const ashKind = (ashId: string): "weapon" | "shield" =>
+    (data.ashFits.get(ashId) ?? []).some((row) => row.category === "shield") ? "shield" : "weapon";
+  section("Ashes for weapons", shares(keysIn(["rh_ash", "lh_ash"], (roll) => ashKind(roll.chosen ?? "") === "weapon"), 0));
+  section("Ashes for shields", shares(keysIn(["rh_ash", "lh_ash"], (roll) => ashKind(roll.chosen ?? "") === "shield"), 0));
+  section("Item slot", shares(chosenKey("item"), 0));
   section("Armor sets", shares(chosenKey("armor"), 40));
-  section("Combat rules, either slot", shares(keysIn(["rule_1", "rule_2"]), 0));
+
   section(
     "How many rule slots show None",
     shares((one) => {
       const nones = ["rule_1", "rule_2"].filter((slot) => one.rolls.get(slot as LoadoutSlot)?.chosen === "none").length;
       return [["neither slot", "one slot", "both slots"][nones]!];
-    }, 0, undefined, (key) => key),
-    "Both slots can't show None: `rule_2` leaves out what `rule_1` rolled.",
+    }, 0, undefined, (key) => key, true),
+    "Both slots can't show None: `rule_2` leaves out what `rule_1` rolled. No stat depends on it, so one column.",
   );
 
   // Never rolled
@@ -216,13 +296,17 @@ export function buildReport(data: EngineData, results: readonly RunResult[]): st
   const empties = new Map<string, number>();
   for (const one of objectives) {
     for (const [slot, roll] of one.rolls) {
-      if (roll.chosen === null) empties.set(`${className(one.row.characterClass)} ${slot}`, (empties.get(`${className(one.row.characterClass)} ${slot}`) ?? 0) + 1);
+      if (roll.chosen !== null) continue;
+      if (alwaysNone(one.row.characterClass, slot)) continue;
+      const key = `${className(one.row.characterClass)} ${slot}`;
+      empties.set(key, (empties.get(key) ?? 0) + 1);
     }
   }
   section(
     "Empty results",
+    "A class and slot whose only possible roll is `none` is left out: an empty result there is a bare pick, not a gap.",
     empties.size === 0
-      ? "None: every slot found something to roll."
+      ? "None: every other slot found something to roll."
       : table(["Class and slot", "Empty rolls", "Share of all objectives"], [...empties].sort((a, b) => b[1] - a[1]).map(([key, count]) => [key, String(count), pct(count, objectives.length)])),
   );
 
@@ -313,30 +397,16 @@ export function buildReport(data: EngineData, results: readonly RunResult[]): st
       list.push({ objective: one.row.objective, values: [roll.drift] });
       driftBySlot.set(slot, list);
     }
-    const list = driftBySlot.get("class") ?? [];
-    list.push({ objective: one.row.objective, values: [Math.abs(one.row.classChance - one.row.classChanceNoDecay)] });
-    driftBySlot.set("class", list);
   }
   section(
     "Decay drift",
-    "How far decay moves each pool from its odds: half the summed difference between the chances with decay and without, from 0 (no change) to 1. All scenarios together.",
+    "How far decay moves each pool from its odds: half the summed difference between the chances with decay and without, from 0 (no change) to 1. All scenarios together. Classes don't decay, so they're left out.",
     table(
       ["Slot", ...BUCKETS.map(([from, to]) => `${from}–${to === 999 ? "end" : to}`)],
       [...POOL_SLOTS, "armor" as const].map((slot) => {
         const rows = driftBySlot.get(slot) ?? [];
         return [slot, ...BUCKETS.map(([from, to]) => num(mean(rows.filter((row) => row.objective >= from && row.objective <= to).map((row) => row.values[0]!)), 3))];
       }),
-    ),
-    "Each class's chance with decay against without, when it rolled, by objective number:",
-    table(
-      ["Class", ...BUCKETS.map(([from, to]) => `${from}–${to === 999 ? "end" : to}`)],
-      data.database.character_class.map((row) => [
-        row.name,
-        ...BUCKETS.map(([from, to]) => {
-          const inside = objectives.filter((one) => one.row.characterClass === row.id && one.row.objective >= from && one.row.objective <= to);
-          return `${num(mean(inside.map((one) => one.row.classChance)), 3)} / ${num(mean(inside.map((one) => one.row.classChanceNoDecay)), 3)}`;
-        }),
-      ]),
     ),
   );
 

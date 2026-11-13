@@ -89,6 +89,25 @@ describe("slot pools on the real data", () => {
   });
 });
 
+const PAIRED_SUBCATEGORIES = new Set([
+  "fist",
+  "claw",
+  "beast_claw",
+  "hand_to_hand",
+  "backhand_blade",
+  "throwing_blade",
+]);
+const PAIRED_WEAPONS = new Set([
+  "ornamental_straight_sword",
+  "falx",
+  "dancing_blade_of_ranah",
+  "horned_warriors_sword",
+  "death_knights_twin_axes",
+  "rellanas_twin_blades",
+  "greatsword_of_radahn_lord",
+  "greatsword_of_radahn_light",
+]);
+
 describe("a condition on a slot not rolled yet", () => {
   it("leaves Dual-Wield Warrior RH with only Grafted Dragon losing odds", () => {
     const result = pool("warrior_dw", "rh");
@@ -98,7 +117,11 @@ describe("a condition on a slot not rolled yet", () => {
     expect(result.total).toBe(options.length);
     expect(options.length - result.options.length).toBe(1);
     expect(ids(result)).not.toContain("grafted_dragon");
-    for (const row of result.options) expect(row.weight).toBe(row.option.row.odds);
+    for (const row of result.options) {
+      const item = row.option.row as Item;
+      const boosted = PAIRED_SUBCATEGORIES.has(item.subcategory ?? "") || PAIRED_WEAPONS.has(item.id);
+      expect(row.weight).toBe(item.odds * (boosted ? 2 : 1));
+    }
   });
 
   it("is inactive when it says does not match, so a rule survives until its slot rolls", () => {
@@ -156,7 +179,7 @@ describe("modifiers across slots", () => {
   it("needs a parry ash for Parry only, and boosts it with one", () => {
     expect(ids(pool("knight", "rule_1", KNIGHT_MELEE))).not.toContain("parry_only");
     const withParry = pool("knight", "rule_1", { ...KNIGHT_MELEE, lh_ash: "parry" });
-    expect(weightOf(withParry, "parry_only")).toBe(10);
+    expect(weightOf(withParry, "parry_only")).toBe(5);
   });
 
   it("makes a named talisman's rule top tier", () => {

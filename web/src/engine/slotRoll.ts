@@ -1,6 +1,7 @@
 import type { LoadoutSlot, Modifier } from "./database";
 import { isSetReachable } from "./eligibility";
 import { poolKey, type EngineData } from "./engineData";
+import { decayRate, type DecayParams } from "./hyperparams";
 import { activeModifiers, type RollState } from "./modifiers";
 import { pickWeighted } from "./random";
 import { matchesOption, type Option } from "./selectors";
@@ -70,14 +71,24 @@ export type RollObserver = (slot: LoadoutSlot, roll: SlotRoll) => void;
 export interface Repetition {
   /** How many completed objectives showed each `repeatKey` this run. */
   readonly seen: Readonly<Record<string, number>>;
-  readonly decay: number;
+  /** `EngineData.decayGroupSize`; a missing key decays as a pool of 1. */
+  readonly decayGroupSize: ReadonlyMap<string, number>;
+  readonly decay: DecayParams;
 }
 
-export const NO_REPETITION: Repetition = { seen: {}, decay: 1 };
+const NO_DECAY: DecayParams = { max: 1, min: 1, halfSize: 1 };
 
-/** Compounds: each completed objective that showed it multiplies again. */
+export const NO_REPETITION: Repetition = { seen: {}, decayGroupSize: new Map(), decay: NO_DECAY };
+
+/** The decay rate this key's own pool sets, for the trace line. */
+export function decayRateOf(key: string, repetition: Repetition): number {
+  return decayRate(repetition.decayGroupSize.get(key) ?? 1, repetition.decay);
+}
+
+/** Compounds: each completed objective that showed it multiplies again, at a rate its pool's
+ * size sets (`data/balance.md#Hyperparameters`). */
 export function repetitionMultiplier(key: string, repetition: Repetition): number {
-  return repetition.decay ** (repetition.seen[key] ?? 0);
+  return decayRateOf(key, repetition) ** (repetition.seen[key] ?? 0);
 }
 
 export interface RollContext {

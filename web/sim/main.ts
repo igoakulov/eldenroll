@@ -12,8 +12,15 @@ import { SCENARIOS, type Scenario } from "./player";
 import { buildReport } from "./report";
 import { simulateRun, type RunResult } from "./simulate";
 
-const USAGE = `pnpm sim [--runs 20] [--scenarios ITEMS,STR,DEX,INT,FTH,ALL] [--seed 1] [--no-dlc]
-         [--classes knight,jester] [--reroll-every 3] [--out ../data/build/sim]`;
+const USAGE = `pnpm sim [--runs 20] [--scenarios ITEMS,STR,DEX,INT,FTH,ARC,ALL] [--seed 1] [--no-dlc]
+         [--classes knight,jester] [--reroll-every 3] [--out ../data/build/sim/<timestamp>]`;
+
+/** Each run writes its own folder, so an earlier report stays put while the next one is read. */
+function timestamp(): string {
+  const now = new Date();
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+}
 
 function csv(rows: readonly (readonly (string | number | boolean | null)[])[]): string {
   const cell = (value: string | number | boolean | null) => {
@@ -34,7 +41,7 @@ export function main(argv: readonly string[], repo: string): void {
       "no-dlc": { type: "boolean", default: false },
       classes: { type: "string" },
       "reroll-every": { type: "string", default: "3" },
-      out: { type: "string", default: path.join(repo, "data/build/sim") },
+      out: { type: "string", default: path.join(repo, "data/build/sim", timestamp()) },
       help: { type: "boolean", default: false },
     },
   });
@@ -74,11 +81,11 @@ export function main(argv: readonly string[], repo: string): void {
   writeFileSync(
     path.join(out, "objectives.csv"),
     csv([
-      ["scenario", "run", "seed", "objective", "kept", "region", "regions_open", "level", ...STATS, "boss", "character_class", "class_chance", "class_chance_no_decay", ...slots],
+      ["scenario", "run", "seed", "objective", "kept", "region", "regions_open", "level", ...STATS, "boss", "character_class", ...slots],
       ...results.flatMap((result, index) =>
         result.objectives.map((row) => [
           result.options.scenario, index, result.options.seed, row.objective, row.kept, row.region, row.regionsOpen, row.level,
-          ...STATS.map((stat) => row.stats[stat]), row.boss, row.characterClass, row.classChance, row.classChanceNoDecay,
+          ...STATS.map((stat) => row.stats[stat]), row.boss, row.characterClass,
           ...slots.map((slot) => (row.slots[slot] === undefined ? "" : (row.slots[slot] ?? "(empty)"))),
         ]),
       ),

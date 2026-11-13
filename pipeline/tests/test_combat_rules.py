@@ -53,6 +53,13 @@ def test_odds_other_than_one() -> None:
     rules = load_combat_rules(CSV)
     assert {rule.id: rule.odds for rule in rules if rule.odds != 1} == {
         "none": 4,
+        "do_not_get_hit": 0.5,
+        "no_healing_flasks": 0.5,
+        "no_armor": 0.5,
+        "no_rolling": 0.5,
+        "overloaded": 0.5,
+        "parry_only": 0.5,
+        "l2_only": 0.5,
         "drink_deflecting_hardtear": 0,
         "drink_crimson_sapping_cracked_tear": 0,
         "drink_bloodsucking_cracked_tear": 0,

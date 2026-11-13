@@ -1,6 +1,6 @@
 id,name,odds
 none,None,4
-do_not_get_hit,Do not get hit,1
+do_not_get_hit,Do not get hit,0.5
 apply_status,Apply status,1
 land_a_riposte,Land a riposte,1
 dodge_1x_with_crouch_or_jump,Dodge 1x with crouch or jump,1
@@ -10,18 +10,18 @@ r1_only,R1 only,1
 r2_only,R2 only,1
 charged_r2_only,Charged R2 only,1
 l1_only_can_swap_hands,L1 only (can swap hands),1
-l2_only,L2 only,1
+l2_only,L2 only,0.5
 jump_attacks_only,Jump attacks only,1
 rolling_crouch_attacks_only,Rolling / crouch attacks only,1
-parry_only,Parry only,1
+parry_only,Parry only,0.5
 no_ripostes,No ripostes,1
 no_lock_on,No lock-on,1
-no_healing_flasks,No healing flasks,1
-no_armor,No armor,1
+no_healing_flasks,No healing flasks,0.5
+no_armor,No armor,0.5
 no_talismans,No talismans,1
-no_rolling,No rolling,1
+no_rolling,No rolling,0.5
 heavy_rolling,Heavy rolling,1
-overloaded,Overloaded,1
+overloaded,Overloaded,0.5
 drink_deflecting_hardtear,Drink Deflecting Hardtear,0
 drink_crimson_sapping_cracked_tear,Drink Crimson-Sapping Cracked Tear,0
 drink_bloodsucking_cracked_tear,Drink Bloodsucking Cracked Tear,0

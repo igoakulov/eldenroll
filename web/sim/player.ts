@@ -4,7 +4,7 @@ import type { RolledSlots } from "../src/engine/display";
 import type { EngineData } from "../src/engine/engineData";
 import { MAX_STAT, type Stat, type Stats } from "../src/engine/settings";
 
-export const SCENARIOS = ["ITEMS", "STR", "DEX", "INT", "FTH", "ALL"] as const;
+export const SCENARIOS = ["ITEMS", "STR", "DEX", "INT", "FTH", "ARC", "ALL"] as const;
 export type Scenario = (typeof SCENARIOS)[number];
 
 const ITEM_STATS = ["str", "dex", "int", "fth", "arc"] as const satisfies readonly Stat[];
@@ -42,6 +42,12 @@ const BUILDS: Readonly<Record<Exclude<Scenario, "ITEMS">, readonly BuildStep[]>>
   DEX: [{ targets: { str: 20 } }, { targets: { dex: 80 } }, { targets: { fth: 25 } }],
   INT: [{ targets: { int: 80 } }],
   FTH: [{ targets: { fth: 80 } }],
+  ARC: [
+    { targets: { dex: 25 } },
+    { targets: { str: 16, arc: 60 } },
+    { targets: { fth: 25 } },
+    { targets: { dex: MAX_STAT }, aside: { every: 2, stats: ["str"] } },
+  ],
   ALL: [],
 };
 
@@ -60,15 +66,23 @@ export function newPlayer(scenario: Scenario, stats: Stats): PlayerState {
   return { scenario, stats: { ...stats }, bank: 0, window: -1, windowRate: 0, windowCredit: 0, asideCount: 0 };
 }
 
-/** Boss counts by region, to know how many levels are left before a region opens. */
-export function bossesByRegion(database: Database): ReadonlyMap<string, number> {
+/** Which region each boss belongs to, to know when a region is half felled and to count how many
+ * levels are left before one opens. */
+export function bossRegions(database: Database): ReadonlyMap<string, string> {
   const regionOf = new Map(database.location.map((row) => [row.id, row.region_id]));
-  const counts = new Map<string, number>();
+  const regions = new Map<string, string>();
   for (const boss of database.boss_instance) {
     if (boss.odds <= 0) continue;
     const region = regionOf.get(boss.location_id);
-    if (region !== undefined) counts.set(region, (counts.get(region) ?? 0) + 1);
+    if (region !== undefined) regions.set(boss.id, region);
   }
+  return regions;
+}
+
+/** Boss counts by region, to know how many levels are left before a region opens. */
+export function bossesByRegion(database: Database): ReadonlyMap<string, number> {
+  const counts = new Map<string, number>();
+  for (const region of bossRegions(database).values()) counts.set(region, (counts.get(region) ?? 0) + 1);
   return counts;
 }
 

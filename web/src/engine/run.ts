@@ -14,9 +14,8 @@ import {
   type Settings,
   type Stats,
 } from "./settings";
-import { repeatKey, repetitionMultiplier, type Random, type RollObserver } from "./slotRoll";
+import { repeatKey, type Random, type RollObserver } from "./slotRoll";
 import {
-  characterClassRepeatLine,
   pickTrace,
   slotTrace,
   type TraceBlock,
@@ -121,7 +120,7 @@ function counted(engine: Engine, run: Run, asIfDead?: ReadonlySet<string>): Read
 }
 
 function repetition(engine: Engine, run: Run) {
-  return { seen: run.seen, decay: engine.hyperparams.repetitionDecay };
+  return { seen: run.seen, decayGroupSize: engine.data.decayGroupSize, decay: engine.hyperparams.decay };
 }
 
 type Rolled = { readonly id: string; readonly block: TraceBlock };
@@ -158,12 +157,12 @@ function rollBoss(
   };
 }
 
+/** Odds are a deliberate, fixed mix of playstyles (`data/balance.md#Classes with extra rules`),
+ * not a pool to keep varied, so classes don't decay. */
 function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: string | null): Rolled | null {
-  const decay = repetition(engine, run);
   const rows = engine.data.database.character_class
     .filter((row) => run.settings.characterClasses.includes(row.id))
-    .map((row) => ({ value: row, weight: row.odds * repetitionMultiplier(characterClassKey(row.id), decay) }))
-    .filter((row) => row.weight > 0);
+    .map((row) => ({ value: row, weight: row.odds }));
   const others = rows.filter((row) => row.value.id !== exclude);
   const candidates = others.length > 0 ? others : rows;
   const picked = pickWeighted(candidates, random);
@@ -176,7 +175,7 @@ function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: s
       heading: characterClass.name,
       pool: candidates.length,
       odds: characterClass.odds,
-      repeat: characterClassRepeatLine(characterClass.id, decay),
+      repeat: null,
       probability: picked.weight / total,
     }),
   };

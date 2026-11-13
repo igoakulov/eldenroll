@@ -198,11 +198,15 @@ def test_only_grafted_dragon_loses_odds_in_dual_wield_rh(
             for one in row.when
         )
     ]
-    assert [
+    assert {
         row.id
         for row in known_before_rh
         if rh & {item.id for item in resolve_items((row.target,), data.table)}
-    ] == ["grafted_dragon_only_on_jester"]
+    } == {
+        "grafted_dragon_only_on_jester",
+        "warrior_dw_boosts_paired_subcategories",
+        "warrior_dw_boosts_paired_weapons",
+    }
 
 
 def test_a_paired_rh_leaves_only_none_in_dual_wield_lh(modifiers: tuple[Modifier, ...]) -> None:

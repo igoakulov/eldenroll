@@ -7,6 +7,7 @@ import { repeatKey, type SlotRoll, type WeightedOption } from "../src/engine/slo
 import {
   ITEMS_MAX_STAT_GAP,
   bossesByRegion,
+  bossRegions,
   levelUp,
   meetRequirements,
   newPlayer,
@@ -68,8 +69,6 @@ export interface ObjectiveRow {
   readonly stats: Stats;
   readonly boss: string;
   readonly characterClass: string;
-  readonly classChance: number;
-  readonly classChanceNoDecay: number;
   readonly slots: RolledSlots;
 }
 
@@ -145,18 +144,17 @@ function describe(observed: Observed, offered: Set<string>) {
   };
 }
 
-function classChances(engine: Engine, run: Run, characterClass: string) {
-  const rows = engine.data.database.character_class.filter((row) =>
-    run.settings.characterClasses.includes(row.id),
-  );
-  const decay = engine.hyperparams.repetitionDecay;
-  const weight = (id: string, odds: number) => odds * decay ** (run.seen[`character_class:${id}`] ?? 0);
-  const total = rows.reduce((sum, row) => sum + weight(row.id, row.odds), 0);
-  const plainTotal = rows.reduce((sum, row) => sum + row.odds, 0);
-  const row = rows.find((one) => one.id === characterClass);
-  if (row === undefined) return { chance: 0, plain: 0 };
-  return { chance: weight(row.id, row.odds) / total, plain: row.odds / plainTotal };
-}
+/** Nobody clears a region before moving on, so the DLC plays out of `region_level` order: a
+ * player who reaches Farum Azula is already strong enough for the early DLC, and plays the late
+ * DLC (its dragons, and Enir-Ilim after them) only once Haligtree and the Ashen Capital are open
+ * (web/sim/README.md#A run). Unlisted regions keep their `region_level`. */
+const DLC_ORDER: Readonly<Record<string, number>> = {
+  dlc_gravesite: 116,
+  dlc_shadowkeep: 117,
+  dlc_abyssal: 118,
+  dlc_jaggedpeak: 131,
+  dlc_enirilim: 132,
+};
 
 export function simulateRun(base: Engine, options: SimOptions): RunResult {
   const observed: Observed[] = [];
@@ -164,9 +162,10 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
   const database = engine.data.database;
   const order = [...database.region]
     .filter((row) => options.dlc || !row.name.startsWith("DLC: "))
-    .sort((a, b) => a.region_level - b.region_level)
+    .sort((a, b) => (DLC_ORDER[a.id] ?? a.region_level) - (DLC_ORDER[b.id] ?? b.region_level))
     .map((row) => row.id);
   const bosses = bossesByRegion(database);
+  const regionOfBoss = bossRegions(database);
   const settings = {
     ...defaultSettings(database, engine.hyperparams),
     ...(options.scenario === "ITEMS" ? { maxStatGap: ITEMS_MAX_STAT_GAP } : {}),
@@ -190,7 +189,6 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
     const objectiveNumber = current.completed.length + 1;
     const region = order[open - 1]!;
     const level = derivedLevel(current.stats);
-    const chances = classChances(engine, current, objective.characterClass);
     result.objectives.push({
       objective: objectiveNumber,
       kept,
@@ -200,8 +198,6 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
       stats: current.stats,
       boss: objective.boss,
       characterClass: objective.characterClass,
-      classChance: chances.chance,
-      classChanceNoDecay: chances.plain,
       slots: objective.slots,
     });
     for (const one of rolls) {
@@ -241,6 +237,16 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
       meetRequirements(player, requirements(engine.data, run.current.slots));
     }
     run = done(engine, run);
+    // Nobody clears a region before moving on: the next one opens once this one is half felled,
+    // rounding up, rather than waiting for its last boss (web/sim/README.md#A run).
+    while (open < order.length) {
+      const region = order[open - 1]!;
+      const total = bosses.get(region) ?? 0;
+      const dead = run.deadBosses.filter((row) => regionOfBoss.get(row.instanceId) === region).length;
+      if (total === 0 || dead * 2 < total) break;
+      open += 1;
+      run = editRun(run, { regions: order.slice(0, open) });
+    }
     levelUp(player, { order, open, completed: run.completed.length, bosses });
     run = editRun(run, { stats: { ...player.stats } });
   }

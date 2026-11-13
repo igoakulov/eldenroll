@@ -91,8 +91,15 @@ describe("the trace of an objective", () => {
   it("shows decay as a repeat line once something was seen", () => {
     let run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
     run = rollNext(engine, done(engine, rollNext(engine, done(engine, run))));
+    const rule = blocks(run).find((text) => text.startsWith("Rule 1: "));
+    expect(rule).toContain("  repeat: x0.88^");
+  });
+
+  it("never shows a repeat line for a class: odds are a deliberate mix, not a pool to vary", () => {
+    let run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
+    run = rollNext(engine, done(engine, rollNext(engine, done(engine, run))));
     const characterClass = blocks(run).find((text) => text.startsWith("Class: "));
-    expect(characterClass).toContain("  repeat: x0.8^2 = x0.64");
+    expect(characterClass).not.toContain("repeat:");
   });
 
   it("names the condition behind a modifier", () => {

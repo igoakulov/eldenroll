@@ -239,6 +239,7 @@ def test_only_the_items_that_never_roll_sit_at_odds_zero() -> None:
         "Litany of Proper Death",
         "Priestess Heart",
         "Rock Heart",
+        "Warrior Jar Shard",
     }
 
 

@@ -161,6 +161,8 @@ describe("Done", () => {
   });
 });
 
+const FLAT_DECAY = { max: 0.8, min: 0.8, halfSize: 1 };
+
 describe("decay", () => {
   it("multiplies again for each completed objective that showed an option", () => {
     const context = {
@@ -170,7 +172,7 @@ describe("decay", () => {
     };
     const options = slotOptions(engine.data, "knight", "rule_1");
     const weigh = (seen: Record<string, number>) =>
-      weighOptions({ ...context, repetition: { seen, decay: 0.8 } }, options);
+      weighOptions({ ...context, repetition: { seen, decayGroupSize: new Map(), decay: FLAT_DECAY } }, options);
     const weight = (result: ReturnType<typeof weigh>, id: string) =>
       result.options.find((row) => row.option.row.id === id)?.weight ?? 0;
 
@@ -196,7 +198,8 @@ describe("aliases", () => {
     };
     const options = slotOptions(engine.data, "sorcerer", "rh");
     const weigh = (seen: Record<string, number>) =>
-      weighOptions({ ...context, repetition: { seen, decay: 0.8 } }, options).options;
+      weighOptions({ ...context, repetition: { seen, decayGroupSize: new Map(), decay: FLAT_DECAY } }, options)
+        .options;
     const fresh = weigh({});
     const decayed = weigh({ "alias:any_staff": 1 });
     for (const row of fresh) {
