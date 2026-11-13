@@ -6,7 +6,6 @@ import { indexDatabase, type EngineData } from "./engineData";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
 import {
-  NOTHING_REMOVED,
   sample,
   slotOptions,
   weighOptions,
@@ -114,7 +113,6 @@ describe("a condition on a slot not rolled yet", () => {
     const options = slotOptions(real, "warrior_dw", "rh").filter(
       (one) => one.row.odds > 0 && EVERYTHING.has(one.row.id),
     );
-    expect(result.total).toBe(options.length);
     expect(options.length - result.options.length).toBe(1);
     expect(ids(result)).not.toContain("grafted_dragon");
     for (const row of result.options) {
@@ -285,14 +283,6 @@ describe("on a small database", () => {
     expect(ids(smallPool(data))).toEqual(["b"]);
   });
 
-  it("counts an option a modifier removed in the total, and one at odds 0 nowhere", () => {
-    const data = small([{ id: "m", when: whenCharacterClass, target: targetA, value: 0 }]);
-    const result = smallPool(data);
-    expect(result.total).toBe(2);
-    expect(result.pool).toBe(1);
-    expect(result.removed.byModifier).toEqual([["m", 1]]);
-  });
-
   it("needs every condition of a row", () => {
     const rolledRh = {
       kind: "rolled",
@@ -378,7 +368,7 @@ describe("on a small database", () => {
     });
 
     it("gives an empty result when nothing is left", () => {
-      const roll = sample({ total: 3, pool: 0, removed: NOTHING_REMOVED, options: [] }, () => 0.5);
+      const roll = sample({ pool: 0, options: [] }, () => 0.5);
       expect(roll.chosen).toBeNull();
       expect(roll.probability).toBe(0);
     });

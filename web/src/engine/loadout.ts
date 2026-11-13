@@ -36,7 +36,6 @@ export interface LoadoutInput {
   readonly characterClass: string;
   readonly boss: string | null;
   readonly counted: ReadonlySet<string>;
-  readonly countedIfBossesDead?: ReadonlySet<string>;
   readonly neverRoll?: ReadonlySet<string>;
   readonly limits: StatLimits;
   readonly random: Random;
@@ -178,9 +177,6 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     state,
     counted,
     repetition: input.repetition ?? NO_REPETITION,
-    ...(input.countedIfBossesDead === undefined
-      ? {}
-      : { countedIfBossesDead: input.countedIfBossesDead }),
     ...(input.neverRoll === undefined ? {} : { neverRoll: input.neverRoll }),
     ...(input.lateOffset === undefined ? {} : { lateOffset: input.lateOffset }),
   };

@@ -11,30 +11,11 @@ export type Random = () => number;
 
 export type OptionFilter = (option: Option) => boolean;
 
-/** Game rules always hold and are never traced; the stat filter follows the player's inputs. */
+/** Game rules always hold; the stat filter follows the player's inputs. */
 export interface PoolFilters {
   readonly rules?: readonly OptionFilter[];
   readonly stats?: OptionFilter;
 }
-
-/** What the player's inputs and the modifiers took out of a pool, each option counted under the
- * first it fails. */
-export interface Removed {
-  readonly neverRoll: number;
-  readonly notInRegion: number;
-  readonly bossStillAlive: number;
-  readonly statReq: number;
-  /** By modifier id, in table order; an option two `x0` rows hit counts under the first. */
-  readonly byModifier: readonly (readonly [string, number])[];
-}
-
-export const NOTHING_REMOVED: Removed = {
-  neverRoll: 0,
-  notInRegion: 0,
-  bossStillAlive: 0,
-  statReq: 0,
-  byModifier: [],
-};
 
 export interface WeightedOption {
   readonly option: Option;
@@ -47,19 +28,14 @@ export interface WeightedOption {
 }
 
 export interface SlotPoolResult {
-  /** Options the game rules allow, before the player's inputs and the modifiers remove any. */
-  readonly total: number;
   /** Options that can still roll. */
   readonly pool: number;
-  readonly removed: Removed;
   /** In table order, holding only options that can still roll. */
   readonly options: readonly WeightedOption[];
 }
 
 export interface SlotRoll {
-  readonly total: number;
   readonly pool: number;
-  readonly removed: Removed;
   /** `null` is an empty result. */
   readonly chosen: WeightedOption | null;
   readonly probability: number;
@@ -84,15 +60,11 @@ const NO_DECAY: DecayParams = { max: 1, min: 1, halfSize: 1 };
 
 export const NO_REPETITION: Repetition = { seen: {}, decayGroupSize: new Map(), decay: NO_DECAY };
 
-/** The decay rate this key's own pool sets, for the trace line. */
-export function decayRateOf(key: string, repetition: Repetition): number {
-  return decayRate(repetition.decayGroupSize.get(key) ?? 1, repetition.decay);
-}
-
 /** Compounds: each completed objective that showed it multiplies again, at a rate its pool's
  * size sets (`data/balance.md#Hyperparameters`). */
 export function repetitionMultiplier(key: string, repetition: Repetition): number {
-  return decayRateOf(key, repetition) ** (repetition.seen[key] ?? 0);
+  const rate = decayRate(repetition.decayGroupSize.get(key) ?? 1, repetition.decay);
+  return rate ** (repetition.seen[key] ?? 0);
 }
 
 export interface RollContext {
@@ -100,8 +72,6 @@ export interface RollContext {
   readonly state: RollState;
   /** Items with a location row that counts for this selection. */
   readonly counted: ReadonlySet<string>;
-  /** Items that would count if every boss were dead, which tells a living boss from a region. */
-  readonly countedIfBossesDead?: ReadonlySet<string>;
   /** `optionKey`s the player excluded; they win over every other input. */
   readonly neverRoll?: ReadonlySet<string>;
   readonly repetition?: Repetition;
@@ -132,24 +102,20 @@ export function slotOptions(data: EngineData, characterClass: string, slot: Load
   );
 }
 
-type Verdict = "keep" | "rule" | Exclude<keyof Removed, "byModifier">;
-
 function reachable(option: Option, counted: ReadonlySet<string>): boolean {
   if (option.kind === "item") return counted.has(option.row.id);
   if (option.kind === "armor_set") return isSetReachable(option.row, counted);
   return true;
 }
 
-function verdict(option: Option, context: RollContext, filters: PoolFilters): Verdict {
-  if (option.row.odds <= 0) return "rule";
-  if (!(filters.rules ?? []).every((filter) => filter(option))) return "rule";
-  if (context.neverRoll?.has(optionKey(option))) return "neverRoll";
-  if (!reachable(option, context.counted)) {
-    const ifDead = context.countedIfBossesDead;
-    return ifDead !== undefined && reachable(option, ifDead) ? "bossStillAlive" : "notInRegion";
-  }
-  if (filters.stats !== undefined && !filters.stats(option)) return "statReq";
-  return "keep";
+function allowed(option: Option, context: RollContext, filters: PoolFilters): boolean {
+  return (
+    option.row.odds > 0 &&
+    (filters.rules ?? []).every((filter) => filter(option)) &&
+    !(context.neverRoll?.has(optionKey(option)) ?? false) &&
+    reachable(option, context.counted) &&
+    (filters.stats === undefined || filters.stats(option))
+  );
 }
 
 /** Filters run before odds, so a modifier can never bring back what they removed. */
@@ -158,16 +124,7 @@ export function weighOptions(
   options: readonly Option[],
   filters: PoolFilters = {},
 ): SlotPoolResult {
-  const removed = { neverRoll: 0, notInRegion: 0, bossStillAlive: 0, statReq: 0 };
-  const candidates: Option[] = [];
-  let total = 0;
-  for (const option of options) {
-    const result = verdict(option, context, filters);
-    if (result === "rule") continue;
-    total += 1;
-    if (result === "keep") candidates.push(option);
-    else removed[result] += 1;
-  }
+  const candidates = options.filter((option) => allowed(option, context, filters));
   const active = activeModifiers(context.data, context.state);
   const repetition = context.repetition ?? NO_REPETITION;
   const lateOffset = context.lateOffset;
@@ -187,15 +144,7 @@ export function weighOptions(
       return { option, weight, modifiers, decay, late };
     });
   const kept = weighted.filter((row) => row.weight > 0);
-  const byModifier = new Map<string, number>();
-  for (const row of weighted) {
-    if (row.weight > 0) continue;
-    const zero = row.modifiers.find((modifier) => modifier.value === 0);
-    if (zero !== undefined) byModifier.set(zero.id, (byModifier.get(zero.id) ?? 0) + 1);
-  }
-  const order = active.map((row) => row.id);
-  const counts = [...byModifier].sort(([a], [b]) => order.indexOf(a) - order.indexOf(b));
-  return { total, pool: kept.length, removed: { ...removed, byModifier: counts }, options: kept };
+  return { pool: kept.length, options: kept };
 }
 
 export function sample(result: SlotPoolResult, random: Random): SlotRoll {
@@ -205,9 +154,7 @@ export function sample(result: SlotPoolResult, random: Random): SlotRoll {
     random,
   );
   const shared = {
-    total: result.total,
     pool: result.pool,
-    removed: result.removed,
     fromShortlist: false,
     options: result.options,
   };

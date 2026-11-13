@@ -15,12 +15,6 @@ import {
   type Stats,
 } from "./settings";
 import { repeatKey, type Random, type RollObserver } from "./slotRoll";
-import {
-  pickTrace,
-  slotTrace,
-  type TraceBlock,
-  type TraceSlot,
-} from "./trace";
 
 export interface Engine {
   readonly data: EngineData;
@@ -43,8 +37,6 @@ export interface Objective {
   readonly shortlistRh: boolean;
   /** Every reroll since the last `Done`, carried across `Reroll objective` and `Reroll items`. */
   readonly rerolls: readonly RerollTarget[];
-  /** One block per rolled slot, for the console in development (`web/src/engine/README.md#Trace`). */
-  readonly trace: readonly TraceBlock[];
 }
 
 export interface CompletedObjective extends Objective {
@@ -99,22 +91,14 @@ function characterClassKey(characterClass: string): string {
   return `character_class:${characterClass}`;
 }
 
-const TRACE_ORDER: readonly TraceSlot[] = ["boss", "character_class", ...LOADOUT_ORDER];
-
-function traceBefore(trace: readonly TraceBlock[], slot: TraceSlot): readonly TraceBlock[] {
-  const limit = TRACE_ORDER.indexOf(slot);
-  return trace.filter((block) => TRACE_ORDER.indexOf(block.slot) < limit);
-}
-
 function deadSet(run: Run): ReadonlySet<string> {
   return new Set(run.deadBosses.map((row) => row.instanceId));
 }
 
-/** `asIfDead` only changes which boss rows count; the map still follows who is really dead. */
-function counted(engine: Engine, run: Run, asIfDead?: ReadonlySet<string>): ReadonlySet<string> {
+function counted(engine: Engine, run: Run): ReadonlySet<string> {
   return countedItems(engine.data, {
     locations: selectedLocations(engine.data.database, new Set(run.regions), deadSet(run)),
-    deadBosses: asIfDead ?? deadSet(run),
+    deadBosses: deadSet(run),
     bossGearLockedUntilDead: run.settings.bossGearLockedUntilDead,
   });
 }
@@ -123,14 +107,13 @@ function repetition(engine: Engine, run: Run) {
   return { seen: run.seen, decayGroupSize: engine.data.decayGroupSize, decay: engine.hyperparams.decay };
 }
 
-type Rolled = { readonly id: string; readonly block: TraceBlock };
 
 function rollBoss(
   engine: Engine,
   run: Run,
   random: Random,
   exclude: string | null,
-): Rolled | Exclude<BossPool["status"], "ready"> {
+): { readonly id: string } | Exclude<BossPool["status"], "ready"> {
   const pool = bossPool(
     engine.data.database,
     new Set(run.regions),
@@ -143,48 +126,24 @@ function rollBoss(
   const candidates = others.length > 0 ? others : rows;
   const picked = pickWeighted(candidates, random);
   if (picked === null) return "no_bosses";
-  const total = candidates.reduce((sum, row) => sum + row.weight, 0);
-  const boss = picked.value;
-  return {
-    id: boss.id,
-    block: pickTrace("boss", {
-      heading: `${boss.name} — ${boss.location}`,
-      pool: candidates.length,
-      odds: boss.odds,
-      repeat: null,
-      probability: picked.weight / total,
-    }),
-  };
+  return { id: picked.value.id };
 }
 
 /** Odds are a deliberate, fixed mix of playstyles (`data/balance.md#Classes with extra rules`),
  * not a pool to keep varied, so classes don't decay. */
-function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: string | null): Rolled | null {
+function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: string | null): string | null {
   const rows = engine.data.database.character_class
     .filter((row) => run.settings.characterClasses.includes(row.id))
     .map((row) => ({ value: row, weight: row.odds }));
   const others = rows.filter((row) => row.value.id !== exclude);
   const candidates = others.length > 0 ? others : rows;
   const picked = pickWeighted(candidates, random);
-  if (picked === null) return null;
-  const total = candidates.reduce((sum, row) => sum + row.weight, 0);
-  const characterClass = picked.value;
-  return {
-    id: characterClass.id,
-    block: pickTrace("character_class", {
-      heading: characterClass.name,
-      pool: candidates.length,
-      odds: characterClass.odds,
-      repeat: null,
-      probability: picked.weight / total,
-    }),
-  };
+  return picked?.value.id ?? null;
 }
 
 interface RolledSlotsResult {
   readonly slots: RolledSlots;
   readonly shortlistRh: boolean | null;
-  readonly trace: readonly TraceBlock[];
 }
 
 function rollSlots(
@@ -197,13 +156,11 @@ function rollSlots(
   exclude: string | null = null,
 ): RolledSlotsResult {
   const decay = repetition(engine, run);
-  const allDead = new Set(engine.data.database.boss_instance.map((row) => row.id));
   const loadout = rollLoadout({
     data: engine.data,
     characterClass: objective.characterClass,
     boss: objective.boss,
     counted: counted(engine, run),
-    countedIfBossesDead: counted(engine, run, allDead),
     limits: { stats: run.stats, maxStatGap: run.settings.maxStatGap },
     random,
     repetition: decay,
@@ -221,10 +178,8 @@ function rollSlots(
     if (kept[slot] !== undefined) slots[slot] = kept[slot];
   }
   for (const [slot, roll] of loadout) slots[slot] = roll.chosen?.option.row.id ?? null;
-  const rolled = { boss: objective.boss, characterClass: objective.characterClass, slots };
-  const trace = [...loadout].map(([slot, roll]) => slotTrace(engine.data, slot, roll, rolled, decay));
   const rh = loadout.get("rh");
-  return { slots, shortlistRh: rh === undefined ? null : rh.fromShortlist, trace };
+  return { slots, shortlistRh: rh === undefined ? null : rh.fromShortlist };
 }
 
 function stopped(run: Run, status: Exclude<BossPool["status"], "ready">, rngState: number): Run {
@@ -244,18 +199,17 @@ function rollObjective(
   if (typeof boss === "string") return stopped(run, boss, state());
   const characterClass = rollCharacterClass(engine, run, random, null);
   if (characterClass === null) return { ...run, rngState: state(), current: null, waiting: null };
-  const loadout = rollSlots(engine, run, random, { boss: boss.id, characterClass: characterClass.id });
+  const loadout = rollSlots(engine, run, random, { boss: boss.id, characterClass });
   return {
     ...run,
     rngState: state(),
     waiting: null,
     current: {
       boss: boss.id,
-      characterClass: characterClass.id,
+      characterClass,
       slots: loadout.slots,
       shortlistRh: loadout.shortlistRh ?? false,
       rerolls,
-      trace: [boss.block, characterClass.block, ...loadout.trace],
     },
   };
 }
@@ -411,9 +365,8 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
   const { random, state } = seededRandom(run.rngState);
   if (target === "character_class") {
     const characterClass = rollCharacterClass(engine, run, random, objective.characterClass);
-    const characterClassId = characterClass?.id ?? objective.characterClass;
+    const characterClassId = characterClass ?? objective.characterClass;
     const loadout = rollSlots(engine, run, random, { boss: objective.boss, characterClass: characterClassId });
-    const kept = traceBefore(objective.trace, "character_class");
     return {
       ...run,
       rngState: state(),
@@ -423,7 +376,6 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
         slots: loadout.slots,
         shortlistRh: loadout.shortlistRh ?? false,
         rerolls,
-        trace: [...kept, ...(characterClass === null ? [] : [characterClass.block]), ...loadout.trace],
       },
     };
   }
@@ -445,7 +397,6 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
       slots: loadout.slots,
       shortlistRh: loadout.shortlistRh ?? objective.shortlistRh,
       rerolls,
-      trace: [...traceBefore(objective.trace, target), ...loadout.trace],
     },
   };
 }

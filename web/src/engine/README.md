@@ -17,10 +17,9 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 
 ## Pitfalls
 
-- **Filters come in two kinds** (`PoolFilters` in `slotRoll.ts`). `rules` are game rules: always applied, never traced. Player inputs (`never roll`, region, boss status, stats) are counted and traced, and so are `×0` modifiers, by id. A new filter must pick its side.
 - **Decay compounds** per `repeatKey`: `item:x`, `rule:x`, `armor_set:x`, `character_class:x`, or `alias:x` for an alias member. An objective counts once however many slots showed the same thing. `Never roll` keys on `optionKey` instead, which never names an alias.
 - **`none` is one key across all slots,** so decay hits it on almost every objective: `Jester`'s empty RH and the rule `None` fade fast.
-- **A reroll** keeps the slots and trace blocks before its target, rolls the rest, and leaves out only the target's current result unless nothing else is left.
+- **A reroll** keeps the slots before its target, rolls the rest, and leaves out only the target's current result unless nothing else is left.
 - **Determinism.** The generator's state lives in `run.rngState`, and tables are iterated in file order. Every action returns a new `Run`; keep the returned one, or reproducibility breaks.
 - **Ash fit, ash duplication and spell type** depend on a hand but hold for every class, so they are filters, not modifiers.
 
@@ -33,7 +32,6 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 - A slot the class has no row for can't be rerolled: `reroll` returns the run unchanged.
 - `done` leaves no current objective and the view calls `rollNext` after `Level up`, so edits made there apply to that roll. It already sets `waiting`, or finishes the run, from the regions as they stand. `Undo` puts back the run from before `Done`: every action returns a new run, so the engine needs no undo.
 - `alreadyDead` rerolls at once, before the countdown, and may leave the run waiting or finished as `done` does.
-- Print the trace in development only after an action that rolls, from the action handler, not a React effect: `StrictMode` runs effects twice.
 - Keep UI state in plain data, so a save layer can store it.
 
 ## Run model
@@ -115,7 +113,7 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 
 - **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it.
 - **`any`** is a slot state, never sampled, owned, decayed or counted.
-- **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership, decay and the summary use the label; the trace names the member. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label.
+- **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership, decay and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label.
 - **Ash line.** A rolled ash shows its name or label; no ash row or an empty pool shows `any`; a hand that rolled `none` shows `none`.
 
 ## Combat rules
@@ -142,10 +140,6 @@ An item rolls if at least one of its location rows counts (`eligibility.ts`). A 
 ## Decay
 
 On `Done`, everything the objective showed decays: class, items, ashes, spells, talismans, armor set, rules and `none`. A shortlisted weapon decays like any other, so it only competes less against the rest of the list. `any` and empty results don't decay, and nothing carries across runs.
-
-## Trace
-
-Every roll emits a plain-text trace, stored on the objective and printed in development; editing prints nothing. It is for spotting an odd roll in a play-test and finding what to tune, so it shows only what player inputs and modifiers remove; game rules are applied before counting, with no line. The format is pinned by `trace.test.ts`.
 
 ## Design constraints
 

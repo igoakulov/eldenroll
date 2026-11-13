@@ -19,7 +19,6 @@ import {
   type Run,
 } from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
-import { formatTrace } from "./engine/trace";
 import { loadDatabase } from "./loadDatabase";
 import { PhoneFrame } from "./ui/PhoneFrame";
 import { boardBefore, boardOf, countState, inState } from "./views/bossList";
@@ -43,11 +42,6 @@ type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level" | "sett
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
-}
-
-/** Called from the action that rolled, not an effect, which `StrictMode` runs twice. */
-function printTrace(run: Run) {
-  if (import.meta.env.DEV && run.current !== null) console.log(formatTrace(run.current.trace));
 }
 
 /** Until saving (9.1), `?resume` in development starts a run and lands on Start with it in progress. */
@@ -234,7 +228,6 @@ function Game({ database }: { readonly database: Database }) {
           // With no living boss in the selected regions, the run stays here, waiting for more
           const next = rollNext(engine, edited);
           setRun(next);
-          printTrace(next);
           if (next.current !== null) showCard("full");
         }}
       />
@@ -251,7 +244,6 @@ function Game({ database }: { readonly database: Database }) {
         onReroll={(target) => {
           const next = reroll(engine, run, rerollTarget(run.current.slots, target));
           setRun(next);
-          printTrace(next);
           // Only a full-objective reroll replays the reveal; any other keeps the card and swaps what changed
           if (target === "boss") showCard("quick");
         }}
@@ -264,7 +256,6 @@ function Game({ database }: { readonly database: Database }) {
           const next = alreadyDead(engine, run);
           setUndoTo(run);
           setRun(next);
-          printTrace(next);
           setView("rerolling");
         }}
         onLevelUp={() => setView("level")}
@@ -319,7 +310,6 @@ function Game({ database }: { readonly database: Database }) {
         }
         setProblems([]);
         setRun(result.run);
-        printTrace(result.run);
         showCard("full");
       }}
     />

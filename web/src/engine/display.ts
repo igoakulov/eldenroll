@@ -8,7 +8,7 @@ export const ARMOR_PIECES = ["head", "body", "arms", "legs"] as const;
 export type ArmorPiece = (typeof ARMOR_PIECES)[number];
 
 /** `none` and `any` are constants, never read from a data row, so a missing row can't break a card.
- * An alias shows its label; the rolled member stays alongside for the trace and the summary. */
+ * An alias shows its label; the rolled member stays alongside for the summary. */
 export type SlotDisplay =
   | { readonly kind: "none" }
   | { readonly kind: "any" }

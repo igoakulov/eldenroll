@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { copy } from "../copy";
+import type { LoadoutSlot } from "./database";
 import { indexDatabase } from "./engineData";
 import { DEFAULT_HYPERPARAMS } from "./hyperparams";
 import { realDatabase } from "./realDatabase.testing";
@@ -19,7 +20,7 @@ import {
   type RunInputs,
 } from "./run";
 import { DEFAULT_STATS, STATS, defaultSettings, type Stats } from "./settings";
-import { NO_REPETITION, slotOptions, weighOptions } from "./slotRoll";
+import { NO_REPETITION, slotOptions, weighOptions, type SlotRoll } from "./slotRoll";
 
 const engine: Engine = { data: indexDatabase(realDatabase), hyperparams: DEFAULT_HYPERPARAMS };
 const MAXED = Object.fromEntries(STATS.map((stat) => [stat, 99])) as Stats;
@@ -37,8 +38,8 @@ function inputs(changes: Partial<RunInputs> = {}): RunInputs {
   };
 }
 
-function start(changes: Partial<RunInputs> = {}, seed = 7): Run {
-  const result = startRun(engine, inputs(changes), seed);
+function start(changes: Partial<RunInputs> = {}, seed = 7, using: Engine = engine): Run {
+  const result = startRun(using, inputs(changes), seed);
   if (!result.ok) throw new Error(result.problems.join(", "));
   return result.run;
 }
@@ -46,6 +47,13 @@ function start(changes: Partial<RunInputs> = {}, seed = 7): Run {
 /** `Done`, then `Roll objective N` with nothing changed on `Level up`. */
 function doneAndRoll(run: Run): Run {
   return rollNext(engine, done(engine, run));
+}
+
+/** Every slot roll an action makes, in order. */
+function observed(action: (observing: Engine) => Run): [LoadoutSlot, SlotRoll][] {
+  const rolls: [LoadoutSlot, SlotRoll][] = [];
+  action({ ...engine, observe: (slot, roll) => rolls.push([slot, roll]) });
+  return rolls;
 }
 
 function current(run: Run) {
@@ -251,9 +259,8 @@ describe("rerolls", () => {
 
   it("rerolls the armor with any slot before it", () => {
     const run = start(knight);
-    const after = current(reroll(engine, run, "rule_2"));
-    expect(after.trace.at(-1)?.slot).toBe("armor");
-    expect(after.trace.filter((block) => block.slot === "armor")).toHaveLength(1);
+    const slots = observed((observing) => reroll(observing, run, "rule_2")).map(([slot]) => slot);
+    expect(slots).toEqual(["rule_2", "armor"]);
   });
 
   it("gives the same result back when it's the only option", () => {
@@ -288,7 +295,6 @@ describe("Already dead and Finish run", () => {
     const objective = current(run);
     const next = alreadyDead(engine, run);
     expect(current(next).boss).not.toBe(objective.boss);
-    expect(current(next).trace.map((block) => block.slot).slice(0, 2)).toEqual(["boss", "character_class"]);
     expect(current(next).rerolls).toEqual(["armor"]);
     expect(next.deadBosses).toEqual([{ instanceId: objective.boss, objectiveIndex: 1 }]);
     expect(next.completed).toHaveLength(0);
@@ -388,15 +394,11 @@ describe("the Bosses list", () => {
       run = doneAndRoll(run);
     }
 
-    const bossLocked = (one: Run) => {
-      const text = current(one).trace.find((block) => block.slot === "rh")?.text ?? "";
-      return Number(/boss still alive: -(\d+)/.exec(text)?.[1] ?? 0);
-    };
-    const before = reroll(engine, start({ settings }), "rh");
-    const skipped = reroll(engine, setBossState(engine, before, morgott, "skipped"), "rh");
-    const dead = reroll(engine, setBossState(engine, before, morgott, "dead"), "rh");
-    expect(bossLocked(skipped)).toBe(bossLocked(before));
-    expect(bossLocked(dead)).toBeLessThan(bossLocked(before));
+    const rhPool = (one: Run) =>
+      observed((observing) => reroll(observing, one, "rh")).find(([slot]) => slot === "rh")?.[1].pool ?? 0;
+    const before = start({ settings });
+    expect(rhPool(setBossState(engine, before, morgott, "skipped"))).toBe(rhPool(before));
+    expect(rhPool(setBossState(engine, before, morgott, "dead"))).toBeGreaterThan(rhPool(before));
   });
 
   it("locks bosses killed by Done and the current boss, and lets the rest change", () => {
@@ -426,12 +428,12 @@ describe("the Bosses list", () => {
 });
 
 describe("armor", () => {
-  it("rolls only sets whose every piece is in reach, and traces why the others are out", () => {
-    const run = start({ regions: ["limgrave"] });
-    const armor = current(run).trace.find((block) => block.slot === "armor")?.text ?? "";
-    expect(armor).toMatch(/^Armor: /);
-    expect(armor).toMatch(/not in region: -\d+/);
-    expect(armor).toMatch(/boss still alive: -\d+/);
+  it("rolls only sets whose every piece is in reach", () => {
+    const rolls = observed((observing) => start({ regions: ["limgrave"] }, 7, observing));
+    const armor = rolls.find(([slot]) => slot === "armor")?.[1];
+    const rollable = realDatabase.armor_set.filter((row) => row.odds > 0).length;
+    expect(armor?.pool).toBeGreaterThan(0);
+    expect(armor?.pool).toBeLessThan(rollable);
   });
 });
 
@@ -449,7 +451,5 @@ describe("Never roll", () => {
       expect(current(run).slots.rule_2).not.toBe("none");
       run = doneAndRoll(run);
     }
-    const rh = current(run).trace.find((block) => block.slot === "rh")?.text ?? "";
-    expect(rh).toMatch(/never roll: -1/);
   });
 });
