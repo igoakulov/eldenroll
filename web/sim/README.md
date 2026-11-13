@@ -8,7 +8,7 @@ Two front ends read the same runs from `simulate.ts`: the page at `/simulate/`, 
 cd web && pnpm sim --runs 50
 ```
 
-`pnpm sim --help` lists the arguments. Each call writes `objectives.csv` and `rolls.csv` to its own timestamped folder under `data/build/sim/`, never overwriting an earlier one. Fifty runs per stat allocation take about two minutes. The page and the dump take the same seed to the same runs (`runSeed`).
+`pnpm sim --help` lists the arguments. Each call writes `objectives.csv` and `rolls.csv` to its own timestamped folder under `data/build/sim/`, never overwriting an earlier one. Fifty runs of each of the seven stat allocations take about two minutes. The page and the dump take the same seed to the same runs (`runSeed`). Both read `data/build/db.json`, so a change to `data/overrides/` shows only after the database is rebuilt (`pipeline/README.md`); the page needs a reload to fetch it.
 
 ## A run
 
@@ -19,7 +19,7 @@ cd web && pnpm sim --runs 50
 - The player never uses `Felled?`: it adds nothing to roll statistics.
 - Each stat allocation plays its own seeds, so allocations are independent samples.
 
-The engine shows the simulation every slot roll through `Engine.observe`, with the whole pool it drew from, so the dump holds each option's exact chance at roll time, with and without decay, rather than only what won.
+The engine shows the simulation every slot roll through `Engine.observe`, with the whole pool it drew from and each option's decay and lateness boost apart, so the dump can give the winner's exact chance at roll time with and without decay, and the chance of `none` and of every boosted option in the pool. Every other option's chance is summed only for the page (`ChanceSums`).
 
 ## The simulated player
 
@@ -50,6 +50,7 @@ Once its targets are met, an allocation spreads the rest evenly over the item st
 - **Right and left hand show a second share as a tick**: what the class would get if every weapon class held as many weapons, so a skew from pool size reads apart from one from decay, stat gates or a modifier. With several classes picked, each class's adjusted share counts by its objectives.
 - **The lateness boost is shown clean of decay**, and decay as its own multiplier beside it.
 - **The Decay tab inspects items one at a time**: every option in reach, with how often it showed and when its odds first fell below half, and, for whatever the search matches, its chance at roll time over the run beside the same chance with every decay removed. Decay follows from showings alone (its pool's rate once per showing), so it is rebuilt from the rows; the chances come from `ChanceSums`, each option's chance added up per class, slot and 20 objectives while the run plays, which the page needs and the dump leaves out. The second talisman and combat rule slots leave out what the first rolled, so only the first is charted; a showing in either marks it.
+- **Settings live in the address** (`src/simulate/inputs.ts`), so an agent can open a result directly, such as `/simulate/?runs=10&allocation=STR&regions=limgrave,liurnia&classes=jester&tab=decay&q=torch`.
 - **Guarantees pass at 99% of the rolls where they're in play** (`data/balance.md#Tiers`), and name what won when they lost. Modifiers read as generated sentences from their conditions and targets, so a new row needs no wording.
 - Hand pairs and Dual-Wield's same-class aim come from the database's classes alone: which hand is heavier can't be told, since it holds no weights.
 
@@ -59,3 +60,6 @@ Once its targets are met, an allocation spreads the rest evenly over the item st
 - `boosts` lists the modifiers above ×1 active on any option in the pool, `boost_chances` the summed chance of the options each hit, `chosen_boosts` those on what won.
 - A talisman boost is active in both talisman slots, and `talisman_2` leaves out what `talisman_1` rolled, so count a synergy per objective, not per roll.
 - An objective's stats and level are those it rolled with; a level gained for felling its boss shows on the next one.
+- In `objectives.csv`, a blank slot is one the class doesn't roll; `(empty)` is a roll that found nothing.
+- `chosen` is the item that rolled; `chosen_key` is what decay counts, so an alias's members share one key (`alias:any_staff`), and `none` is one key across every slot.
+- `drift` is half the summed difference between the pool's chances with decay and without, from 0 to 1; the `none_*` columns are `none`'s chance and decay in pools that hold it.
