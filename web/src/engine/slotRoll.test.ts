@@ -273,7 +273,7 @@ describe("on a small database", () => {
   it("needs every condition of a row", () => {
     const rolledRh = {
       kind: "rolled",
-      slot: "rh",
+      slots: ["rh"],
       selector: { kind: "category", ids: ["none"] },
       negated: false,
     } as const;
@@ -285,7 +285,7 @@ describe("on a small database", () => {
   it("reads an empty result as none", () => {
     const rolledRh = {
       kind: "rolled",
-      slot: "rh",
+      slots: ["rh"],
       selector: { kind: "category", ids: ["none"] },
       negated: false,
     } as const;
@@ -293,10 +293,22 @@ describe("on a small database", () => {
     expect(weightOf(smallPool(data, { rh: null }), "a")).toBe(3);
   });
 
+  it("holds when either listed slot matches, applied once", () => {
+    const eitherHand = {
+      kind: "rolled",
+      slots: ["rh", "lh"],
+      selector: { kind: "category", ids: ["none"] },
+      negated: false,
+    } as const;
+    const data = small([{ id: "m", when: [eitherHand], target: targetA, value: 3 }]);
+    expect(weightOf(smallPool(data, { rh: "a", lh: "none" }), "a")).toBe(3);
+    expect(weightOf(smallPool(data, { rh: "none", lh: "none" }), "a")).toBe(3);
+  });
+
   it("reads the boss, which is known from the start", () => {
     const rolledBoss = {
       kind: "rolled",
-      slot: "boss",
+      slots: ["boss"],
       selector: { kind: "boss", ids: ["radahn"] },
       negated: false,
     } as const;

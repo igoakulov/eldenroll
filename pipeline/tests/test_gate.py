@@ -234,7 +234,7 @@ def test_a_modifier_writes_both_kinds_of_condition(data: GateData) -> None:
     assert rows["l2_only_needs_a_skill_not_empty"]["when"] == [
         {
             "kind": "rolled",
-            "slot": "rh",
+            "slots": ["rh"],
             "selector": {"kind": "category", "ids": ["none"]},
             "negated": False,
         }

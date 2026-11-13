@@ -60,7 +60,7 @@ def validate_rolling_order(
 def _rolls_after_conditions(
     row: Modifier, resolved: Mapping[tuple[str, str], AbstractSet[str]], table: tuple[Item, ...]
 ) -> bool:
-    slots = [_order(one.slot) for one in row.when if isinstance(one, RolledCondition)]
+    slots = [_earliest(one) for one in row.when if isinstance(one, RolledCondition)]
     if row.target.kind not in ITEM_KINDS or not slots:
         return True
     character_classes = set(CHARACTER_CLASSES)
@@ -75,9 +75,9 @@ def _rolls_after_conditions(
     )
 
 
-def _order(slot: str) -> int:
-    """The boss rolls before every slot."""
-    return -1 if slot == "boss" else SLOTS.index(slot)
+def _earliest(condition: RolledCondition) -> int:
+    """A condition can first hold at its earliest slot; the boss rolls before every slot."""
+    return min(-1 if slot == "boss" else SLOTS.index(slot) for slot in condition.slots)
 
 
 def _late(row: Modifier) -> bool:
@@ -85,7 +85,7 @@ def _late(row: Modifier) -> bool:
     if row.target.kind != "rule":
         return False
     return any(
-        _order(one.slot) >= SLOTS.index(LAST_RULE_SLOT)
+        _earliest(one) >= SLOTS.index(LAST_RULE_SLOT)
         for one in row.when
         if isinstance(one, RolledCondition)
     )
@@ -110,7 +110,7 @@ def _exclusions(row: Modifier) -> Iterator[tuple[str, str]]:
     for one in row.when:
         if (
             isinstance(one, RolledCondition)
-            and one.slot == FIRST_RULE_SLOT
+            and one.slots == (FIRST_RULE_SLOT,)
             and not one.negated
             and one.selector.kind == "rule"
         ):

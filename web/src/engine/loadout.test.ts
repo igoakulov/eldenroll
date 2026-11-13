@@ -304,7 +304,7 @@ describe("armor", () => {
   it("dresses Blue Dancer Charm in a light set, unless a rule needs equip load", () => {
     const random = seeded(7);
     const light = new Set(
-      data.database.modifier.find((row) => row.id === "blue_dancer_charm_1_boosts_light_sets")
+      data.database.modifier.find((row) => row.id === "blue_dancer_charm_boosts_light_sets")
         ?.target.ids,
     );
     const armorWith = (rule: string) =>

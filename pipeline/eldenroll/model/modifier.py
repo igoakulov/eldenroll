@@ -7,9 +7,10 @@ from eldenroll.model.selector import Selector
 
 @dataclass(frozen=True, slots=True)
 class RolledCondition:
-    """What one slot rolled matches a selector or, when `negated`, does not."""
+    """What one of `slots` rolled matches a selector or, when `negated`, what the one slot rolled
+    does not."""
 
-    slot: str
+    slots: tuple[str, ...]
     selector: Selector
     negated: bool = False
 

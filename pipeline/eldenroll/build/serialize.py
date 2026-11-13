@@ -153,7 +153,7 @@ def _condition(condition: Condition) -> Row:
         return {"kind": "character_class", "ids": list(condition.character_classes)}
     return {
         "kind": "rolled",
-        "slot": condition.slot,
+        "slots": list(condition.slots),
         "selector": _selector(condition.selector),
         "negated": condition.negated,
     }

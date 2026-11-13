@@ -30,20 +30,23 @@ def build_modifiers(
 def _condition(
     row: ConditionRow, modifier_id: str, bosses_of_region: Mapping[str, Iterable[str]]
 ) -> Condition:
-    if row.subject == CHARACTER_CLASS_SUBJECT:
+    if row.subjects == (CHARACTER_CLASS_SUBJECT,):
         unknown = sorted(set(row.ids) - set(CHARACTER_CLASSES))
         if unknown or not row.ids:
             raise BuildError(f"{modifier_id}: bad character class condition: {', '.join(unknown)}")
         return CharacterClassCondition(row.ids)
-    if row.subject == BOSS_SUBJECT:
+    if BOSS_SUBJECT in row.subjects:
+        if len(row.subjects) > 1:
+            raise BuildError(f"{modifier_id}: the boss can't share a condition with a slot")
         if row.kind != "boss":
             raise BuildError(f"{modifier_id}: a boss condition needs a boss selector")
         # A region id stands for its bosses (`data/overrides/README.md#Selectors and modifiers`)
         ids = [boss for one in row.ids for boss in bosses_of_region.get(one, (one,))]
-        return RolledCondition(row.subject, new_selector(row.kind, ids), row.negated)
-    if row.subject not in SLOTS:
-        raise BuildError(f"{modifier_id}: unknown slot {row.subject}")
-    return RolledCondition(row.subject, new_selector(row.kind, row.ids), row.negated)
+        return RolledCondition(row.subjects, new_selector(row.kind, ids), row.negated)
+    unknown = [one for one in row.subjects if one not in SLOTS]
+    if unknown:
+        raise BuildError(f"{modifier_id}: unknown slot {', '.join(unknown)}")
+    return RolledCondition(row.subjects, new_selector(row.kind, row.ids), row.negated)
 
 
 def bosses_of_region(

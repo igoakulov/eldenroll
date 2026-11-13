@@ -135,9 +135,10 @@ export interface CharacterClassCondition {
   readonly ids: readonly string[];
 }
 
+/** Holds when any of `slots` matches; a negated condition names one slot. */
 export interface RolledCondition {
   readonly kind: "rolled";
-  readonly slot: PoolSlot | "boss";
+  readonly slots: readonly (PoolSlot | "boss")[];
   readonly selector: Selector;
   readonly negated: boolean;
 }

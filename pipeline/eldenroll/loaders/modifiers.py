@@ -1,6 +1,7 @@
 """`when` holds conditions split by `;`: `rule_1=rule:parry_only` when a slot rolled a match,
-`rh!=subcategory:melee` when it did not, and `character_class=sorcerer jester` for the rolled
-character class. `target` is one selector in the `slot_pools.csv` form.
+`rh|lh=item:x` when either did, `rh!=subcategory:melee` when it did not, and
+`character_class=sorcerer jester` for the rolled character class. `target` is one selector in the
+`slot_pools.csv` form.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ CHARACTER_CLASS_SUBJECT = "character_class"
 class ConditionRow:
     """One condition, split but not yet normalized; a character class condition has no `kind`."""
 
-    subject: str
+    subjects: tuple[str, ...]
     negated: bool
     kind: str
     ids: tuple[str, ...]
@@ -65,9 +66,14 @@ def _condition(part: str, where: str) -> ConditionRow:
     subject, equals, rest = part.partition("!=" if negated else "=")
     if not equals:
         raise LoaderError(f"{where}: condition {part!r} has no operator")
-    if subject != CHARACTER_CLASS_SUBJECT:
+    subjects = tuple(one.strip() for one in subject.split("|"))
+    if len(subjects) > 1 and (negated or CHARACTER_CLASS_SUBJECT in subjects):
+        raise LoaderError(f"{where}: condition {part!r} lists slots for a match only")
+    if len(set(subjects)) < len(subjects):
+        raise LoaderError(f"{where}: condition {part!r} repeats a slot")
+    if subjects != (CHARACTER_CLASS_SUBJECT,):
         kind, ids = parse_selector(rest, where)
-        return ConditionRow(subject, negated, kind, ids)
+        return ConditionRow(subjects, negated, kind, ids)
     if negated:
         raise LoaderError(f"{where}: condition {part!r} cannot negate a character class")
-    return ConditionRow(subject, False, "", tuple(rest.split()))
+    return ConditionRow(subjects, False, "", tuple(rest.split()))

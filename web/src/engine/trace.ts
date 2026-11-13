@@ -1,4 +1,5 @@
-import type { Condition, LoadoutSlot, Modifier, PoolSlot } from "./database";
+import type { Condition, LoadoutSlot, Modifier, PoolSlot, Selector } from "./database";
+import { matchesOption } from "./selectors";
 import type { RolledSlots } from "./display";
 import type { EngineData } from "./engineData";
 import {
@@ -74,10 +75,26 @@ function rolledName(data: EngineData, rolled: RolledContext, slot: TraceSlot): s
   return row?.name ?? id;
 }
 
-/** Names what a modifier read, such as `Claw Talisman` or `RH katana`. */
+function rolledMatches(
+  data: EngineData,
+  rolled: RolledContext,
+  slot: PoolSlot | "boss",
+  selector: Selector,
+): boolean {
+  if (slot === "boss") return rolled.boss !== null && (selector.ids?.includes(rolled.boss) ?? true);
+  const id = rolled.slots[slot] ?? "none";
+  const rule = slot === "rule_1" || slot === "rule_2" ? data.rules.get(id) : undefined;
+  if (rule !== undefined) return matchesOption(selector, { kind: "rule", row: rule });
+  const item = data.items.get(id);
+  return item !== undefined && matchesOption(selector, { kind: "item", row: item });
+}
+
+/** Names what a modifier read, such as `Claw Talisman` or `RH katana`: of several slots, the matching one. */
 function conditionLabel(data: EngineData, rolled: RolledContext, condition: Condition): string | null {
   if (condition.kind === "character_class") return null;
-  const { slot, selector } = condition;
+  const { selector } = condition;
+  const matched = condition.slots.find((one) => rolledMatches(data, rolled, one, selector));
+  const slot = matched ?? condition.slots[0] ?? "boss";
   if (selector.kind === "subcategory" || selector.kind === "category") {
     const id = rolled.slots[slot as PoolSlot];
     const item = id === null || id === undefined ? undefined : data.items.get(id);

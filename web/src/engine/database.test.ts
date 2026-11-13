@@ -90,6 +90,8 @@ describe("db.json", () => {
     for (const row of database.ash_compatibility) expect(categories).toContain(row.category);
     for (const row of database.slot_pool) expect(slots).toContain(row.slot);
     for (const one of allSelectors()) expect(kinds).toContain(one.kind);
-    for (const one of rolledConditions()) expect([...slots, "boss"]).toContain(one.slot);
+    for (const one of rolledConditions()) {
+      for (const slot of one.slots) expect([...slots, "boss"]).toContain(slot);
+    }
   });
 });

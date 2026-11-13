@@ -158,37 +158,37 @@ Rows: `heavy_rh_removes_blue_dancer_charm`, `two_hands_need_a_lightest_rh_for_bl
 
 P2. A named class idea: the charm wants a light load, so the 9 light sets (`guarantee`) and `No armor` (`strong`) follow it. Built; its final weight waits for the armor set balance at the simulation.
 
-Rows: `blue_dancer_charm_1_boosts_light_sets`, `blue_dancer_charm_2_boosts_light_sets`, `blue_dancer_charm_1_boosts_no_armor`, `blue_dancer_charm_2_boosts_no_armor`
+Rows: `blue_dancer_charm_boosts_light_sets`, `blue_dancer_charm_boosts_no_armor`
 
 ### 13. Claw Talisman and jump attacks
 
 P2. The talisman boosts jump attacks, so `Jump attacks only` goes top tier, and the rule brings the jump sets (#23. Jump attacks and the jump sets). The talisman doesn't boost the sets itself: that would double-dip, and where the rule can't roll, such as for a caster, the sets don't suit the loadout.
 
-Rows: `claw_talisman_1_makes_jump_attacks_top`, `claw_talisman_2_makes_jump_attacks_top`
+Rows: `claw_talisman_makes_jump_attacks_top`
 
 ### 14. Shards and L2 only
 
 P2. `Shard of Alexander` and `Warrior Jar Shard` boost skills, so `L2 only` goes top tier.
 
-Rows: `shards_1_make_l2_only_top`, `shards_2_make_l2_only_top`
+Rows: `shards_make_l2_only_top`
 
 ### 15. Axe Talisman and charged attacks
 
 P2. The talisman boosts charged attacks, so `Charged R2 only` and `Drink Stonebarb Cracked Tear` go top tier.
 
-Rows: `axe_talisman_1_makes_charged_rules_top`, `axe_talisman_2_makes_charged_rules_top`
+Rows: `axe_talisman_makes_charged_rules_top`
 
 ### 17. Dancer's weapons
 
 P2. Eight weapons suit the Dancer's moveset: `Curseblade's Cirque`, `Dancing Blade of Ranah`, `Eleonora's Poleblade`, `Flowing Curved Sword`, `Giant's Red Braid`, `Hand of Malenia`, `Marais Executioner's Sword`, `Regalia of Eochaid`. One in a hand makes the `Dancer's Set` top tier, and `Shard of Alexander`, `Warrior Jar Shard` and `Axe Talisman` next. The set beats every other boosted set: it comes late, from a DLC boss, when the others have had their turns. So the weapon removes `No armor`, whose `Naked Set` would otherwise split the armor roll with it and contradict the card.
 
-Rows: `dancers_weapon_rh_makes_dancers_set_top`, `dancers_weapon_lh_makes_dancers_set_top`, `dancers_weapon_rh_boosts_moveset_talismans`, `dancers_weapon_lh_boosts_moveset_talismans`, `dancers_weapon_rh_removes_no_armor`, `dancers_weapon_lh_removes_no_armor`
+Rows: `dancers_weapon_makes_dancers_set_top`, `dancers_weapon_boosts_moveset_talismans`, `dancers_weapon_removes_no_armor`
 
 ### 18. Parry ashes
 
 P2. A parry ash in a hand boosts `Dagger Talisman`, `Blade of Mercy` and `Parry only` (`strong`).
 
-Rows: `parry_ash_rh_boosts_parry_talismans`, `parry_ash_lh_boosts_parry_talismans`, `parry_ash_rh_boosts_parry_only`, `parry_ash_lh_boosts_parry_only`
+Rows: `parry_ash_boosts_parry_talismans`, `parry_ash_boosts_parry_only`
 
 ### 19. Jester's right hand
 
@@ -200,25 +200,25 @@ Rows: `jester_none_x6`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_torche
 
 P3, built on the owner's ruling. `Golem Fist`, `Lizard Greatsword`, `Smithscript Axe`, `Smithscript Greathammer`, `Smithscript Spear` and `Smithscript Dagger` can't take an ash that buffs the weapon (Fextralife). One in a hand removes those ashes. The target can't name a slot, so the other hand loses them too; that costs little.
 
-Rows: `buff_ash_weapon_rh_removes_buff_ashes`, `buff_ash_weapon_lh_removes_buff_ashes`
+Rows: `buff_ash_weapon_removes_buff_ashes`
 
 ### 23. Jump attacks and the jump sets
 
 P2. The `Gravebird` and `Raptor's` chests boost jump attacks, so they suit `Jump attacks only`, which `Claw Talisman` brings (#13. Claw Talisman and jump attacks). The rule is rarer than `Kindred of Rot's Exultation`, so the rule removes the `Mushroom Crown` sets, which would otherwise win the armor roll with 5 sets against 2.
 
-Rows: `jump_attacks_rule_1_boosts_jump_sets`, `jump_attacks_rule_2_boosts_jump_sets`, `jump_attacks_rule_1_removes_mushroom_sets`, `jump_attacks_rule_2_removes_mushroom_sets`
+Rows: `jump_attacks_rule_boosts_jump_sets`, `jump_attacks_rule_removes_mushroom_sets`
 
 ### 24. Rot and poison
 
 P2. A rot or poison weapon, shield or ash in a hand makes `Kindred of Rot's Exultation` near-certain (`guarantee`), and the talisman puts the 5 `Mushroom Crown` sets in the guarantee tier, because the crown matters for rot and poison loadouts. The chain goes weapon to talisman to set, never weapon to set, so nothing double-dips, and the three come together. The triggers are the owner's list in the rows. The `Mushroom Crown` sets beat the `Blue Dancer Charm` light sets, so the talisman in the first slot removes the charm from the second; the reverse order needs the charm to beat a near-certain talisman, so it is left. `No armor` and the jump sets win over them (#Tiers, #23. Jump attacks and the jump sets).
 
-Rows: `rot_weapon_rh_boosts_kindred_exultation`, `rot_weapon_lh_boosts_kindred_exultation`, `rot_ash_rh_boosts_kindred_exultation`, `rot_ash_lh_boosts_kindred_exultation`, `kindred_exultation_1_boosts_mushroom_sets`, `kindred_exultation_2_boosts_mushroom_sets`, `kindred_exultation_1_removes_blue_dancer_charm`
+Rows: `rot_boosts_kindred_exultation`, `kindred_exultation_boosts_mushroom_sets`, `kindred_exultation_1_removes_blue_dancer_charm`
 
 ### 25. Blasphemous Blade and Prayerful Strike
 
 P2. Their L2 heals a lot, so the loadout lives by L2: `No healing flasks` and `Overloaded` become playable and are boosted `×5`, and the rules that forbid L2 are removed.
 
-Rows: `blasphemous_blade_rh_boosts_healing_rules`, `blasphemous_blade_lh_boosts_healing_rules`, `prayerful_strike_rh_boosts_healing_rules`, `prayerful_strike_lh_boosts_healing_rules`, `blasphemous_blade_rh_needs_l2`, `blasphemous_blade_lh_needs_l2`, `prayerful_strike_rh_needs_l2`, `prayerful_strike_lh_needs_l2`
+Rows: `blasphemous_blade_boosts_healing_rules`, `prayerful_strike_boosts_healing_rules`, `blasphemous_blade_needs_l2`, `prayerful_strike_needs_l2`
 
 ### 26. Dual-Wield Warrior pairs
 
@@ -230,7 +230,7 @@ Rows: `warrior_dw_pairs_greatsword`, `warrior_dw_pairs_straight_sword`, `warrior
 
 P2. The bleed counterpart of #24. Rot and poison: a bleed weapon, shield or ash in a hand makes `Lord of Blood's Exultation` near-certain, at the same tier as rot, and the talisman boosts the 11 `White Mask` sets (`strong`). Bleed items are far more common than rot ones, so the sets get much less than the `Mushroom Crown` sets do, or the mask would show on too many objectives: the aim is the mask on 33–50% of objectives with the talisman. The triggers are Fextralife's Hemorrhage weapons and shields, and the Ashes of War among its skills; unique skills come with their weapon. The three Dancer's weapons that bleed are left out, so the talisman doesn't take a slot from the moveset talismans (#17. Dancer's weapons).
 
-Rows: `bleed_weapon_rh_boosts_blood_exultation`, `bleed_weapon_lh_boosts_blood_exultation`, `bleed_ash_rh_boosts_blood_exultation`, `bleed_ash_lh_boosts_blood_exultation`, `blood_exultation_1_boosts_white_mask_sets`, `blood_exultation_2_boosts_white_mask_sets`
+Rows: `bleed_boosts_blood_exultation`, `blood_exultation_boosts_white_mask_sets`
 
 ### 28. No paired weapons in unpaired classes
 
@@ -248,13 +248,13 @@ Rows: `grafted_dragon_only_on_jester`
 
 P1. `Overloaded` and `Heavy rolling` need equip load, and the 9 light sets keep slots empty; armor rolls after the rules.
 
-Rows: `overloaded_rule_1_removes_light_sets`, `overloaded_rule_2_removes_light_sets`, `heavy_rolling_rule_1_removes_light_sets`, `heavy_rolling_rule_2_removes_light_sets`
+Rows: `overloaded_rule_removes_light_sets`, `heavy_rolling_rule_removes_light_sets`
 
 ### 31. No armor rolls the Naked Set
 
 P1. The card then shows what the rule asks, so it needs no "rules take precedence" banner; armor rolls after the rules.
 
-Rows: `no_armor_rule_1_makes_naked_set_top`, `no_armor_rule_2_makes_naked_set_top`
+Rows: `no_armor_rule_makes_naked_set_top`
 
 ### 32. A second catalyst for casters
 

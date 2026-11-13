@@ -1,4 +1,4 @@
-import type { Condition, Modifier, PoolSlot, Selector } from "./database";
+import type { Condition, Modifier, PoolSlot, RolledCondition, Selector } from "./database";
 import { poolKey, type EngineData } from "./engineData";
 import { matchesOption, type Option } from "./selectors";
 
@@ -31,17 +31,25 @@ function bossMatches(selector: Selector, boss: string): boolean {
   return selector.kind === "boss" && (selector.ids === null || selector.ids.includes(boss));
 }
 
-/** A condition on a slot not rolled yet is inactive, whether it says "matches" or "does not". */
-function conditionHolds(data: EngineData, state: RollState, condition: Condition): boolean {
-  if (condition.kind === "character_class") return condition.ids.includes(state.characterClass);
-
-  if (condition.slot === "boss") {
+/** A slot not rolled yet is inactive, whether the condition says "matches" or "does not". */
+function holdsOn(
+  data: EngineData,
+  state: RollState,
+  condition: RolledCondition,
+  slot: PoolSlot | "boss",
+): boolean {
+  if (slot === "boss") {
     if (state.boss === null) return false;
     return bossMatches(condition.selector, state.boss) !== condition.negated;
   }
-  const option = rolledOption(data, state, condition.slot);
+  const option = rolledOption(data, state, slot);
   if (option === "not_rolled") return false;
   return matchesOption(condition.selector, option) !== condition.negated;
+}
+
+function conditionHolds(data: EngineData, state: RollState, condition: Condition): boolean {
+  if (condition.kind === "character_class") return condition.ids.includes(state.characterClass);
+  return condition.slots.some((slot) => holdsOn(data, state, condition, slot));
 }
 
 export function activeModifiers(data: EngineData, state: RollState): readonly Modifier[] {
