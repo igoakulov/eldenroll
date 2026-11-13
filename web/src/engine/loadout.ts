@@ -11,6 +11,7 @@ import {
   type Random,
   type Repetition,
   type RollContext,
+  type RollObserver,
   type SlotRoll,
 } from "./slotRoll";
 import { lhStatFilter, plainStatFilter, rhStatFilter, type StatLimits } from "./stats";
@@ -46,6 +47,7 @@ export interface LoadoutInput {
   readonly kept?: Readonly<Partial<Record<LoadoutSlot, string | null>>>;
   /** The reroll target's current result, left out unless it's the only option. */
   readonly exclude?: string | null;
+  readonly observe?: RollObserver;
 }
 
 /** Holds a roll for each slot rolled, in rolling order. */
@@ -189,6 +191,7 @@ export function rollLoadout(input: LoadoutInput): Loadout {
       shortlisted ?? rollExcluding(context, slot, filtersFor(slot, context, limits), exclude, random);
     if (slot !== "armor") rolled.set(slot, roll.chosen?.option.row.id ?? null);
     loadout.set(slot, roll);
+    input.observe?.(slot, roll);
   }
   return loadout;
 }

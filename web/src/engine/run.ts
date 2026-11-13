@@ -14,7 +14,7 @@ import {
   type Settings,
   type Stats,
 } from "./settings";
-import { repeatKey, repetitionMultiplier, type Random } from "./slotRoll";
+import { repeatKey, repetitionMultiplier, type Random, type RollObserver } from "./slotRoll";
 import {
   characterClassRepeatLine,
   pickTrace,
@@ -26,6 +26,7 @@ import {
 export interface Engine {
   readonly data: EngineData;
   readonly hyperparams: Hyperparams;
+  readonly observe?: RollObserver;
 }
 
 export interface DeadBoss {
@@ -212,6 +213,7 @@ function rollSlots(
     from,
     kept,
     exclude,
+    ...(engine.observe === undefined ? {} : { observe: engine.observe }),
   });
   const start = LOADOUT_ORDER.indexOf(from);
   const slots: Partial<Record<LoadoutSlot, string | null>> = {};

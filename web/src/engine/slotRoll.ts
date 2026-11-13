@@ -60,7 +60,12 @@ export interface SlotRoll {
   readonly probability: number;
   /** Rolled from the `Weapon shortlist` rather than the usual pool. */
   readonly fromShortlist: boolean;
+  /** The pool it was drawn from, so the simulation can read every option's chance. */
+  readonly options: readonly WeightedOption[];
 }
+
+/** Sees every slot roll, discarded ones included; the simulation's only way in. */
+export type RollObserver = (slot: LoadoutSlot, roll: SlotRoll) => void;
 
 export interface Repetition {
   /** How many completed objectives showed each `repeatKey` this run. */
@@ -173,7 +178,13 @@ export function sample(result: SlotPoolResult, random: Random): SlotRoll {
     result.options.map((row) => ({ value: row, weight: row.weight })),
     random,
   );
-  const shared = { total: result.total, pool: result.pool, removed: result.removed, fromShortlist: false };
+  const shared = {
+    total: result.total,
+    pool: result.pool,
+    removed: result.removed,
+    fromShortlist: false,
+    options: result.options,
+  };
   return picked === null
     ? { ...shared, chosen: null, probability: 0 }
     : { ...shared, chosen: picked.value, probability: picked.weight / total };

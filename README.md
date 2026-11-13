@@ -14,7 +14,7 @@ Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai N
 |---|---|
 | `data/` | the database: sources, overrides, the reasons behind its balance, and the built `db.json` |
 | `pipeline/` | the Python build that makes `db.json` |
-| `web/` | the app; `web/src/engine/` holds the rules of a run |
+| `web/` | the app; `web/src/engine/` holds the rules of a run, `web/sim/` plays whole runs to tune the odds |
 | `design/` | the icon generator |
 
 ## Getting started
