@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 
 import { copy } from "../copy";
 import "./Stepper.css";
 
-/** A number field between `−` and `+`, its label over an optional detail. `correct` turns what was typed into an
+/** A number field between `−` and `+`, its label over an optional detail, wide enough for `max`'s digits. `correct` turns what was typed into an
  * accepted value. `raised` shows the value in blue, above where it was. */
 export function Stepper({
   id,
@@ -48,6 +48,7 @@ export function Stepper({
         <input
           id={id}
           className={raised ? "raised" : undefined}
+          style={{ "--digits": String(max).length } as CSSProperties}
           inputMode="numeric"
           value={draft ?? String(value)}
           onChange={(event) => setDraft(event.target.value)}

@@ -41,3 +41,26 @@
 .chips-instant .chip {
   transition: none;
 }
+
+.chip-button-item {
+  flex: none;
+}
+
+.chip-button {
+  position: relative;
+  background: none;
+}
+
+/* A 44px touch area on a chip a line tall */
+.chip-button::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--space-3)) 0;
+}
+
+@media (hover: hover) {
+  .chip-button:not(.chip-lit):hover {
+    border-color: var(--frame-lit);
+    color: var(--text-2);
+  }
+}

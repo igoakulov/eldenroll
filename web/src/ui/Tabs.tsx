@@ -12,12 +12,15 @@ export function Tabs({
   selected,
   onSelect,
   panels,
+  bar,
 }: {
   readonly label: string;
   readonly tabs: readonly string[];
   readonly selected: number;
   readonly onSelect: (index: number) => void;
   readonly panels: readonly ReactNode[];
+  /** Wraps the tab row, such as in a sticky header with more controls; the panels stay where they are. */
+  readonly bar?: (tabs: ReactNode) => ReactNode;
 }) {
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -37,35 +40,38 @@ export function Tabs({
     buttons.current[next]?.focus();
   };
 
+  const row = (
+    <div
+      className="tabs"
+      role="tablist"
+      aria-label={label}
+      style={{ "--tabs": tabs.length, "--tab": selected } as CSSProperties}
+      onKeyDown={onKeyDown}
+    >
+      {tabs.map((tab, index) => (
+        <button
+          key={tab}
+          ref={(element) => {
+            buttons.current[index] = element;
+          }}
+          type="button"
+          className="tab"
+          role="tab"
+          id={`${id}-tab-${index}`}
+          aria-selected={index === selected}
+          aria-controls={`${id}-panel-${index}`}
+          tabIndex={index === selected ? 0 : -1}
+          onClick={() => onSelect(index)}
+        >
+          {tab}
+        </button>
+      ))}
+      <span className="tabs-underline" aria-hidden="true" />
+    </div>
+  );
   return (
     <>
-      <div
-        className="tabs"
-        role="tablist"
-        aria-label={label}
-        style={{ "--tabs": tabs.length, "--tab": selected } as CSSProperties}
-        onKeyDown={onKeyDown}
-      >
-        {tabs.map((tab, index) => (
-          <button
-            key={tab}
-            ref={(element) => {
-              buttons.current[index] = element;
-            }}
-            type="button"
-            className="tab"
-            role="tab"
-            id={`${id}-tab-${index}`}
-            aria-selected={index === selected}
-            aria-controls={`${id}-panel-${index}`}
-            tabIndex={index === selected ? 0 : -1}
-            onClick={() => onSelect(index)}
-          >
-            {tab}
-          </button>
-        ))}
-        <span className="tabs-underline" aria-hidden="true" />
-      </div>
+      {bar === undefined ? row : bar(row)}
       <div className="tab-panels">
         {tabs.map((tab, index) => (
           <div

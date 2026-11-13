@@ -36,3 +36,27 @@ export function Chip({ lit, red = false, at = 0, children }: {
     </li>
   );
 }
+
+/** A chip that toggles, for picking several of a few things, such as classes: lit while picked. */
+export function ChipButton({
+  pressed,
+  onToggle,
+  children,
+}: {
+  readonly pressed: boolean;
+  readonly onToggle: (pressed: boolean) => void;
+  readonly children: ReactNode;
+}) {
+  return (
+    <li className="chip-button-item">
+      <button
+        type="button"
+        className={`chip chip-button${pressed ? " chip-lit" : ""}`}
+        aria-pressed={pressed}
+        onClick={() => onToggle(!pressed)}
+      >
+        {children}
+      </button>
+    </li>
+  );
+}

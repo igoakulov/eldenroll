@@ -6,7 +6,7 @@ import { Stepper } from "../ui/Stepper";
 
 export const STAT_NAMES: Readonly<Record<Stat, string>> = copy.statsAndRegions.stats;
 
-const DLC_PREFIX = "DLC: ";
+export const DLC_PREFIX = "DLC: ";
 
 /** The 8 stats on Start and `Level up`. Given `before`, a stat above it shows raised. */
 export function StatSteppers({

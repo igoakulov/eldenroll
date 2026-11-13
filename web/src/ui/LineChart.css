@@ -1,0 +1,98 @@
+.line-chart {
+  margin: 0;
+  min-width: 0;
+}
+
+.line-chart-title {
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--gold-mute);
+}
+
+.line-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: var(--space-2);
+  touch-action: pan-y;
+}
+
+.line-chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.line-chart-axis {
+  fill: var(--text-3);
+  font-size: var(--type-caps);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.line-chart-line {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.line-chart-baseline {
+  fill: none;
+  stroke: var(--bronze);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+  stroke-linejoin: round;
+}
+
+.line-chart-mark {
+  fill: var(--grace);
+  stroke: var(--ground);
+  stroke-width: 1;
+}
+
+.line-chart-rule {
+  stroke: var(--frame-lit);
+  stroke-width: 1;
+}
+
+.line-chart-dot {
+  fill: var(--grace);
+  stroke: var(--ground);
+  stroke-width: 2;
+}
+
+/* The last point's values until a pointer picks another, so the charts below never move */
+.line-chart-readout {
+  margin-top: var(--space-2);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.line-chart-readout-title {
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--gold-mute);
+}
+
+.line-chart-readout dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-2) 0 0;
+}
+
+.line-chart-readout dt {
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--text-3);
+}
+
+.line-chart-readout dd {
+  margin: 0;
+  font-size: var(--type-body);
+  line-height: var(--leading-tight);
+  color: var(--text);
+}

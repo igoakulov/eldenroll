@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 import { copy } from "../copy";
-import { KitPad, type KitBlock } from "../kit/kit";
+import { KitPad, type KitBlock, type KitProps } from "../kit/kit";
 import { OPENING_STOP, REROLL_STOPS } from "../views/rerollScope";
-import { Chip, Chips } from "./Chips";
+import { Chip, ChipButton, Chips } from "./Chips";
 import { StopSlider, glideAt } from "./StopSlider";
 
 function LiveChips() {
@@ -67,4 +67,54 @@ export const kit: readonly KitBlock[] = [
     liveSize: "phone",
     note: "The live chips light as the slider's handle passes them, as on the reroll panel.",
   },
+  {
+    id: "chip-button",
+    title: "Chip that toggles",
+    section: "simulation",
+    size: "small",
+    states: [
+      {
+        label: "picked",
+        render: ({ samples }) => (
+          <Chips label="picked">
+            <ChipButton pressed onToggle={() => {}}>
+              {samples.characterClass.name}
+            </ChipButton>
+          </Chips>
+        ),
+      },
+      {
+        label: "not picked",
+        render: ({ samples }) => (
+          <Chips label="not picked">
+            <ChipButton pressed={false} onToggle={() => {}}>
+              {samples.characterClass.name}
+            </ChipButton>
+          </Chips>
+        ),
+      },
+    ],
+    Live: LiveChipButtons,
+    liveSize: "phone",
+    note: "On desktop, hover brightens a chip that isn't picked.",
+  },
 ];
+
+function LiveChipButtons({ kit }: KitProps) {
+  const [picked, setPicked] = useState<readonly string[]>(kit.database.character_class.map((row) => row.id));
+  return (
+    <KitPad>
+      <Chips label="Classes">
+        {kit.database.character_class.map((row) => (
+          <ChipButton
+            key={row.id}
+            pressed={picked.includes(row.id)}
+            onToggle={(on) => setPicked((last) => (on ? [...last, row.id] : last.filter((id) => id !== row.id)))}
+          >
+            {row.name}
+          </ChipButton>
+        ))}
+      </Chips>
+    </KitPad>
+  );
+}

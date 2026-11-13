@@ -4,8 +4,8 @@ import type { RolledSlots } from "../src/engine/display";
 import type { EngineData } from "../src/engine/engineData";
 import { MAX_STAT, type Stat, type Stats } from "../src/engine/settings";
 
-export const SCENARIOS = ["ITEMS", "STR", "DEX", "INT", "FTH", "ARC", "ALL"] as const;
-export type Scenario = (typeof SCENARIOS)[number];
+export const ALLOCATIONS = ["ITEMS", "STR", "DEX", "INT", "FTH", "ARC", "ALL"] as const;
+export type Allocation = (typeof ALLOCATIONS)[number];
 
 const ITEM_STATS = ["str", "dex", "int", "fth", "arc"] as const satisfies readonly Stat[];
 type ItemStat = (typeof ITEM_STATS)[number];
@@ -32,7 +32,7 @@ interface BuildStep {
   readonly aside?: { readonly every: number; readonly stats: readonly ItemStat[] };
 }
 
-const BUILDS: Readonly<Record<Exclude<Scenario, "ITEMS">, readonly BuildStep[]>> = {
+const BUILDS: Readonly<Record<Exclude<Allocation, "ITEMS">, readonly BuildStep[]>> = {
   STR: [
     { targets: { str: 54 } },
     { targets: { dex: 20 } },
@@ -52,7 +52,7 @@ const BUILDS: Readonly<Record<Exclude<Scenario, "ITEMS">, readonly BuildStep[]>>
 };
 
 export interface PlayerState {
-  readonly scenario: Scenario;
+  readonly allocation: Allocation;
   stats: Record<Stat, number>;
   /** ITEMS keeps unspent levels until a rolled item needs them. */
   bank: number;
@@ -62,8 +62,8 @@ export interface PlayerState {
   asideCount: number;
 }
 
-export function newPlayer(scenario: Scenario, stats: Stats): PlayerState {
-  return { scenario, stats: { ...stats }, bank: 0, window: -1, windowRate: 0, windowCredit: 0, asideCount: 0 };
+export function newPlayer(allocation: Allocation, stats: Stats): PlayerState {
+  return { allocation, stats: { ...stats }, bank: 0, window: -1, windowRate: 0, windowCredit: 0, asideCount: 0 };
 }
 
 /** Which region each boss belongs to, to know when a region is half felled and to count how many
@@ -89,6 +89,9 @@ export function bossesByRegion(database: Database): ReadonlyMap<string, number> 
 export interface Progress {
   /** The run's regions in opening order. */
   readonly order: readonly string[];
+  /** Every region's place in a run with every region, so a window still ends when the run leaves out the
+   * region that ends it. */
+  readonly rank: ReadonlyMap<string, number>;
   /** How many are open. */
   readonly open: number;
   /** Objectives completed, this one included. */
@@ -96,15 +99,19 @@ export interface Progress {
   readonly bosses: ReadonlyMap<string, number>;
 }
 
+function rankOf(progress: Progress, region: string | null): number {
+  return region === null ? Infinity : (progress.rank.get(region) ?? Infinity);
+}
+
 function levelsBefore(progress: Progress, until: string | null): number {
-  const end = until === null ? progress.order.length : progress.order.indexOf(until);
-  const regions = progress.order.slice(0, end === -1 ? progress.order.length : end);
+  const end = rankOf(progress, until);
+  const regions = progress.order.filter((region) => rankOf(progress, region) < end);
   return regions.reduce((sum, region) => sum + (progress.bosses.get(region) ?? 0), 0);
 }
 
 function windowIndex(progress: Progress): number {
-  const opened = new Set(progress.order.slice(0, progress.open));
-  const index = BASE_WINDOWS.findIndex((window) => window.until === null || !opened.has(window.until));
+  const reached = Math.max(...progress.order.slice(0, progress.open).map((region) => rankOf(progress, region)));
+  const index = BASE_WINDOWS.findIndex((window) => window.until === null || reached < rankOf(progress, window.until));
   return index === -1 ? BASE_WINDOWS.length - 1 : index;
 }
 
@@ -151,8 +158,8 @@ function lowestItemStat(player: PlayerState): ItemStat | null {
   return best;
 }
 
-function buildPoint(player: PlayerState, scenario: Exclude<Scenario, "ITEMS">): ItemStat | null {
-  for (const step of BUILDS[scenario]) {
+function buildPoint(player: PlayerState, allocation: Exclude<Allocation, "ITEMS">): ItemStat | null {
+  for (const step of BUILDS[allocation]) {
     const open = (Object.entries(step.targets) as [ItemStat, number][]).filter(
       ([stat, target]) => player.stats[stat] < target,
     );
@@ -178,11 +185,11 @@ function raise(player: PlayerState, stat: Stat): void {
 export function levelUp(player: PlayerState, progress: Progress): void {
   const base = takesBasePoint(player, progress);
   if (base !== null) return raise(player, base);
-  if (player.scenario === "ITEMS") {
+  if (player.allocation === "ITEMS") {
     player.bank += 1;
     return;
   }
-  const stat = buildPoint(player, player.scenario);
+  const stat = buildPoint(player, player.allocation);
   if (stat !== null) raise(player, stat);
 }
 

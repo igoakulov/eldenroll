@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode }
 import type { Database } from "../engine/database";
 import { loadDatabase } from "../loadDatabase";
 import { WordmarkO } from "../ui/Icon";
+import { useHideOnScroll } from "../ui/useHideOnScroll";
 import { Blocks, MissingEntries } from "./Blocks";
 import { KitFrame } from "./kit";
 import { kitData, type KitData } from "./kitData";
@@ -18,6 +19,7 @@ const SECTIONS = [
   { id: "groups", title: "Groups" },
   { id: "sequences", title: "Sequences" },
   { id: "views", title: "Views" },
+  { id: "simulation", title: "Simulation page" },
 ] as const;
 
 type Loaded =
@@ -110,6 +112,13 @@ function Sections({ kit }: { readonly kit: KitData }) {
         <h2 className="kit-section-title">Views</h2>
         <Views views={views} sheets={false} />
       </section>
+      <section id="simulation" className="kit-section">
+        <h2 className="kit-section-title">Simulation page</h2>
+        <p className="kit-note">
+          Only the simulation page at <a href="/simulate/">/simulate/</a> uses these; the app never shows them.
+        </p>
+        <Blocks kit={kit} section="simulation" />
+      </section>
     </>
   );
 }
@@ -185,32 +194,8 @@ export function KitPage() {
   );
 }
 
-/** Sticks to the top, hides while the page scrolls down and comes back as soon as it scrolls up, so the
- * contents are a short scroll away on a long page. A jump to a section keeps it hidden, so it never covers the
- * heading it landed on. */
+/** Sticks to the top and hides while the page scrolls down (`useHideOnScroll`). */
 function KitHeader({ children }: { readonly children: ReactNode }) {
-  const [hidden, setHidden] = useState(false);
-  const last = useRef(0);
-  const jumping = useRef(false);
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (jumping.current) {
-        jumping.current = false;
-        setHidden(y > 0);
-      } else if (y <= 0) setHidden(false);
-      else if (Math.abs(y - last.current) > 4) setHidden(y > last.current);
-      last.current = y;
-    };
-    const onClick = (event: MouseEvent) => {
-      if (event.target instanceof Element && event.target.closest('a[href^="#"]') !== null) jumping.current = true;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    document.addEventListener("click", onClick);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("click", onClick);
-    };
-  }, []);
+  const hidden = useHideOnScroll();
   return <header className={`kit-header${hidden ? " kit-header-hidden" : ""}`}>{children}</header>;
 }

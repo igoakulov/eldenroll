@@ -26,13 +26,14 @@ export function FramedRow({
 
 /** A list row: a name over an optional detail, a value at the right, and a chevron when it opens something. `cut`
  * keeps a long name to one line. `danger` is an action that cannot be undone: red, and no chevron, since it asks
- * first rather than opening a screen. */
+ * first rather than opening a screen. `verdict` colours the value: gold for a pass, red for a fail. */
 export function ListRow({
   title,
   detail,
   value,
   cut = false,
   danger = false,
+  verdict,
   onClick,
 }: {
   readonly title: ReactNode;
@@ -40,6 +41,7 @@ export function ListRow({
   readonly value?: ReactNode;
   readonly cut?: boolean;
   readonly danger?: boolean;
+  readonly verdict?: "pass" | "fail";
   readonly onClick?: () => void;
 }) {
   const className = `list-row${cut ? " list-row-cut" : ""}${danger ? " list-row-danger" : ""}`;
@@ -49,7 +51,9 @@ export function ListRow({
         <span className="row-title">{title}</span>
         {detail !== undefined && <span className="row-detail">{detail}</span>}
       </span>
-      {value !== undefined && <span className="list-row-value">{value}</span>}
+      {value !== undefined && (
+        <span className={`list-row-value${verdict === undefined ? "" : ` list-row-${verdict}`}`}>{value}</span>
+      )}
       {onClick !== undefined && !danger && <Icon name="chevron" size={20} />}
     </>
   );

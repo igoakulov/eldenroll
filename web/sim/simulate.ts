@@ -1,5 +1,5 @@
 // One full run from `Start run` until every boss is felled (web/sim/README.md#A run)
-import type { LoadoutSlot } from "../src/engine/database";
+import type { Database, LoadoutSlot } from "../src/engine/database";
 import type { RolledSlots } from "../src/engine/display";
 import { done, editRun, reroll, rollNext, startRun, type Engine, type Run } from "../src/engine/run";
 import { DEFAULT_STATS, defaultSettings, derivedLevel, type Stats } from "../src/engine/settings";
@@ -12,16 +12,43 @@ import {
   meetRequirements,
   newPlayer,
   requirements,
-  type Scenario,
+  ALLOCATIONS,
+  type Allocation,
 } from "./player";
 
 export interface SimOptions {
-  readonly scenario: Scenario;
+  readonly allocation: Allocation;
   readonly seed: number;
-  readonly dlc: boolean;
+  /** The regions the run may open, in any order; null for every region. */
+  readonly regions: readonly string[] | null;
+  /** The percentage of a region's bosses felled, rounding up, before the next one opens. */
+  readonly completion: number;
   readonly characterClasses: readonly string[] | null;
   /** A full-objective reroll on every n-th objective; 0 never rerolls. */
   readonly rerollEvery: number;
+  /** Where to add every option's chance at roll time, for the page's item charts; left out by the dump. */
+  readonly chances?: ChanceSums;
+}
+
+/** Objectives per stretch in `ChanceSums` and the page's charts. */
+export const BUCKET = 20;
+
+/** Slots whose options' chances are summed: the second talisman and combat rule slots leave out what the first
+ * rolled, so they run close to the first and are left out. */
+export const CHANCE_SLOTS: readonly LoadoutSlot[] = ["rh", "rh_ash", "lh", "lh_ash", "spell", "item", "talisman_1", "rule_1", "armor"];
+
+/** Every option's chance at roll time, with decay and with every decay removed, summed over the kept rolls of one
+ * class and slot in one stretch of `BUCKET` objectives, across runs: `chanceKey` to sums. An alias counts once per
+ * roll, its members' chances added. */
+export type ChanceSums = Map<string, { chance: number; plain: number; rolls: number }>;
+
+export function chanceKey(characterClass: string, slot: LoadoutSlot, key: string, stretch: number): string {
+  return `${characterClass}|${slot}|${key}|${stretch}`;
+}
+
+/** The stretch an objective falls in, by its first objective number. */
+export function stretchOf(objective: number): number {
+  return Math.floor((objective - 1) / BUCKET) * BUCKET + 1;
 }
 
 /** A boost this large or more is a guarantee (`data/balance.md#Tiers`). */
@@ -43,6 +70,8 @@ export interface RollRow {
   readonly chanceNoDecay: number;
   /** The decay multiplier on the chosen option. */
   readonly decay: number;
+  /** The lateness and stat-requirement boost on the chosen option, without decay. */
+  readonly late: number;
   readonly pool: number;
   readonly noneChance: number | null;
   readonly noneChanceNoDecay: number | null;
@@ -77,17 +106,12 @@ export interface RunResult {
   readonly rolls: RollRow[];
   readonly objectives: ObjectiveRow[];
   readonly finalStats: Stats;
-  /** Every option key any pool offered, to tell "never rolled" from "never in reach". */
-  readonly offered: Set<string>;
+  /** Every option key any pool offered, by class, to tell "never rolled" from "never in reach". */
+  readonly offered: Map<string, Set<string>>;
 }
 
 function boostOf(row: WeightedOption): number {
   return row.modifiers.reduce((product, modifier) => product * modifier.value, 1);
-}
-
-function decayOf(row: WeightedOption): number {
-  const plain = row.option.row.odds * boostOf(row);
-  return plain > 0 ? row.weight / plain : 1;
 }
 
 interface Observed {
@@ -95,24 +119,32 @@ interface Observed {
   readonly roll: SlotRoll;
 }
 
-function describe(observed: Observed, offered: Set<string>) {
+function describe(observed: Observed, offered: Set<string>, sum?: (key: string, chance: number, plain: number) => void) {
   const { roll } = observed;
   const options = roll.options;
   const total = options.reduce((sum, row) => sum + row.weight, 0);
-  const plain = options.map((row) => row.option.row.odds * boostOf(row));
+  const plain = options.map((row) => row.option.row.odds * row.late * boostOf(row));
   const plainTotal = plain.reduce((sum, value) => sum + value, 0);
   let drift = 0;
   let none: { chance: number; plain: number; decay: number } | null = null;
   let guaranteed = 0;
   let hasGuaranteed = false;
   const boostChance = new Map<string, number>();
+  const byKey = new Map<string, { chance: number; plain: number }>();
   options.forEach((row, index) => {
-    offered.add(repeatKey(row.option));
+    const key = repeatKey(row.option);
+    offered.add(key);
     const chance = row.weight / total;
     const chancePlain = plain[index]! / plainTotal;
+    if (sum !== undefined) {
+      const sums = byKey.get(key) ?? { chance: 0, plain: 0 };
+      sums.chance += chance;
+      sums.plain += chancePlain;
+      byKey.set(key, sums);
+    }
     drift += Math.abs(chance - chancePlain) / 2;
     if (row.option.kind !== "armor_set" && row.option.row.id === "none") {
-      none = { chance, plain: chancePlain, decay: decayOf(row) };
+      none = { chance, plain: chancePlain, decay: row.decay };
     }
     if (boostOf(row) >= GUARANTEE) {
       hasGuaranteed = true;
@@ -122,6 +154,7 @@ function describe(observed: Observed, offered: Set<string>) {
       if (modifier.value > 1) boostChance.set(modifier.id, (boostChance.get(modifier.id) ?? 0) + chance);
     }
   });
+  for (const [key, sums] of byKey) sum?.(key, sums.chance, sums.plain);
   const chosen = roll.chosen;
   const chosenIndex = chosen === null ? -1 : options.indexOf(chosen);
   const noneRow = none as { chance: number; plain: number; decay: number } | null;
@@ -130,7 +163,8 @@ function describe(observed: Observed, offered: Set<string>) {
     chosenKey: chosen === null ? null : repeatKey(chosen.option),
     chance: roll.probability,
     chanceNoDecay: chosenIndex === -1 ? 0 : plain[chosenIndex]! / plainTotal,
-    decay: chosen === null ? 1 : decayOf(chosen),
+    decay: chosen?.decay ?? 1,
+    late: chosen?.late ?? 1,
     pool: roll.pool,
     noneChance: noneRow?.chance ?? null,
     noneChanceNoDecay: noneRow?.plain ?? null,
@@ -156,23 +190,34 @@ const DLC_ORDER: Readonly<Record<string, number>> = {
   dlc_enirilim: 132,
 };
 
+/** One run's seed among several. Seeds differ by allocation too: with shared seeds every allocation rolls the same
+ * bosses, classes and rules. */
+export function runSeed(seed: number, allocation: Allocation, run: number): number {
+  return (Math.imul(seed, 2654435761) + Math.imul(ALLOCATIONS.indexOf(allocation), 97_003) + run * 40503) | 0;
+}
+
+/** Every region in the order a run opens them. */
+export function playOrder(database: Database): readonly string[] {
+  return [...database.region]
+    .sort((a, b) => (DLC_ORDER[a.id] ?? a.region_level) - (DLC_ORDER[b.id] ?? b.region_level))
+    .map((row) => row.id);
+}
+
 export function simulateRun(base: Engine, options: SimOptions): RunResult {
   const observed: Observed[] = [];
   const engine: Engine = { ...base, observe: (slot, roll) => observed.push({ slot, roll }) };
   const database = engine.data.database;
-  const order = [...database.region]
-    .filter((row) => options.dlc || !row.name.startsWith("DLC: "))
-    .sort((a, b) => (DLC_ORDER[a.id] ?? a.region_level) - (DLC_ORDER[b.id] ?? b.region_level))
-    .map((row) => row.id);
+  const order = playOrder(database).filter((id) => options.regions === null || options.regions.includes(id));
+  const rank = new Map(playOrder(database).map((id, index) => [id, index]));
   const bosses = bossesByRegion(database);
   const regionOfBoss = bossRegions(database);
   const settings = {
     ...defaultSettings(database, engine.hyperparams),
-    ...(options.scenario === "ITEMS" ? { maxStatGap: ITEMS_MAX_STAT_GAP } : {}),
+    ...(options.allocation === "ITEMS" ? { maxStatGap: ITEMS_MAX_STAT_GAP } : {}),
     ...(options.characterClasses === null ? {} : { characterClasses: options.characterClasses }),
   };
-  const player = newPlayer(options.scenario, DEFAULT_STATS);
-  const result: RunResult = { options, rolls: [], objectives: [], finalStats: DEFAULT_STATS, offered: new Set() };
+  const player = newPlayer(options.allocation, DEFAULT_STATS);
+  const result: RunResult = { options, rolls: [], objectives: [], finalStats: DEFAULT_STATS, offered: new Map() };
 
   let open = 1;
   const started = startRun(
@@ -200,6 +245,8 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
       characterClass: objective.characterClass,
       slots: objective.slots,
     });
+    const offered = result.offered.get(objective.characterClass) ?? new Set<string>();
+    result.offered.set(objective.characterClass, offered);
     for (const one of rolls) {
       result.rolls.push({
         objective: objectiveNumber,
@@ -209,7 +256,20 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
         characterClass: objective.characterClass,
         boss: objective.boss,
         slot: one.slot,
-        ...describe(one, result.offered),
+        ...describe(
+          one,
+          offered,
+          kept && options.chances !== undefined && CHANCE_SLOTS.includes(one.slot)
+            ? (key, chance, plain) => {
+                const at = chanceKey(objective.characterClass, one.slot, key, stretchOf(objectiveNumber));
+                const sums = options.chances!.get(at) ?? { chance: 0, plain: 0, rolls: 0 };
+                sums.chance += chance;
+                sums.plain += plain;
+                sums.rolls += 1;
+                options.chances!.set(at, sums);
+              }
+            : undefined,
+        ),
       });
     }
   };
@@ -233,21 +293,23 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
       if (run.current === null) continue;
     }
     record(run, true, rolled);
-    if (options.scenario === "ITEMS") {
+    if (options.allocation === "ITEMS") {
       meetRequirements(player, requirements(engine.data, run.current.slots));
     }
-    run = done(engine, run);
-    // Nobody clears a region before moving on: the next one opens once this one is half felled,
-    // rounding up, rather than waiting for its last boss (web/sim/README.md#A run).
+    // Nobody clears a region before moving on: the next one opens once `completion` of it is felled,
+    // rounding up, rather than waiting for its last boss (web/sim/README.md#A run). This boss counts as
+    // felled already: opened after `done`, a region's last boss would finish the run first.
+    const felled = [...run.deadBosses.map((row) => row.instanceId), run.current.boss];
     while (open < order.length) {
       const region = order[open - 1]!;
       const total = bosses.get(region) ?? 0;
-      const dead = run.deadBosses.filter((row) => regionOfBoss.get(row.instanceId) === region).length;
-      if (total === 0 || dead * 2 < total) break;
+      const dead = felled.filter((id) => regionOfBoss.get(id) === region).length;
+      if (total === 0 || dead * 100 < total * options.completion) break;
       open += 1;
       run = editRun(run, { regions: order.slice(0, open) });
     }
-    levelUp(player, { order, open, completed: run.completed.length, bosses });
+    run = done(engine, run);
+    levelUp(player, { order, rank, open, completed: run.completed.length, bosses });
     run = editRun(run, { stats: { ...player.stats } });
   }
   return { ...result, finalStats: { ...player.stats } };

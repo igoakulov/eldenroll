@@ -28,8 +28,16 @@ export interface EngineData {
   readonly decayGroupSize: ReadonlyMap<string, number>;
   /** Every item's `lateness` (how late its earliest region is) and `demand` (how far its stat
    * requirements reach), both 0 to 1, for `lateBoost` (`data/balance.md#Hyperparameters`). An item
-   * with no location row, or no stat requirement, sits at 0 on that axis. */
-  readonly lateOffset: ReadonlyMap<string, { readonly lateness: number; readonly demand: number }>;
+   * with no location row, or no stat requirement, sits at 0 on that axis. `region` is the region that sets its
+   * lateness, null for an item with no location row; `statTotal` the total `demand` is read from. */
+  readonly lateOffset: ReadonlyMap<string, LateOffset>;
+}
+
+export interface LateOffset {
+  readonly lateness: number;
+  readonly demand: number;
+  readonly region: string | null;
+  readonly statTotal: number;
 }
 
 export function poolKey(characterClass: string, slot: PoolSlot): string {
@@ -50,31 +58,30 @@ function decayGroups(database: Database): ReadonlyMap<string, number> {
   return sizes;
 }
 
-function lateOffsets(database: Database): ReadonlyMap<string, { lateness: number; demand: number }> {
+function lateOffsets(database: Database): ReadonlyMap<string, LateOffset> {
   const regionLevel = new Map(database.region.map((row) => [row.id, row.region_level]));
   const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
   const bossLocation = new Map(database.boss_instance.map((row) => [row.id, row.location_id]));
-  const levelOfLocation = (locationId: string): number | undefined => {
-    const regionId = locationRegion.get(locationId);
-    return regionId === undefined ? undefined : regionLevel.get(regionId);
-  };
   const maxLevel = Math.max(1, ...database.region.map((row) => row.region_level));
-  const nativeLevel = new Map<string, number>();
+  const native = new Map<string, { level: number; region: string }>();
   for (const row of database.item_location) {
     const locationId = row.location_id ?? (row.boss_instance_id === null ? null : bossLocation.get(row.boss_instance_id));
-    const level = locationId === null || locationId === undefined ? undefined : levelOfLocation(locationId);
-    if (level === undefined) continue;
-    const current = nativeLevel.get(row.item_id);
-    if (current === undefined || level < current) nativeLevel.set(row.item_id, level);
+    const region = locationId === null || locationId === undefined ? undefined : locationRegion.get(locationId);
+    const level = region === undefined ? undefined : regionLevel.get(region);
+    if (region === undefined || level === undefined) continue;
+    const current = native.get(row.item_id);
+    if (current === undefined || level < current.level) native.set(row.item_id, { level, region });
   }
   const effectiveTotal = (row: Item): number => row.str / 1.5 + row.dex + row.int + row.fth + row.arc;
   const maxEffective = Math.max(1, ...database.item.map(effectiveTotal));
-  const offsets = new Map<string, { lateness: number; demand: number }>();
+  const offsets = new Map<string, LateOffset>();
   for (const row of database.item) {
-    const level = nativeLevel.get(row.id) ?? 1;
+    const found = native.get(row.id);
     offsets.set(row.id, {
-      lateness: (level - 1) / (maxLevel - 1 || 1),
+      lateness: ((found?.level ?? 1) - 1) / (maxLevel - 1 || 1),
       demand: effectiveTotal(row) / maxEffective,
+      region: found?.region ?? null,
+      statTotal: effectiveTotal(row),
     });
   }
   return offsets;

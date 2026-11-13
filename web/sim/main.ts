@@ -8,14 +8,14 @@ import { DEFAULT_HYPERPARAMS } from "../src/engine/hyperparams";
 import type { Engine } from "../src/engine/run";
 import { STATS } from "../src/engine/settings";
 import { LOADOUT_ORDER } from "../src/engine/loadout";
-import { SCENARIOS, type Scenario } from "./player";
-import { buildReport } from "./report";
-import { simulateRun, type RunResult } from "./simulate";
+import { ALLOCATIONS, type Allocation } from "./player";
+import { playOrder, runSeed, simulateRun, type RunResult } from "./simulate";
 
-const USAGE = `pnpm sim [--runs 20] [--scenarios ITEMS,STR,DEX,INT,FTH,ARC,ALL] [--seed 1] [--no-dlc]
-         [--classes knight,jester] [--reroll-every 3] [--out ../data/build/sim/<timestamp>]`;
+const USAGE = `pnpm sim [--runs 20] [--allocations ITEMS,STR,DEX,INT,FTH,ARC,ALL] [--seed 1] [--no-dlc]
+         [--regions limgrave,liurnia] [--completion 50] [--classes knight,jester] [--reroll-every 3]
+         [--out ../data/build/sim/<timestamp>]`;
 
-/** Each run writes its own folder, so an earlier report stays put while the next one is read. */
+/** Each run writes its own folder, so an earlier dump stays put while the next one is read. */
 function timestamp(): string {
   const now = new Date();
   const pad = (value: number) => String(value).padStart(2, "0");
@@ -36,9 +36,11 @@ export function main(argv: readonly string[], repo: string): void {
     args: [...argv],
     options: {
       runs: { type: "string", default: "20" },
-      scenarios: { type: "string", default: SCENARIOS.join(",") },
+      allocations: { type: "string", default: ALLOCATIONS.join(",") },
       seed: { type: "string", default: "1" },
       "no-dlc": { type: "boolean", default: false },
+      regions: { type: "string" },
+      completion: { type: "string", default: "50" },
       classes: { type: "string" },
       "reroll-every": { type: "string", default: "3" },
       out: { type: "string", default: path.join(repo, "data/build/sim", timestamp()) },
@@ -49,25 +51,33 @@ export function main(argv: readonly string[], repo: string): void {
     console.log(USAGE);
     return;
   }
-  const scenarios = values.scenarios.split(",").map((one) => one.trim().toUpperCase());
-  const unknown = scenarios.filter((one) => !(SCENARIOS as readonly string[]).includes(one));
-  if (unknown.length > 0) throw new Error(`Unknown scenario ${unknown.join(", ")}; use ${SCENARIOS.join(", ")}`);
+  const allocations = values.allocations.split(",").map((one) => one.trim().toUpperCase());
+  const unknown = allocations.filter((one) => !(ALLOCATIONS as readonly string[]).includes(one));
+  if (unknown.length > 0) throw new Error(`Unknown allocation ${unknown.join(", ")}; use ${ALLOCATIONS.join(", ")}`);
 
   const database = JSON.parse(readFileSync(path.join(repo, "data/build/db.json"), "utf8")) as Database;
   const engine: Engine = { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
+  const regions = (values.regions?.split(",").map((one) => one.trim()) ?? playOrder(database)).filter(
+    (id) => !values["no-dlc"] || !id.startsWith("dlc_"),
+  );
+  const unknownRegions = regions.filter((id) => !database.region.some((row) => row.id === id));
+  if (unknownRegions.length > 0) throw new Error(`Unknown region ${unknownRegions.join(", ")}`);
+  const completion = Number(values.completion);
+  if (!Number.isInteger(completion) || completion < 1 || completion > 100) {
+    throw new Error(`--completion takes a whole percentage from 1 to 100, not ${values.completion}`);
+  }
   const runs = Number(values.runs);
   const seed = Number(values.seed);
   const started = performance.now();
   const results: RunResult[] = [];
-  for (const scenario of scenarios as Scenario[]) {
+  for (const allocation of allocations as Allocation[]) {
     for (let run = 0; run < runs; run += 1) {
-      // Seeds differ by scenario too: with shared seeds every scenario rolls the same bosses, classes and rules
-      const runSeed = (Math.imul(seed, 2654435761) + Math.imul(SCENARIOS.indexOf(scenario), 97_003) + run * 40503) | 0;
       results.push(
         simulateRun(engine, {
-          scenario,
-          seed: runSeed,
-          dlc: !values["no-dlc"],
+          allocation,
+          seed: runSeed(seed, allocation, run),
+          regions,
+          completion,
           characterClasses: values.classes === undefined ? null : values.classes.split(","),
           rerollEvery: Number(values["reroll-every"]),
         }),
@@ -81,10 +91,10 @@ export function main(argv: readonly string[], repo: string): void {
   writeFileSync(
     path.join(out, "objectives.csv"),
     csv([
-      ["scenario", "run", "seed", "objective", "kept", "region", "regions_open", "level", ...STATS, "boss", "character_class", ...slots],
+      ["allocation", "run", "seed", "objective", "kept", "region", "regions_open", "level", ...STATS, "boss", "character_class", ...slots],
       ...results.flatMap((result, index) =>
         result.objectives.map((row) => [
-          result.options.scenario, index, result.options.seed, row.objective, row.kept, row.region, row.regionsOpen, row.level,
+          result.options.allocation, index, result.options.seed, row.objective, row.kept, row.region, row.regionsOpen, row.level,
           ...STATS.map((stat) => row.stats[stat]), row.boss, row.characterClass,
           ...slots.map((slot) => (row.slots[slot] === undefined ? "" : (row.slots[slot] ?? "(empty)"))),
         ]),
@@ -94,22 +104,17 @@ export function main(argv: readonly string[], repo: string): void {
   writeFileSync(
     path.join(out, "rolls.csv"),
     csv([
-      ["scenario", "run", "objective", "kept", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "chance_no_decay", "decay", "pool", "none_chance", "none_chance_no_decay", "none_decay", "guaranteed_chance", "guaranteed_won", "drift", "boosts", "boost_chances", "chosen_boosts"],
+      ["allocation", "run", "objective", "kept", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "chance_no_decay", "decay", "late", "pool", "none_chance", "none_chance_no_decay", "none_decay", "guaranteed_chance", "guaranteed_won", "drift", "boosts", "boost_chances", "chosen_boosts"],
       ...results.flatMap((result, index) =>
         result.rolls.map((row) => [
-          result.options.scenario, index, row.objective, row.kept, row.region, row.level, row.characterClass, row.boss, row.slot,
-          row.chosen ?? "(empty)", row.chosenKey, row.chance, row.chanceNoDecay, row.decay, row.pool, row.noneChance, row.noneChanceNoDecay,
+          result.options.allocation, index, row.objective, row.kept, row.region, row.level, row.characterClass, row.boss, row.slot,
+          row.chosen ?? "(empty)", row.chosenKey, row.chance, row.chanceNoDecay, row.decay, row.late, row.pool, row.noneChance, row.noneChanceNoDecay,
           row.noneDecay, row.guaranteedChance, row.guaranteedWon, row.drift, row.boosts.join(";"),
           row.boostChances.map((value) => value.toPrecision(4)).join(";"), row.chosenBoosts.join(";"),
         ]),
       ),
     ]),
   );
-  const header = [
-    `Arguments: ${argv.join(" ") || "(defaults)"}. ${runs} runs per scenario, seed ${seed}, DLC ${values["no-dlc"] ? "off" : "on"}, a full-objective reroll every ${values["reroll-every"]} objectives.`,
-    "",
-  ].join("\n");
-  writeFileSync(path.join(out, "report.md"), buildReport(engine.data, results).replace("\n\n", `\n\n${header}\n`));
   const seconds = ((performance.now() - started) / 1000).toFixed(1);
-  console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/report.md, rolls.csv, objectives.csv`);
+  console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/rolls.csv, objectives.csv`);
 }

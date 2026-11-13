@@ -40,6 +40,10 @@ export interface WeightedOption {
   readonly option: Option;
   readonly weight: number;
   readonly modifiers: readonly Modifier[];
+  /** The decay multiplier in `weight`: 1 for an option never shown. */
+  readonly decay: number;
+  /** The lateness and stat-requirement boost in `weight` (`lateBoost`): 1 for anything but an item. */
+  readonly late: number;
 }
 
 export interface SlotPoolResult {
@@ -178,9 +182,9 @@ export function weighOptions(
               context.data.lateOffset.get(option.row.id)?.demand ?? 0,
               lateOffset,
             );
-      const base = option.row.odds * repetitionMultiplier(repeatKey(option), repetition) * late;
-      const weight = modifiers.reduce((product, row) => product * row.value, base);
-      return { option, weight, modifiers };
+      const decay = repetitionMultiplier(repeatKey(option), repetition);
+      const weight = modifiers.reduce((product, row) => product * row.value, option.row.odds * decay * late);
+      return { option, weight, modifiers, decay, late };
     });
   const kept = weighted.filter((row) => row.weight > 0);
   const byModifier = new Map<string, number>();

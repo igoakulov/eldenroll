@@ -21,7 +21,8 @@ export interface KitBlock {
   /** The block's anchor, as in `/kit/#chip`. */
   readonly id: string;
   readonly title: string;
-  readonly section: "controls" | "groups";
+  /** `simulation`: built for the simulation page alone, which the app never shows. */
+  readonly section: "controls" | "groups" | "simulation";
   /** `phone` cells are a phone's width, for what spans the screen; `small` ones fit what they hold; `wide` ones
    * take the page's width. */
   readonly size: "small" | "phone" | "wide";
