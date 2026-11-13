@@ -5,7 +5,8 @@ remembrance or unlock names. `boss_slot_links.csv` ties what no tag shows, such 
 `odds = 0`, and every row of it must apply, so a source change that orphans one stops the build.
 `placement_areas.csv` places a slot line at other areas, and every row of it must apply too.
 
-The drop CSVs add every regular enemy's farm spots. Last, an ash the mod has only on a weapon
+The drop CSVs add every regular enemy's farm spots; `drop_areas.csv` moves one enemy's on a label
+too coarse for it, and every row of it must apply. Last, an ash the mod has only on a weapon
 takes that weapon's rows, boss-tied ones included.
 """
 
@@ -97,6 +98,7 @@ class PlacementSources:
     armor_shops: Mapping[str, BossPlace]
     slot_links: Mapping[tuple[str, str], tuple[BossPlace, ...]]
     moved_areas: Mapping[tuple[str, str], tuple[str, ...]]
+    drop_areas: Mapping[tuple[str, str], str]
     ash_sources: Mapping[str, Sequence[str]]
 
 
@@ -274,8 +276,10 @@ def _location_placement(item: Item, area: str, source_name: str) -> Placement:
 
 
 def _drop_placements(sources: PlacementSources) -> Iterator[Placement]:
+    moved: set[tuple[str, str]] = set()
     yield from _cell_placements(
         sources,
+        moved,
         sources.drops,
         _DROP_LOCATION,
         _DROP_NAME,
@@ -284,12 +288,16 @@ def _drop_placements(sources: PlacementSources) -> Iterator[Placement]:
     )
     yield from _cell_placements(
         sources,
+        moved,
         sources.lots,
         _LOT_LOCATION,
         _LOT_NAME,
         _columns(sources.lots, _LOT_CELLS),
         _lot_cell_name,
     )
+    unmoved = sorted(set(sources.drop_areas) - moved)
+    if unmoved:
+        raise BuildError(f"drop_areas names no drop: {', '.join(map(repr, unmoved))}")
 
 
 def _columns(table: CsvTable, prefixes: tuple[str, ...]) -> tuple[int, ...]:
@@ -313,6 +321,7 @@ def _lot_cell_name(cell: str) -> str:
 
 def _cell_placements(
     sources: PlacementSources,
+    moved: set[tuple[str, str]],
     table: CsvTable,
     location_column: str,
     name_column: str,
@@ -332,7 +341,11 @@ def _cell_placements(
                 continue
             if BOSS_TAG in row[enemy]:
                 raise BuildError(f"boss row {row[enemy]!r} on {label!r} drops {item.name!r}")
-            area = sources.aliases.get(label)
+            area = sources.drop_areas.get((row[enemy], label))
+            if area is not None:
+                moved.add((row[enemy], label))
+            else:
+                area = sources.aliases.get(label)
             if area is None:
                 raise BuildError(f"{item.name!r} drops on {label!r}, which has no alias")
             yield _location_placement(item, area, source_name)

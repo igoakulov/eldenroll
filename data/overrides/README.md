@@ -28,6 +28,7 @@ Each file's name and header say what it holds. What they don't say:
 | `added_armor.csv` | `copies` names the piece whose locations it shares; empty means found nowhere, which counts everywhere |
 | `armor_sets.csv` | a set with no pieces is one row with an empty `piece` |
 | `boss_slot_links.csv`, `placement_areas.csv` | several rows for one item and area give it one row per boss or area; any one counts |
+| `drop_areas.csv` | `enemy` and `label` are written as the drop tables write them, typos included (`Redmane Kngiht`); a row moves only that enemy's drops on that label, so the label's other items stay put |
 | `aliases.csv` | `members` are selectors, never name matches; an item in two aliases stops the build |
 | `combat_rules.csv` | a rule has no description: its name says the whole rule |
 | `wiki_urls.csv` | the Fextralife page a name doesn't reach, and each alias's group page; an empty `url` means no link (`data/sources/README.md#Wiki lookups`) |

@@ -458,6 +458,7 @@ def _fake_sources(sources: GapSources, *slots: ItemSlot) -> PlacementSources:
         armor_shops={},
         slot_links={},
         moved_areas={},
+        drop_areas={},
         ash_sources={},
     )
 
