@@ -26,6 +26,10 @@ export interface EngineData {
    * don't decay, so no `character_class:` key is here. A key missing here (none else should be)
    * falls back to 1 in `repetitionMultiplier`. */
   readonly decayGroupSize: ReadonlyMap<string, number>;
+  /** Every item's `lateness` (how late its earliest region is) and `demand` (how far its stat
+   * requirements reach), both 0 to 1, for `lateBoost` (`data/balance.md#Hyperparameters`). An item
+   * with no location row, or no stat requirement, sits at 0 on that axis. */
+  readonly lateOffset: ReadonlyMap<string, { readonly lateness: number; readonly demand: number }>;
 }
 
 export function poolKey(characterClass: string, slot: PoolSlot): string {
@@ -46,6 +50,36 @@ function decayGroups(database: Database): ReadonlyMap<string, number> {
   return sizes;
 }
 
+function lateOffsets(database: Database): ReadonlyMap<string, { lateness: number; demand: number }> {
+  const regionLevel = new Map(database.region.map((row) => [row.id, row.region_level]));
+  const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
+  const bossLocation = new Map(database.boss_instance.map((row) => [row.id, row.location_id]));
+  const levelOfLocation = (locationId: string): number | undefined => {
+    const regionId = locationRegion.get(locationId);
+    return regionId === undefined ? undefined : regionLevel.get(regionId);
+  };
+  const maxLevel = Math.max(1, ...database.region.map((row) => row.region_level));
+  const nativeLevel = new Map<string, number>();
+  for (const row of database.item_location) {
+    const locationId = row.location_id ?? (row.boss_instance_id === null ? null : bossLocation.get(row.boss_instance_id));
+    const level = locationId === null || locationId === undefined ? undefined : levelOfLocation(locationId);
+    if (level === undefined) continue;
+    const current = nativeLevel.get(row.item_id);
+    if (current === undefined || level < current) nativeLevel.set(row.item_id, level);
+  }
+  const effectiveTotal = (row: Item): number => row.str / 1.5 + row.dex + row.int + row.fth + row.arc;
+  const maxEffective = Math.max(1, ...database.item.map(effectiveTotal));
+  const offsets = new Map<string, { lateness: number; demand: number }>();
+  for (const row of database.item) {
+    const level = nativeLevel.get(row.id) ?? 1;
+    offsets.set(row.id, {
+      lateness: (level - 1) / (maxLevel - 1 || 1),
+      demand: effectiveTotal(row) / maxEffective,
+    });
+  }
+  return offsets;
+}
+
 export function indexDatabase(database: Database): EngineData {
   const ashFits = new Map<string, AshCompatibility[]>();
   for (const row of database.ash_compatibility) {
@@ -56,6 +90,7 @@ export function indexDatabase(database: Database): EngineData {
     ashFits,
     foundEverywhere: new Set(database.item.filter((row) => !placed.has(row.id)).map((row) => row.id)),
     decayGroupSize: decayGroups(database),
+    lateOffset: lateOffsets(database),
     database,
     items: new Map(database.item.map((row) => [row.id, row])),
     rules: new Map(database.combat_rule.map((row) => [row.id, row])),

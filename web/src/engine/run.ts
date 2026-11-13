@@ -207,6 +207,7 @@ function rollSlots(
     limits: { stats: run.stats, maxStatGap: run.settings.maxStatGap },
     random,
     repetition: decay,
+    lateOffset: engine.hyperparams.lateOffset,
     shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,
     neverRoll: new Set(run.neverRoll),
     from,

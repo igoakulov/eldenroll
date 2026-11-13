@@ -1,7 +1,7 @@
 import type { LoadoutSlot, Modifier } from "./database";
 import { isSetReachable } from "./eligibility";
 import { poolKey, type EngineData } from "./engineData";
-import { decayRate, type DecayParams } from "./hyperparams";
+import { decayRate, lateBoost, type DecayParams, type LateOffsetParams } from "./hyperparams";
 import { activeModifiers, type RollState } from "./modifiers";
 import { pickWeighted } from "./random";
 import { matchesOption, type Option } from "./selectors";
@@ -101,6 +101,8 @@ export interface RollContext {
   /** `optionKey`s the player excluded; they win over every other input. */
   readonly neverRoll?: ReadonlySet<string>;
   readonly repetition?: Repetition;
+  /** Absent means no boost: most tests roll a pool in isolation and don't need one. */
+  readonly lateOffset?: LateOffsetParams;
 }
 
 export function optionKey(option: Option): string {
@@ -164,10 +166,19 @@ export function weighOptions(
   }
   const active = activeModifiers(context.data, context.state);
   const repetition = context.repetition ?? NO_REPETITION;
+  const lateOffset = context.lateOffset;
   const weighted = candidates
     .map((option) => {
       const modifiers = active.filter((row) => matchesOption(row.target, option));
-      const base = option.row.odds * repetitionMultiplier(repeatKey(option), repetition);
+      const late =
+        lateOffset === undefined || option.kind !== "item"
+          ? 1
+          : lateBoost(
+              context.data.lateOffset.get(option.row.id)?.lateness ?? 0,
+              context.data.lateOffset.get(option.row.id)?.demand ?? 0,
+              lateOffset,
+            );
+      const base = option.row.odds * repetitionMultiplier(repeatKey(option), repetition) * late;
       const weight = modifiers.reduce((product, row) => product * row.value, base);
       return { option, weight, modifiers };
     });

@@ -1,5 +1,6 @@
 import type { Item, LoadoutSlot, PoolSlot } from "./database";
 import { poolKey, type EngineData } from "./engineData";
+import type { LateOffsetParams } from "./hyperparams";
 import type { RollState } from "./modifiers";
 import {
   NO_REPETITION,
@@ -40,6 +41,7 @@ export interface LoadoutInput {
   readonly limits: StatLimits;
   readonly random: Random;
   readonly repetition?: Repetition;
+  readonly lateOffset?: LateOffsetParams;
   /** RH rolls from these first; `null` when the setting is off. */
   readonly shortlist?: ReadonlySet<string> | null;
   /** A reroll keeps the slots before `from` as they are. */
@@ -180,6 +182,7 @@ export function rollLoadout(input: LoadoutInput): Loadout {
       ? {}
       : { countedIfBossesDead: input.countedIfBossesDead }),
     ...(input.neverRoll === undefined ? {} : { neverRoll: input.neverRoll }),
+    ...(input.lateOffset === undefined ? {} : { lateOffset: input.lateOffset }),
   };
 
   for (const slot of LOADOUT_ORDER.slice(start)) {
