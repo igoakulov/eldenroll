@@ -4,14 +4,12 @@ import { Icon } from "./Icon";
 import "./LozengeCheckbox.css";
 
 /** A checkbox row: a lozenge that fills and glows, like a grace being lit. `icons` follow the name, dimmer while
- * unchecked; a `lead` icon goes before it instead. A setting carries a `detail` line under its name. A `framed` one
- * stands alone between two rules, at a name's size. A search `result`'s name dims until ticked, so the letters it
+ * unchecked; a `lead` icon goes before it instead. A `framed` one stands alone between two rules, at a name's size. A search `result`'s name dims until ticked, so the letters it
  * matched stand out (`SearchMatch`). */
 export function LozengeCheckbox({
   checked,
   onChange,
   children,
-  detail,
   tag,
   icons,
   lead,
@@ -22,7 +20,6 @@ export function LozengeCheckbox({
   readonly checked: boolean;
   readonly onChange: (checked: boolean) => void;
   readonly children: ReactNode;
-  readonly detail?: ReactNode;
   readonly tag?: string;
   readonly icons?: readonly string[];
   readonly lead?: ReactNode;
@@ -33,7 +30,6 @@ export function LozengeCheckbox({
   const modifier =
     (icons === undefined ? "" : " lozenge-row-icons") +
     (lead === undefined ? "" : " lozenge-row-lead") +
-    (detail === undefined ? "" : " lozenge-row-detail") +
     (framed ? " lozenge-row-framed" : "") +
     (result ? " lozenge-row-result" : "");
   return (
@@ -45,14 +41,7 @@ export function LozengeCheckbox({
           {lead}
         </span>
       )}
-      {detail === undefined ? (
-        <span className="lozenge-label">{children}</span>
-      ) : (
-        <span className="lozenge-label">
-          <span className="lozenge-name">{children}</span>
-          <span className="lozenge-detail">{detail}</span>
-        </span>
-      )}
+      <span className="lozenge-label">{children}</span>
       {icons !== undefined && (
         <span className="lozenge-icons" aria-hidden="true">
           {icons.map((icon, index) => (

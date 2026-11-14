@@ -110,8 +110,6 @@ export const copy = {
     maxStatGap: "Max stat gap",
     maxStatGapDetail: "Points an item may need above your stats",
     bossCounts: (felled: number, skipped: number) => `${felled} felled, ${skipped} skipped`,
-    bossGearLocked: "Boss gear locked until felled",
-    bossGearLockedDetail: "Must fell boss first to roll their gear",
     neverRollNote: "Anything selected here never rolls again.",
     searchNeverRoll: "Search Never roll",
     neverRollNotFound: "Nothing by that name.",

@@ -73,14 +73,6 @@ export const kit: readonly KitBlock[] = [
         ),
       },
       {
-        label: "a setting",
-        render: () => (
-          <LozengeCheckbox checked detail={copy.runSettings.bossGearLockedDetail} onChange={noop}>
-            {copy.runSettings.bossGearLocked}
-          </LozengeCheckbox>
-        ),
-      },
-      {
         label: "a lead icon",
         render: ({ samples }) => (
           <LozengeCheckbox checked lead={<Icon name={`${iconKey(samples.weapon) ?? ""}-22`} size={22} />} onChange={noop}>

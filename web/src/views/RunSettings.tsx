@@ -144,13 +144,6 @@ export function RunSettings({
                 detail={copy.runSettings.bossCounts(bossCounts.felled, bossCounts.skipped)}
                 onClick={() => setBossesOpen(true)}
               />
-              <LozengeCheckbox
-                checked={draft.bossGearLockedUntilDead}
-                detail={copy.runSettings.bossGearLockedDetail}
-                onChange={(bossGearLockedUntilDead) => edit({ bossGearLockedUntilDead })}
-              >
-                {copy.runSettings.bossGearLocked}
-              </LozengeCheckbox>
             </div>
           </>,
           <>

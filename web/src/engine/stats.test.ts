@@ -17,7 +17,6 @@ const counted = countedItems(data, {
     new Set(realDatabase.region.map((row) => row.id).filter((id) => id !== "leyndell_ashen")),
   ),
   deadBosses: new Set(realDatabase.boss_instance.map((row) => row.id)),
-  bossGearLockedUntilDead: true,
 });
 
 const MAXED = Object.fromEntries(STATS.map((stat) => [stat, 99])) as Stats;

@@ -6,7 +6,7 @@ Scripts are in `package.json`. The app and the engine tests read `../data/build/
 
 ## Views
 
-Player-facing text says *felled* where the game does: `Felled?`, `Felled on the way`, `Boss gear locked until felled`, `Felled` in `Bosses`. Code and stored data say `dead`. *Felled on the way* names a boss felled outside an objective: before the run, between objectives, or one `Felled?` marks.
+Player-facing text says *felled* where the game does: `Felled?`, `Felled on the way`, `Felled` in `Bosses`. Code and stored data say `dead`. *Felled on the way* names a boss felled outside an objective: before the run, between objectives, or one `Felled?` marks.
 
 There are no item pictures. Every image slot shows our own icon for the item's subcategory, so pictures could replace them later without a redesign.
 
@@ -44,7 +44,7 @@ The onboarding card, opened from `Elden Rold` in Start's tagline and from the me
 One screen from Start and from the menu. It reopens on the last tab used, so a list edited often stays two taps from the card.
 
 - **General:**
-  - **Bosses:** a row opening `Bosses`, and the `Boss gear locked until felled` toggle. Off stops the boss filter; `Bosses` stays, because felled and skipped bosses still leave the pool.
+  - **Bosses:** a row opening `Bosses`.
 - **Never roll** has no browsing by category, only search. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, since a set is what rolls; typing a piece's name finds every set that holds it.
 - **Shortlist** searches weapons and greatshields never narrowed by class, since classes can change at any time. The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`.
 - In both lists an unticked entry keeps its place until `Save`. Search results group like the card, names starting with the search first.

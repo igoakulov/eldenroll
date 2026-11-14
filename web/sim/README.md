@@ -12,7 +12,7 @@ cd web && pnpm sim --runs 50
 
 ## A run
 
-- Every class is on, the boss setting is on, the weapon shortlist is off.
+- Every class is on and the weapon shortlist is off.
 - Regions open one at a time, by region level with one exception: nobody clears a region before moving on, so the next opens once a share of this one is felled (rounding up, half by default), not when it's fully clear. The DLC plays out of level order too: `Gravesite Plain`, `Shadow Keep` and `Abyssal Woods` open after Farum Azula and before Haligtree and the Ashen Capital; `Jagged Peak` (its dragons) and `Enir-Ilim` open only after those two.
 - A run limited to some regions skips the others in that order and ends once every boss in its regions is felled. The simulated player's stat targets still follow the whole order: a target due by a region the run leaves out is due by the next one it plays.
 - Every third objective, by default, is rerolled once with `Full objective`; the replaced roll is in the dump with `kept` false and counts nowhere on the page.

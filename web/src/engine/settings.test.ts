@@ -49,7 +49,6 @@ describe("defaultSettings", () => {
       maxStatGap: 10,
       characterClasses: ["knight", "jester"],
       weaponShortlistEnabled: false,
-      bossGearLockedUntilDead: true,
     });
   });
 });

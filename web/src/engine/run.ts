@@ -99,7 +99,6 @@ function counted(engine: Engine, run: Run): ReadonlySet<string> {
   return countedItems(engine.data, {
     locations: selectedLocations(engine.data.database, new Set(run.regions), deadSet(run)),
     deadBosses: deadSet(run),
-    bossGearLockedUntilDead: run.settings.bossGearLockedUntilDead,
   });
 }
 

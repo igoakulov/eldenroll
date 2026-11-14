@@ -24,29 +24,23 @@ function fromBoss(id: string): ItemLocation {
 
 describe("rowCounts follows the eligibility table", () => {
   it.each([
-    ["pickup, region selected", located("spot"), HERE, true, true],
-    ["pickup, region not selected", located("spot"), NOWHERE, false, false],
-    ["alive boss, region selected", fromBoss("alive"), HERE, false, true],
-    ["alive boss, region not selected", fromBoss("alive"), NOWHERE, false, false],
-    ["dead boss, region selected", fromBoss("dead"), HERE, true, true],
-    ["dead boss, region not selected", fromBoss("dead"), NOWHERE, true, false],
-    ["boss at odds 0, region selected", fromBoss("zero"), HERE, true, true],
-    ["boss at odds 0, region not selected", fromBoss("zero"), NOWHERE, false, false],
-  ] as const)("%s", (_case, row, locations, on, off) => {
-    const reach = { locations, deadBosses: DEAD };
-    expect(rowCounts(row, BOSSES, { ...reach, bossGearLockedUntilDead: true })).toBe(on);
-    expect(rowCounts(row, BOSSES, { ...reach, bossGearLockedUntilDead: false })).toBe(off);
+    ["pickup, region selected", located("spot"), HERE, true],
+    ["pickup, region not selected", located("spot"), NOWHERE, false],
+    ["alive boss, region selected", fromBoss("alive"), HERE, false],
+    ["alive boss, region not selected", fromBoss("alive"), NOWHERE, false],
+    ["dead boss, region selected", fromBoss("dead"), HERE, true],
+    ["dead boss, region not selected", fromBoss("dead"), NOWHERE, true],
+    ["boss at odds 0, region selected", fromBoss("zero"), HERE, true],
+    ["boss at odds 0, region not selected", fromBoss("zero"), NOWHERE, false],
+  ] as const)("%s", (_case, row, locations, counts) => {
+    expect(rowCounts(row, BOSSES, { locations, deadBosses: DEAD })).toBe(counts);
   });
 });
 
 describe("countedItems", () => {
   it("counts an item with no location row everywhere, and others only from a row", () => {
     const data = indexDatabase(realDatabase);
-    const counted = countedItems(data, {
-      locations: NOWHERE,
-      deadBosses: NOWHERE,
-      bossGearLockedUntilDead: true,
-    });
+    const counted = countedItems(data, { locations: NOWHERE, deadBosses: NOWHERE });
     const consumable = realDatabase.item.find((row) => row.category === "consumable")?.id;
     for (const id of [consumable, "none", "none_head"]) expect(counted.has(id ?? "")).toBe(true);
     expect(counted.has("uchigatana")).toBe(false);

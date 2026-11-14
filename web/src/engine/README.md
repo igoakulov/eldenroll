@@ -83,7 +83,7 @@ Every input and setting stays editable; changes apply on the next roll and never
 - **Stats** are typed by hand and impossible builds are accepted, but a run can't start below level 1. Gear, Great Runes and buffs are ignored; two-handing is the only adjustment.
 - **Regions** are the only progression input: no boss level or rune filter. Region 1 is the default, because region 2 bundles Mohgwyn and region 3 is a higher level band. Selecting the Ashen Capital drops the Royal Capital silently, except the Shunning-Grounds, which both reach. A felled Maliketh drops the Royal Capital the same way without selecting the Ashen Capital's areas.
 - **`Max stat gap`** is per item, never a shared loadout budget.
-- **Weapon shortlist** is in #Weapon shortlist; **`Boss gear locked until felled`** in #Eligibility.
+- **Weapon shortlist** is in #Weapon shortlist.
 
 ## Bosses
 
@@ -124,7 +124,7 @@ A rule is its name and nothing else, so the name says the whole rule: `Land a ri
 - `No healing flasks` allows healing items, spells and blocking, and doesn't forbid the Flask of Wondrous Physick.
 - Rules have no location filter, so the tears that come only from DLC bosses sit at `odds = 0` (`data/balance.md#Parked crystal tears`).
 - Requirements remove a rule the loadout can't obey, and exclusions keep two contradicting rules apart.
-- With the felled-boss setting on, a trigger or target from a boss waits until it is felled; a modifier whose target is filtered out is simply inactive.
+- A trigger or target from a boss waits until it is felled; a modifier whose target is filtered out is simply inactive.
 
 ## Weapon shortlist
 
@@ -132,9 +132,9 @@ The player lists favourite or upgraded weapons and greatshields; with the checkb
 
 ## Eligibility
 
-An item rolls if at least one of its location rows counts (`eligibility.ts`). A place row counts when its region is selected. With `Boss gear locked until felled` on, a boss row counts once the boss is felled, whatever the region, and never before: Radahn's weapons stay out while he lives, even with Caelid ticked, and keep rolling after he falls with Caelid unticked. Off, a boss row counts by the boss's region. A boss at `odds = 0` always counts by region, like a regular enemy, and is absent from `Bosses`.
+An item rolls if at least one of its location rows counts (`eligibility.ts`). A place row counts when its region is selected. A boss row counts once the boss is felled, whatever the region, and never before: Radahn's weapons stay out while he lives, even with Caelid ticked, and keep rolling after he falls with Caelid unticked. There is no setting to turn this off. A boss at `odds = 0` always counts by region, like a regular enemy, and is absent from `Bosses`.
 
-- A boss is known felled only through `Done`, `Felled?` or `Bosses`; skipped bosses are presumed alive. With the setting off, felled bosses still leave the boss pool; off is mainly for testing.
+- A boss is known felled only through `Done`, `Felled?` or `Bosses`; skipped bosses are presumed alive.
 - An item with no location row counts everywhere: consumables, whose result names a family the player fills with any variant, and the `None` pieces. A set rolls only if every piece is reachable.
 
 ## Decay

@@ -32,7 +32,6 @@ function countedFor(regions: ReadonlySet<string>, dead: ReadonlySet<string>): Re
   return countedItems(real, {
     locations: selectedLocations(realDatabase, regions),
     deadBosses: dead,
-    bossGearLockedUntilDead: true,
   });
 }
 

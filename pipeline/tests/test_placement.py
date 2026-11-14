@@ -361,25 +361,22 @@ NOWHERE: set[str] = set()
 
 
 @pytest.mark.parametrize(
-    ("row", "locations", "on", "off"),
+    ("row", "locations", "counts"),
     [
-        (ItemLocation("i", location_id="spot"), HERE, True, True),
-        (ItemLocation("i", location_id="spot"), NOWHERE, False, False),
-        (ItemLocation("i", boss_instance_id="alive"), HERE, False, True),
-        (ItemLocation("i", boss_instance_id="alive"), NOWHERE, False, False),
-        (ItemLocation("i", boss_instance_id="dead"), HERE, True, True),
-        (ItemLocation("i", boss_instance_id="dead"), NOWHERE, True, False),
-        (ItemLocation("i", boss_instance_id="zero"), HERE, True, True),
-        (ItemLocation("i", boss_instance_id="zero"), NOWHERE, False, False),
+        (ItemLocation("i", location_id="spot"), HERE, True),
+        (ItemLocation("i", location_id="spot"), NOWHERE, False),
+        (ItemLocation("i", boss_instance_id="alive"), HERE, False),
+        (ItemLocation("i", boss_instance_id="alive"), NOWHERE, False),
+        (ItemLocation("i", boss_instance_id="dead"), HERE, True),
+        (ItemLocation("i", boss_instance_id="dead"), NOWHERE, True),
+        (ItemLocation("i", boss_instance_id="zero"), HERE, True),
+        (ItemLocation("i", boss_instance_id="zero"), NOWHERE, False),
     ],
 )
 def test_row_eligibility_follows_the_prd_table(
-    row: ItemLocation, locations: set[str], on: bool, off: bool
+    row: ItemLocation, locations: set[str], counts: bool
 ) -> None:
-    dead = {"dead", "zero"}
-
-    assert row_counts(row, locations, dead, BOSSES) is on
-    assert row_counts(row, locations, dead, BOSSES, boss_gear_locked_until_dead=False) is off
+    assert row_counts(row, locations, {"dead", "zero"}, BOSSES) is counts
 
 
 def test_the_ashen_capital_replaces_the_royal_one_but_not_the_shunning_grounds(

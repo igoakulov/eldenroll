@@ -33,7 +33,6 @@ function counted(regions: readonly string[], dead: readonly string[]): ReadonlyS
   return countedItems(data, {
     locations: selectedLocations(realDatabase, new Set(regions)),
     deadBosses: new Set(dead),
-    bossGearLockedUntilDead: true,
   });
 }
 
