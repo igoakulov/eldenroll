@@ -100,14 +100,6 @@ div.list-row {
 }
 
 /* After its value, so a verdict's colour wins */
-.list-row-pass {
-  color: var(--gold);
-}
-
-.list-row-fail {
-  color: var(--blood-text);
-}
-
 @media (hover: hover) {
   .framed-row:hover {
     border-color: var(--frame-lit);

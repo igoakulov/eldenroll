@@ -7,40 +7,74 @@ import {
   ruleNone,
   THIN_SAMPLE,
   type EmptyRow,
+  type HandView,
   type PairRow,
   type Sample,
 } from "../../sim/aggregate";
 import { copy } from "../copy";
+import { Cycler } from "../ui/Cycler";
 import { DataTable, ShareBar } from "../ui/DataTable";
 import { SectionHeading } from "../ui/Headings";
 import { ListRow } from "../ui/Rows";
-import { FOLD, matches, percent } from "./format";
+import { FOLD, matches, percent, perRun } from "./format";
 import { ShareSection } from "./ShareSection";
 
 const words = copy.simulate.slots;
 const columns = copy.simulate.columns;
 
-export function Slots({ sample, search }: { readonly sample: Sample; readonly search: string }) {
+export function Slots({
+  sample,
+  search,
+  hands,
+  onHands,
+}: {
+  readonly sample: Sample;
+  readonly search: string;
+  readonly hands: HandView;
+  readonly onHands: (hands: HandView) => void;
+}) {
   const both = pairs(sample);
   const pairRows = both.rows.filter((row) => matches(row.name, search));
   const scale = Math.max(0, ...both.rows.map((row) => row.share));
   const dualWieldOnly = sample.classes.length === 1 && sample.classes[0] === "warrior_dw";
   const none = ruleNone(sample);
   const empty = empties(sample);
+  const runs = sample.results.length;
   return (
     <>
-      <ShareSection title={words.rh} lede={words.handLede} table={handShares(sample, "rh")} search={search} />
-      <ShareSection title={words.lh} lede={words.handLede} table={handShares(sample, "lh")} search={search} />
+      {(["rh", "lh"] as const).map((slot) => (
+        <ShareSection
+          key={slot}
+          title={words[slot]}
+          lede={words.handLede[hands]}
+          // One switch for both hands, so they always read the same way
+          control={
+            <div className="simulate-switch">
+              <Cycler<HandView>
+                label={words.countBy}
+                options={[
+                  { value: "class", label: words.byClass },
+                  { value: "weapon", label: words.byWeapon },
+                ]}
+                value={hands}
+                onChange={onHands}
+              />
+            </div>
+          }
+          table={handShares(sample, slot, hands)}
+          search={search}
+        />
+      ))}
 
       {(search === "" || pairRows.length > 0) && (
         <section className="simulate-section">
           <SectionHeading>{words.pairs}</SectionHeading>
           <p className="simulate-lede">
-            {`${words.pairsLede} ${copy.simulate.counted(both.total)}`}
+            {`${words.pairsLede} ${copy.simulate.counted(perRun(both.total / runs))}`}
             {both.sameClass.of > 0 && (
               <>
                 <br />
-                {words.sameClass(percent(both.sameClass.count / both.sameClass.of), both.sameClass.of)}
+                {words.sameClass(percent(both.sameClass.count / both.sameClass.of), perRun(both.sameClass.of / runs))}
                 {dualWieldOnly && ` ${words.dualWieldAim}`}
               </>
             )}
@@ -50,7 +84,7 @@ export function Slots({ sample, search }: { readonly sample: Sample; readonly se
             columns={[
               { id: "rh", label: words.rhColumn, sortValue: (row) => row.rh, render: (row) => row.rh },
               { id: "lh", label: words.lhColumn, sortValue: (row) => row.lh, render: (row) => row.lh },
-              { id: "count", label: columns.objectives, numeric: true, sortValue: (row) => row.count, render: (row) => row.count },
+              { id: "per-run", label: columns.perRun, numeric: true, sortValue: (row) => row.count, render: (row) => perRun(row.perRun) },
               {
                 id: "share",
                 label: columns.share,
@@ -77,7 +111,7 @@ export function Slots({ sample, search }: { readonly sample: Sample; readonly se
       <ShareSection title={words.rule} lede={words.ruleLede} table={gearShares(sample, "rule")} search={search} />
       <section className="simulate-section">
         <SectionHeading>{words.ruleNone}</SectionHeading>
-        <p className="simulate-lede">{`${words.ruleNoneNote} ${copy.simulate.counted(none.total)}`}</p>
+        <p className="simulate-lede">{`${words.ruleNoneNote} ${copy.simulate.counted(perRun(none.total / runs))}`}</p>
         <div className="simulate-rows">
           <ListRow title={words.neither} value={percent(none.total === 0 ? NaN : none.neither / none.total)} />
           <ListRow title={words.one} value={percent(none.total === 0 ? NaN : none.one / none.total)} />
@@ -99,7 +133,7 @@ export function Slots({ sample, search }: { readonly sample: Sample; readonly se
               render: (row) => className(sample.data, row.characterClass),
             },
             { id: "slot", label: columns.slot, render: (row) => copy.simulate.slotNames[row.slot] },
-            { id: "count", label: columns.rolls, numeric: true, sortValue: (row) => row.count, render: (row) => row.count },
+            { id: "per-run", label: columns.perRun, numeric: true, sortValue: (row) => row.count, render: (row) => perRun(row.perRun) },
             {
               id: "share",
               label: columns.share,
@@ -113,7 +147,7 @@ export function Slots({ sample, search }: { readonly sample: Sample; readonly se
           rows={empty}
           rowKey={(row) => `${row.characterClass}/${row.slot}`}
           fold={FOLD}
-          initialSort="count"
+          initialSort="per-run"
           empty={words.noEmpties}
         />
       </section>

@@ -57,9 +57,6 @@ export function stretchOf(objective: number): number {
   return Math.floor((objective - 1) / BUCKET) * BUCKET + 1;
 }
 
-/** A boost this large or more is a guarantee (`data/balance.md#Tiers`). */
-export const GUARANTEE = 100_000;
-
 export interface RollRow {
   readonly objective: number;
   readonly region: string;
@@ -75,8 +72,6 @@ export interface RollRow {
   readonly pool: number;
   readonly noneChance: number | null;
   /** Summed chance of options boosted ×100,000 or more, if any. */
-  readonly guaranteedChance: number | null;
-  readonly guaranteedWon: boolean;
   /** Ids of boosting modifiers (×>1) active on any option in the pool. */
   readonly boosts: readonly string[];
   /** Summed chance of the options each boost hits, in `boosts` order. */
@@ -121,8 +116,6 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
   const plain = options.map((row) => row.option.row.odds * boostOf(row));
   const plainTotal = plain.reduce((sum, value) => sum + value, 0);
   let none: number | null = null;
-  let guaranteed = 0;
-  let hasGuaranteed = false;
   const boostChance = new Map<string, number>();
   const byKey = new Map<string, Omit<ChanceSum, "rolls">>();
   options.forEach((row, index) => {
@@ -138,10 +131,6 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
       byKey.set(key, sums);
     }
     if (row.option.kind !== "armor_set" && row.option.row.id === "none") none = chance;
-    if (boostOf(row) >= GUARANTEE) {
-      hasGuaranteed = true;
-      guaranteed += chance;
-    }
     for (const modifier of row.modifiers) {
       if (modifier.value > 1) boostChance.set(modifier.id, (boostChance.get(modifier.id) ?? 0) + chance);
     }
@@ -155,8 +144,6 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
     catchUp: chosen?.catchUp ?? 1,
     pool: roll.pool,
     noneChance: none as number | null,
-    guaranteedChance: hasGuaranteed ? guaranteed : null,
-    guaranteedWon: chosen !== null && boostOf(chosen) >= GUARANTEE,
     boosts: [...boostChance.keys()],
     boostChances: [...boostChance.values()],
     chosenBoosts: chosen === null ? [] : chosen.modifiers.filter((row) => row.value > 1).map((row) => row.id),

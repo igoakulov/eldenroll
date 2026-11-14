@@ -2,13 +2,18 @@ import type { ModifierText, Trigger } from "../../sim/aggregate";
 import { copy } from "../copy";
 import type { TableFold } from "../ui/DataTable";
 
-const words = copy.simulate.boosts;
+const words = copy.simulate.synergies;
 
 /** Every long table shows its first 10 rows and folds the rest behind `Show all`. */
 export const FOLD: TableFold = { after: 10, showAll: copy.simulate.showAll, showLess: copy.simulate.showLess };
 
 export function percent(share: number, digits = 1): string {
   return Number.isFinite(share) ? `${(share * 100).toFixed(digits)}%` : "–";
+}
+
+/** Showings per run, the unit a run is judged by: two decimals below 10, so a rare option still reads. */
+export function perRun(value: number): string {
+  return decimal(value, value < 10 ? 2 : 1);
 }
 
 export function decimal(value: number, digits = 2): string {
@@ -28,10 +33,10 @@ function trigger(one: Trigger): string {
   return (one.negated ? words.notRolled : words.rolled)(words.list(one.names), slots);
 }
 
-/** A modifier in plain words: what must hold, what it multiplies and by how much. */
-export function modifierSentence(modifier: ModifierText): string {
+/** A modifier in plain words: what must hold, and what it multiplies. */
+export function modifierRule(modifier: ModifierText): { readonly when: string; readonly target: string } {
   const when = modifier.when.length === 0 ? words.always : modifier.when.map(trigger).join(words.and);
-  return words.modifier(when, words.list(modifier.target), modifier.value.toLocaleString("en-GB"));
+  return { when, target: words.target(words.list(modifier.target)) };
 }
 
 /** Whether a name matches the search: every word of it, anywhere, any case. */

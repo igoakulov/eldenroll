@@ -1,10 +1,11 @@
 // The page's settings and view, kept in the address so a link reproduces a result (web/sim/README.md#The page)
+import type { HandView } from "../../sim/aggregate";
 import { ALLOCATIONS, type Allocation } from "../../sim/player";
 
 export const MAX_RUNS = 10;
 export const MAX_SEED = 999_999;
 export const COMPLETION_STEP = 10;
-export const TABS = ["overview", "slots", "boosts", "variety", "items"] as const;
+export const TABS = ["overview", "slots", "synergies", "variety", "items"] as const;
 export type Tab = (typeof TABS)[number];
 
 /** What a run plays with: changing any of these needs `Simulate`. */
@@ -22,6 +23,7 @@ export interface View {
   readonly classes: readonly string[] | null;
   readonly tab: Tab;
   readonly search: string;
+  readonly hands: HandView;
 }
 
 export const DEFAULT_INPUTS: Omit<Inputs, "seed"> = {
@@ -40,8 +42,11 @@ const int = (value: string | null, min: number, max: number): number | undefined
   return Math.min(max, Math.max(min, Number(value)));
 };
 
+/** `all`, or no value, for every one. */
+const ALL = "all";
+
 const list = (value: string | null): readonly string[] | null =>
-  value === null ? null : value.split(",").filter((one) => one !== "");
+  value === null || value === ALL ? null : value.split(",").filter((one) => one !== "");
 
 export function readAddress(search: string): { readonly inputs: Inputs; readonly view: View } {
   const params = new URLSearchParams(search);
@@ -61,19 +66,22 @@ export function readAddress(search: string): { readonly inputs: Inputs; readonly
       classes: list(params.get("classes")),
       tab: TABS.find((one) => one === tab) ?? "overview",
       search: params.get("q") ?? "",
+      hands: params.get("hands") === "weapon" ? "weapon" : "class",
     },
   };
 }
 
+/** Every setting, defaults included, so a link reads whole; only an empty search is left out. */
 export function writeAddress(inputs: Inputs, view: View): string {
   const params = new URLSearchParams();
-  if (inputs.runs !== DEFAULT_INPUTS.runs) params.set("runs", String(inputs.runs));
-  if (inputs.allocation !== DEFAULT_INPUTS.allocation) params.set("allocation", inputs.allocation);
-  if (inputs.regions !== null) params.set("regions", inputs.regions.join(","));
-  if (inputs.completion !== DEFAULT_INPUTS.completion) params.set("completion", String(inputs.completion));
+  params.set("runs", String(inputs.runs));
+  params.set("allocation", inputs.allocation);
+  params.set("regions", inputs.regions === null ? ALL : inputs.regions.join(","));
+  params.set("completion", String(inputs.completion));
   params.set("seed", String(inputs.seed));
-  if (view.classes !== null) params.set("classes", view.classes.join(","));
-  if (view.tab !== "overview") params.set("tab", view.tab);
+  params.set("classes", view.classes === null ? ALL : view.classes.join(","));
+  params.set("tab", view.tab);
+  params.set("hands", view.hands);
   if (view.search !== "") params.set("q", view.search);
   return `?${params.toString().replaceAll("%2C", ",")}`;
 }

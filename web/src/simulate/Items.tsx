@@ -1,16 +1,14 @@
-import { itemSeries, items, oddsOf, THIN_SAMPLE, type ItemRow, type Sample } from "../../sim/aggregate";
+import { itemSeries, items, oddsOf, type ItemRow, type Sample } from "../../sim/aggregate";
 import { BUCKET, stretchOf, type ChanceSums } from "../../sim/simulate";
 import { copy } from "../copy";
-import { DataTable } from "../ui/DataTable";
 import { SectionHeading } from "../ui/Headings";
 import { LineChart } from "../ui/LineChart";
-import { decimal, FOLD, matches, multiplier, percent } from "./format";
+import { decimal, matches, multiplier, percent } from "./format";
 
 const words = copy.simulate.items;
-const columns = copy.simulate.columns;
 
-/** How many matches get a chart; the rest stay in the table. */
-const CHARTED = 4;
+/** How many matches get charts: enough for a whole armor set with its variants. */
+const CHARTED = 10;
 
 /** The smallest round number at or above `top`, one significant digit: each chart's own scale. */
 function niceMax(top: number): number {
@@ -19,7 +17,7 @@ function niceMax(top: number): number {
   return Math.ceil(top / step - 1e-9) * step;
 }
 
-/** Per-item inspection: a table of everything in reach, and a chart of each searched item's chance over the run. */
+/** Per-item inspection: a chart of each searched item's chance over the run, in every slot it rolls in. */
 export function Items({
   sample,
   chances,
@@ -31,57 +29,16 @@ export function Items({
 }) {
   const rows = items(sample, chances).filter((row) => matches(row.name, search));
   const charted = search === "" ? [] : [...rows].sort((a, b) => a.name.localeCompare(b.name)).slice(0, CHARTED);
-  const runs = sample.results.length;
   return (
-    <>
-      <section className="simulate-section">
-        <SectionHeading>{words.overTheRun}</SectionHeading>
-        <p className="simulate-lede">
-          {charted.length === 0 ? words.searchToChart : words.chartLede(charted.length, rows.length - charted.length)}
-        </p>
-        {charted.map((row) => (
-          <ItemCharts key={row.key} sample={sample} chances={chances} row={row} />
-        ))}
-      </section>
-      <section className="simulate-section">
-        <SectionHeading>{words.items}</SectionHeading>
-        <p className="simulate-lede">{words.itemsLede}</p>
-        <DataTable<ItemRow>
-          label={words.items}
-          columns={[
-            { id: "name", label: columns.name, sortValue: (row) => row.name, render: (row) => row.name },
-            {
-              id: "shown",
-              label: columns.shownPerRun,
-              numeric: true,
-              sortValue: (row) => row.shownPerRun,
-              render: (row) => decimal(row.shownPerRun, 1),
-            },
-            {
-              id: "seen",
-              label: columns.seenIn,
-              numeric: true,
-              // Rarest first
-              sortValue: (row) => -row.seenIn,
-              render: (row) => percent(row.seenIn / runs, 0),
-            },
-            {
-              id: "ceiling",
-              label: columns.ceiling,
-              numeric: true,
-              sortValue: (row) => row.ceiling ?? 0,
-              render: (row) => (row.ceiling === null ? "–" : words.times(multiplier(row.ceiling))),
-            },
-          ]}
-          rows={rows}
-          rowKey={(row) => row.key}
-          fold={FOLD}
-          faded={() => sample.objectives.length < THIN_SAMPLE}
-          initialSort="seen"
-          empty={copy.simulate.nothing}
-        />
-      </section>
-    </>
+    <section className="simulate-section">
+      <SectionHeading>{words.overTheRun}</SectionHeading>
+      <p className="simulate-lede">
+        {charted.length === 0 ? words.searchToChart : words.chartLede(charted.length, rows.length - charted.length)}
+      </p>
+      {charted.map((row) => (
+        <ItemCharts key={row.key} sample={sample} chances={chances} row={row} />
+      ))}
+    </section>
   );
 }
 

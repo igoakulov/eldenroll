@@ -17,7 +17,7 @@ import { Stepper } from "../ui/Stepper";
 import { StopSlider } from "../ui/StopSlider";
 import { Tabs } from "../ui/Tabs";
 import { useHideOnScroll } from "../ui/useHideOnScroll";
-import { Boosts } from "./Boosts";
+import { Synergies } from "./Synergies";
 import { Items } from "./Items";
 import { Slots } from "./Slots";
 import { Variety } from "./Variety";
@@ -240,7 +240,7 @@ export function SimulatePage() {
           chances={results?.chances ?? null}
           classes={classes}
           view={view}
-          onTab={(tab) => setView((last) => ({ ...last, tab }))}
+          onView={(change) => setView((last) => ({ ...last, ...change }))}
           filters={
             <>
             <div className="simulate-classes">
@@ -275,7 +275,7 @@ function Results({
   chances,
   classes,
   view,
-  onTab,
+  onView,
   filters,
 }: {
   readonly data: EngineData;
@@ -283,7 +283,7 @@ function Results({
   readonly chances: ChanceSums | null;
   readonly classes: readonly string[];
   readonly view: View;
-  readonly onTab: (tab: View["tab"]) => void;
+  readonly onView: (change: Partial<View>) => void;
   /** The class filter and the search, in the sticky header above the tabs. */
   readonly filters: ReactNode;
 }) {
@@ -298,8 +298,8 @@ function Results({
         ? TABS.map(() => note(words.noClasses))
         : [
             <Overview key="overview" sample={sample} search={view.search} />,
-            <Slots key="slots" sample={sample} search={view.search} />,
-            <Boosts key="boosts" sample={sample} search={view.search} />,
+            <Slots key="slots" sample={sample} search={view.search} hands={view.hands} onHands={(hands) => onView({ hands })} />,
+            <Synergies key="synergies" sample={sample} search={view.search} />,
             <Variety key="variety" sample={sample} search={view.search} />,
             <Items key="items" sample={sample} chances={chances ?? new Map()} search={view.search} />,
           ];
@@ -310,7 +310,7 @@ function Results({
       label={words.title}
       tabs={words.tabs}
       selected={selected}
-      onSelect={(index) => onTab(TABS[index]!)}
+      onSelect={(index) => onView({ tab: TABS[index]! })}
       panels={panels.map((panel, index) => (index === selected ? panel : null))}
       bar={(row) => (
         <ResultsHeader>

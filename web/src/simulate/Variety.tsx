@@ -11,7 +11,7 @@ import {
 import { copy } from "../copy";
 import { DataTable, ShareBar } from "../ui/DataTable";
 import { SectionHeading } from "../ui/Headings";
-import { decimal, FOLD, matches, multiplier, percent } from "./format";
+import { decimal, FOLD, matches, multiplier, percent, perRun } from "./format";
 
 const words = copy.simulate.variety;
 const columns = copy.simulate.columns;
@@ -38,7 +38,7 @@ export function Variety({ sample, search }: { readonly sample: Sample; readonly 
           label={words.repeats}
           columns={[
             { id: "kind", label: columns.what, render: (row) => words.repeatKinds[row.kind] },
-            { id: "showings", label: columns.showings, numeric: true, sortValue: (row) => row.showings, render: (row) => row.showings },
+            { id: "per-run", label: columns.perRun, numeric: true, sortValue: (row) => row.showings, render: (row) => perRun(row.perRun) },
             { id: "gap", label: columns.gap, numeric: true, sortValue: (row) => row.gap, render: (row) => decimal(row.gap, 1) },
             { id: "soon", label: columns.soon, numeric: true, sortValue: (row) => row.soon, render: (row) => percent(row.soon) },
           ]}
@@ -72,7 +72,7 @@ function CatchUpTable({
       label={label}
       columns={[
         { id: "name", label, render: (row) => name(row.key) },
-        { id: "count", label: columns.rolls, numeric: true, sortValue: (row) => row.count, render: (row) => row.count },
+        { id: "per-run", label: columns.perRun, numeric: true, sortValue: (row) => row.count, render: (row) => perRun(row.perRun) },
         {
           id: "share",
           label: columns.share,

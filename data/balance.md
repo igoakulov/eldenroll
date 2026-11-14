@@ -34,10 +34,9 @@ When two boosted options meet in one pool, compare them with each other, not wit
 
 - **Keep tiers two orders of magnitude apart.** A `top` (×10,000,000) next to a `guarantee` (×100,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
 - **Avoid two `top` targets in one pool:** they split about 50/50. It is allowed where the combination is rare, such as `Claw Talisman` with `Axe Talisman`; `import-report.json` lists every pool where it can happen.
-- **Soft rows and catch-up compound on top.** A `prefer` or `strong` row on a rival raises the rival, and so does the catch-up boost on a late one; the simulation's Boosts tab shows how often each guarantee still wins and what beat it.
+- **Soft rows and catch-up compound on top.** A `prefer` or `strong` row on a rival raises the rival, and so does the catch-up boost on a late one; the simulation's Synergies tab shows how often each boosted target still wins.
 - **Off-tier values** (`×67`, `×6`, `×5`, `×3.5`, `×3`, `×0.5`) are aimed at a target share rather than a feel, such as 75% same-class pairs, and are tuned at the simulation.
 - **When two boosted targets clash, the rarer trigger wins.** The run should vary, and the more common trigger gets more chances to show its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger, since rules roll before armor.
-- **Acceptance:** where one `top` target is in play, it must win at least 99% of its rolls in the simulation; if not, raise its tier or reduce the rivals.
 
 ## Hyperparameters
 

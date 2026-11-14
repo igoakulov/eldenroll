@@ -1,4 +1,4 @@
-import { useState, type PointerEvent } from "react";
+import { useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 
 import "./LineChart.css";
 
@@ -13,9 +13,12 @@ export interface ChartReadout {
   readonly facts: readonly { readonly label: string; readonly value: string }[];
 }
 
-/** The drawing's own units; it scales to its box's width. */
-const WIDTH = 320;
-const HEIGHT = 128;
+/** The chart draws at its box's own width, so its text and lines keep their size at any width; its height follows
+ * at `ASPECT`, up to `MAX_HEIGHT`, so a wide chart doesn't tower. It measures before the first paint, so it never
+ * shows at a guessed width. */
+const FIRST_WIDTH = 320;
+const ASPECT = 2.5;
+const MAX_HEIGHT = 240;
 const LEFT = 40;
 const RIGHT = 8;
 const TOP = 8;
@@ -50,12 +53,26 @@ export function LineChart({
   readonly describe: (index: number) => ChartReadout;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+  const figure = useRef<HTMLElement>(null);
+  const [width, setWidth] = useState(FIRST_WIDTH);
+  const height = Math.min(MAX_HEIGHT, Math.round(width / ASPECT));
+  useLayoutEffect(() => {
+    const element = figure.current;
+    if (element === null) return;
+    if (element.clientWidth > 0) setWidth(element.clientWidth);
+    const observer = new ResizeObserver(([entry]) => {
+      const measured = Math.round(entry?.contentRect.width ?? 0);
+      if (measured > 0) setWidth(measured);
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   const xs = points.map((point) => point.x);
   const xMin = xRange?.[0] ?? Math.min(...xs);
   const xMax = xRange?.[1] ?? Math.max(...xs);
   const lineEnd = Math.max(...xs);
-  const plotX = (x: number) => LEFT + (xMax === xMin ? 0 : ((x - xMin) / (xMax - xMin)) * (WIDTH - LEFT - RIGHT));
-  const plotY = (y: number) => TOP + (1 - (yMax > 0 ? Math.min(1, y / yMax) : 0)) * (HEIGHT - TOP - BOTTOM);
+  const plotX = (x: number) => LEFT + (xMax === xMin ? 0 : ((x - xMin) / (xMax - xMin)) * (width - LEFT - RIGHT));
+  const plotY = (y: number) => TOP + (1 - (yMax > 0 ? Math.min(1, y / yMax) : 0)) * (height - TOP - BOTTOM);
   const line = (series: readonly ChartPoint[]) =>
     series.map((point, index) => `${index === 0 ? "M" : "L"}${plotX(point.x)},${plotY(point.y)}`).join(" ");
   const ticks = [0, yMax / 2, yMax];
@@ -70,7 +87,7 @@ export function LineChart({
 
   const onPointer = (event: PointerEvent<SVGSVGElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - box.left) / box.width) * WIDTH;
+    const x = ((event.clientX - box.left) / box.width) * width;
     let nearest = 0;
     points.forEach((point, index) => {
       if (Math.abs(plotX(point.x) - x) < Math.abs(plotX(points[nearest]!.x) - x)) nearest = index;
@@ -83,10 +100,10 @@ export function LineChart({
   const readout = points.length === 0 ? null : describe(picked ?? points.length - 1);
 
   return (
-    <figure className="line-chart">
+    <figure className="line-chart" ref={figure}>
       <figcaption className="line-chart-title">{title}</figcaption>
       <svg
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label={title}
         onPointerMove={onPointer}
@@ -94,7 +111,7 @@ export function LineChart({
       >
         {ticks.map((tick) => (
           <g key={tick}>
-            <line className="line-chart-grid" x1={LEFT} x2={WIDTH - RIGHT} y1={plotY(tick)} y2={plotY(tick)} />
+            <line className="line-chart-grid" x1={LEFT} x2={width - RIGHT} y1={plotY(tick)} y2={plotY(tick)} />
             <text className="line-chart-axis" x={LEFT - 6} y={plotY(tick)} textAnchor="end" dominantBaseline="middle">
               {formatY(tick)}
             </text>
@@ -102,10 +119,10 @@ export function LineChart({
         ))}
         {points.length > 0 && (
           <>
-            <text className="line-chart-axis" x={LEFT} y={HEIGHT - 4} textAnchor="start">
+            <text className="line-chart-axis" x={LEFT} y={height - 4} textAnchor="start">
               {formatX(xMin)}
             </text>
-            <text className="line-chart-axis" x={WIDTH - RIGHT} y={HEIGHT - 4} textAnchor="end">
+            <text className="line-chart-axis" x={width - RIGHT} y={height - 4} textAnchor="end">
               {formatX(xMax)}
             </text>
           </>
@@ -118,7 +135,7 @@ export function LineChart({
           ))}
         {shown !== undefined && (
           <>
-            <line className="line-chart-rule" x1={plotX(shown.x)} x2={plotX(shown.x)} y1={TOP} y2={HEIGHT - BOTTOM} />
+            <line className="line-chart-rule" x1={plotX(shown.x)} x2={plotX(shown.x)} y1={TOP} y2={height - BOTTOM} />
             <circle className="line-chart-dot" cx={plotX(shown.x)} cy={plotY(shown.y)} r={4} />
           </>
         )}

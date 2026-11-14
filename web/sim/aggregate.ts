@@ -5,12 +5,11 @@ import { POOL_SLOTS } from "../src/engine/database";
 import type { EngineData } from "../src/engine/engineData";
 import { STATS, type Stat } from "../src/engine/settings";
 import { catchUpMultiplier, repeatKey, slotOptions } from "../src/engine/slotRoll";
-import type { Option } from "../src/engine/selectors";
+import { matchesOption, type Option } from "../src/engine/selectors";
 import { DEFAULT_HYPERPARAMS } from "../src/engine/hyperparams";
 import {
   BUCKET,
   CHANCE_SLOTS,
-  GUARANTEE,
   playOrder,
   type ChanceSum,
   type ChanceSums,
@@ -23,8 +22,6 @@ import {
 export const THIN_SAMPLE = 20;
 /** A repeat within this many objectives counts as soon. */
 export const SOON = 10;
-/** The acceptance for a guarantee (`data/balance.md#Tiers`). */
-export const ACCEPTANCE = 0.99;
 
 export interface Obj {
   readonly run: number;
@@ -138,32 +135,55 @@ export interface ShareRow {
   readonly key: string;
   readonly name: string;
   readonly count: number;
+  /** Showings per run: a run is the unit a share is judged by, more runs only widen the sample. */
+  readonly perRun: number;
   /** 0 to 1, of the table's objectives. */
   readonly share: number;
+  /** 0 to 1, of the runs, the share it showed in at least once. */
+  readonly seenIn: number;
+  /** The most its catch-up boost can reach; null where none applies. */
+  readonly ceiling: number | null;
   /** The share if every weapon class held as many weapons, where it applies. */
   readonly adjusted?: number;
 }
 
 export interface ShareTable {
   readonly total: number;
+  readonly runs: number;
   readonly rows: readonly ShareRow[];
 }
 
 /** `universe` adds a row at 0 for each key that never showed. */
 function shareTable(
+  sample: Sample,
   objectives: readonly Obj[],
   keysOf: (one: Obj) => readonly string[],
   name: (key: string) => string,
   universe: Iterable<string> = [],
 ): ShareTable {
   const counted = new Map<string, number>();
+  const inRuns = new Map<string, Set<number>>();
   for (const key of universe) counted.set(key, 0);
-  for (const one of objectives) for (const key of new Set(keysOf(one))) counted.set(key, (counted.get(key) ?? 0) + 1);
+  for (const one of objectives) {
+    for (const key of new Set(keysOf(one))) {
+      counted.set(key, (counted.get(key) ?? 0) + 1);
+      inRuns.set(key, (inRuns.get(key) ?? new Set()).add(one.run));
+    }
+  }
   const total = objectives.length;
+  const runs = sample.results.length;
   const rows = [...counted]
-    .map(([key, count]) => ({ key, name: name(key), count, share: total === 0 ? 0 : count / total }))
+    .map(([key, count]) => ({
+      key,
+      name: name(key),
+      count,
+      perRun: count / runs,
+      share: total === 0 ? 0 : count / total,
+      seenIn: (inRuns.get(key)?.size ?? 0) / runs,
+      ceiling: ceilingOf(sample.data, key),
+    }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  return { total, rows };
+  return { total, runs, rows };
 }
 
 const chosenKeys =
@@ -215,15 +235,23 @@ function poolSizes(data: EngineData, characterClass: string, slot: LoadoutSlot):
   return counts;
 }
 
-/** A hand by weapon class, each share beside the one it would have if every class held the same number of
- * weapons, so a skew from pool size reads apart from one from catch-up, stat gates or a modifier. With several
- * classes picked, each class's adjusted shares count by its objectives. */
-export function handShares(sample: Sample, slot: "rh" | "lh"): ShareTable | null {
+/** A hand counted by weapon class, or by the weapon itself. */
+export type HandView = "class" | "weapon";
+
+/** A hand by weapon, or by weapon class with each share beside the one it would have if every class held the same
+ * number of weapons, so a skew from pool size reads apart from one from catch-up, stat gates or a modifier. With
+ * several classes picked, each class's adjusted shares count by its objectives. */
+export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView): ShareTable | null {
   const { data } = sample;
   const classes = sample.classes.filter((id) => !alwaysNone(data, id, slot));
   if (classes.length === 0) return null;
   const inClasses = sample.objectives.filter((one) => classes.includes(one.row.characterClass));
+  if (by === "weapon") {
+    const universe = inReach(sample, classes, [slot]).map(repeatKey);
+    return shareTable(sample, inClasses, chosenKeys([slot]), (key) => nameOf(data, key), universe);
+  }
   const table = shareTable(
+    sample,
     inClasses,
     (one) => {
       const key = handClass(data, one.rolls.get(slot));
@@ -268,36 +296,31 @@ export interface Pairs {
 /** Right hand and left hand classes together, as the player holds them. */
 export function pairs(sample: Sample): Pairs {
   const { data } = sample;
-  const counted = new Map<string, { rh: string; lh: string; count: number }>();
   let same = 0;
   let both = 0;
   for (const one of sample.objectives) {
-    const rh = handClass(data, one.rolls.get("rh"));
-    const lh = handClass(data, one.rolls.get("lh"));
-    if (rh === undefined || lh === undefined) continue;
-    const key = `${rh}+${lh}`;
-    const row = counted.get(key) ?? { rh, lh, count: 0 };
-    row.count += 1;
-    counted.set(key, row);
     const rhItem = chosenItem(data, one.rolls.get("rh"));
     const lhItem = chosenItem(data, one.rolls.get("lh"));
     if (rhItem?.category === "weapon" && lhItem?.category === "weapon") {
       both += 1;
-      if (rh === lh) same += 1;
+      if (handClass(data, one.rolls.get("rh")) === handClass(data, one.rolls.get("lh"))) same += 1;
     }
   }
-  const total = sample.objectives.length;
-  const rows = [...counted]
-    .map(([key, row]) => ({
-      key,
-      name: `${humanise(row.rh)} + ${humanise(row.lh)}`,
-      rh: humanise(row.rh),
-      lh: humanise(row.lh),
-      count: row.count,
-      share: total === 0 ? 0 : row.count / total,
-    }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  return { total, rows, sameClass: { count: same, of: both } };
+  const table = shareTable(
+    sample,
+    sample.objectives,
+    (one) => {
+      const rh = handClass(data, one.rolls.get("rh"));
+      const lh = handClass(data, one.rolls.get("lh"));
+      return rh === undefined || lh === undefined ? [] : [`${rh}+${lh}`];
+    },
+    (key) => key.split("+").map(humanise).join(" + "),
+  );
+  const rows = table.rows.map((row) => {
+    const [rh = "", lh = ""] = row.key.split("+").map(humanise);
+    return { ...row, rh, lh };
+  });
+  return { total: table.total, rows, sameClass: { count: same, of: both } };
 }
 
 /** Whether an ash fits shields rather than weapons. */
@@ -315,7 +338,7 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
     const classes = sample.classes.filter((id) => !alwaysNone(data, id, "spell"));
     if (classes.length === 0) return null;
     const objectives = sample.objectives.filter((one) => classes.includes(one.row.characterClass));
-    return shareTable(objectives, chosenKeys(["spell"]), name, inReach(sample, classes, ["spell"]).map(repeatKey));
+    return shareTable(sample, objectives, chosenKeys(["spell"]), name, inReach(sample, classes, ["spell"]).map(repeatKey));
   }
   const ash = (shield: boolean) => (option: Option) => shieldAsh(data, option.row.id) === shield;
   const universe = {
@@ -334,7 +357,7 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
     rule: chosenKeys(["rule_1", "rule_2"]),
     armor: chosenKeys(["armor"]),
   }[table];
-  return shareTable(sample.objectives, keysOf, name, universe);
+  return shareTable(sample, sample.objectives, keysOf, name, universe);
 }
 
 // Overview
@@ -367,6 +390,7 @@ export function runSummary(sample: Sample): RunSummary {
 /** The picked classes' shares of every objective. */
 export function classShares(sample: Sample): ShareTable {
   const table = shareTable(
+    sample,
     sample.all,
     (one) => [`character_class:${one.row.characterClass}`],
     (key) => nameOf(sample.data, key),
@@ -432,6 +456,7 @@ const REPEAT_KEYS: Readonly<Record<RepeatKind, (one: Obj) => readonly string[]>>
 export interface RepeatRow {
   readonly kind: RepeatKind;
   readonly showings: number;
+  readonly perRun: number;
   /** Mean objectives since the same thing last showed in that run. */
   readonly gap: number;
   /** The share of showings repeating one from the last `SOON` objectives. */
@@ -456,7 +481,7 @@ export function repeats(sample: Sample): readonly RepeatRow[] {
         last.set(key, one.row.objective);
       }
     }
-    return { kind, showings, gap: mean(gaps), soon: showings === 0 ? 0 : gaps.filter((gap) => gap <= SOON).length / showings };
+    return { kind, showings, perRun: showings / sample.results.length, gap: mean(gaps), soon: showings === 0 ? 0 : gaps.filter((gap) => gap <= SOON).length / showings };
   });
 }
 
@@ -464,6 +489,7 @@ export interface EmptyRow {
   readonly characterClass: string;
   readonly slot: LoadoutSlot;
   readonly count: number;
+  readonly perRun: number;
   /** Of the picked classes' objectives. */
   readonly share: number;
 }
@@ -475,12 +501,15 @@ export function empties(sample: Sample): readonly EmptyRow[] {
     for (const [slot, roll] of one.rolls) {
       if (roll.chosen !== null || alwaysNone(sample.data, one.row.characterClass, slot)) continue;
       const key = `${one.row.characterClass}/${slot}`;
-      const row = counts.get(key) ?? { characterClass: one.row.characterClass, slot, count: 0, share: 0 };
+      const row = counts.get(key) ?? { characterClass: one.row.characterClass, slot, count: 0, perRun: 0, share: 0 };
       counts.set(key, { ...row, count: row.count + 1 });
     }
   }
   const total = sample.objectives.length;
-  return [...counts.values()].map((row) => ({ ...row, share: row.count / total })).sort((a, b) => b.count - a.count);
+  const runs = sample.results.length;
+  return [...counts.values()]
+    .map((row) => ({ ...row, perRun: row.count / runs, share: row.count / total }))
+    .sort((a, b) => b.count - a.count);
 }
 
 // Boosts
@@ -488,6 +517,7 @@ export function empties(sample: Sample): readonly EmptyRow[] {
 export interface CatchUpRow {
   readonly key: string;
   readonly count: number;
+  readonly perRun: number;
   /** Of the rolls that showed an item. */
   readonly share: number;
   /** The mean catch-up boost on the items that won. */
@@ -535,115 +565,94 @@ export function catchUpByRegion(sample: Sample): readonly CatchUpRow[] {
     .filter((key) => groups.has(key))
     .map((key) => {
       const list = groups.get(key)!;
-      return { key, count: list.length, share: list.length / rolls.length, catchUp: mean(list.map((roll) => roll.catchUp)) };
+      return { key, count: list.length, perRun: list.length / sample.results.length, share: list.length / rolls.length, catchUp: mean(list.map((roll) => roll.catchUp)) };
     });
 }
 
-export interface BoostRow {
+export interface SynergyRow {
   readonly modifier: ModifierText;
-  /** Rolls where it boosted an option in the pool. */
-  readonly active: number;
-  /** Rolls a boosted option won. */
-  readonly won: number;
-  /** The boosted options' mean summed chance at roll time. */
-  readonly chance: number;
-  /** For a guarantee: what won instead, most often first. */
-  readonly lostTo: readonly { readonly name: string; readonly count: number }[];
+  /** Per run: for a win, objectives where it was in play; for a showing outside it, objectives showing its target
+   * without it. */
+  readonly perRun: number;
+  /** Of those objectives, the share where a boosted option won. */
+  readonly share: number;
+  readonly count: number;
 }
 
-/** Every boosting modifier in play for the picked classes: guarantees (×100,000 or more) first. */
-export function boosts(sample: Sample): { readonly guarantees: readonly BoostRow[]; readonly others: readonly BoostRow[] } {
+const inAnyRoll = (one: Obj, test: (roll: RollRow) => boolean) => [...one.rolls.values()].some(test);
+
+/** A boost that matches the left hand's weapon class to the right hand's: Slots' both-hands table reads these. */
+function pairsHands(modifier: Modifier): boolean {
+  const { target } = modifier;
+  return (
+    target.kind === "subcategory" &&
+    modifier.when.some(
+      (condition) =>
+        condition.kind === "rolled" &&
+        condition.selector.kind === "subcategory" &&
+        condition.selector.ids?.join() === target.ids?.join(),
+    )
+  );
+}
+
+/** Every boosting modifier the Synergies tab lists. */
+const isSynergy = (modifier: Modifier) => modifier.value > 1 && !pairsHands(modifier);
+
+/** Every boosting modifier in play for the picked classes: how often it was active, and how often what it boosted
+ * won. Counted per objective, since a talisman or rule boost is active in both of its slots. */
+export function synergyWins(sample: Sample): readonly SynergyRow[] {
   const { data } = sample;
-  const stats = new Map<string, { active: number; won: number; chance: number[]; lost: Map<string, number> }>();
-  for (const one of sample.objectives) {
-    for (const roll of one.rolls.values()) {
-      roll.boosts.forEach((id, index) => {
-        const row = stats.get(id) ?? { active: 0, won: 0, chance: [] as number[], lost: new Map<string, number>() };
-        row.active += 1;
-        row.chance.push(roll.boostChances[index]!);
-        if (roll.chosenBoosts.includes(id)) row.won += 1;
-        else {
-          const key = roll.chosenKey === null ? "" : nameOf(data, roll.chosenKey);
-          row.lost.set(key, (row.lost.get(key) ?? 0) + 1);
-        }
-        stats.set(id, row);
-      });
-    }
-  }
-  const rows = data.database.modifier.flatMap((modifier): BoostRow[] => {
-    const row = stats.get(modifier.id);
-    if (modifier.value <= 1 || row === undefined) return [];
-    return [
-      {
-        modifier: modifierText(data, modifier),
-        active: row.active,
-        won: row.won,
-        chance: mean(row.chance),
-        lostTo: [...row.lost].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count),
-      },
-    ];
+  const runs = sample.results.length;
+  return data.database.modifier.flatMap((modifier): SynergyRow[] => {
+    if (!isSynergy(modifier)) return [];
+    const active = sample.objectives.filter((one) => inAnyRoll(one, (roll) => roll.boosts.includes(modifier.id)));
+    if (active.length === 0) return [];
+    const won = active.filter((one) => inAnyRoll(one, (roll) => roll.chosenBoosts.includes(modifier.id))).length;
+    return [{ modifier: modifierText(data, modifier), perRun: active.length / runs, share: won / active.length, count: active.length }];
   });
-  return {
-    guarantees: rows.filter((row) => row.modifier.value >= GUARANTEE),
-    others: rows.filter((row) => row.modifier.value < GUARANTEE),
-  };
 }
 
-/** The planned synergies, each a chain of modifiers (data/balance.md#Conditional rules). */
-export const SYNERGIES = [
-  ["bleed_boosts_blood_exultation", "blood_exultation_boosts_white_mask_sets"],
-  ["rot_boosts_kindred_exultation", "kindred_exultation_boosts_mushroom_sets"],
-  ["claw_talisman_makes_jump_attacks_top", "jump_attacks_rule_boosts_jump_sets"],
-  ["dancers_weapon_makes_dancers_set_top"],
-  ["blue_dancer_charm_boosts_light_sets"],
-  ["blue_dancer_charm_boosts_no_armor"],
-] as const;
-
-export interface SynergyStep {
-  readonly modifier: ModifierText;
-  /** Objectives where its trigger held. */
-  readonly triggered: number;
-  /** Of those, objectives where its target rolled. */
-  readonly landed: number;
+function chosenOption(data: EngineData, roll: RollRow): Option | undefined {
+  const id = roll.chosen ?? "";
+  const item = data.items.get(id);
+  if (roll.chosenKey?.startsWith("rule:")) {
+    const rule = data.rules.get(id);
+    return rule === undefined ? undefined : { kind: "rule", row: rule };
+  }
+  if (roll.chosenKey?.startsWith("armor_set:")) {
+    const set = data.armorSets.get(id);
+    return set === undefined ? undefined : { kind: "armor_set", row: set };
+  }
+  return item === undefined ? undefined : { kind: "item", row: item };
 }
 
-/** Counted per objective: a talisman boost is active in both talisman slots. */
-export function synergies(sample: Sample): readonly (readonly SynergyStep[])[] {
+/** Every boosting modifier with a condition on the loadout: the objectives per run showing what it boosts without
+ * it, its condition not holding, and their share of all objectives showing it. Only the classes its class condition names count, and
+ * only the slots it was ever active in, so a Dual-Wield greatsword in the right hand isn't counted against the left
+ * hand's pairing. */
+export function outsideSynergy(sample: Sample): readonly SynergyRow[] {
   const { data } = sample;
-  const active = (one: Obj, id: string) => [...one.rolls.values()].some((roll) => roll.boosts.includes(id));
-  const won = (one: Obj, id: string) => [...one.rolls.values()].some((roll) => roll.chosenBoosts.includes(id));
-  return SYNERGIES.map((chain) =>
-    chain.flatMap((id) => {
-      const modifier = data.database.modifier.find((row) => row.id === id);
-      if (modifier === undefined) return [];
-      const triggered = sample.objectives.filter((one) => active(one, id));
-      return [{ modifier: modifierText(data, modifier), triggered: triggered.length, landed: triggered.filter((one) => won(one, id)).length }];
-    }),
-  ).filter((chain) => chain.length > 0);
-}
-
-export const OUT_OF_PLACE = ["lord_of_bloods_exultation", "kindred_of_rots_exultation", "blue_dancer_charm", "claw_talisman", "axe_talisman"] as const;
-export type OutOfPlace = (typeof OUT_OF_PLACE)[number];
-
-/** Of objectives showing a synergy talisman, those where its synergy didn't hold: for the exultations, no boost
- * brought it in; the Blue Dancer Charm with armor its boosts didn't bring; the Claw and Axe Talismans without
- * their rule. */
-export function outOfPlace(sample: Sample): readonly { readonly id: OutOfPlace; readonly name: string; readonly shown: number; readonly out: number }[] {
-  const { data } = sample;
-  const won = (one: Obj, id: string) => [...one.rolls.values()].some((roll) => roll.chosenBoosts.includes(id));
-  const shown = (one: Obj, id: string) =>
-    (["talisman_1", "talisman_2"] as const).map((slot) => one.rolls.get(slot)).find((roll) => roll?.chosen === id);
-  const tests: Readonly<Record<OutOfPlace, (one: Obj) => boolean>> = {
-    lord_of_bloods_exultation: (one) => (shown(one, "lord_of_bloods_exultation")?.chosenBoosts.length ?? 0) === 0,
-    kindred_of_rots_exultation: (one) => (shown(one, "kindred_of_rots_exultation")?.chosenBoosts.length ?? 0) === 0,
-    blue_dancer_charm: (one) =>
-      !(one.rolls.get("armor")?.chosenBoosts.some((id) => id.startsWith("blue_dancer_charm_boosts")) ?? false),
-    claw_talisman: (one) => !won(one, "claw_talisman_makes_jump_attacks_top"),
-    axe_talisman: (one) => !won(one, "axe_talisman_makes_charged_rules_top"),
-  };
-  return OUT_OF_PLACE.map((id) => {
-    const showing = sample.objectives.filter((one) => shown(one, id) !== undefined);
-    return { id, name: data.items.get(id)?.name ?? id, shown: showing.length, out: showing.filter(tests[id]).length };
+  const runs = sample.results.length;
+  return data.database.modifier.flatMap((modifier): SynergyRow[] => {
+    if (!isSynergy(modifier) || !modifier.when.some((condition) => condition.kind === "rolled")) return [];
+    const classes = modifier.when.flatMap((condition) => (condition.kind === "character_class" ? [condition.ids] : []));
+    const slots = new Set(
+      sample.all.flatMap((one) => [...one.rolls].flatMap(([slot, roll]) => (roll.boosts.includes(modifier.id) ? [slot] : []))),
+    );
+    const targets = (one: Obj) =>
+      [...one.rolls].flatMap(([slot, roll]) => {
+        if (slots.size > 0 && !slots.has(slot)) return [];
+        const option = chosenOption(data, roll);
+        return option !== undefined && matchesOption(modifier.target, option) ? [roll] : [];
+      });
+    const showing = sample.objectives.filter(
+      (one) => classes.every((ids) => ids.includes(one.row.characterClass)) && targets(one).length > 0,
+    );
+    if (showing.length === 0) return [];
+    const outside = showing.filter((one) => targets(one).every((roll) => !roll.chosenBoosts.includes(modifier.id))).length;
+    return [
+      { modifier: modifierText(data, modifier), perRun: outside / runs, share: outside / showing.length, count: showing.length },
+    ];
   });
 }
 
@@ -688,41 +697,17 @@ function ceilingOf(data: EngineData, key: string): number | null {
 export interface ItemRow {
   readonly key: string;
   readonly name: string;
-  /** Slots it was in reach in for the picked classes, in `CHANCE_SLOTS` order. */
-  readonly slots: readonly LoadoutSlot[];
-  readonly odds: number;
-  readonly ceiling: number | null;
-  readonly shownPerRun: number;
-  /** Runs it showed in at least once. */
-  readonly seenIn: number;
 }
 
-/** Every option in reach for the picked classes, with how often it showed. */
+/** Every option in reach for the picked classes. */
 export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
-  const { data } = sample;
   const picked = new Set(sample.classes);
-  const slotsOf = new Map<string, Set<LoadoutSlot>>();
+  const keys = new Set<string>();
   for (const at of chances.keys()) {
-    const [characterClass = "", slot = "", key = ""] = at.split("|");
-    if (!picked.has(characterClass)) continue;
-    const slots = slotsOf.get(key) ?? new Set<LoadoutSlot>();
-    slots.add(slot as LoadoutSlot);
-    slotsOf.set(key, slots);
+    const [characterClass = "", , key = ""] = at.split("|");
+    if (picked.has(characterClass)) keys.add(key);
   }
-  const shown = showings(sample);
-  const runs = sample.results.length;
-  return [...slotsOf].map(([key, slots]) => {
-    const perRun = shown.get(key) ?? sample.results.map(() => []);
-    return {
-      key,
-      name: nameOf(data, key),
-      slots: CHANCE_SLOTS.filter((slot) => slots.has(slot)),
-      odds: baseOdds(data, key),
-      ceiling: ceilingOf(data, key),
-      shownPerRun: perRun.reduce((sum, objectives) => sum + objectives.length, 0) / runs,
-      seenIn: perRun.filter((objectives) => objectives.length > 0).length,
-    };
-  });
+  return [...keys].map((key) => ({ key, name: nameOf(sample.data, key) }));
 }
 
 export interface ItemPoint {

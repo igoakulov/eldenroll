@@ -102,12 +102,12 @@ export function main(argv: readonly string[], repo: string): void {
   writeFileSync(
     path.join(out, "rolls.csv"),
     csv([
-      ["allocation", "run", "objective", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "catch_up", "pool", "none_chance", "guaranteed_chance", "guaranteed_won", "boosts", "boost_chances", "chosen_boosts"],
+      ["allocation", "run", "objective", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "catch_up", "pool", "none_chance", "boosts", "boost_chances", "chosen_boosts"],
       ...results.flatMap((result, index) =>
         result.rolls.map((row) => [
           result.options.allocation, index, row.objective, row.region, row.level, row.characterClass, row.boss, row.slot,
           row.chosen ?? "(empty)", row.chosenKey, row.chance, row.catchUp, row.pool, row.noneChance,
-          row.guaranteedChance, row.guaranteedWon, row.boosts.join(";"),
+          row.boosts.join(";"),
           row.boostChances.map((value) => value.toPrecision(4)).join(";"), row.chosenBoosts.join(";"),
         ]),
       ),

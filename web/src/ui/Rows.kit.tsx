@@ -61,21 +61,4 @@ export const kit: readonly KitBlock[] = [
     ),
     note: "On desktop, hover brightens a framed row's frame.",
   },
-  {
-    id: "row-verdict",
-    title: "Row with a verdict",
-    section: "simulation",
-    size: "phone",
-    states: [
-      {
-        label: "pass, then fail",
-        render: ({ samples }) => (
-          <div className="kit-pad">
-            <ListRow title={samples.talisman.name} value="99.6% of 270" verdict="pass" />
-            <ListRow title={samples.rule.name} detail={`Lost to ${samples.armorSet.name} 5.9%`} value="94.1% of 17" verdict="fail" />
-          </div>
-        ),
-      },
-    ],
-  },
 ];

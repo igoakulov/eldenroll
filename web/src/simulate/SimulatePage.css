@@ -89,6 +89,10 @@
   margin-right: var(--gutter);
 }
 
+.simulate-switch {
+  margin-bottom: var(--space-4);
+}
+
 .simulate-lede {
   margin-bottom: var(--space-4);
   font-size: var(--type-small);
@@ -142,7 +146,6 @@
 
 .simulate-charts {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-6);
 }
 

@@ -300,29 +300,26 @@ export const copy = {
     allClasses: "All",
     searchLabel: "Search the tables",
     searchPlaceholder: "Find an item, combat rule or armor set",
-    tabs: ["Overview", "Slots", "Boosts", "Variety", "Items"],
+    tabs: ["Overview", "Slots", "Synergies", "Variety", "Items"],
     noClasses: "Pick a class to see its results.",
     showAll: (count: number) => `Show all ${count}`,
     showLess: "Show less",
-    counted: (total: number) => `Out of ${total} objectives.`,
+    counted: (perRun: string) => `Out of ${perRun} objectives per run.`,
     nothing: "Nothing.",
     columns: {
       name: "Name",
       share: "Share",
-      objectives: "Objectives",
-      rolls: "Rolls",
       what: "What",
       gap: "Gap",
       soon: "Within 10",
-      showings: "Showings",
       klass: "Class",
       slot: "Slot",
       region: "Region",
       boost: "Boost",
       value: "Mean",
-      shownPerRun: "Shown per run",
-      seenIn: "Runs it showed in",
-      ceiling: "Catch-up up to",
+      perRun: "Per run",
+      seenIn: "Runs",
+      ceiling: "Catch-up",
     },
     overview: {
       runs: "Runs",
@@ -336,13 +333,19 @@ export const copy = {
     slots: {
       rh: "Right hand",
       lh: "Left hand",
-      handLede: "By weapon class. The bright tick is the share pool size alone would give, if every class held as many weapons.",
+      handLede: {
+        class: "By weapon class. The bright tick is the share pool size alone would give, if every class held as many weapons.",
+        weapon: "By weapon.",
+      },
+      countBy: "Count by",
+      byClass: "Weapon class",
+      byWeapon: "Weapon",
       pairs: "Both hands",
       pairsLede: "Right hand and left hand classes together, as the player holds them.",
       rhColumn: "Right hand",
       lhColumn: "Left hand",
-      sameClass: (share: string, of: number) =>
-        `Same weapon class in both hands: ${share} of the ${of} objectives with a weapon in each.`,
+      sameClass: (share: string, of: string) =>
+        `Same weapon class in both hands: ${share} of the ${of} objectives per run with a weapon in each.`,
       dualWieldAim: "The aim for Dual-Wield Warrior is 75%.",
       spell: "Spell",
       weaponAsh: "Ashes of war for weapons",
@@ -361,28 +364,19 @@ export const copy = {
       emptiesLede: "Rolls that found nothing at all, not even none. A slot whose only roll is none is left out.",
       noEmpties: "Every slot found something to roll.",
     },
-    boosts: {
-      guarantees: "Guarantees",
-      guaranteesLede: "Each must win 99% of the rolls where it is in play.",
-      won: (share: string, active: number) => `${share} of ${active}`,
-      failed: (share: string, active: number) => `${share} of ${active}, under 99%`,
-      lostTo: (names: string) => `Lost to ${names}`,
-      lostToEmpty: "an empty roll",
-      others: "Other boosts",
-      othersLede: "How often an option they boosted won, with no aim to meet.",
-      synergies: "Planned synergies",
-      synergiesLede: "Each step: how often its target rolled once its trigger was in place.",
-      landed: (share: string, triggered: number) => `${share} of ${triggered}`,
-      outOfPlace: "Synergy talismans out of place",
-      outOfPlaceLede: "Of the objectives showing the talisman, the share where its synergy didn't hold.",
-      outOfPlaceDetail: {
-        lord_of_bloods_exultation: "No bleed weapon or ash brought it in",
-        kindred_of_rots_exultation: "No rot or poison weapon or ash brought it in",
-        blue_dancer_charm: "Armor neither a light set nor the Naked Set it boosted",
-        claw_talisman: "Without Jump attacks only",
-        axe_talisman: "Without a charged-attack combat rule",
-      },
-      /** A modifier: its conditions, its targets and the multiplier, in game names. */
+    synergies: {
+      wins: "Synergy wins",
+      winsLede:
+        "Every modifier that boosts: how often it was in play per run, and the share of those objectives where what it boosted won.",
+      outside: "Shown without their synergy",
+      outsideLede:
+        "What a synergy boosts, showing without it, its condition not holding: the share of all its showings, and how often per run. Only the classes and slots the synergy applies to count.",
+      id: "Id",
+      rule: "Synergy",
+      won: "Won",
+      without: "Without",
+      times: (value: string) => `×${value}`,
+      /** A modifier: its conditions and its targets, in game names. */
       list: (names: readonly string[] | null) =>
         names === null
           ? "anything"
@@ -408,7 +402,7 @@ export const copy = {
       notBoss: (names: string) => `the boss isn't ${names}`,
       or: " or ",
       and: "; ",
-      modifier: (when: string, target: string, times: string) => `${when} → ${target} ×${times}`,
+      target: (names: string) => `→ ${names}`,
       always: "Always",
     },
     variety: {
@@ -437,12 +431,9 @@ export const copy = {
     },
     items: {
       overTheRun: "Over the run",
-      items: "Items",
-      itemsLede:
-        "Every option in reach for the picked classes: how often it showed per run, the share of runs it showed in at all, and the most its catch-up boost can reach. Rarest first. Showings count every class.",
       chartLede: (shown: number, more: number) =>
         `Each item's chance per stretch of 20 objectives: its share of its slot's roll, against every option competing with it at that moment. The gold line is the chance with the catch-up boost, the dashed one with the boost removed from every option. Items in reach from the start sit below the dashed line, since later items take a bigger share; a late item rises above it from when it comes into reach. Both lines fall as new regions and higher stats bring more competitors. A dot is an objective it showed on, in any run, for the picked classes.${
-          more === 0 ? "" : ` Charts for the first ${shown} matches, ${more} more in the table; narrow the search to chart them.`
+          more === 0 ? "" : ` Charts for the first ${shown} matches; ${more} more match, so narrow the search to chart them.`
         }`,
       searchToChart: "Search for an item to chart its chance over the run.",
       times: (value: string) => `×${value}`,
