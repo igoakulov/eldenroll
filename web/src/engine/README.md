@@ -122,7 +122,7 @@ A rule is its name and nothing else, so the name says the whole rule: `Land a ri
 
 - `No talismans` is advisory: talismans roll first, so they show and the player ignores them. `No armor` makes the `Naked Set` top tier instead, because armor rolls after the rules.
 - `No healing flasks` allows healing items, spells and blocking, and doesn't forbid the Flask of Wondrous Physick.
-- Rules have no location filter, so the tears that come only from DLC bosses sit at `odds = 0` (`data/balance.md#Parked crystal tears`).
+- Rules have no location filter, so the tears that come only from DLC bosses sit at `odds = 0` (`data/balance.md#Base odds`).
 - Requirements remove a rule the loadout can't obey, and exclusions keep two contradicting rules apart.
 - A trigger or target from a boss waits until it is felled; a modifier whose target is filtered out is simply inactive.
 

@@ -29,6 +29,7 @@ NAMES = {
     "Parry only",
     "No ripostes",
     "No lock-on",
+    "No buffs",
     "No healing flasks",
     "No armor",
     "No talismans",
@@ -43,9 +44,9 @@ NAMES = {
 }
 
 
-def test_the_28_rules_match_the_prd() -> None:
+def test_the_29_rules_match_the_prd() -> None:
     rules = load_combat_rules(CSV)
-    assert len(rules) == 28
+    assert len(rules) == 29
     assert {rule.name for rule in rules} == NAMES
 
 

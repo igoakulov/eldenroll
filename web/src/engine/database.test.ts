@@ -67,7 +67,7 @@ describe("db.json", () => {
     expect(database.item.filter((row) => row.category === "none")).toHaveLength(1);
     expect(database.character_class).toHaveLength(8);
     expect(database.slot_pool).toHaveLength(72);
-    expect(database.combat_rule).toHaveLength(28);
+    expect(database.combat_rule).toHaveLength(29);
     expect(database.alias).toHaveLength(11);
   });
 

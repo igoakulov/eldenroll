@@ -42,8 +42,10 @@ When two boosted options meet in one pool, compare them with each other, not wit
 
 `web/src/engine/hyperparams.ts` holds the balance values that apply to every row, passed into the engine so a hidden page can tune them live during a play-test.
 
+Decay and the lateness boost are both off, at a rate of 1 and a `boostMax` of 0: owner, 2026-11-14, for a clean baseline, so engine tuning is added back only where the simulation shows a problem. Decay mattered mainly in small pools (talismans and rules all run, other categories only early); the mechanisms below stay in the code.
+
 - **`decay`** multiplies an option's odds once per completed objective that showed it, so a run keeps varying. The rate isn't flat: it depends on the size of the option's pool — its item category, or the rule or armor-set table — so a wide pool (weapons, armor sets) decays hard, spreading exposure to many other options including late-game ones that just came into reach, while a pool of one, such as `none` in its own category, barely decays. `max` is the rate at pool size 1, `min` the rate an arbitrarily large pool approaches, and `halfSize` the pool size halfway between them; a key with no pool (there should be none) decays as a pool of 1. `decayRate` and `EngineData.decayGroupSize` do the arithmetic. Classes are the one exception: their odds are a deliberate mix of playstyles, not a pool to keep varied, so they never decay (`rollCharacterClass` in `run.ts`).
-- **`lateOffset`** boosts an item's odds by how late its region is and how demanding its stats are, on top of decay: a wide pool barely decays per repeat, and keeps growing as regions open, so a late or demanding item can still sit far below the rest of its pool for most of a run. `lateness = (nativeLevel − 1) / (maxLevel − 1)`, `nativeLevel` the lowest region level among the item's own locations (1, no boost, for anything with none, such as consumables); `demand = effectiveTotal / maxEffectiveTotal`, `effectiveTotal = str/1.5 + dex + int + fth + arc`, Str divided by the two-handing bonus so it reads on the same scale as the rest. `boost = 1 + boostMax × (levelWeight × lateness + statWeight × demand)`. Owner, 2026-11-13: `levelWeight` 0.7 and `statWeight` 0.3, since a late region is a hard ceiling on how many objectives can ever offer the item, while a high stat requirement is softer — the item is still reachable, `Max stat gap` already tolerates a deficit, and the gap closes as the player levels; `boostMax` 3. Boost-only, with no matching deboost of early, undemanding items, so a skew across categories from this alone is still open (`internal/decisions/open.md#Lateness and stat-requirement decay offset`). `lateBoost` and `EngineData.lateOffset` do the arithmetic; rules and armor sets don't get it, only items.
+- **`lateOffset`** boosts an item's odds by how late its region is and how demanding its stats are, on top of decay: in a wide pool each repeat frees little room for any one other option, and the pool keeps growing as regions open, so a late or demanding item can still sit far below the rest of its pool for most of a run. `lateness = (nativeLevel − 1) / (maxLevel − 1)`, `nativeLevel` the lowest region level among the item's own locations (1, no boost, for anything with none, such as consumables); `demand = effectiveTotal / maxEffectiveTotal`, `effectiveTotal = str/1.5 + dex + int + fth + arc`, Str divided by the two-handing bonus so it reads on the same scale as the rest. `boost = 1 + boostMax × (levelWeight × lateness + statWeight × demand)`. Owner, 2026-11-13: `levelWeight` 0.7 and `statWeight` 0.3, since a late region is a hard ceiling on how many objectives can ever offer the item, while a high stat requirement is softer — the item is still reachable, `Max stat gap` already tolerates a deficit, and the gap closes as the player levels; `boostMax` 3. Boost-only, with no matching deboost of early, undemanding items, so a skew across categories from this alone is still open (`internal/decisions/open.md#Lateness and stat-requirement decay offset`). `lateBoost` and `EngineData.lateOffset` do the arithmetic; rules and armor sets don't get it, only items.
 - **`defaultMaxStatGap`** is how far above the player's stats an item may be. It is per item, never a shared budget, so a loadout of several near-reach items is fine.
 
 ## Base odds
@@ -57,11 +59,11 @@ A row's own odds, for every option that rolls differently all the time. Files: `
 | rule | `none` | 4 | so not every fight carries two rules: objectives with 0, 1 and 2 rules should come up about equally often |
 | rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` | 0.5 | owner decision: the full-run simulation (`web/sim/README.md`) showed these five crowding out other rules and, for `no_armor`, pushing the `Naked Set` and the Blue Dancer Charm's light sets past their guarantee's reach of each other |
 | rule | `parry_only` `l2_only` | 0.5 | owner decision: both limit the moveset a lot, `L2 only` sometimes clashing with an ash it doesn't suit, so each joins the other hard rules at about 5% |
-| rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach (#Parked crystal tears) |
+| rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
 | item | `grafted_dragon` | 3 | `Jester`'s signature right hand; it rolls nowhere else (#29. Grafted Dragon only on Jester) |
 | item | `perfumed_oil_of_ranah` `ancestral_infants_head` `omen_bairn` `regal_omen_bairn` `horned_bairn` | 28 | the item slot rolls tools and consumables together, and consumables far outnumber tools, so each tool rolls at half the odds of the whole `Any pots / perfumes` alias, whose members all sit at 1. Tools keep the region filter and consumables don't, so no tool rolls in the Limgrave region until a boss is felled |
 | item | `wraith_calling_bell` | 10 | owner decision: the full-run simulation showed it far ahead of the other tools, since it's reachable from Liurnia while they wait for a later region or boss; brought down to where theirs land |
-| item | `bone_dart` `poisonbone_dart` `crystal_dart` `throwing_dagger` `kukri` `fan_daggers` `dragon_communion_harpoon` `ruin_fragment` `roundrock` `poisoned_stone` `poisoned_stone_clump` `explosive_stone` `explosive_stone_clump` `glintstone_scrap` `large_glintstone_scrap` `cuckoo_glintstone` `glinting_nail` `gravity_stone_fan` `gravity_stone_chunk` `fire_spritestone` `spritestone` `fire_coil` `surging_frenzied_flame` `innard_meat` `call_of_tibia` | 0.335 | the throwables, a third less often than pots and perfumes to start, then owner decision: the full-run simulation still showed them taking the item slot too often, so they're at half that |
+| item | `bone_dart` `poisonbone_dart` `crystal_dart` `throwing_dagger` `kukri` `fan_daggers` `dragon_communion_harpoon` `ruin_fragment` `roundrock` `poisoned_stone` `poisoned_stone_clump` `explosive_stone` `explosive_stone_clump` `glintstone_scrap` `large_glintstone_scrap` `cuckoo_glintstone` `glinting_nail` `gravity_stone_fan` `gravity_stone_chunk` `fire_spritestone` `spritestone` `fire_coil` `surging_frenzied_flame` `innard_meat` `call_of_tibia` | 0.335 | the throwables, together a third as often as the whole `Any pots / perfumes` alias to start, then owner decision: the full-run simulation still showed them taking the item slot too often, so they're at half that, about a sixth |
 | item | `igons_drake_hunt` | 0 | easily missed in the game; `Igon's Greatbow` itself keeps normal odds |
 | item | `lamenters_mask` `rock_heart` `priestess_heart` | 0 | transforms that conflict with gear, so an objective can't use one with its loadout |
 | item | `litany_of_proper_death` | 0 | its places are hard to pin down, and it is nearly useless against anything not undead |
@@ -107,9 +109,10 @@ Four questions decide a tier: what happens when the rule is missing (an impossib
 Most classes are just their pools in `slot_pools.csv`. Four have rules on top:
 
 - **Dual-Wield Warrior:** same-class pairs and paired weapons (#26. Dual-Wield Warrior pairs), and `Grafted Dragon` kept out (#29. Grafted Dragon only on Jester).
-- **Jester:** its right hand's balance (#19. Jester's right hand), `Grafted Dragon` as its own, and odd pairs left alone on purpose (#Decided against). Its pool holds `none`, 6 offensive greatshields, torches, perfume bottles, one staff and `Grafted Dragon`; none of the greatshields is reachable in the Limgrave region, which is accepted because `Jester` rolls about once per run there.
+- **Jester:** its right hand's balance (#19. Jester's right hand), `Grafted Dragon` as its own, and odd pairs, such as `Spinning Weapon` on a staff, left alone on purpose: they are the point of the class. Its pool holds `none`, 6 offensive greatshields, torches, perfume bottles, one staff and `Grafted Dragon`; none of the greatshields is reachable in the Limgrave region, which is accepted because `Jester` rolls about once per run there.
 - **Knight:** the thrusting shield (#10. Knight's thrusting shield) and no paired weapons (#28. No paired weapons in unpaired classes).
 - **Sorcerer and Pyromancer:** never `L2 only` (#6. L2 only needs a skill), and a second catalyst in LH (#32. A second catalyst for casters).
+- **Sorcerer, Pyromancer, Ranger and Jester** lose the talismans and rules they can't use (#33. Talismans a class can't use, #34. Attack rules a class can't use).
 
 ### 1. Parry only needs a parry ash
 
@@ -125,7 +128,7 @@ Rows: `charged_r2_needs_a_melee_weapon_in_rh`, `stonebarb_needs_a_weapon_in_rh`
 
 ### 3. Melee rules need a melee weapon
 
-P1. `Jump attacks only`, `Rolling / crouch attacks only` and `Land a riposte` need a melee weapon, thrusting shield, torch or perfume bottle in a hand; `Sorcerer` and `Pyromancer` would hit it on every roll.
+P1. `Jump attacks only`, `Rolling / crouch attacks only` and `Land a riposte` need a melee weapon, thrusting shield, torch or perfume bottle in a hand; `Sorcerer` and `Pyromancer` would hit it on every roll. `No ripostes` needs one too, since without one it asks nothing.
 
 Rows: `melee_rules_need_a_melee_weapon_in_a_hand`
 
@@ -163,7 +166,7 @@ Rows: `heavy_rh_removes_blue_dancer_charm`, `two_hands_need_a_lightest_rh_for_bl
 
 ### 12. Blue Dancer Charm and the light sets
 
-P2. A named class idea: the charm wants a light load, so the 9 light sets (`guarantee`) and `No armor` (`strong`) follow it. Built; its final weight waits for the armor set balance at the simulation.
+P2. A named class idea: the charm wants a light load, so the 9 light sets (`guarantee`) and `No armor` (`strong`) follow it. Owner, 2026-11-13: final, since the simulation shows the sets winning every roll the charm is in.
 
 Rows: `blue_dancer_charm_boosts_light_sets`, `blue_dancer_charm_boosts_no_armor`
 
@@ -271,29 +274,21 @@ P2. Small and medium shields crowd a caster's LH at equal odds, so catalysts go 
 
 Rows: `casters_lh_prefers_a_second_catalyst`
 
-### Planned
+### 33. Talismans a class can't use
 
-- **12 (balance)** waits for the armor set balance.
+P1. A talisman that does nothing for the loadout wastes the slot, and the talisman pool is small enough that each one shifts the rest. From each talisman's Fextralife page, owner's rulings, 2026-11-14:
 
-### Parked crystal tears
+- Critical hits, R1 chains, jump, roll and dash attacks, charged attacks and successive melee hits (`Dagger Talisman`, `Twinblade Talisman`, `Claw Talisman`, `Retaliatory Crossed-Tree`, `Lacerating Crossed-Tree`, `Blade of Mercy`, `Godskin Swaddling Cloth`, `Axe Talisman`) need melee: never `Sorcerer`, `Pyromancer` or `Ranger` (the wiki says bows don't count), and never `Jester`, taken as a whole rather than by what its right hand holds.
+- `Curved Sword Talisman` boosts guard counters: never `Ranger` or a caster, `Spellblade` included.
+- `Greatshield Talisman` and `Pearl Shield Talisman` act only while guarding: never `Ranger`, `Sorcerer` or `Pyromancer`; a caster can hide behind a shield, but it isn't a way to fight.
+- `Shard of Alexander` boosts skills, so it follows `L2 only` (#6. L2 only needs a skill): never `Sorcerer` or `Pyromancer`, nor an empty right hand.
+- `Rellana's Cameo` boosts only stance skills: it needs `Square Off`, `Unsheathe`, `Wing Stance` or `Overhead Stance` on a hand, or `Moonveil`, `Rellana's Twin Blades` or `Sword of Night and Flame`, whose own skills are stances.
+- `Beloved Stardust` speeds up casting, so only `Sorcerer`, `Pyromancer` and `Spellblade` roll it. `Old Lord's Talisman` stays for everyone, since any class can lengthen a buff with it.
 
-The three tears at odds 0 have no rows. Turning one on by odds alone would bring it back with no exclusions, so restore these with it:
+Rows: `melee_talismans_need_a_melee_class`, `guard_counter_talisman_not_on_casters_or_ranger`, `guard_talismans_not_on_pure_casters_or_ranger`, `shard_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`
 
-| Tear | Restore |
-|---|---|
-| All 3 | it excludes `Drink Stonebarb Cracked Tear`, `Drink Ruptured Crystal Tear` and any other tear turned on, both ways |
-| `Drink Deflecting Hardtear` | needs a melee weapon, thrusting shield, torch, perfume bottle or shield in a hand, because it boosts guarding |
-| `Drink Crimson-Sapping Cracked Tear` | excludes `Do not get hit`, because it heals a player who is never hurt; `Godskin Swaddling Cloth` makes it top tier |
-| `Drink Bloodsucking Cracked Tear` | `Blasphemous Blade` and `Prayerful Strike` boost it `×5`, with `No healing flasks` and `Overloaded` (#25. Blasphemous Blade and Prayerful Strike) |
+### 34. Attack rules a class can't use
 
-### Ideas
+P1. Owner, 2026-11-14: `Sorcerer` and `Pyromancer` don't attack physically, so `R1 only` and `R2 only` mean nothing for them; a bow can't attack from the left hand, so `Ranger` never gets `L1 only (can swap hands)`. Jumps, rolls, ripostes and charged attacks are already covered (#2. Charged attacks need a weapon in the right hand, #3. Melee rules need a melee weapon), and `L2 only` by #6. L2 only needs a skill.
 
-Candidate combat rules, unscored until someone defines a requirement and its exclusions: `No jumping` · `No sprinting` · `No blocking` · `No buffs` · `No spirit ashes` · `No summons` · `No FP` · `No skills` · `No spells` · `No items` · `No critical hits` · `No thrusting attacks` · `No jumping attacks` · `No guard counters` · `No backsteps` · `No camera lock` (a duplicate of `No lock-on`; keep one name).
-
-### Decided against
-
-| Rule | Why not |
-|---|---|
-| Removing odd pairs in `Jester`, such as `Spinning Weapon` on a staff | they are the point of that class |
-| A size rule for `Dual-Wield Warrior` hands | comical mismatches are accepted rather than adding sizes to the data |
-| An engine filter for same-class hands | a same-class boost needs no re-roll or fallback (#26. Dual-Wield Warrior pairs) |
+Rows: `r1_r2_only_not_on_pure_casters`, `l1_only_not_on_ranger`

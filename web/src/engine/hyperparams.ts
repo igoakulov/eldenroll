@@ -17,8 +17,8 @@ export function decayRate(size: number, params: DecayParams): number {
 }
 
 /** Boosts an item's odds by how late its region is and how demanding its stats are, on top of
- * decay: a wide pool barely decays per repeat, and keeps growing as regions open, so a late or
- * demanding item can otherwise sit unreachable odds below the rest of its pool for most of a run.
+ * decay: in a wide pool each repeat frees little room for any one other option, and the pool keeps
+ * growing as regions open, so a late or demanding item can otherwise sit unreachable odds below the rest of its pool for most of a run.
  * `lateness` and `demand` are read from `EngineData.lateOffset`, both already 0 to 1
  * (`data/balance.md#Hyperparameters`); boost-only, not a matching deboost of early, undemanding
  * items, so a cross-category skew from this alone is still open. */
@@ -43,8 +43,10 @@ export interface Hyperparams {
   readonly defaultMaxStatGap: number;
 }
 
+/** Decay and the lateness boost are off (`data/balance.md#Hyperparameters`): a rate of 1 and a
+ * `boostMax` of 0 leave every option at its odds. */
 export const DEFAULT_HYPERPARAMS: Hyperparams = {
-  decay: { max: 0.95, min: 0.5, halfSize: 150 },
-  lateOffset: { levelWeight: 0.7, statWeight: 0.3, boostMax: 3 },
+  decay: { max: 1, min: 1, halfSize: 150 },
+  lateOffset: { levelWeight: 0.7, statWeight: 0.3, boostMax: 0 },
   defaultMaxStatGap: 10,
 };

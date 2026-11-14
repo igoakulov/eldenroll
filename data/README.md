@@ -101,5 +101,3 @@ Already decided, so not to be reopened without new data: talisman, tool and spel
 ## Build
 
 `pipeline/README.md` has the command. It runs the gate and writes `build/db.json` and `build/import-report.json` (counts, coverage, pools with several top-tier modifiers, guarantee targets off base odds, dropped values), or nothing when a check fails, naming every failure. Two runs with the same inputs give a byte-identical `db.json`: no timestamp, path or machine value. Nothing under `web/` reads `sources/`.
-
-One gate check waits for the balance simulation: the largest soft-multiplier product per pool, and per-option selection rates.

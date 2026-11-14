@@ -16,6 +16,7 @@ rolling_crouch_attacks_only,Rolling / crouch attacks only,1
 parry_only,Parry only,0.5
 no_ripostes,No ripostes,1
 no_lock_on,No lock-on,1
+no_buffs,No buffs,1
 no_healing_flasks,No healing flasks,0.5
 no_armor,No armor,0.5
 no_talismans,No talismans,1
