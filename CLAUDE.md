@@ -38,7 +38,6 @@ Run both before and after a change, and expect them clean with no skips:
 - zsh aborts a whole command when a glob matches nothing. Quote globs.
 - The shell's directory can change between commands; use absolute paths or `cd` in the same command.
 - Deleting a Markdown table row by script can merge two rows; search for `||` afterwards.
-- The item `none` is one key across all slots, so compounding decay hits it on almost every objective: `Jester`'s empty right hand and the rule `None` fade fast.
 - Felling Maliketh before every Royal Capital boss leaves those bosses unreachable; the run then finishes without them.
 - `Great Épée`, `Miséricorde`, `Kalé` and `Varré's Bouquet` carry accents. Slugs keep every letter: `Thops's Barrier` is `thopss_barrier`.
 - Fandom refuses WebFetch with HTTP 402; read it in a browser.

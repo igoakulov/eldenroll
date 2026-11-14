@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 
 import "./DataTable.css";
+import { ShowAll } from "./ShowAll";
 
 export interface DataColumn<R> {
   readonly id: string;
@@ -10,6 +11,13 @@ export interface DataColumn<R> {
   /** Absent for a column that doesn't sort. */
   readonly sortValue?: (row: R) => number | string;
   readonly render: (row: R) => ReactNode;
+}
+
+/** Folds a long table after its first rows, in the current sort, behind `Show all`. */
+export interface TableFold {
+  readonly after: number;
+  readonly showAll: (count: number) => string;
+  readonly showLess: string;
 }
 
 /** A table of figures: a column heading in small caps sorts by its column, numbers first from the largest, names
@@ -23,6 +31,7 @@ export function DataTable<R>({
   faded,
   initialSort,
   empty,
+  fold,
 }: {
   readonly label: string;
   readonly columns: readonly DataColumn<R>[];
@@ -33,7 +42,9 @@ export function DataTable<R>({
   readonly initialSort?: string;
   /** What shows in place of an empty table. */
   readonly empty?: string;
+  readonly fold?: TableFold;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const [sort, setSort] = useState<{ readonly id: string; readonly reversed: boolean } | null>(
     initialSort === undefined ? null : { id: initialSort, reversed: false },
   );
@@ -53,51 +64,71 @@ export function DataTable<R>({
     return largestFirst !== sort.reversed ? "descending" : "ascending";
   };
 
+  const folds = fold !== undefined && sorted.length > fold.after;
+  const shown = folds && !expanded ? sorted.slice(0, fold.after) : sorted;
+
   if (rows.length === 0 && empty !== undefined) return <p className="data-table-empty">{empty}</p>;
   return (
-    <div className="data-table-frame">
-      <table className="data-table" aria-label={label}>
-        <thead>
-          <tr>
-            {columns.map((one) => (
-              <th
-                key={one.id}
-                scope="col"
-                className={one.numeric === true ? "data-table-numeric" : undefined}
-                aria-sort={direction(one)}
-              >
-                {one.sortValue === undefined ? (
-                  one.label
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSort((last) => ({ id: one.id, reversed: last?.id === one.id ? !last.reversed : false }))
-                    }
-                  >
-                    {one.label}
-                    <span className="data-table-sort" aria-hidden="true">
-                      {direction(one) === "ascending" ? "▴" : direction(one) === "descending" ? "▾" : ""}
-                    </span>
-                  </button>
-                )}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((row) => (
-            <tr key={rowKey(row)} className={faded?.(row) === true ? "data-table-faded" : undefined}>
+    <>
+      <div className="data-table-frame">
+        <table className="data-table" aria-label={label}>
+          <thead>
+            <tr>
               {columns.map((one) => (
-                <td key={one.id} className={one.numeric === true ? "data-table-numeric" : undefined}>
-                  {one.render(row)}
-                </td>
+                <th
+                  key={one.id}
+                  scope="col"
+                  className={one.numeric === true ? "data-table-numeric" : undefined}
+                  aria-sort={direction(one)}
+                >
+                  {one.sortValue === undefined ? (
+                    one.label
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSort((last) => ({ id: one.id, reversed: last?.id === one.id ? !last.reversed : false }))
+                      }
+                    >
+                      {one.label}
+                      <span className="data-table-sort" aria-hidden="true">
+                        {direction(one) === "ascending" ? "▴" : direction(one) === "descending" ? "▾" : ""}
+                      </span>
+                    </button>
+                  )}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {shown.map((row, index) => (
+              <tr
+                key={rowKey(row)}
+                className={
+                  [faded?.(row) === true ? "data-table-faded" : "", folds && index >= fold.after ? "show-all-new" : ""]
+                    .filter(Boolean)
+                    .join(" ") || undefined
+                }
+              >
+                {columns.map((one) => (
+                  <td key={one.id} className={one.numeric === true ? "data-table-numeric" : undefined}>
+                    {one.render(row)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {folds && (
+        // The wrapper takes whatever margin the page gives the table, so the full-width button lines up with it
+        <div className="data-table-more">
+          <ShowAll className="data-table-show-all" expanded={expanded} onToggle={() => setExpanded(!expanded)}>
+            {expanded ? fold.showLess : fold.showAll(sorted.length)}
+          </ShowAll>
+        </div>
+      )}
+    </>
   );
 }
 

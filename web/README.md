@@ -51,7 +51,7 @@ One screen from Start and from the menu. It reopens on the last tab used, so a l
 
 ### Bosses
 
-Every boss instance with `odds > 0`, under a legend of the three states. `Felled` writes to `deadBosses`, `Skipped` to `skippedBosses`: before a run, the lists `Start run` hands the engine, where every felled boss counts as felled on the way; during one, `Save` applies them through `setBossState`. Marking a boss here decays nothing.
+Every boss instance with `odds > 0`, under a legend of the three states. `Felled` writes to `deadBosses`, `Skipped` to `skippedBosses`: before a run, the lists `Start run` hands the engine, where every felled boss counts as felled on the way; during one, `Save` applies them through `setBossState`. Marking a boss here changes nothing until the next roll.
 
 - A boss felled with `Done` can't change and is listed by objective, folded; the current objective's boss can't change either, since only `Felled?` marks it. One marked by `Felled?` is `Felled` and can change.
 - Alive bosses show only in search results. A changed row keeps its place until `Save`; a new search regroups the rows by their pending states.
@@ -136,7 +136,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 Totals, top classes, unique gear and most rerolled; their layout is in #Run view.
 
 - Only completed objectives count; `none` and `any` never.
-- Top lists by gear category were dropped: with decay a category drifts towards an even spread, or the shortlist dominates it, and the player already knows their shortlist. Counts of unique gear say more.
+- No top lists by gear category: the shortlist would dominate one, and the player already knows their shortlist. Counts of unique gear say more.
 - **Unique gear** counts distinct entries per category, an alias as one label. `Any staff` and `Any seal` are left out of weapons: those classes attack with spells, so the label says nothing about their weapon. `Any torch` counts, because the torch is the weapon.
 - **Most rerolled** ranks everything a reroll replaced, across bosses, classes, gear and rules, by how often; ties by name.
 - Bosses aren't ranked: each completes at most once. `Bosses felled` counts those felled in objectives and on the way. Completed objectives and bosses accounted for can differ.

@@ -1,16 +1,14 @@
 import type { Item, LoadoutSlot, PoolSlot } from "./database";
 import { poolKey, type EngineData } from "./engineData";
-import type { LateOffsetParams } from "./hyperparams";
+import type { CatchUpParams } from "./hyperparams";
 import type { RollState } from "./modifiers";
 import {
-  NO_REPETITION,
   sample,
   slotOptions,
   weighOptions,
   type OptionFilter,
   type PoolFilters,
   type Random,
-  type Repetition,
   type RollContext,
   type RollObserver,
   type SlotRoll,
@@ -39,8 +37,8 @@ export interface LoadoutInput {
   readonly neverRoll?: ReadonlySet<string>;
   readonly limits: StatLimits;
   readonly random: Random;
-  readonly repetition?: Repetition;
-  readonly lateOffset?: LateOffsetParams;
+  readonly catchUp?: CatchUpParams;
+  readonly availableSince?: Readonly<Record<string, number>>;
   /** RH rolls from these first; `null` when the setting is off. */
   readonly shortlist?: ReadonlySet<string> | null;
   /** A reroll keeps the slots before `from` as they are. */
@@ -176,9 +174,9 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     data,
     state,
     counted,
-    repetition: input.repetition ?? NO_REPETITION,
     ...(input.neverRoll === undefined ? {} : { neverRoll: input.neverRoll }),
-    ...(input.lateOffset === undefined ? {} : { lateOffset: input.lateOffset }),
+    ...(input.catchUp === undefined ? {} : { catchUp: input.catchUp }),
+    ...(input.availableSince === undefined ? {} : { availableSince: input.availableSince }),
   };
 
   for (const slot of LOADOUT_ORDER.slice(start)) {

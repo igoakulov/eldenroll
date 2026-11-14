@@ -170,7 +170,7 @@ def test_the_real_data_passes_the_gate(data: GateData) -> None:
         (_add_modifier(_modifier("negative", -1)), "modifier value below 0: negative"),
         (_add_modifier(_modifier("ghost_rule", 2, ("ghost",))), "rule: ghost"),
         (_add_modifier(replace(_modifier("no_when", 2), when=())), "no_when has no condition"),
-        (_add_modifier(_modifier("too_close", 500_000)), "guarantees too close in the rule pool"),
+        (_add_modifier(_modifier("too_close", 5_000_000)), "guarantees too close in the rule pool"),
     ],
 )
 def test_a_broken_table_is_a_structure_problem(

@@ -21,70 +21,34 @@ export interface EngineData {
   readonly ashFits: ReadonlyMap<string, readonly AshCompatibility[]>;
   /** Items with no location row. */
   readonly foundEverywhere: ReadonlySet<string>;
-  /** How many options repeat the same key's decay: every `repeatKey` mapped to the size of its
-   * item category or its rule or armor-set table (`data/balance.md#Hyperparameters`). Classes
-   * don't decay, so no `character_class:` key is here. A key missing here (none else should be)
-   * falls back to 1 in `repetitionMultiplier`. */
-  readonly decayGroupSize: ReadonlyMap<string, number>;
-  /** Every item's `lateness` (how late its earliest region is) and `demand` (how far its stat
-   * requirements reach), both 0 to 1, for `lateBoost` (`data/balance.md#Hyperparameters`). An item
-   * with no location row, or no stat requirement, sits at 0 on that axis. `region` is the region that sets its
-   * lateness, null for an item with no location row; `statTotal` the total `demand` is read from. */
-  readonly lateOffset: ReadonlyMap<string, LateOffset>;
-}
-
-export interface LateOffset {
-  readonly lateness: number;
-  readonly demand: number;
-  readonly region: string | null;
-  readonly statTotal: number;
+  /** By `optionKey`, for items and armor sets: the catch-up boost's ceiling, the share of a typical
+   * run still ahead when it comes into reach. An item takes its earliest region's `run_left`, a set
+   * its latest piece's; one with no location row is in reach from the start, at 1. */
+  readonly runLeft: ReadonlyMap<string, number>;
 }
 
 export function poolKey(characterClass: string, slot: PoolSlot): string {
   return `${characterClass}/${slot}`;
 }
 
-function decayGroups(database: Database): ReadonlyMap<string, number> {
-  const byCategory = new Map<string, number>();
-  for (const row of database.item) byCategory.set(row.category, (byCategory.get(row.category) ?? 0) + 1);
-  const sizes = new Map<string, number>();
-  for (const row of database.item) sizes.set(`item:${row.id}`, byCategory.get(row.category) ?? 1);
-  for (const row of database.alias) {
-    const member = database.item.find((item) => item.alias === row.id);
-    if (member !== undefined) sizes.set(`alias:${row.id}`, byCategory.get(member.category) ?? 1);
-  }
-  for (const row of database.combat_rule) sizes.set(`rule:${row.id}`, database.combat_rule.length);
-  for (const row of database.armor_set) sizes.set(`armor_set:${row.id}`, database.armor_set.length);
-  return sizes;
-}
-
-function lateOffsets(database: Database): ReadonlyMap<string, LateOffset> {
-  const regionLevel = new Map(database.region.map((row) => [row.id, row.region_level]));
+function runLefts(database: Database): ReadonlyMap<string, number> {
+  const regionLeft = new Map(database.region.map((row) => [row.id, row.run_left]));
   const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
   const bossLocation = new Map(database.boss_instance.map((row) => [row.id, row.location_id]));
-  const maxLevel = Math.max(1, ...database.region.map((row) => row.region_level));
-  const native = new Map<string, { level: number; region: string }>();
+  const itemLeft = new Map<string, number>();
   for (const row of database.item_location) {
-    const locationId = row.location_id ?? (row.boss_instance_id === null ? null : bossLocation.get(row.boss_instance_id));
-    const region = locationId === null || locationId === undefined ? undefined : locationRegion.get(locationId);
-    const level = region === undefined ? undefined : regionLevel.get(region);
-    if (region === undefined || level === undefined) continue;
-    const current = native.get(row.item_id);
-    if (current === undefined || level < current.level) native.set(row.item_id, { level, region });
+    const locationId = row.location_id ?? (row.boss_instance_id === null ? undefined : bossLocation.get(row.boss_instance_id));
+    const region = locationId === undefined ? undefined : locationRegion.get(locationId);
+    const left = region === undefined ? undefined : regionLeft.get(region);
+    if (left === undefined) continue;
+    itemLeft.set(row.item_id, Math.max(itemLeft.get(row.item_id) ?? 0, left));
   }
-  const effectiveTotal = (row: Item): number => row.str / 1.5 + row.dex + row.int + row.fth + row.arc;
-  const maxEffective = Math.max(1, ...database.item.map(effectiveTotal));
-  const offsets = new Map<string, LateOffset>();
-  for (const row of database.item) {
-    const found = native.get(row.id);
-    offsets.set(row.id, {
-      lateness: ((found?.level ?? 1) - 1) / (maxLevel - 1 || 1),
-      demand: effectiveTotal(row) / maxEffective,
-      region: found?.region ?? null,
-      statTotal: effectiveTotal(row),
-    });
+  const keys = new Map<string, number>();
+  for (const row of database.item) keys.set(`item:${row.id}`, itemLeft.get(row.id) ?? 1);
+  for (const row of database.armor_set) {
+    keys.set(`armor_set:${row.id}`, Math.min(1, ...row.pieces.map((piece) => itemLeft.get(piece) ?? 1)));
   }
-  return offsets;
+  return keys;
 }
 
 export function indexDatabase(database: Database): EngineData {
@@ -96,8 +60,7 @@ export function indexDatabase(database: Database): EngineData {
   return {
     ashFits,
     foundEverywhere: new Set(database.item.filter((row) => !placed.has(row.id)).map((row) => row.id)),
-    decayGroupSize: decayGroups(database),
-    lateOffset: lateOffsets(database),
+    runLeft: runLefts(database),
     database,
     items: new Map(database.item.map((row) => [row.id, row])),
     rules: new Map(database.combat_rule.map((row) => [row.id, row])),

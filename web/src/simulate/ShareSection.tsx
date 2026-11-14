@@ -2,7 +2,7 @@ import { THIN_SAMPLE, type ShareRow, type ShareTable } from "../../sim/aggregate
 import { copy } from "../copy";
 import { DataTable, ShareBar, type DataColumn } from "../ui/DataTable";
 import { SectionHeading } from "../ui/Headings";
-import { matches, percent } from "./format";
+import { FOLD, matches, percent } from "./format";
 
 const words = copy.simulate;
 
@@ -51,6 +51,7 @@ export function ShareSection({
         columns={columns}
         rows={rows}
         rowKey={(row) => row.key}
+        fold={FOLD}
         faded={() => table.total < THIN_SAMPLE}
         initialSort="share"
         empty={words.nothing}

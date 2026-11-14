@@ -254,9 +254,9 @@ def test_a_target_rolled_before_its_condition_fails(data: PlacementData) -> None
 @pytest.mark.parametrize(
     ("talismans", "kind", "targets", "value"),
     [
-        (("claw_talisman",), "rule", ("jump_attacks_only",), 1000000),
-        (("shard_of_alexander", "warrior_jar_shard"), "rule", ("l2_only",), 1000000),
-        (("axe_talisman",), "rule", ("charged_r2_only", "drink_stonebarb_cracked_tear"), 1000000),
+        (("claw_talisman",), "rule", ("jump_attacks_only",), 10000000),
+        (("shard_of_alexander", "warrior_jar_shard"), "rule", ("l2_only",), 10000000),
+        (("axe_talisman",), "rule", ("charged_r2_only", "drink_stonebarb_cracked_tear"), 10000000),
     ],
 )
 def test_talismans_reach_their_targets_from_either_slot(
@@ -281,7 +281,7 @@ def test_jump_attacks_boost_the_jump_sets_from_either_rule(
         if row.when == (condition,) and row.target.kind == "armor_set" and row.value > 0
     ]
     assert [(row.target, row.value) for row in rows] == [
-        (Selector("armor_set", ("gravebird_set", "raptors_set")), 10000)
+        (Selector("armor_set", ("gravebird_set", "raptors_set")), 100000)
     ]
 
 
@@ -298,7 +298,7 @@ def test_dancers_weapons_reach_the_set_and_talismans_from_either_hand(
         and row.when[0].slots == ("rh", "lh")
         and "hand_of_malenia" in (row.when[0].selector.ids or ())
     ]
-    assert {row.target.kind: row.value for row in rows} == {"armor_set": 1000000, "item": 10000}
+    assert {row.target.kind: row.value for row in rows} == {"armor_set": 10000000, "item": 100000}
     for row in rows:
         condition = row.when[0]
         assert isinstance(condition, RolledCondition)

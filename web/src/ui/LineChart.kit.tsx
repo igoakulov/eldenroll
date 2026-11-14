@@ -1,31 +1,30 @@
-import { DEFAULT_HYPERPARAMS, lateBoost } from "../engine/hyperparams";
+import { catchUpBoost } from "../engine/hyperparams";
 import type { KitBlock } from "../kit/kit";
 import type { KitData } from "../kit/kitData";
 import { KitPad } from "../kit/kit";
 import { LineChart } from "./LineChart";
 
-/** The lateness boost of an item with no stat requirement, region by region: the engine's own curve. */
-function boostByRegion({ database }: KitData, demand: number) {
+/** The catch-up boost's ceiling region by region, at `strength`: the engine's own curve. */
+function boostByRegion({ database }: KitData, strength: number) {
   const regions = [...database.region].sort((a, b) => a.region_level - b.region_level);
-  const top = Math.max(...regions.map((row) => row.region_level));
   return regions.map((row) => ({
     region: row,
-    point: { x: row.region_level, y: lateBoost((row.region_level - 1) / (top - 1), demand, DEFAULT_HYPERPARAMS.lateOffset) },
+    point: { x: row.region_level, y: catchUpBoost(row.run_left, { strength }) },
   }));
 }
 
-/** The boost with no stat requirement; with `baseline`, the most demanding item's beneath it. */
+/** The boost at strength 1; with `baseline`, strength 0.5 beneath it. */
 /** With `marks`, the DLC regions' levels marked on the line. */
 function Chart({ kit, baseline = false, marks = false }: { readonly kit: KitData; readonly baseline?: boolean; readonly marks?: boolean }) {
-  const rows = boostByRegion(kit, 0);
-  const most = boostByRegion(kit, 1);
+  const rows = boostByRegion(kit, 1);
+  const half = boostByRegion(kit, 0.5);
   return (
     <LineChart
-      title="Lateness boost by region level"
+      title="Catch-up boost by region level"
       points={rows.map((row) => row.point)}
-      {...(baseline ? { baseline: most.map((row) => row.point) } : {})}
+      {...(baseline ? { baseline: half.map((row) => row.point) } : {})}
       {...(marks ? { marks: rows.filter((row) => row.region.id.startsWith("dlc_")).map((row) => row.point.x) } : {})}
-      yMax={Math.ceil(Math.max(...(baseline ? most : rows).map((row) => row.point.y)))}
+      yMax={Math.ceil(Math.max(...rows.map((row) => row.point.y)))}
       formatY={(value) => `×${value.toFixed(1)}`}
       formatX={String}
       describe={(index) => ({

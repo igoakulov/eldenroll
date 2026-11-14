@@ -39,7 +39,6 @@ scope.onmessage = async (event) => {
           regions: inputs.regions,
           completion: inputs.completion,
           characterClasses: null,
-          rerollEvery: inputs.rerollEvery,
           chances,
         }),
       );

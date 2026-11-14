@@ -20,7 +20,7 @@ import {
   type RunInputs,
 } from "./run";
 import { DEFAULT_STATS, STATS, defaultSettings, type Stats } from "./settings";
-import { NO_REPETITION, slotOptions, weighOptions, type SlotRoll } from "./slotRoll";
+import type { SlotRoll } from "./slotRoll";
 
 const engine: Engine = { data: indexDatabase(realDatabase), hyperparams: DEFAULT_HYPERPARAMS };
 const MAXED = Object.fromEntries(STATS.map((stat) => [stat, 99])) as Stats;
@@ -140,81 +140,20 @@ describe("a whole run, one Done per boss", () => {
 });
 
 describe("Done", () => {
-  it("marks the boss dead at its objective, records the snapshot and remembers what was seen", () => {
+  it("marks the boss dead at its objective and records the snapshot", () => {
     const run = start();
     const objective = current(run);
     const next = done(engine, run);
     expect(next.deadBosses).toEqual([{ instanceId: objective.boss, objectiveIndex: 1 }]);
     expect(next.completed[0]).toMatchObject({ boss: objective.boss, stats: MAXED, level: 713 });
-    expect(next.seen[`character_class:${objective.characterClass}`]).toBe(1);
-    expect(next.seen[`rule:${objective.slots.rule_1}`]).toBe(1);
-    expect(next.seen[`armor_set:${objective.slots.armor}`]).toBe(1);
     expect(next.current).toBeNull();
     expect(current(rollNext(engine, next)).boss).not.toBe(objective.boss);
-  });
-
-  it("remembers the hands too, so weapons and shields decay like everything else", () => {
-    const run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } });
-    const { rh, lh } = current(run).slots;
-    const next = done(engine, run);
-    expect(next.seen[`item:${rh}`]).toBe(1);
-    expect(next.seen[`item:${lh}`]).toBe(1);
-  });
-
-  it("counts each completed objective once, even when none fills several of its slots", () => {
-    let run = start({ settings: { ...defaultSettings(realDatabase), characterClasses: ["warrior_2h"] } });
-    run = done(engine, doneAndRoll(doneAndRoll(run)));
-    expect(run.seen["character_class:warrior_2h"]).toBe(3);
-    expect(run.seen["item:none"]).toBe(3);
-  });
-});
-
-const FLAT_DECAY = { max: 0.8, min: 0.8, halfSize: 1 };
-
-describe("decay", () => {
-  it("multiplies again for each completed objective that showed an option", () => {
-    const context = {
-      data: engine.data,
-      counted: new Set<string>(),
-      state: { characterClass: "knight", boss: null, rolled: new Map() },
-    };
-    const options = slotOptions(engine.data, "knight", "rule_1");
-    const weigh = (seen: Record<string, number>) =>
-      weighOptions({ ...context, repetition: { seen, decayGroupSize: new Map(), decay: FLAT_DECAY } }, options);
-    const weight = (result: ReturnType<typeof weigh>, id: string) =>
-      result.options.find((row) => row.option.row.id === id)?.weight ?? 0;
-
-    const fresh = weigh({});
-    expect(weight(weigh({ "rule:no_armor": 1 }), "no_armor")).toBeCloseTo(0.8 * weight(fresh, "no_armor"));
-    expect(weight(weigh({ "rule:no_armor": 3 }), "no_armor")).toBeCloseTo(0.512 * weight(fresh, "no_armor"));
-    expect(weight(weigh({ "rule:no_armor": 3 }), "no_rolling")).toBe(weight(fresh, "no_rolling"));
-    expect(weighOptions({ ...context, repetition: NO_REPETITION }, options)).toEqual(fresh);
   });
 });
 
 describe("aliases", () => {
   const sorcerer = { settings: { ...defaultSettings(realDatabase), characterClasses: ["sorcerer"] } };
   const staves = realDatabase.item.filter((row) => row.alias === "any_staff").map((row) => row.id);
-
-  it("counts a shown member as its alias, so every member repeats", () => {
-    const run = done(engine, start(sorcerer));
-    expect(run.seen["alias:any_staff"]).toBe(1);
-    const context = {
-      data: engine.data,
-      counted: new Set(staves),
-      state: { characterClass: "sorcerer", boss: null, rolled: new Map() },
-    };
-    const options = slotOptions(engine.data, "sorcerer", "rh");
-    const weigh = (seen: Record<string, number>) =>
-      weighOptions({ ...context, repetition: { seen, decayGroupSize: new Map(), decay: FLAT_DECAY } }, options)
-        .options;
-    const fresh = weigh({});
-    const decayed = weigh({ "alias:any_staff": 1 });
-    for (const row of fresh) {
-      const after = decayed.find((one) => one.option.row.id === row.option.row.id);
-      expect(after?.weight).toBeCloseTo(row.weight * 0.8);
-    }
-  });
 
   it("lets Never roll take out one member while the others still roll", () => {
     let run = start({ ...sorcerer, neverRoll: ["item:meteorite_staff"] });
@@ -227,6 +166,29 @@ describe("aliases", () => {
     expect(rolled.has("meteorite_staff")).toBe(false);
     expect([...rolled].every((id) => staves.includes(id))).toBe(true);
     expect(rolled.size).toBeGreaterThan(1);
+  });
+});
+
+describe("catch-up boost", () => {
+  const LATE = "item:miquellan_knights_sword";
+
+  it("gives gear in reach from the start nothing over the rest", () => {
+    const rolls = observed((observing) => start({}, 7, observing));
+    expect(rolls.flatMap(([, roll]) => roll.options).every((row) => row.catchUp === 1)).toBe(true);
+  });
+
+  it("boosts gear from when it comes into reach, and anew when it comes back", () => {
+    let run = start({ regions: ["limgrave"] });
+    for (let step = 0; step < 10; step += 1) run = doneAndRoll(run);
+    run = rollNext(engine, done(engine, editRun(run, { regions: ["limgrave", "haligtree"] })));
+    const first = run.availableSince[LATE];
+    expect(first).toBeLessThan(1);
+
+    run = rollNext(engine, done(engine, editRun(run, { regions: ["limgrave"] })));
+    expect(run.availableSince[LATE]).toBeUndefined();
+    for (let step = 0; step < 5; step += 1) run = doneAndRoll(run);
+    run = rollNext(engine, done(engine, editRun(run, { regions: ["limgrave", "haligtree"] })));
+    expect(run.availableSince[LATE]).toBeLessThan(first ?? 0);
   });
 });
 
@@ -360,15 +322,6 @@ describe("Weapon shortlist", () => {
     const next = current(reroll(engine, run, "rh"));
     expect(next.slots.rh).not.toBe("uchigatana");
     expect(next.shortlistRh).toBe(false);
-  });
-
-  it("decays a used listed weapon against the others on the list", () => {
-    const listed = ["uchigatana", "longsword"];
-    let run = start({ settings, weaponShortlist: listed });
-    const first = current(run).slots.rh;
-    run = doneAndRoll(run);
-    expect(run.seen[`item:${first}`]).toBe(1);
-    expect(listed).toContain(current(run).slots.rh);
   });
 
   it("lets none join Jester's first pool without counting as a listed weapon", () => {

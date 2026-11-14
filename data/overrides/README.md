@@ -14,7 +14,7 @@ Each file's name and header say what it holds. What they don't say:
 
 | File | Read it as |
 |---|---|
-| `regions.csv` | `region_level` orders the checkboxes and never filters; DLC regions carry `DLC: ` in `name` |
+| `regions.csv` | `region_level` orders the checkboxes and never filters; DLC regions carry `DLC: ` in `name`; `run_left` is the share of a typical run still ahead when the region opens, read off the simulation at its default settings, and caps the catch-up boost (`data/balance.md#Hyperparameters`) |
 | `location_aliases.csv` | a label names a map tile, not a place; see `data/sources/README.md#The spreadsheets` |
 | `boss_merges.csv` | an empty `instance_label` keeps the row's own label, and the row holding the instance's label locates the fight |
 | `boss_names.csv` | an empty `label` means every label |

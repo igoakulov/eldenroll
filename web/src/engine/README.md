@@ -9,7 +9,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 | `engineData.ts` | indexes built once from `db.json` |
 | `eligibility.ts` | which location rows count (#Eligibility); `countedItems` also counts every item with no row, everywhere |
 | `regions.ts` | selected locations, the Ashen Capital and Maliketh rules, the boss pool |
-| `slotRoll.ts` | one pool: filters, odds, modifiers, decay, removal counts, sampling |
+| `slotRoll.ts` | one pool: filters, odds, modifiers, the catch-up boost, sampling |
 | `loadout.ts` | every slot in roll order, ash and spell rules, rerolls, the weapon shortlist |
 | `run.ts` | the run as plain data and every action |
 | `display.ts` | what each card row shows |
@@ -17,8 +17,8 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 
 ## Pitfalls
 
-- **Decay compounds** per `repeatKey`: `item:x`, `rule:x`, `armor_set:x`, `character_class:x`, or `alias:x` for an alias member. An objective counts once however many slots showed the same thing. `Never roll` keys on `optionKey` instead, which never names an alias.
-- **`none` is one key across all slots,** so decay hits it on almost every objective: `Jester`'s empty RH and the rule `None` fade fast.
+- **The catch-up boost reads `Run.availableSince`**, refreshed before every roll: an option out of reach at a roll loses its entry, so a change made and undone between two rolls changes nothing (`data/balance.md#Hyperparameters`).
+- **Showings are tallied per `repeatKey`**: `alias:x` for an alias member, else its `optionKey`. `Never roll` keys on `optionKey`, which never names an alias.
 - **A reroll** keeps the slots before its target, rolls the rest, and leaves out only the target's current result unless nothing else is left.
 - **Determinism.** The generator's state lives in `run.rngState`, and tables are iterated in file order. Every action returns a new `Run`; keep the returned one, or reproducibility breaks.
 - **Ash fit, ash duplication and spell type** depend on a hand but hold for every class, so they are filters, not modifiers.
@@ -45,14 +45,14 @@ An objective is a boss instance, a class loadout and 2 combat rules. The player 
 ### Lifecycle
 
 1. `Start run` validates inputs and rolls objective 1.
-2. `Done` marks the objective completed and its boss felled, stores the snapshot and applies decay. `Great enemy felled` counts down 5 seconds with `Undo`, which restores the run exactly. `Level up` follows, to update stats and regions, then `Roll objective N`. If the selected regions hold no living boss, the run waits with no current objective until more are ticked.
+2. `Done` marks the objective completed and its boss felled, stores the snapshot. `Great enemy felled` counts down 5 seconds with `Undo`, which restores the run exactly. `Level up` follows, to update stats and regions, then `Roll objective N`. If the selected regions hold no living boss, the run waits with no current objective until more are ticked.
 3. `Felled?` is for a boss felled before this objective: it marks it felled, so its items unlock, and rerolls the full objective after the same countdown, reading `Rerolling in`, with no `Level up`.
 4. `Finish run` works at any time; the current objective is discarded unless `Done`. The run finishes by itself when every boss with `odds > 0` is felled or skipped, whatever the regions. Once Maliketh is felled, a Royal Capital boss left alive outside the Shunning-Grounds doesn't count: his death turns the city to ash.
 5. `New run` finishes the current run as `Finish run` does, then clears all run state.
 
 ### Rerolls
 
-Unlimited; they never change the objective number or any probability, and a discarded roll adds no ownership or decay. A slider with 9 stops picks the scope; its target and every slot after it in the roll order re-roll:
+Unlimited; they never change the objective number or any probability, and a discarded roll adds no ownership. A slider with 9 stops picks the scope; its target and every slot after it in the roll order re-roll:
 
 ```
 boss → character_class → rh → rh_ash → lh → lh_ash → spell → item → talisman_1 → talisman_2 → rule_1 → rule_2 → armor
@@ -112,8 +112,8 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 | randomized, nothing survives the filters | a narrow pool | empty result | `none` |
 
 - **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it.
-- **`any`** is a slot state, never sampled, owned, decayed or counted.
-- **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership, decay and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label.
+- **`any`** is a slot state, never sampled, owned or counted.
+- **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label.
 - **Ash line.** A rolled ash shows its name or label; no ash row or an empty pool shows `any`; a hand that rolled `none` shows `none`.
 
 ## Combat rules
@@ -136,10 +136,6 @@ An item rolls if at least one of its location rows counts (`eligibility.ts`). A 
 
 - A boss is known felled only through `Done`, `Felled?` or `Bosses`; skipped bosses are presumed alive.
 - An item with no location row counts everywhere: consumables, whose result names a family the player fills with any variant, and the `None` pieces. A set rolls only if every piece is reachable.
-
-## Decay
-
-On `Done`, everything the objective showed decays: class, items, ashes, spells, talismans, armor set, rules and `none`. A shortlisted weapon decays like any other, so it only competes less against the rest of the list. `any` and empty results don't decay, and nothing carries across runs.
 
 ## Design constraints
 

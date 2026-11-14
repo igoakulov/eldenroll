@@ -30,6 +30,11 @@ function withinGap(item: Item, limits: StatLimits, twoHanded: boolean): boolean 
   return statDeficit(item, limits.stats, twoHanded) <= limits.maxStatGap;
 }
 
+/** Within reach in some hand: two-handing's Strength bonus counts where the item takes it. */
+export function inStatReach(item: Item, limits: StatLimits): boolean {
+  return withinGap(item, limits, false) || (item.str_bonus_2h === true && withinGap(item, limits, true));
+}
+
 /** For a slot no hand's bonus can reach, such as a spell. */
 export function plainStatFilter(limits: StatLimits): OptionFilter {
   return (option) => option.kind !== "item" || withinGap(option.row, limits, false);

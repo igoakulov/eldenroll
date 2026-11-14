@@ -281,8 +281,6 @@ export const copy = {
       ARC: "Arcane",
       ALL: "Everything evenly",
     },
-    rerollEvery: "Reroll every",
-    rerollEveryDetail: "Number of objectives",
     seed: "Seed",
     newSeed: "New seed",
     regions: "Regions",
@@ -302,8 +300,10 @@ export const copy = {
     allClasses: "All",
     searchLabel: "Search the tables",
     searchPlaceholder: "Find an item, combat rule or armor set",
-    tabs: ["Overview", "Gear", "Boosts", "Decay"],
+    tabs: ["Overview", "Slots", "Boosts", "Variety", "Items"],
     noClasses: "Pick a class to see its results.",
+    showAll: (count: number) => `Show all ${count}`,
+    showLess: "Show less",
     counted: (total: number) => `Out of ${total} objectives.`,
     nothing: "Nothing.",
     columns: {
@@ -318,35 +318,22 @@ export const copy = {
       klass: "Class",
       slot: "Slot",
       region: "Region",
-      demand: "Stats needed, in total",
       boost: "Boost",
-      decay: "Decay when rolled",
       value: "Mean",
       shownPerRun: "Shown per run",
-      endDecay: "Decay at the end",
-      halvedAt: "Odds below half at",
+      seenIn: "Runs it showed in",
+      ceiling: "Catch-up up to",
     },
     overview: {
       runs: "Runs",
       perRun: "Each run, on average",
       objectives: "Objectives",
-      rerolls: "Rerolls",
       level: "Final level",
       runsCount: (runs: number) => (runs === 1 ? "1 run" : `${runs} runs`),
       classes: "Classes",
       classesLede: "The picked classes' shares of every objective.",
-      ruleNone: "Combat rule slots showing None",
-      neither: "Neither slot",
-      one: "One slot",
-      ruleNoneNote: "Both never can: the second combat rule slot leaves out what the first rolled.",
-      neverRolled: "Never rolled",
-      inReach: "In a pool at some point, never shown",
-      outOfReach: "Never in a pool under these settings",
-      empties: "Empty results",
-      emptiesLede: "Rolls that found nothing at all, not even none. A slot whose only roll is none is left out.",
-      noEmpties: "Every slot found something to roll.",
     },
-    gear: {
+    slots: {
       rh: "Right hand",
       lh: "Left hand",
       handLede: "By weapon class. The bright tick is the share pool size alone would give, if every class held as many weapons.",
@@ -366,16 +353,15 @@ export const copy = {
       rule: "Combat rules",
       ruleLede: "Either slot.",
       armor: "Armor sets",
+      ruleNone: "Combat rule slots showing None",
+      neither: "Neither slot",
+      one: "One slot",
+      ruleNoneNote: "Both never can: the second combat rule slot leaves out what the first rolled.",
+      empties: "Empty results",
+      emptiesLede: "Rolls that found nothing at all, not even none. A slot whose only roll is none is left out.",
+      noEmpties: "Every slot found something to roll.",
     },
     boosts: {
-      lateness: "Lateness and stat boost",
-      latenessLede:
-        "Every roll that showed an item, by the region that makes it late and by the stats it needs. Boost: the mean lateness and stat multiplier on the items that won, without decay. Decay when rolled: the mean decay those items already carried when they won.",
-      noLocation: "No location",
-      /** Strength counts at its two-handed requirement, as the boost counts it. */
-      statTotal: (from: number, to: number | null) =>
-        from === 0 ? "None" : to === null ? `${from} or more` : `${from} to ${to}`,
-      times: (value: string) => `×${value}`,
       guarantees: "Guarantees",
       guaranteesLede: "Each must win 99% of the rolls where it is in play.",
       won: (share: string, active: number) => `${share} of ${active}`,
@@ -425,7 +411,12 @@ export const copy = {
       modifier: (when: string, target: string, times: string) => `${when} → ${target} ×${times}`,
       always: "Always",
     },
-    decay: {
+    variety: {
+      catchUp: "Catch-up boost",
+      catchUpLede:
+        "Every roll that showed an item, by its earliest region, which caps its catch-up boost. Boost: the mean catch-up boost on the items that won.",
+      noLocation: "No location",
+      times: (value: string) => `×${value}`,
       repeats: "Repeats",
       repeatsLede:
         "Gap: objectives since the same thing last showed in that run. Within 10: the share of showings that repeat one from the last 10 objectives.",
@@ -440,27 +431,28 @@ export const copy = {
         rule: "Combat rule other than None",
         armor: "Armor set",
       },
+      neverRolled: "Never rolled",
+      inReach: "In a pool at some point, never shown",
+      outOfReach: "Never in a pool under these settings",
+    },
+    items: {
       overTheRun: "Over the run",
       items: "Items",
       itemsLede:
-        "Every option in reach for the picked classes, and how far decay took it: how often it showed per run, the multiplier on its odds once the run ends, and the objective whose roll first had its odds below half. Earliest first. Decay counts showings across every class, as the engine does.",
+        "Every option in reach for the picked classes: how often it showed per run, the share of runs it showed in at all, and the most its catch-up boost can reach. Rarest first. Showings count every class.",
       chartLede: (shown: number, more: number) =>
-        `Each item's chance per stretch of 20 objectives: its share of its slot's roll, its odds against every option competing with it at that moment. The gold line is the chance with decay, the dashed one with every decay removed. Decay works on both sides: until an item shows, the others' decay frees room for it, so its chance can sit above the dashed line; once it shows, its own decay pulls it down. Both lines fall as new regions and higher stats bring more competitors. A dot is an objective it showed on, in any run, for the picked classes; showings and decay count every class, as the engine does.${
+        `Each item's chance per stretch of 20 objectives: its share of its slot's roll, against every option competing with it at that moment. The gold line is the chance with the catch-up boost, the dashed one with the boost removed from every option. Items in reach from the start sit below the dashed line, since later items take a bigger share; a late item rises above it from when it comes into reach. Both lines fall as new regions and higher stats bring more competitors. A dot is an objective it showed on, in any run, for the picked classes.${
           more === 0 ? "" : ` Charts for the first ${shown} matches, ${more} more in the table; narrow the search to chart them.`
         }`,
       searchToChart: "Search for an item to chart its chance over the run.",
-      never: "Never",
-      halvedAt: (objective: number, runs: number, of: number) =>
-        runs === of ? `${Math.round(objective)}` : `${Math.round(objective)} in ${runs} of ${of} runs`,
       times: (value: string) => `×${value}`,
-      metrics: (odds: string, late: string | null, rate: string) =>
-        `Base odds ${odds}${late === null ? "" : `, lateness boost ×${late}`}, decay ×${rate} per showing`,
+      metrics: (odds: string, ceiling: string | null) =>
+        `Base odds ${odds}${ceiling === null ? "" : `, catch-up boost up to ×${ceiling}`}`,
       point: (from: number, to: number) => `Objectives ${from} to ${to}`,
       chance: "Chance",
-      withoutDecay: "Without decay",
+      withoutCatchUp: "Without catch-up",
+      catchUpBoost: "Catch-up boost",
       shownSoFar: (to: number) => `Shown by ${to}, any class`,
-      decaySoFar: (to: number) => `Decay by ${to}`,
-      oddsLeft: "Odds left",
     },
     slotNames: {
       rh: "Right hand",

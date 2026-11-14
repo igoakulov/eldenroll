@@ -1,12 +1,12 @@
 import { copy } from "../copy";
 import type { LoadoutSlot } from "./database";
 import type { RolledSlots } from "./display";
-import { countedItems } from "./eligibility";
+import { countedItems, isSetReachable } from "./eligibility";
 import type { EngineData } from "./engineData";
 import type { Hyperparams } from "./hyperparams";
 import { LOADOUT_ORDER, rollLoadout } from "./loadout";
 import { pickWeighted, seededRandom } from "./random";
-import { bossPool, selectedLocations, type BossPool } from "./regions";
+import { bossPool, lockedOutBosses, selectedLocations, type BossPool } from "./regions";
 import {
   derivedLevel,
   settingsProblems,
@@ -14,7 +14,8 @@ import {
   type Settings,
   type Stats,
 } from "./settings";
-import { repeatKey, type Random, type RollObserver } from "./slotRoll";
+import type { Random, RollObserver } from "./slotRoll";
+import { inStatReach } from "./stats";
 
 export interface Engine {
   readonly data: EngineData;
@@ -69,8 +70,9 @@ export interface Run {
   readonly current: Objective | null;
   readonly waiting: Waiting | null;
   readonly completed: readonly CompletedObjective[];
-  /** How many completed objectives showed each `repeatKey` or `character_class:` id. */
-  readonly seen: Readonly<Record<string, number>>;
+  /** The share of the run left when each option last came into reach, by `optionKey`, for the
+   * catch-up boost; an option dropping out of reach loses its entry, so coming back sets it anew. */
+  readonly availableSince: Readonly<Record<string, number>>;
 }
 
 export interface RunInputs {
@@ -87,10 +89,6 @@ export type StartResult =
   | { readonly ok: true; readonly run: Run }
   | { readonly ok: false; readonly problems: readonly string[] };
 
-function characterClassKey(characterClass: string): string {
-  return `character_class:${characterClass}`;
-}
-
 function deadSet(run: Run): ReadonlySet<string> {
   return new Set(run.deadBosses.map((row) => row.instanceId));
 }
@@ -102,10 +100,39 @@ function counted(engine: Engine, run: Run): ReadonlySet<string> {
   });
 }
 
-function repetition(engine: Engine, run: Run) {
-  return { seen: run.seen, decayGroupSize: engine.data.decayGroupSize, decay: engine.hyperparams.decay };
+/** Bosses felled since the start against every rollable boss the run can still reach: dead at the
+ * start, skipped, and locked out alive (the Royal Capital after Maliketh) don't count. */
+function runShareLeft(engine: Engine, run: Run): number {
+  const { database } = engine.data;
+  const dead = deadSet(run);
+  const lockedOut = lockedOutBosses(database, dead);
+  const atStart = new Set(run.deadBosses.filter((row) => row.objectiveIndex === 0).map((row) => row.instanceId));
+  const skipped = new Set(run.skippedBosses);
+  const inRun = database.boss_instance.filter(
+    (row) => row.odds > 0 && !atStart.has(row.id) && !skipped.has(row.id) && !(lockedOut.has(row.id) && !dead.has(row.id)),
+  );
+  const felled = inRun.filter((row) => dead.has(row.id)).length;
+  return inRun.length === 0 ? 1 : 1 - felled / inRun.length;
 }
 
+/** Only options whose catch-up ceiling is below 1 can get a boost, so only they are tracked.
+ * In reach means by location, felled boss and stats; a set needs every piece. */
+function refreshAvailable(engine: Engine, run: Run): Run {
+  const { data } = engine;
+  const reach = counted(engine, run);
+  const limits = { stats: run.stats, maxStatGap: run.settings.maxStatGap };
+  const left = runShareLeft(engine, run);
+  const availableSince: Record<string, number> = {};
+  const keep = (key: string) => {
+    if ((data.runLeft.get(key) ?? 1) < 1) availableSince[key] = run.availableSince[key] ?? left;
+  };
+  for (const id of reach) {
+    const item = data.items.get(id);
+    if (item !== undefined && inStatReach(item, limits)) keep(`item:${id}`);
+  }
+  for (const set of data.armorSets.values()) if (isSetReachable(set, reach)) keep(`armor_set:${set.id}`);
+  return { ...run, availableSince };
+}
 
 function rollBoss(
   engine: Engine,
@@ -128,8 +155,6 @@ function rollBoss(
   return { id: picked.value.id };
 }
 
-/** Odds are a deliberate, fixed mix of playstyles (`data/balance.md#Classes with extra rules`),
- * not a pool to keep varied, so classes don't decay. */
 function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: string | null): string | null {
   const rows = engine.data.database.character_class
     .filter((row) => run.settings.characterClasses.includes(row.id))
@@ -154,7 +179,6 @@ function rollSlots(
   kept: RolledSlots = {},
   exclude: string | null = null,
 ): RolledSlotsResult {
-  const decay = repetition(engine, run);
   const loadout = rollLoadout({
     data: engine.data,
     characterClass: objective.characterClass,
@@ -162,8 +186,8 @@ function rollSlots(
     counted: counted(engine, run),
     limits: { stats: run.stats, maxStatGap: run.settings.maxStatGap },
     random,
-    repetition: decay,
-    lateOffset: engine.hyperparams.lateOffset,
+    catchUp: engine.hyperparams.catchUp,
+    availableSince: run.availableSince,
     shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,
     neverRoll: new Set(run.neverRoll),
     from,
@@ -189,10 +213,11 @@ function stopped(run: Run, status: Exclude<BossPool["status"], "ready">, rngStat
 /** Rolls a whole new objective, or leaves the run waiting or finished when no boss can roll. */
 function rollObjective(
   engine: Engine,
-  run: Run,
+  played: Run,
   rerolls: readonly RerollTarget[],
   excludeBoss: string | null,
 ): Run {
+  const run = refreshAvailable(engine, played);
   const { random, state } = seededRandom(run.rngState);
   const boss = rollBoss(engine, run, random, excludeBoss);
   if (typeof boss === "string") return stopped(run, boss, state());
@@ -239,7 +264,7 @@ export function startRun(engine: Engine, inputs: RunInputs, seed: number): Start
     current: null,
     waiting: null,
     completed: [],
-    seen: {},
+    availableSince: {},
   };
   return { ok: true, run: rollObjective(engine, run, [], null) };
 }
@@ -274,7 +299,7 @@ export function bossStatus(run: Run, boss: string): BossStatus {
   return { state, locked: doneDead || run.current?.boss === boss };
 }
 
-/** The `Bosses` list; like any edit, it applies on the next roll and decays nothing. */
+/** The `Bosses` list; like any edit, it applies on the next roll. */
 export function setBossState(engine: Engine, run: Run, boss: string, state: BossState): Run {
   const row = engine.data.bosses.get(boss);
   if (row === undefined || row.odds <= 0 || bossStatus(run, boss).locked) return run;
@@ -286,36 +311,6 @@ export function setBossState(engine: Engine, run: Run, boss: string, state: Boss
     deadBosses: state === "dead" ? [...deadBosses, marked] : deadBosses,
     skippedBosses: state === "skipped" ? [...skippedBosses, boss] : skippedBosses,
   };
-}
-
-function seenIn(engine: Engine, objective: Objective): string[] {
-  const keys = [characterClassKey(objective.characterClass)];
-  for (const [slot, id] of Object.entries(objective.slots) as [LoadoutSlot, string | null][]) {
-    if (id === null) continue;
-    if (slot === "armor") {
-      const row = engine.data.armorSets.get(id);
-      if (row !== undefined) keys.push(repeatKey({ kind: "armor_set", row }));
-      continue;
-    }
-    if (slot === "rule_1" || slot === "rule_2") {
-      const row = engine.data.rules.get(id);
-      if (row !== undefined) keys.push(repeatKey({ kind: "rule", row }));
-      continue;
-    }
-    const row = engine.data.items.get(id);
-    if (row !== undefined) keys.push(repeatKey({ kind: "item", row }));
-  }
-  return keys;
-}
-
-/** `none` can fill several slots of one objective, but the objective counts once. */
-function countedOnce(
-  seen: Readonly<Record<string, number>>,
-  keys: readonly string[],
-): Readonly<Record<string, number>> {
-  const next = { ...seen };
-  for (const key of new Set(keys)) next[key] = (next[key] ?? 0) + 1;
-  return next;
 }
 
 export function done(engine: Engine, run: Run): Run {
@@ -333,7 +328,6 @@ export function done(engine: Engine, run: Run): Run {
       ...run.deadBosses,
       { instanceId: objective.boss, objectiveIndex: objectiveNumber(run) },
     ],
-    seen: countedOnce(run.seen, seenIn(engine, objective)),
     current: null,
   };
   // The next objective waits for `rollNext`, after `Level up`; only whether one can roll is known now
@@ -354,12 +348,13 @@ export function rollNext(engine: Engine, run: Run): Run {
 }
 
 /** Rerolls the target and everything after it; only the target avoids its current result. */
-export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
-  const objective = run.current;
-  if (objective === null || run.finished) return run;
+export function reroll(engine: Engine, played: Run, target: RerollTarget): Run {
+  const objective = played.current;
+  if (objective === null || played.finished) return played;
   const rerolls = [...objective.rerolls, target];
 
-  if (target === "boss") return rollObjective(engine, run, rerolls, objective.boss);
+  if (target === "boss") return rollObjective(engine, played, rerolls, objective.boss);
+  const run = refreshAvailable(engine, played);
 
   const { random, state } = seededRandom(run.rngState);
   if (target === "character_class") {
@@ -378,7 +373,7 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
       },
     };
   }
-  if (objective.slots[target] === undefined) return run;
+  if (objective.slots[target] === undefined) return played;
   const loadout = rollSlots(
     engine,
     run,

@@ -1,53 +1,19 @@
-import {
-  ACCEPTANCE,
-  STAT_TIERS,
-  THIN_SAMPLE,
-  boosts,
-  lateness,
-  outOfPlace,
-  regionName,
-  synergies,
-  type BoostRow,
-  type LateRow,
-  type Sample,
-} from "../../sim/aggregate";
+import { ACCEPTANCE, boosts, outOfPlace, synergies, type BoostRow, type Sample } from "../../sim/aggregate";
 import { copy } from "../copy";
-import { DataTable, ShareBar } from "../ui/DataTable";
 import { SectionHeading } from "../ui/Headings";
 import { ListRow } from "../ui/Rows";
-import { decimal, matches, modifierSentence, percent } from "./format";
+import { matches, modifierSentence, percent } from "./format";
 
 const words = copy.simulate.boosts;
-const columns = copy.simulate.columns;
 
 /** How many of what a guarantee lost to are named. */
 const LOST_TO = 3;
 
 export function Boosts({ sample, search }: { readonly sample: Sample; readonly search: string }) {
-  const late = lateness(sample);
   const { guarantees, others } = boosts(sample);
   const shown = (row: BoostRow) => matches(modifierSentence(row.modifier), search);
   return (
     <>
-      <section className="simulate-section">
-        <SectionHeading>{words.lateness}</SectionHeading>
-        <p className="simulate-lede">{words.latenessLede}</p>
-        <LateTable
-          label={columns.region}
-          rows={late.byRegion}
-          name={(key) => (key === "" ? words.noLocation : regionName(sample.data, key))}
-        />
-        <LateTable
-          label={columns.demand}
-          rows={late.byDemand}
-          name={(key) => {
-            const index = Number(key);
-            const next = STAT_TIERS[index + 1];
-            return words.statTotal(STAT_TIERS[index] ?? 0, next === undefined ? null : next - 1);
-          }}
-        />
-      </section>
-
       <BoostList title={words.guarantees} lede={words.guaranteesLede} rows={guarantees.filter(shown)} verdict />
       <BoostList title={words.others} lede={words.othersLede} rows={others.filter(shown)} verdict={false} />
 
@@ -84,40 +50,6 @@ export function Boosts({ sample, search }: { readonly sample: Sample; readonly s
         </div>
       </section>
     </>
-  );
-}
-
-function LateTable({
-  label,
-  rows,
-  name,
-}: {
-  readonly label: string;
-  readonly rows: readonly LateRow[];
-  readonly name: (key: string) => string;
-}) {
-  const scale = Math.max(0, ...rows.map((row) => row.share));
-  return (
-    <DataTable<LateRow>
-      label={label}
-      columns={[
-        { id: "name", label, render: (row) => name(row.key) },
-        { id: "count", label: columns.rolls, numeric: true, sortValue: (row) => row.count, render: (row) => row.count },
-        {
-          id: "share",
-          label: columns.share,
-          numeric: true,
-          sortValue: (row) => row.share,
-          render: (row) => <ShareBar share={row.share} scale={scale} text={percent(row.share)} />,
-        },
-        { id: "late", label: columns.boost, numeric: true, sortValue: (row) => row.late, render: (row) => words.times(decimal(row.late)) },
-        { id: "decay", label: columns.decay, numeric: true, sortValue: (row) => row.decay, render: (row) => words.times(decimal(row.decay)) },
-      ]}
-      rows={rows}
-      rowKey={(row) => row.key}
-      faded={(row) => row.count < THIN_SAMPLE}
-      empty={copy.simulate.nothing}
-    />
   );
 }
 

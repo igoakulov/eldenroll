@@ -16,7 +16,7 @@ from eldenroll.model.selector import Selector
 Row = Mapping[str, object]
 
 TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
-    "region": ("id", "name", "region_level"),
+    "region": ("id", "name", "region_level", "run_left"),
     "location": ("id", "name", "region_id"),
     "boss_instance": ("id", "name", "location_id", "location", "odds", "url"),
     "item": (
@@ -50,7 +50,12 @@ TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
 def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
     return {
         "region": [
-            {"id": row.id, "name": row.name, "region_level": row.region_level}
+            {
+                "id": row.id,
+                "name": row.name,
+                "region_level": row.region_level,
+                "run_left": _number(row.run_left),
+            }
             for row in database.regions
         ],
         "location": [

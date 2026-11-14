@@ -3,7 +3,7 @@
 Why the data rolls the way it does: every odds value other than 1 and every conditional rule, with its reason. Read it before tuning, and change the data and this file together: `pipeline/tests/test_balance.py` fails when a modifier row or an odds value other than 1 is missing here, or listed here but gone from the data.
 
 - How modifier rows combine: `data/overrides/README.md#Selectors and modifiers`.
-- Most values are provisional until the full-run simulation tunes them; values off the tier table (`×67`, `×6`, `×5`, `×3.5`, `×3`, `×0.5`) are deliberate placeholders for it.
+- Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×67`, `×6`, `×5`, `×3.5`, `×3`, `×0.5`) are deliberate placeholders for it.
 
 ## Tiers
 
@@ -14,8 +14,8 @@ A modifier multiplies an option's odds. Pick its value from these tiers, or `0` 
 | `prefer` | 2 | a nudge |
 | `strong` | 10 | clearly more likely |
 | `boost` | 100 | likely, but other options still show up |
-| `guarantee` | 10,000 | near-certain in a small pool |
-| `top` | 1,000,000 | near-certain in any pool |
+| `guarantee` | 100,000 | near-certain in a small pool |
+| `top` | 10,000,000 | near-certain in any pool |
 
 **Each ×10 adds about one more 9, never 100%.** One boosted option among others at odds 1 wins this often:
 
@@ -25,15 +25,16 @@ A modifier multiplies an option's odds. Pick its value from these tiers, or `0` 
 | 100 | 92% | 50% |
 | 1,000 | 99.1% | 91% |
 | 10,000 | 99.9% | 99% |
-| 1,000,000 | 99.999% | 99.99% |
+| 100,000 | 99.99% | 99.9% |
+| 10,000,000 | 99.9999% | 99.999% |
 
-So the same multiplier feels weaker in a bigger pool, which is why `guarantee` is for small pools (a few armor sets in reach) and `top` for large ones (the rule pool). Nothing short of removing every other option makes a roll certain, and a reroll can always show something else.
+So the same multiplier feels weaker in a bigger pool, which is why `guarantee` is for small pools (a few armor sets in reach) and `top` for large ones (the rule pool). Both sit an order of magnitude higher than the feel alone needs, because the catch-up boost (#Hyperparameters) weighs the latest items up to about ×20,000: owner, 2026-11-14, broad mechanisms first, guarantees raised to make room. Nothing short of removing every other option makes a roll certain, and a reroll can always show something else.
 
 When two boosted options meet in one pool, compare them with each other, not with the pool:
 
-- **Keep tiers two orders of magnitude apart.** A `top` (×1,000,000) next to a `guarantee` (×10,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
+- **Keep tiers two orders of magnitude apart.** A `top` (×10,000,000) next to a `guarantee` (×100,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
 - **Avoid two `top` targets in one pool:** they split about 50/50. It is allowed where the combination is rare, such as `Claw Talisman` with `Axe Talisman`; `import-report.json` lists every pool where it can happen.
-- **Decay and soft rows compound on top.** Decay lowers a guaranteed option a little each time it rolls, and a `prefer` or `strong` row on a rival raises the rival; the simulation's Boosts tab shows how often each guarantee still wins and what beat it.
+- **Soft rows and catch-up compound on top.** A `prefer` or `strong` row on a rival raises the rival, and so does the catch-up boost on a late one; the simulation's Boosts tab shows how often each guarantee still wins and what beat it.
 - **Off-tier values** (`×67`, `×6`, `×5`, `×3.5`, `×3`, `×0.5`) are aimed at a target share rather than a feel, such as 75% same-class pairs, and are tuned at the simulation.
 - **When two boosted targets clash, the rarer trigger wins.** The run should vary, and the more common trigger gets more chances to show its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger, since rules roll before armor.
 - **Acceptance:** where one `top` target is in play, it must win at least 99% of its rolls in the simulation; if not, raise its tier or reduce the rivals.
@@ -42,10 +43,8 @@ When two boosted options meet in one pool, compare them with each other, not wit
 
 `web/src/engine/hyperparams.ts` holds the balance values that apply to every row, passed into the engine so a hidden page can tune them live during a play-test.
 
-Decay and the lateness boost are both off, at a rate of 1 and a `boostMax` of 0: owner, 2026-11-14, for a clean baseline, so engine tuning is added back only where the simulation shows a problem. Decay mattered mainly in small pools (talismans and rules all run, other categories only early); the mechanisms below stay in the code.
+- **`catchUp`** evens out how often items show over a whole run. With every option at its odds, an item in reach from Limgrave gets every objective of the run while a Haligtree one gets the last tenth, so early regions took most of the rolls: Limgrave alone held a quarter of the items and showed in 42% of item rolls. An item rolls at `(1 / runLeft) ^ strength`, so one in reach for a tenth of the run rolls at ten times its odds and, by the end, is about as likely to have shown as a Limgrave one; this is inverse-exposure weighting, as in fair-share scheduling. `runLeft` is the share of this run still ahead when the item last came into reach, by whichever gate let it in: its region ticked, its boss felled, or the stats and `Max stat gap` reaching it (owner, 2026-11-14). An item that drops out of reach, by unticking a region or lowering the gap, starts afresh when it comes back. The share counts bosses felled since the start against the rollable ones neither dead at the start, skipped nor locked out alive (the Royal Capital after Maliketh), assuming the player plays to the end. So a player who ticks every region at the start, as on New Game+, gets no boost at all, since everything shares the whole run. `runLeft` never goes below the `run_left` column of `regions.csv`, the share of a typical run still ahead when the region opens, read off the simulation at its default settings; an item takes its earliest region's, an armor set its latest piece's, and anything with no location row 1, which is never boosted. That ceiling keeps a region ticked later than usual at today's boost, clear of the guarantee tiers. `strength` 1 would even fully if the pool stayed the same size, but it grows as regions open and boss gear waits for its boss, so a late item meets more rivals than the formula counts: owner, 2026-11-14, strength 3, which the simulation showed coming closest to even (a region's items seen at least once a run: Limgrave 54%, Leyndell 48%, Haligtree 49%, Enir-Ilim 33%, against 68%, 31%, 9% and 1% without it). Rules and bosses don't get it. `catchUpBoost` and `EngineData.runLeft` do the arithmetic.
 
-- **`decay`** multiplies an option's odds once per completed objective that showed it, so a run keeps varying. The rate isn't flat: it depends on the size of the option's pool — its item category, or the rule or armor-set table — so a wide pool (weapons, armor sets) decays hard, spreading exposure to many other options including late-game ones that just came into reach, while a pool of one, such as `none` in its own category, barely decays. `max` is the rate at pool size 1, `min` the rate an arbitrarily large pool approaches, and `halfSize` the pool size halfway between them; a key with no pool (there should be none) decays as a pool of 1. `decayRate` and `EngineData.decayGroupSize` do the arithmetic. Classes are the one exception: their odds are a deliberate mix of playstyles, not a pool to keep varied, so they never decay (`rollCharacterClass` in `run.ts`).
-- **`lateOffset`** boosts an item's odds by how late its region is and how demanding its stats are, on top of decay: in a wide pool each repeat frees little room for any one other option, and the pool keeps growing as regions open, so a late or demanding item can still sit far below the rest of its pool for most of a run. `lateness = (nativeLevel − 1) / (maxLevel − 1)`, `nativeLevel` the lowest region level among the item's own locations (1, no boost, for anything with none, such as consumables); `demand = effectiveTotal / maxEffectiveTotal`, `effectiveTotal = str/1.5 + dex + int + fth + arc`, Str divided by the two-handing bonus so it reads on the same scale as the rest. `boost = 1 + boostMax × (levelWeight × lateness + statWeight × demand)`. Owner, 2026-11-13: `levelWeight` 0.7 and `statWeight` 0.3, since a late region is a hard ceiling on how many objectives can ever offer the item, while a high stat requirement is softer — the item is still reachable, `Max stat gap` already tolerates a deficit, and the gap closes as the player levels; `boostMax` 3. Boost-only, with no matching deboost of early, undemanding items, so a skew across categories from this alone is still open (`internal/decisions/open.md#Lateness and stat-requirement decay offset`). `lateBoost` and `EngineData.lateOffset` do the arithmetic; rules and armor sets don't get it, only items.
 - **`defaultMaxStatGap`** is how far above the player's stats an item may be. It is per item, never a shared budget, so a loadout of several near-reach items is fine.
 
 ## Base odds

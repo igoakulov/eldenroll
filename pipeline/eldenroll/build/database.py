@@ -99,7 +99,7 @@ def _guarantee_targets_off_base_odds(database: Database) -> list[str]:
         {
             target
             for row in database.modifiers
-            if row.value >= 10_000
+            if row.value >= 100_000
             for target in row.target.ids or ()
             if odds.get(target, 1) != 1
         }

@@ -104,8 +104,12 @@ export function Tagline({ onOpen }: { readonly onOpen: () => void }) {
 
   const line = ([from, to]: readonly [number, number], index: number) => {
     const { before, link, after } = splitTyped(text, shown, from, to);
+    // Keyed by position, so each keystroke starts a fresh blink in its lit half: the caret stays solid while the
+    // line types or deletes, as an editor's does, and blinks only once it holds still
     const caret = (where: typeof caretIn) =>
-      !reduced && index === caretLine && caretIn === where && <span className="tagline-caret" aria-hidden="true" />;
+      !reduced &&
+      index === caretLine &&
+      caretIn === where && <span key={shown} className="tagline-caret" aria-hidden="true" />;
     return (
       <span key={index} className={`tagline-line tagline-line-${index + 1}`}>
         {before.typed}

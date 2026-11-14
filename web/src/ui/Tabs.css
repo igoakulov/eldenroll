@@ -25,15 +25,18 @@
   color: var(--gold);
 }
 
+/* Placed by the selected tab's measured box; equal shares until it is measured */
 .tabs-underline {
   position: absolute;
   left: 0;
   bottom: -1px;
-  width: calc(100% / var(--tabs));
+  width: var(--underline-w, calc(100% / var(--tabs)));
   height: 2px;
   background: var(--gold);
-  transform: translateX(calc(var(--tab) * 100%));
-  transition: transform var(--dur-glide) var(--ease-out);
+  transform: translateX(var(--underline-x, calc(var(--tab) * 100%)));
+  transition:
+    transform var(--dur-glide) var(--ease-out),
+    width var(--dur-glide) var(--ease-out);
 }
 
 /* One grid cell for every panel: a hidden panel keeps its height, and visibility keeps it out of focus and the

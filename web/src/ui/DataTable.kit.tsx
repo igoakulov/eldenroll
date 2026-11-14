@@ -1,3 +1,4 @@
+import { copy } from "../copy";
 import type { CharacterClass } from "../engine/database";
 import type { KitBlock, KitProps } from "../kit/kit";
 import { KitPad } from "../kit/kit";
@@ -73,6 +74,21 @@ export const kit: readonly KitBlock[] = [
         ),
       },
       {
+        label: "folded after 4 rows",
+        render: ({ database }) => (
+          <KitPad>
+            <DataTable
+              label="Classes"
+              columns={classColumns(database.character_class, false)}
+              rows={database.character_class}
+              rowKey={(row) => row.id}
+              initialSort="share"
+              fold={{ after: 4, showAll: copy.simulate.showAll, showLess: copy.simulate.showLess }}
+            />
+          </KitPad>
+        ),
+      },
+      {
         label: "empty",
         render: () => (
           <KitPad>
@@ -82,6 +98,6 @@ export const kit: readonly KitBlock[] = [
       },
     ],
     Live: LiveTable,
-    note: "Tap a column heading to sort by it; tap again to turn the order around. On desktop, hover brightens a heading.",
+    note: "Tap a column heading to sort by it; tap again to turn the order around. On desktop, hover brightens a heading. A folded table keeps its first rows in the current sort; Show all opens the rest.",
   },
 ];

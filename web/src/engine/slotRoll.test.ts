@@ -181,7 +181,7 @@ describe("modifiers across slots", () => {
 
   it("makes a named talisman's rule top tier", () => {
     const result = pool("knight", "rule_1", { ...KNIGHT_MELEE, talisman_1: "claw_talisman" });
-    expect(weightOf(result, "jump_attacks_only")).toBe(1_000_000);
+    expect(weightOf(result, "jump_attacks_only")).toBe(10_000_000);
   });
 
   it("removes Blue Dancer Charm for a heavy RH, whatever the class", () => {
@@ -384,5 +384,18 @@ describe("on a small database", () => {
       };
       expect(sequence()).toEqual(sequence());
     });
+  });
+});
+
+describe("the catch-up boost", () => {
+  it("weighs a straight sword from the Haligtree against one from Liurnia by how much of the run each is in reach", () => {
+    const state = { characterClass: "knight", boss: null, rolled: new Map<PoolSlot, string | null>() };
+    const result = weighOptions(
+      { data: real, state, counted: EVERYTHING, catchUp: { strength: 1 } },
+      slotOptions(real, "knight", "rh"),
+    );
+    const left = (id: string) => realDatabase.region.find((row) => row.id === id)!.run_left;
+    const ratio = weightOf(result, "miquellan_knights_sword")! / weightOf(result, "crystal_sword")!;
+    expect(ratio).toBeCloseTo(left("liurnia") / left("haligtree"));
   });
 });

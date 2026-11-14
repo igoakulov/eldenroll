@@ -11,7 +11,7 @@ from eldenroll.loaders.csv_source import read_table
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.region import Region
 
-REGION_COLUMNS: tuple[str, ...] = ("id", "name", "region_level")
+REGION_COLUMNS: tuple[str, ...] = ("id", "name", "region_level", "run_left")
 
 
 def load_regions(path: Path) -> tuple[Region, ...]:
@@ -19,6 +19,7 @@ def load_regions(path: Path) -> tuple[Region, ...]:
     id_column = table.column("id")
     name_column = table.column("name")
     level_column = table.column("region_level")
+    run_left_column = table.column("run_left")
     regions: list[Region] = []
     for index, row in enumerate(table.rows, start=1):
         where = f"{path}: data row {index}"
@@ -33,6 +34,7 @@ def load_regions(path: Path) -> tuple[Region, ...]:
                 id=region_id,
                 name=region_name,
                 region_level=_parse_level(row[level_column], where),
+                run_left=_parse_run_left(row[run_left_column], where),
             )
         )
     _check_ids_and_levels(regions, str(path))
@@ -44,6 +46,16 @@ def _parse_level(value: str, where: str) -> int:
         return int(value)
     except ValueError as exc:
         raise LoaderError(f"{where}: region_level {value!r} is not an integer") from exc
+
+
+def _parse_run_left(value: str, where: str) -> float:
+    try:
+        share = float(value)
+    except ValueError as exc:
+        raise LoaderError(f"{where}: run_left {value!r} is not a number") from exc
+    if not 0 < share <= 1:
+        raise LoaderError(f"{where}: run_left {share} is not above 0 and at most 1")
+    return share
 
 
 def _check_ids_and_levels(regions: list[Region], path: str) -> None:

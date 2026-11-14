@@ -12,7 +12,7 @@ import { ALLOCATIONS, type Allocation } from "./player";
 import { playOrder, runSeed, simulateRun, type RunResult } from "./simulate";
 
 const USAGE = `pnpm sim [--runs 20] [--allocations ITEMS,STR,DEX,INT,FTH,ARC,ALL] [--seed 1] [--no-dlc]
-         [--regions limgrave,liurnia] [--completion 50] [--classes knight,jester] [--reroll-every 3]
+         [--regions limgrave,liurnia] [--completion 50] [--classes knight,jester]
          [--out ../data/build/sim/<timestamp>]`;
 
 /** Each run writes its own folder, so an earlier dump stays put while the next one is read. */
@@ -42,7 +42,6 @@ export function main(argv: readonly string[], repo: string): void {
       regions: { type: "string" },
       completion: { type: "string", default: "50" },
       classes: { type: "string" },
-      "reroll-every": { type: "string", default: "3" },
       out: { type: "string", default: path.join(repo, "data/build/sim", timestamp()) },
       help: { type: "boolean", default: false },
     },
@@ -79,7 +78,6 @@ export function main(argv: readonly string[], repo: string): void {
           regions,
           completion,
           characterClasses: values.classes === undefined ? null : values.classes.split(","),
-          rerollEvery: Number(values["reroll-every"]),
         }),
       );
     }
@@ -91,10 +89,10 @@ export function main(argv: readonly string[], repo: string): void {
   writeFileSync(
     path.join(out, "objectives.csv"),
     csv([
-      ["allocation", "run", "seed", "objective", "kept", "region", "regions_open", "level", ...STATS, "boss", "character_class", ...slots],
+      ["allocation", "run", "seed", "objective", "region", "regions_open", "level", ...STATS, "boss", "character_class", ...slots],
       ...results.flatMap((result, index) =>
         result.objectives.map((row) => [
-          result.options.allocation, index, result.options.seed, row.objective, row.kept, row.region, row.regionsOpen, row.level,
+          result.options.allocation, index, result.options.seed, row.objective, row.region, row.regionsOpen, row.level,
           ...STATS.map((stat) => row.stats[stat]), row.boss, row.characterClass,
           ...slots.map((slot) => (row.slots[slot] === undefined ? "" : (row.slots[slot] ?? "(empty)"))),
         ]),
@@ -104,12 +102,12 @@ export function main(argv: readonly string[], repo: string): void {
   writeFileSync(
     path.join(out, "rolls.csv"),
     csv([
-      ["allocation", "run", "objective", "kept", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "chance_no_decay", "decay", "late", "pool", "none_chance", "none_chance_no_decay", "none_decay", "guaranteed_chance", "guaranteed_won", "drift", "boosts", "boost_chances", "chosen_boosts"],
+      ["allocation", "run", "objective", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "catch_up", "pool", "none_chance", "guaranteed_chance", "guaranteed_won", "boosts", "boost_chances", "chosen_boosts"],
       ...results.flatMap((result, index) =>
         result.rolls.map((row) => [
-          result.options.allocation, index, row.objective, row.kept, row.region, row.level, row.characterClass, row.boss, row.slot,
-          row.chosen ?? "(empty)", row.chosenKey, row.chance, row.chanceNoDecay, row.decay, row.late, row.pool, row.noneChance, row.noneChanceNoDecay,
-          row.noneDecay, row.guaranteedChance, row.guaranteedWon, row.drift, row.boosts.join(";"),
+          result.options.allocation, index, row.objective, row.region, row.level, row.characterClass, row.boss, row.slot,
+          row.chosen ?? "(empty)", row.chosenKey, row.chance, row.catchUp, row.pool, row.noneChance,
+          row.guaranteedChance, row.guaranteedWon, row.boosts.join(";"),
           row.boostChances.map((value) => value.toPrecision(4)).join(";"), row.chosenBoosts.join(";"),
         ]),
       ),

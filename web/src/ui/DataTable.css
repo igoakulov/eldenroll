@@ -76,6 +76,12 @@
   opacity: var(--dimmed);
 }
 
+/* Under the numbers, where the pointer already is; doubled to win over the control's own padding */
+.show-all.data-table-show-all {
+  justify-content: flex-end;
+  padding-right: 0;
+}
+
 .data-table-empty {
   font-style: italic;
   color: var(--text-3);
@@ -110,9 +116,9 @@
   position: absolute;
   top: -3px;
   bottom: -3px;
-  left: calc(var(--mark) * 100%);
+  /* Centred on its share, but kept inside the rail, so a tick at either end never widens the table */
+  left: clamp(0px, calc(var(--mark) * 100% - 1px), calc(100% - 2px));
   width: 2px;
-  transform: translateX(-50%);
   background: var(--grace);
 }
 

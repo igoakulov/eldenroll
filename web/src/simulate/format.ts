@@ -1,7 +1,11 @@
 import type { ModifierText, Trigger } from "../../sim/aggregate";
 import { copy } from "../copy";
+import type { TableFold } from "../ui/DataTable";
 
 const words = copy.simulate.boosts;
+
+/** Every long table shows its first 10 rows and folds the rest behind `Show all`. */
+export const FOLD: TableFold = { after: 10, showAll: copy.simulate.showAll, showLess: copy.simulate.showLess };
 
 export function percent(share: number, digits = 1): string {
   return Number.isFinite(share) ? `${(share * 100).toFixed(digits)}%` : "–";
@@ -11,10 +15,10 @@ export function decimal(value: number, digits = 2): string {
   return Number.isFinite(value) ? value.toFixed(digits) : "–";
 }
 
-/** A multiplier: two decimals, or two significant digits once it falls below 0.01, so a deep decay never reads 0. */
+/** A multiplier: two decimals below 10, whole numbers above, since the catch-up boost reaches tens of thousands. */
 export function multiplier(value: number): string {
   if (!Number.isFinite(value)) return "–";
-  return value > 0 && value < 0.01 ? value.toPrecision(2) : value.toFixed(2);
+  return value < 10 ? value.toFixed(2) : Math.round(value).toLocaleString("en-GB");
 }
 
 function trigger(one: Trigger): string {

@@ -50,6 +50,7 @@ export interface Region {
   readonly id: string;
   readonly name: string;
   readonly region_level: number;
+  readonly run_left: number;
 }
 
 export interface Location {

@@ -1,4 +1,4 @@
-import { useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 
 import "./Tabs.css";
 
@@ -24,7 +24,21 @@ export function Tabs({
 }) {
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const list = useRef<HTMLDivElement | null>(null);
   const last = tabs.length - 1;
+  // A label wider than its share of the row widens its column, so the underline follows the selected tab as laid out
+  const [underline, setUnderline] = useState<{ readonly left: number; readonly width: number } | null>(null);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const tab = buttons.current[selected];
+      if (tab) setUnderline({ left: tab.offsetLeft, width: tab.offsetWidth });
+    };
+    measure();
+    if (list.current === null || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(list.current);
+    return () => observer.disconnect();
+  }, [selected, tabs.length]);
 
   const onKeyDown = (event: KeyboardEvent) => {
     const keys: Readonly<Record<string, number>> = {
@@ -42,10 +56,17 @@ export function Tabs({
 
   const row = (
     <div
+      ref={list}
       className="tabs"
       role="tablist"
       aria-label={label}
-      style={{ "--tabs": tabs.length, "--tab": selected } as CSSProperties}
+      style={
+        {
+          "--tabs": tabs.length,
+          "--tab": selected,
+          ...(underline === null ? {} : { "--underline-x": `${underline.left}px`, "--underline-w": `${underline.width}px` }),
+        } as CSSProperties
+      }
       onKeyDown={onKeyDown}
     >
       {tabs.map((tab, index) => (

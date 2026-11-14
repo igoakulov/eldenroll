@@ -4,13 +4,15 @@ import type { Condition, LoadoutSlot, Modifier, Selector } from "../src/engine/d
 import { POOL_SLOTS } from "../src/engine/database";
 import type { EngineData } from "../src/engine/engineData";
 import { STATS, type Stat } from "../src/engine/settings";
-import { repeatKey, slotOptions } from "../src/engine/slotRoll";
-import { decayRate, DEFAULT_HYPERPARAMS, lateBoost } from "../src/engine/hyperparams";
+import { catchUpMultiplier, repeatKey, slotOptions } from "../src/engine/slotRoll";
+import type { Option } from "../src/engine/selectors";
+import { DEFAULT_HYPERPARAMS } from "../src/engine/hyperparams";
 import {
   BUCKET,
   CHANCE_SLOTS,
   GUARANTEE,
   playOrder,
+  type ChanceSum,
   type ChanceSums,
   type ObjectiveRow,
   type RollRow,
@@ -33,9 +35,9 @@ export interface Obj {
 export interface Sample {
   readonly data: EngineData;
   readonly results: readonly RunResult[];
-  /** Every kept objective, every class. */
+  /** Every objective, every class. */
   readonly all: readonly Obj[];
-  /** Kept objectives of the picked classes. */
+  /** Objectives of the picked classes. */
   readonly objectives: readonly Obj[];
   readonly classes: readonly string[];
 }
@@ -45,13 +47,12 @@ export function sampleOf(data: EngineData, results: readonly RunResult[], classe
   results.forEach((result, run) => {
     const byObjective = new Map<number, Map<LoadoutSlot, RollRow>>();
     for (const roll of result.rolls) {
-      if (!roll.kept) continue;
       const slots = byObjective.get(roll.objective) ?? new Map<LoadoutSlot, RollRow>();
       slots.set(roll.slot, roll);
       byObjective.set(roll.objective, slots);
     }
     for (const row of result.objectives) {
-      if (row.kept) all.push({ run, row, rolls: byObjective.get(row.objective) ?? new Map() });
+      all.push({ run, row, rolls: byObjective.get(row.objective) ?? new Map() });
     }
   });
   const picked = new Set(classes);
@@ -148,12 +149,15 @@ export interface ShareTable {
   readonly rows: readonly ShareRow[];
 }
 
+/** `universe` adds a row at 0 for each key that never showed. */
 function shareTable(
   objectives: readonly Obj[],
   keysOf: (one: Obj) => readonly string[],
   name: (key: string) => string,
+  universe: Iterable<string> = [],
 ): ShareTable {
   const counted = new Map<string, number>();
+  for (const key of universe) counted.set(key, 0);
   for (const one of objectives) for (const key of new Set(keysOf(one))) counted.set(key, (counted.get(key) ?? 0) + 1);
   const total = objectives.length;
   const rows = [...counted]
@@ -172,6 +176,21 @@ const chosenKeys =
 
 function chosenItem(data: EngineData, roll: RollRow | undefined) {
   return roll?.chosen === null || roll?.chosen === undefined ? undefined : data.items.get(roll.chosen);
+}
+
+/** Options of the classes' pools for these slots that some roll of that class offered, so a table can list what was
+ * in reach and never showed. */
+function inReach(sample: Sample, classes: readonly string[], slots: readonly LoadoutSlot[], test: (option: Option) => boolean = () => true): Option[] {
+  const found: Option[] = [];
+  for (const characterClass of classes) {
+    const offered = new Set(sample.results.flatMap((result) => [...(result.offered.get(characterClass) ?? [])]));
+    for (const slot of slots) {
+      for (const option of slotOptions(sample.data, characterClass, slot)) {
+        if (option.row.odds > 0 && offered.has(repeatKey(option)) && test(option)) found.push(option);
+      }
+    }
+  }
+  return found;
 }
 
 /** A weapon class, a shield class or a category: what the hand holds, `none` for an empty one. */
@@ -197,7 +216,7 @@ function poolSizes(data: EngineData, characterClass: string, slot: LoadoutSlot):
 }
 
 /** A hand by weapon class, each share beside the one it would have if every class held the same number of
- * weapons, so a skew from pool size reads apart from one from decay, stat gates or a modifier. With several
+ * weapons, so a skew from pool size reads apart from one from catch-up, stat gates or a modifier. With several
  * classes picked, each class's adjusted shares count by its objectives. */
 export function handShares(sample: Sample, slot: "rh" | "lh"): ShareTable | null {
   const { data } = sample;
@@ -211,6 +230,9 @@ export function handShares(sample: Sample, slot: "rh" | "lh"): ShareTable | null
       return key === undefined ? [] : [key];
     },
     humanise,
+    inReach(sample, classes, [slot]).flatMap((option) =>
+      option.kind === "item" ? [option.row.subcategory ?? option.row.category] : [],
+    ),
   );
   const adjusted = new Map<string, number>();
   for (const characterClass of classes) {
@@ -293,8 +315,17 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
     const classes = sample.classes.filter((id) => !alwaysNone(data, id, "spell"));
     if (classes.length === 0) return null;
     const objectives = sample.objectives.filter((one) => classes.includes(one.row.characterClass));
-    return shareTable(objectives, chosenKeys(["spell"]), name);
+    return shareTable(objectives, chosenKeys(["spell"]), name, inReach(sample, classes, ["spell"]).map(repeatKey));
   }
+  const ash = (shield: boolean) => (option: Option) => shieldAsh(data, option.row.id) === shield;
+  const universe = {
+    weaponAsh: inReach(sample, sample.classes, ["rh_ash", "lh_ash"], ash(false)),
+    shieldAsh: inReach(sample, sample.classes, ["rh_ash", "lh_ash"], ash(true)),
+    item: inReach(sample, sample.classes, ["item"]),
+    talisman: inReach(sample, sample.classes, ["talisman_1", "talisman_2"]),
+    rule: inReach(sample, sample.classes, ["rule_1", "rule_2"]),
+    armor: inReach(sample, sample.classes, ["armor"]),
+  }[table].map(repeatKey);
   const keysOf = {
     weaponAsh: chosenKeys(["rh_ash", "lh_ash"], (roll) => !shieldAsh(data, roll.chosen ?? "")),
     shieldAsh: chosenKeys(["rh_ash", "lh_ash"], (roll) => shieldAsh(data, roll.chosen ?? "")),
@@ -303,7 +334,7 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
     rule: chosenKeys(["rule_1", "rule_2"]),
     armor: chosenKeys(["armor"]),
   }[table];
-  return shareTable(sample.objectives, keysOf, name);
+  return shareTable(sample.objectives, keysOf, name, universe);
 }
 
 // Overview
@@ -311,7 +342,6 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
 export interface RunSummary {
   readonly runs: number;
   readonly objectives: number;
-  readonly rerolls: number;
   readonly level: number;
   readonly stats: Readonly<Record<Stat, number>>;
 }
@@ -325,8 +355,7 @@ export function runSummary(sample: Sample): RunSummary {
   const levels = results.map((result) => STATS.reduce((sum, stat) => sum + result.finalStats[stat], 0) - 79);
   return {
     runs: results.length,
-    objectives: mean(results.map((result) => result.objectives.filter((row) => row.kept).length)),
-    rerolls: mean(results.map((result) => result.objectives.filter((row) => !row.kept).length)),
+    objectives: mean(results.map((result) => result.objectives.length)),
     level: mean(levels),
     stats: Object.fromEntries(STATS.map((stat) => [stat, mean(results.map((result) => result.finalStats[stat]))])) as Record<
       Stat,
@@ -337,7 +366,12 @@ export function runSummary(sample: Sample): RunSummary {
 
 /** The picked classes' shares of every objective. */
 export function classShares(sample: Sample): ShareTable {
-  const table = shareTable(sample.all, (one) => [`character_class:${one.row.characterClass}`], (key) => nameOf(sample.data, key));
+  const table = shareTable(
+    sample.all,
+    (one) => [`character_class:${one.row.characterClass}`],
+    (key) => nameOf(sample.data, key),
+    sample.classes.map((id) => `character_class:${id}`),
+  );
   return { ...table, rows: table.rows.filter((row) => sample.classes.includes(row.key.slice("character_class:".length))) };
 }
 
@@ -451,68 +485,58 @@ export function empties(sample: Sample): readonly EmptyRow[] {
 
 // Boosts
 
-export interface LateRow {
+export interface CatchUpRow {
   readonly key: string;
   readonly count: number;
   /** Of the rolls that showed an item. */
   readonly share: number;
-  /** The mean lateness and stat-requirement boost, without decay. */
-  readonly late: number;
-  readonly decay: number;
+  /** The mean catch-up boost on the items that won. */
+  readonly catchUp: number;
 }
 
-/** Stat tiers by the total an item needs, Strength at its two-handed requirement (`EngineData.lateOffset`): each
- * the first total of its tier, `0` for no requirement. */
-export const STAT_TIERS = [0, 1, 21, 41, 61] as const;
+const ceilingRegions = new WeakMap<EngineData, ReadonlyMap<string, string>>();
 
-function statTier(total: number): number {
-  let tier = 0;
-  STAT_TIERS.forEach((from, index) => {
-    if (total >= from) tier = index;
-  });
-  return tier;
+/** The region setting each item's catch-up ceiling: its earliest, the one with the most `run_left`. */
+function ceilingRegion(data: EngineData, itemId: string): string | undefined {
+  let regions = ceilingRegions.get(data);
+  if (regions === undefined) {
+    const { database } = data;
+    const left = new Map(database.region.map((row) => [row.id, row.run_left]));
+    const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
+    const found = new Map<string, string>();
+    for (const row of database.item_location) {
+      const location = row.location_id ?? data.bosses.get(row.boss_instance_id ?? "")?.location_id;
+      const region = location === undefined ? undefined : locationRegion.get(location);
+      if (region === undefined) continue;
+      const current = found.get(row.item_id);
+      if (current === undefined || (left.get(region) ?? 0) > (left.get(current) ?? 0)) found.set(row.item_id, region);
+    }
+    regions = found;
+    ceilingRegions.set(data, regions);
+  }
+  return regions.get(itemId);
 }
 
-/** Every roll that showed an item (`none` aside), grouped by the region setting its lateness (`""` for an
- * item with no location) or by its stat tier (an index into `STAT_TIERS`). */
-export function lateness(sample: Sample): { readonly byRegion: readonly LateRow[]; readonly byDemand: readonly LateRow[] } {
+/** Every roll that showed an item (`none` aside), grouped by the region setting its catch-up ceiling (`""` for an
+ * item with no location). */
+export function catchUpByRegion(sample: Sample): readonly CatchUpRow[] {
   const { data } = sample;
   const rolls = sample.objectives.flatMap((one) =>
     [...one.rolls.values()].filter(
       (roll) => roll.chosen !== null && roll.chosen !== "none" && data.items.has(roll.chosen),
     ),
   );
-  const group = (keyOf: (roll: RollRow) => string): Map<string, RollRow[]> => {
-    const groups = new Map<string, RollRow[]>();
-    for (const roll of rolls) {
-      const key = keyOf(roll);
-      const list = groups.get(key) ?? [];
-      list.push(roll);
-      groups.set(key, list);
-    }
-    return groups;
-  };
-  const rowsOf = (groups: Map<string, RollRow[]>, order: readonly string[]): LateRow[] =>
-    order
-      .filter((key) => groups.has(key))
-      .map((key) => {
-        const list = groups.get(key)!;
-        return {
-          key,
-          count: list.length,
-          share: list.length / rolls.length,
-          late: mean(list.map((roll) => roll.late)),
-          decay: mean(list.map((roll) => roll.decay)),
-        };
-      });
-  const offset = (roll: RollRow) => data.lateOffset.get(roll.chosen ?? "");
-  return {
-    byRegion: rowsOf(group((roll) => offset(roll)?.region ?? ""), [...playOrder(data.database), ""]),
-    byDemand: rowsOf(
-      group((roll) => String(statTier(Math.round(offset(roll)?.statTotal ?? 0)))),
-      STAT_TIERS.map((_, index) => String(index)),
-    ),
-  };
+  const groups = new Map<string, RollRow[]>();
+  for (const roll of rolls) {
+    const key = ceilingRegion(data, roll.chosen ?? "") ?? "";
+    groups.set(key, [...(groups.get(key) ?? []), roll]);
+  }
+  return [...playOrder(data.database), ""]
+    .filter((key) => groups.has(key))
+    .map((key) => {
+      const list = groups.get(key)!;
+      return { key, count: list.length, share: list.length / rolls.length, catchUp: mean(list.map((roll) => roll.catchUp)) };
+    });
 }
 
 export interface BoostRow {
@@ -527,7 +551,7 @@ export interface BoostRow {
   readonly lostTo: readonly { readonly name: string; readonly count: number }[];
 }
 
-/** Every boosting modifier in play for the picked classes: guarantees (×10,000 or more) first. */
+/** Every boosting modifier in play for the picked classes: guarantees (×100,000 or more) first. */
 export function boosts(sample: Sample): { readonly guarantees: readonly BoostRow[]; readonly others: readonly BoostRow[] } {
   const { data } = sample;
   const stats = new Map<string, { active: number; won: number; chance: number[]; lost: Map<string, number> }>();
@@ -625,8 +649,8 @@ export function outOfPlace(sample: Sample): readonly { readonly id: OutOfPlace; 
 
 // Items
 
-/** Each option's showings in each run, as the engine counts them for decay: once per completed objective, every
- * class, every slot. `none` is one key across all slots. */
+/** Each option's showings in each run: once per completed objective, every class, every slot. `none` is one key
+ * across all slots. */
 function showings(sample: Sample): ReadonlyMap<string, readonly (readonly number[])[]> {
   const byKey = new Map<string, number[][]>();
   for (const one of sample.all) {
@@ -650,16 +674,15 @@ function baseOdds(data: EngineData, key: string): number {
   return 0;
 }
 
-/** The lateness and stat-requirement boost on an item; null for anything else, an alias included, whose members
- * each carry their own. */
-function lateOf(data: EngineData, key: string): number | null {
+/** The catch-up boost's ceiling on an item or armor set, the most it can get (`catchUpMultiplier`); null for
+ * anything else, an alias included, whose members each carry their own. */
+function ceilingOf(data: EngineData, key: string): number | null {
   const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
-  const offset = kind === "item" ? data.lateOffset.get(id) : undefined;
-  return offset === undefined ? null : lateBoost(offset.lateness, offset.demand, DEFAULT_HYPERPARAMS.lateOffset);
-}
-
-function rateOf(data: EngineData, key: string): number {
-  return decayRate(data.decayGroupSize.get(key) ?? 1, DEFAULT_HYPERPARAMS.decay);
+  const item = kind === "item" ? data.items.get(id) : undefined;
+  const set = kind === "armor_set" ? data.armorSets.get(id) : undefined;
+  const option: Option | undefined =
+    item !== undefined ? { kind: "item", row: item } : set !== undefined ? { kind: "armor_set", row: set } : undefined;
+  return option === undefined ? null : catchUpMultiplier(data, option, DEFAULT_HYPERPARAMS.catchUp);
 }
 
 export interface ItemRow {
@@ -668,18 +691,13 @@ export interface ItemRow {
   /** Slots it was in reach in for the picked classes, in `CHANCE_SLOTS` order. */
   readonly slots: readonly LoadoutSlot[];
   readonly odds: number;
-  readonly late: number | null;
-  /** The multiplier on its odds each time it shows. */
-  readonly rate: number;
+  readonly ceiling: number | null;
   readonly shownPerRun: number;
-  /** Its decay multiplier once the run ends, averaged over runs. */
-  readonly endDecay: number;
-  /** The first objective whose roll had its odds below half, averaged over the runs it happened in. */
-  readonly halvedAt: number | null;
-  readonly halvedRuns: number;
+  /** Runs it showed in at least once. */
+  readonly seenIn: number;
 }
 
-/** Every option in reach for the picked classes, with how far decay took it. */
+/** Every option in reach for the picked classes, with how often it showed. */
 export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
   const { data } = sample;
   const picked = new Set(sample.classes);
@@ -694,22 +712,15 @@ export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
   const shown = showings(sample);
   const runs = sample.results.length;
   return [...slotsOf].map(([key, slots]) => {
-    const rate = rateOf(data, key);
     const perRun = shown.get(key) ?? sample.results.map(() => []);
-    // Shown this many times, its odds are below half from the next objective on
-    const toHalve = rate < 1 ? Math.floor(Math.log(0.5) / Math.log(rate)) + 1 : Infinity;
-    const halved = perRun.flatMap((objectives) => (objectives.length >= toHalve ? [objectives[toHalve - 1]! + 1] : []));
     return {
       key,
       name: nameOf(data, key),
       slots: CHANCE_SLOTS.filter((slot) => slots.has(slot)),
       odds: baseOdds(data, key),
-      late: lateOf(data, key),
-      rate,
+      ceiling: ceilingOf(data, key),
       shownPerRun: perRun.reduce((sum, objectives) => sum + objectives.length, 0) / runs,
-      endDecay: mean(perRun.map((objectives) => rate ** objectives.length)),
-      halvedAt: halved.length === 0 ? null : mean(halved),
-      halvedRuns: halved.length,
+      seenIn: perRun.filter((objectives) => objectives.length > 0).length,
     };
   });
 }
@@ -717,14 +728,15 @@ export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
 export interface ItemPoint {
   /** The stretch's first objective number. */
   readonly x: number;
-  /** Mean chance per roll in the stretch, with decay and with every decay removed. */
+  /** Mean chance per roll in the stretch, with the catch-up boost and with it removed from every option. */
   readonly chance: number;
   readonly plain: number;
+  /** The mean catch-up boost on it in the stretch. */
+  readonly catchUp: number;
   /** Rolls of the picked classes in the stretch where it was in reach. */
   readonly rolls: number;
-  /** Times shown by the stretch's end, and the decay that leaves, averaged over runs. */
+  /** Times shown by the stretch's end, averaged over runs. */
   readonly shown: number;
-  readonly decay: number;
 }
 
 /** Slots whose showings mark a slot's chart: the second talisman and combat rule slots show on the first's. */
@@ -741,19 +753,19 @@ export function itemSeries(
   key: string,
 ): readonly { readonly slot: LoadoutSlot; readonly points: readonly ItemPoint[]; readonly shown: readonly number[] }[] {
   const picked = new Set(sample.classes);
-  const bySlot = new Map<LoadoutSlot, Map<number, { chance: number; plain: number; rolls: number }>>();
+  const bySlot = new Map<LoadoutSlot, Map<number, ChanceSum>>();
   for (const [at, sums] of chances) {
     const [characterClass = "", slot = "", option = "", stretch = ""] = at.split("|");
     if (option !== key || !picked.has(characterClass)) continue;
-    const stretches = bySlot.get(slot as LoadoutSlot) ?? new Map<number, { chance: number; plain: number; rolls: number }>();
-    const total = stretches.get(Number(stretch)) ?? { chance: 0, plain: 0, rolls: 0 };
+    const stretches = bySlot.get(slot as LoadoutSlot) ?? new Map<number, ChanceSum>();
+    const total = stretches.get(Number(stretch)) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0 };
     total.chance += sums.chance;
     total.plain += sums.plain;
+    total.boosted += sums.boosted;
     total.rolls += sums.rolls;
     stretches.set(Number(stretch), total);
     bySlot.set(slot as LoadoutSlot, stretches);
   }
-  const rate = rateOf(sample.data, key);
   const perRun = showings(sample).get(key) ?? sample.results.map(() => []);
   return CHANCE_SLOTS.filter((slot) => bySlot.has(slot)).map((slot) => ({
     slot,
@@ -768,14 +780,14 @@ export function itemSeries(
           x,
           chance: total.chance / total.rolls,
           plain: total.plain / total.rolls,
+          catchUp: total.plain > 0 ? total.boosted / total.plain : 1,
           rolls: total.rolls,
           shown: mean(counts),
-          decay: mean(counts.map((count) => rate ** count)),
         };
       }),
   }));
 }
 
-export function oddsOf(data: EngineData, key: string): { readonly odds: number; readonly late: number | null; readonly rate: number } {
-  return { odds: baseOdds(data, key), late: lateOf(data, key), rate: rateOf(data, key) };
+export function oddsOf(data: EngineData, key: string): { readonly odds: number; readonly ceiling: number | null } {
+  return { odds: baseOdds(data, key), ceiling: ceilingOf(data, key) };
 }

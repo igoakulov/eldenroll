@@ -36,7 +36,7 @@ DLC_BOSSES: Final[int] = 52
 # (`data/balance.md#Tiers`).
 LOWEST_GUARANTEE: Final[float] = 100
 GUARANTEE_SPACING: Final[float] = 10
-TOP_TIER: Final[float] = 1_000_000
+TOP_TIER: Final[float] = 10_000_000
 
 
 def structure_problems(data: GateData) -> tuple[str, ...]:

@@ -18,8 +18,9 @@ import { StopSlider } from "../ui/StopSlider";
 import { Tabs } from "../ui/Tabs";
 import { useHideOnScroll } from "../ui/useHideOnScroll";
 import { Boosts } from "./Boosts";
-import { Decay } from "./Decay";
-import { Gear } from "./Gear";
+import { Items } from "./Items";
+import { Slots } from "./Slots";
+import { Variety } from "./Variety";
 import {
   COMPLETION_STEP,
   MAX_RUNS,
@@ -164,16 +165,6 @@ export function SimulatePage() {
             />
           </div>
           <Stepper
-            id="simulate-reroll"
-            label={words.rerollEvery}
-            detail={words.rerollEveryDetail}
-            value={inputs.rerollEvery}
-            min={0}
-            max={99}
-            correct={corrector(0, 99)}
-            onChange={(rerollEvery) => setInputs((last) => ({ ...last, rerollEvery }))}
-          />
-          <Stepper
             id="simulate-seed"
             label={words.seed}
             value={inputs.seed}
@@ -307,9 +298,10 @@ function Results({
         ? TABS.map(() => note(words.noClasses))
         : [
             <Overview key="overview" sample={sample} search={view.search} />,
-            <Gear key="gear" sample={sample} search={view.search} />,
+            <Slots key="slots" sample={sample} search={view.search} />,
             <Boosts key="boosts" sample={sample} search={view.search} />,
-            <Decay key="decay" sample={sample} chances={chances ?? new Map()} search={view.search} />,
+            <Variety key="variety" sample={sample} search={view.search} />,
+            <Items key="items" sample={sample} chances={chances ?? new Map()} search={view.search} />,
           ];
   const selected = TABS.indexOf(view.tab);
   // Only the selected panel is drawn: the others would count the whole sample again for nothing

@@ -1,7 +1,7 @@
 import type { LoadoutSlot, Modifier } from "./database";
 import { isSetReachable } from "./eligibility";
 import { poolKey, type EngineData } from "./engineData";
-import { decayRate, lateBoost, type DecayParams, type LateOffsetParams } from "./hyperparams";
+import { catchUpBoost, type CatchUpParams } from "./hyperparams";
 import { activeModifiers, type RollState } from "./modifiers";
 import { pickWeighted } from "./random";
 import { matchesOption, type Option } from "./selectors";
@@ -21,10 +21,8 @@ export interface WeightedOption {
   readonly option: Option;
   readonly weight: number;
   readonly modifiers: readonly Modifier[];
-  /** The decay multiplier in `weight`: 1 for an option never shown. */
-  readonly decay: number;
-  /** The lateness and stat-requirement boost in `weight` (`lateBoost`): 1 for anything but an item. */
-  readonly late: number;
+  /** The catch-up boost in `weight` (`catchUpBoost`), on items and armor sets; 1 on anything else. */
+  readonly catchUp: number;
 }
 
 export interface SlotPoolResult {
@@ -48,25 +46,6 @@ export interface SlotRoll {
 /** Sees every slot roll, discarded ones included; the simulation's only way in. */
 export type RollObserver = (slot: LoadoutSlot, roll: SlotRoll) => void;
 
-export interface Repetition {
-  /** How many completed objectives showed each `repeatKey` this run. */
-  readonly seen: Readonly<Record<string, number>>;
-  /** `EngineData.decayGroupSize`; a missing key decays as a pool of 1. */
-  readonly decayGroupSize: ReadonlyMap<string, number>;
-  readonly decay: DecayParams;
-}
-
-const NO_DECAY: DecayParams = { max: 1, min: 1, halfSize: 1 };
-
-export const NO_REPETITION: Repetition = { seen: {}, decayGroupSize: new Map(), decay: NO_DECAY };
-
-/** Compounds: each completed objective that showed it multiplies again, at a rate its pool's
- * size sets (`data/balance.md#Hyperparameters`). */
-export function repetitionMultiplier(key: string, repetition: Repetition): number {
-  const rate = decayRate(repetition.decayGroupSize.get(key) ?? 1, repetition.decay);
-  return rate ** (repetition.seen[key] ?? 0);
-}
-
 export interface RollContext {
   readonly data: EngineData;
   readonly state: RollState;
@@ -74,16 +53,32 @@ export interface RollContext {
   readonly counted: ReadonlySet<string>;
   /** `optionKey`s the player excluded; they win over every other input. */
   readonly neverRoll?: ReadonlySet<string>;
-  readonly repetition?: Repetition;
   /** Absent means no boost: most tests roll a pool in isolation and don't need one. */
-  readonly lateOffset?: LateOffsetParams;
+  readonly catchUp?: CatchUpParams;
+  /** `Run.availableSince`; absent means every option takes its ceiling, `EngineData.runLeft`. */
+  readonly availableSince?: Readonly<Record<string, number>>;
+}
+
+/** The catch-up boost on one option, as `WeightedOption.catchUp` holds it. */
+export function catchUpMultiplier(
+  data: EngineData,
+  option: Option,
+  catchUp: CatchUpParams | undefined,
+  availableSince?: Readonly<Record<string, number>>,
+): number {
+  const key = optionKey(option);
+  const ceiling = data.runLeft.get(key);
+  if (catchUp === undefined || ceiling === undefined) return 1;
+  // An option the run doesn't track, such as a shortlisted weapon out of reach, gets no boost
+  const left = availableSince === undefined ? ceiling : Math.max(ceiling, availableSince[key] ?? 1);
+  return catchUpBoost(left, catchUp);
 }
 
 export function optionKey(option: Option): string {
   return `${option.kind}:${option.row.id}`;
 }
 
-/** An alias member repeats as its alias, so one seen member makes every member less likely.
+/** An alias member counts as its alias wherever showings are tallied, since the player sees the alias.
  * `Never roll` still keys on `optionKey`, because the player picks real items. */
 export function repeatKey(option: Option): string {
   if (option.kind === "item" && option.row.alias !== null) return `alias:${option.row.alias}`;
@@ -126,23 +121,12 @@ export function weighOptions(
 ): SlotPoolResult {
   const candidates = options.filter((option) => allowed(option, context, filters));
   const active = activeModifiers(context.data, context.state);
-  const repetition = context.repetition ?? NO_REPETITION;
-  const lateOffset = context.lateOffset;
-  const weighted = candidates
-    .map((option) => {
-      const modifiers = active.filter((row) => matchesOption(row.target, option));
-      const late =
-        lateOffset === undefined || option.kind !== "item"
-          ? 1
-          : lateBoost(
-              context.data.lateOffset.get(option.row.id)?.lateness ?? 0,
-              context.data.lateOffset.get(option.row.id)?.demand ?? 0,
-              lateOffset,
-            );
-      const decay = repetitionMultiplier(repeatKey(option), repetition);
-      const weight = modifiers.reduce((product, row) => product * row.value, option.row.odds * decay * late);
-      return { option, weight, modifiers, decay, late };
-    });
+  const weighted = candidates.map((option) => {
+    const modifiers = active.filter((row) => matchesOption(row.target, option));
+    const catchUp = catchUpMultiplier(context.data, option, context.catchUp, context.availableSince);
+    const weight = modifiers.reduce((product, row) => product * row.value, option.row.odds * catchUp);
+    return { option, weight, modifiers, catchUp };
+  });
   const kept = weighted.filter((row) => row.weight > 0);
   return { pool: kept.length, options: kept };
 }
