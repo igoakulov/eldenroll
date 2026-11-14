@@ -38,6 +38,3 @@ class AnnotationConfig:
 
     def area_by_name(self) -> dict[str, Area]:
         return {area.name: area for area in self.areas}
-
-    def event_by_name(self) -> dict[str, GameEvent]:
-        return {event.name: event for event in self.events}

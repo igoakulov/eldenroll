@@ -15,7 +15,6 @@ from eldenroll.errors import BuildError
 from eldenroll.model.database import Database
 
 WIKI_BASE = "https://eldenring.wiki.fextralife.com/"
-KINDS: tuple[str, ...] = ("item", "armor_set", "boss_instance", "alias")
 _ASH_OF_WAR = "Ash of War"
 # The item `none` and the alias of the `None` armor pieces share this id (CLAUDE.md#Traps).
 _NONE = "none"

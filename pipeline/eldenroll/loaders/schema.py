@@ -50,62 +50,22 @@ def check_keys(mapping: Mapping[object, object], allowed: Collection[str], path:
         raise LoaderError(f"{_describe(path)}: unexpected field(s) {', '.join(unknown)}")
 
 
-def _key(mapping: Mapping[object, object], key: str, path: str) -> object | None:
-    """Return the raw value for `key`, or None when absent."""
-    return mapping.get(key)
-
-
 def get_string(mapping: Mapping[object, object], key: str, path: str) -> str:
-    return require_string(_key(mapping, key, path), f"{path}.{key}")
+    return require_string(mapping.get(key), f"{path}.{key}")
 
 
 def get_optional_string(mapping: Mapping[object, object], key: str, path: str) -> str | None:
-    value = _key(mapping, key, path)
+    value = mapping.get(key)
     return None if value is None else require_string(value, f"{path}.{key}")
 
 
 def get_integer(mapping: Mapping[object, object], key: str, path: str) -> int:
-    return require_integer(_key(mapping, key, path), f"{path}.{key}")
+    return require_integer(mapping.get(key), f"{path}.{key}")
 
 
 def get_optional_integer(mapping: Mapping[object, object], key: str, path: str) -> int | None:
-    value = _key(mapping, key, path)
+    value = mapping.get(key)
     return None if value is None else require_integer(value, f"{path}.{key}")
-
-
-def get_optional_scalar(
-    mapping: Mapping[object, object], key: str, path: str
-) -> int | str | None:
-    value = _key(mapping, key, path)
-    where = f"{path}.{key}"
-    if value is None:
-        return None
-    if isinstance(value, int) and not isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        return value
-    raise LoaderError(f"{where}: expected an integer or a string, got {type(value).__name__}")
-
-
-def get_scalar_maps(
-    mapping: Mapping[object, object], key: str, path: str
-) -> tuple[dict[str, str | int], ...]:
-    value = _key(mapping, key, path)
-    if value is None:
-        return ()
-    out: list[dict[str, str | int]] = []
-    for index, entry in enumerate(require_sequence(value, f"{path}.{key}")):
-        where = f"{path}.{key}[{index}]"
-        row = require_mapping(entry, where)
-        parsed: dict[str, str | int] = {}
-        for entry_key, entry_value in row.items():
-            name = require_string(entry_key, f"{where} key")
-            scalar = get_optional_scalar({name: entry_value}, name, where)
-            if scalar is None:
-                raise LoaderError(f"{where}.{name}: expected a value")
-            parsed[name] = scalar
-        out.append(parsed)
-    return tuple(out)
 
 
 def split_words(value: str | None) -> tuple[str, ...]:
@@ -120,7 +80,7 @@ def get_words(mapping: Mapping[object, object], key: str, path: str) -> tuple[st
 
 def get_string_list(mapping: Mapping[object, object], key: str, path: str) -> tuple[str, ...]:
     """Return a YAML list of strings as a tuple, empty when absent."""
-    value = _key(mapping, key, path)
+    value = mapping.get(key)
     if value is None:
         return ()
     items = require_sequence(value, f"{path}.{key}")
@@ -128,7 +88,7 @@ def get_string_list(mapping: Mapping[object, object], key: str, path: str) -> tu
 
 
 def get_int_map(mapping: Mapping[object, object], key: str, path: str) -> dict[int, int]:
-    value = require_mapping(_key(mapping, key, path), f"{path}.{key}")
+    value = require_mapping(mapping.get(key), f"{path}.{key}")
     return {
         _require_int_key(entry_key, f"{path}.{key}"): require_integer(
             entry, f"{path}.{key}[{entry_key}]"
@@ -138,7 +98,7 @@ def get_int_map(mapping: Mapping[object, object], key: str, path: str) -> dict[i
 
 
 def get_str_int_map(mapping: Mapping[object, object], key: str, path: str) -> dict[str, int]:
-    value = require_mapping(_key(mapping, key, path), f"{path}.{key}")
+    value = require_mapping(mapping.get(key), f"{path}.{key}")
     out: dict[str, int] = {}
     for entry_key, entry in value.items():
         name = require_string(entry_key, f"{path}.{key} key")
@@ -150,18 +110,9 @@ def get_str_int_map_optional(
     mapping: Mapping[object, object], key: str, path: str
 ) -> dict[str, int]:
     """Return a string-keyed integer mapping, empty when the field is absent."""
-    if _key(mapping, key, path) is None:
+    if mapping.get(key) is None:
         return {}
     return get_str_int_map(mapping, key, path)
-
-
-def get_optional_int_map(
-    mapping: Mapping[object, object], key: str, path: str
-) -> dict[int, int]:
-    """Return an integer-keyed mapping, empty when the field is absent."""
-    if _key(mapping, key, path) is None:
-        return {}
-    return get_int_map(mapping, key, path)
 
 
 def _require_int_key(value: object, path: str) -> int:
@@ -171,7 +122,7 @@ def _require_int_key(value: object, path: str) -> int:
 def get_id_name_maps(
     mapping: Mapping[object, object], key: str, path: str
 ) -> dict[str, dict[int, str]]:
-    categories = require_mapping(_key(mapping, key, path), f"{path}.{key}")
+    categories = require_mapping(mapping.get(key), f"{path}.{key}")
     out: dict[str, dict[int, str]] = {}
     for category, entries in categories.items():
         name = require_string(category, f"{path}.{key} key")
@@ -188,7 +139,7 @@ def get_id_name_maps(
 def get_category_int_maps(
     mapping: Mapping[object, object], key: str, path: str
 ) -> dict[str, dict[int, int]]:
-    categories = require_mapping(_key(mapping, key, path), f"{path}.{key}")
+    categories = require_mapping(mapping.get(key), f"{path}.{key}")
     out: dict[str, dict[int, int]] = {}
     for category, entries in categories.items():
         name = require_string(category, f"{path}.{key} key")

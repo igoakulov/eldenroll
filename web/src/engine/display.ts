@@ -1,9 +1,6 @@
 import type { ArmorSet, CombatRule, Item, LoadoutSlot, PoolSlot } from "./database";
 import type { EngineData } from "./engineData";
 
-export const NONE_LABEL = "none";
-export const ANY_LABEL = "any";
-
 export const ARMOR_PIECES = ["head", "body", "arms", "legs"] as const;
 export type ArmorPiece = (typeof ARMOR_PIECES)[number];
 
