@@ -25,8 +25,6 @@ from eldenroll.validate.slot_pools import validate_slot_pools
 from eldenroll.validate.subcategories import validate_subcategories
 
 GRAFTED_DRAGON: Final[str] = "grafted_dragon"
-NONE_RULE: Final[str] = "none"
-NONE_RULE_ODDS: Final[float] = 4
 BOSS_ROWS: Final[int] = 229
 ROLLABLE_BOSSES: Final[int] = 218
 BASE_BOSSES: Final[int] = 166
@@ -152,7 +150,7 @@ def _requirements(items: Iterable[Item]) -> Iterator[str]:
 
 
 def _odds(database: Database) -> Iterator[str]:
-    """Yield what breaks the odds rules: below 0, `None` not at 4, or odds on an armor piece."""
+    """Yield what breaks the odds rules: below 0, or odds on an armor piece."""
     rows: tuple[tuple[str, float], ...] = (
         *((f"character class {row.id}", row.odds) for row in database.character_classes),
         *((f"boss {row.id}", row.odds) for row in database.bosses),
@@ -163,8 +161,6 @@ def _odds(database: Database) -> Iterator[str]:
     negative = sorted(name for name, odds in rows if odds < 0)
     if negative:
         yield f"odds below 0 on: {', '.join(negative)}"
-    if [row.odds for row in database.rules if row.id == NONE_RULE] != [NONE_RULE_ODDS]:
-        yield f"the rule None needs odds of {NONE_RULE_ODDS}"
     pieces = sorted(row.id for row in database.items if row.category == "armor" and row.odds != 1)
     if pieces:
         yield f"odds on armor pieces, which roll only through a set: {', '.join(pieces)}"

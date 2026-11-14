@@ -23,8 +23,8 @@ ROOT = Path(__file__).resolve().parents[2]
 REGIONS_CSV = ROOT / "data" / "overrides" / "regions.csv"
 AREAS_CSV = ROOT / "data" / "overrides" / "region_areas.csv"
 
-BASE = Region(id="base", name="Base", region_level=1, run_left=1)
-DLC = Region(id="dlc", name="DLC: Land", region_level=2, run_left=0.5)
+BASE = Region(id="base", name="Base", region_level=1)
+DLC = Region(id="dlc", name="DLC: Land", region_level=2)
 
 
 def _area(name: str, text: str = "Text") -> Area:

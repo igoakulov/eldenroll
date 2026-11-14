@@ -1,4 +1,4 @@
-import type { ArmorSet, BossInstance, CharacterClass, CombatRule, Database, Item, Region } from "../engine/database";
+import { isNone, type ArmorSet, type BossInstance, type CharacterClass, type CombatRule, type Database, type Item, type Region } from "../engine/database";
 
 /** The rows with the longest labels in `db.json`, so the kit stresses a layout the way real data does
  * (web/src/ui/README.md#UI kit). Only rollable rows count: nothing else reaches a screen. */
@@ -59,7 +59,7 @@ export function samples(database: Database): Samples {
     ),
     alias: longest(database.alias, (alias) => alias.label).label,
     rule: longest(
-      database.combat_rule.filter((rule) => rule.odds > 0 && rule.id !== "none"),
+      database.combat_rule.filter((rule) => rule.odds > 0 && !isNone(rule.id)),
       (rule) => rule.name,
     ),
     boss: longest(bosses, (boss) => boss.name),

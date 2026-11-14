@@ -13,7 +13,7 @@ import { realDatabase as database } from "./realDatabase.testing";
 // Record<keyof ...> makes the compiler fail when a type gains a field this list lacks, and the
 // test fails when a row holds a field the list lacks, so the types can't drift from db.json.
 const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number], true> } = {
-  region: { id: true, name: true, region_level: true, run_left: true },
+  region: { id: true, name: true, region_level: true },
   location: { id: true, name: true, region_id: true },
   boss_instance: { id: true, name: true, location_id: true, location: true, odds: true, url: true },
   item: {
@@ -67,7 +67,7 @@ describe("db.json", () => {
     expect(database.item.filter((row) => row.category === "none")).toHaveLength(1);
     expect(database.character_class).toHaveLength(8);
     expect(database.slot_pool).toHaveLength(72);
-    expect(database.combat_rule).toHaveLength(29);
+    expect(database.combat_rule).toHaveLength(30);
     expect(database.alias).toHaveLength(11);
   });
 

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { THIN_SAMPLE, type ShareRow, type ShareTable } from "../../sim/aggregate";
 import { copy } from "../copy";
 import { DataTable, ShareBar, type DataColumn } from "../ui/DataTable";
-import { SectionHeading } from "../ui/Headings";
+import { SectionHeading, SectionNote } from "../ui/Headings";
 import { FOLD, matches, multiplier, percent, perRun } from "./format";
 
 const words = copy.simulate;
@@ -16,8 +16,11 @@ export function ShareSection({
   control,
   table,
   search,
+  nameLabel = words.columns.name,
 }: {
   readonly title: string;
+  /** The first column's heading, such as Region for a table by region. */
+  readonly nameLabel?: string;
   readonly lede?: string;
   readonly control?: ReactNode;
   readonly table: ShareTable | null;
@@ -25,10 +28,11 @@ export function ShareSection({
 }) {
   if (table === null) return null;
   const rows = table.rows.filter((row) => matches(row.name, search));
+  const counted = (table.unit === "showings" ? words.countedShowings : words.counted)(perRun(table.total / table.runs));
   if (search !== "" && rows.length === 0) return null;
   const scale = Math.max(0, ...table.rows.flatMap((row) => [row.share, row.adjusted ?? 0]));
   const columns: DataColumn<ShareRow>[] = [
-    { id: "name", label: words.columns.name, sortValue: (row) => row.name, render: (row) => row.name },
+    { id: "name", label: nameLabel, sortValue: (row) => row.name, render: (row) => row.name },
     { id: "per-run", label: words.columns.perRun, numeric: true, sortValue: (row) => row.count, render: (row) => perRun(row.perRun) },
     {
       id: "share",
@@ -51,15 +55,15 @@ export function ShareSection({
       sortValue: (row) => row.seenIn,
       render: (row) => percent(row.seenIn, 0),
     },
-    // Only options with a region have a catch-up ceiling: a weapon class, a rule or a talisman with no location has none
-    ...(table.rows.some((row) => row.ceiling !== null)
+    // Rules and classes never get a catch-up boost, so their tables leave the column out
+    ...(table.rows.some((row) => row.boost !== null)
       ? [
           {
-            id: "ceiling",
-            label: words.columns.ceiling,
+            id: "catch-up",
+            label: words.columns.catchUp,
             numeric: true,
-            sortValue: (row: ShareRow) => row.ceiling ?? 0,
-            render: (row: ShareRow) => (row.ceiling === null ? "–" : words.items.times(multiplier(row.ceiling))),
+            sortValue: (row: ShareRow) => row.boost ?? 0,
+            render: (row: ShareRow) => (row.boost === null ? "–" : words.items.times(multiplier(row.boost))),
           },
         ]
       : []),
@@ -67,9 +71,9 @@ export function ShareSection({
   return (
     <section className="simulate-section">
       <SectionHeading>{title}</SectionHeading>
-      <p className="simulate-lede">
-        {lede === undefined ? words.counted(perRun(table.total / table.runs)) : `${lede} ${words.counted(perRun(table.total / table.runs))}`}
-      </p>
+      <SectionNote>
+        {lede === undefined ? counted : `${lede} ${counted}`}
+      </SectionNote>
       {control}
       <DataTable
         label={title}

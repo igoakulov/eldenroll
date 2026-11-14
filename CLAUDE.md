@@ -41,3 +41,4 @@ Run both before and after a change, and expect them clean with no skips:
 - Felling Maliketh before every Royal Capital boss leaves those bosses unreachable; the run then finishes without them.
 - `Great Épée`, `Miséricorde`, `Kalé` and `Varré's Bouquet` carry accents. Slugs keep every letter: `Thops's Barrier` is `thopss_barrier`.
 - Fandom refuses WebFetch with HTTP 402; read it in a browser.
+- Some files keep CRLF line endings, such as `combat_rules.csv` and `item_odds.csv` (`git ls-files --eol | grep crlf`). A script that rewrites one must keep them, or the whole file shows as changed.

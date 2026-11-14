@@ -115,8 +115,8 @@ function runShareLeft(engine: Engine, run: Run): number {
   return inRun.length === 0 ? 1 : 1 - felled / inRun.length;
 }
 
-/** Only options whose catch-up ceiling is below 1 can get a boost, so only they are tracked.
- * In reach means by location, felled boss and stats; a set needs every piece. */
+/** In reach means by location, felled boss and stats; an item with no location row is in reach everywhere, and a
+ * set needs every piece. */
 function refreshAvailable(engine: Engine, run: Run): Run {
   const { data } = engine;
   const reach = counted(engine, run);
@@ -124,9 +124,9 @@ function refreshAvailable(engine: Engine, run: Run): Run {
   const left = runShareLeft(engine, run);
   const availableSince: Record<string, number> = {};
   const keep = (key: string) => {
-    if ((data.runLeft.get(key) ?? 1) < 1) availableSince[key] = run.availableSince[key] ?? left;
+    availableSince[key] = run.availableSince[key] ?? left;
   };
-  for (const id of reach) {
+  for (const id of [...reach, ...data.foundEverywhere]) {
     const item = data.items.get(id);
     if (item !== undefined && inStatReach(item, limits)) keep(`item:${id}`);
   }

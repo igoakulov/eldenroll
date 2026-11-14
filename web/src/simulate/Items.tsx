@@ -1,7 +1,9 @@
-import { itemSeries, items, oddsOf, type ItemRow, type Sample } from "../../sim/aggregate";
+import { useMemo } from "react";
+
+import { itemSeries, items, neverRolled, oddsOf, type ItemRow, type Sample } from "../../sim/aggregate";
 import { BUCKET, stretchOf, type ChanceSums } from "../../sim/simulate";
 import { copy } from "../copy";
-import { SectionHeading } from "../ui/Headings";
+import { SectionHeading, SectionNote, SlotHeading } from "../ui/Headings";
 import { LineChart } from "../ui/LineChart";
 import { decimal, matches, multiplier, percent } from "./format";
 
@@ -27,32 +29,52 @@ export function Items({
   readonly chances: ChanceSums;
   readonly search: string;
 }) {
-  const rows = items(sample, chances).filter((row) => matches(row.name, search));
+  const all = useMemo(() => items(sample, chances), [sample, chances]);
+  const never = useMemo(() => neverRolled(sample), [sample]);
+  const rows = all.filter((row) => matches(row.name, search));
   const charted = search === "" ? [] : [...rows].sort((a, b) => a.name.localeCompare(b.name)).slice(0, CHARTED);
   return (
-    <section className="simulate-section">
-      <SectionHeading>{words.overTheRun}</SectionHeading>
-      <p className="simulate-lede">
-        {charted.length === 0 ? words.searchToChart : words.chartLede(charted.length, rows.length - charted.length)}
-      </p>
-      {charted.map((row) => (
-        <ItemCharts key={row.key} sample={sample} chances={chances} row={row} />
-      ))}
-    </section>
+    <>
+      <section className="simulate-section">
+        <SectionHeading>{words.overTheRun}</SectionHeading>
+        <SectionNote>
+          {charted.length === 0 ? words.searchToChart : words.chartLede(charted.length, rows.length - charted.length)}
+        </SectionNote>
+        {charted.map((row) => (
+          <ItemCharts key={row.key} sample={sample} chances={chances} row={row} />
+        ))}
+      </section>
+
+      <section className="simulate-section">
+        <SectionHeading>{words.neverRolled}</SectionHeading>
+        <NameList title={words.inReach} names={never.inReach.filter((name) => matches(name, search))} />
+        <NameList title={words.outOfReach} names={never.outOfReach.filter((name) => matches(name, search))} />
+      </section>
+    </>
+  );
+}
+
+function NameList({ title, names }: { readonly title: string; readonly names: readonly string[] }) {
+  return (
+    <>
+      <SlotHeading>{`${title} (${names.length})`}</SlotHeading>
+      <p className="simulate-names-list">{names.length === 0 ? copy.simulate.nothing : names.join(", ")}</p>
+    </>
   );
 }
 
 function ItemCharts({ sample, chances, row }: { readonly sample: Sample; readonly chances: ChanceSums; readonly row: ItemRow }) {
-  const { odds, ceiling } = oddsOf(sample.data, row.key);
+  const series = useMemo(() => itemSeries(sample, chances, row.key), [sample, chances, row.key]);
+  const odds = oddsOf(sample.data, row.key);
   // Every chart's axis runs over the whole run, so a line starts where its item came into reach
   const lastStretch = stretchOf(Math.max(1, ...sample.all.map((one) => one.row.objective)));
   const formatOdds = (value: number) => decimal(value, value < 1 ? 2 : 1);
   return (
     <div className="simulate-item">
       <h3 className="simulate-item-name">{row.name}</h3>
-      <p className="simulate-lede">{words.metrics(formatOdds(odds), ceiling === null ? null : multiplier(ceiling))}</p>
+      <SectionNote>{words.metrics(formatOdds(odds))}</SectionNote>
       <div className="simulate-charts">
-        {itemSeries(sample, chances, row.key).map(({ slot, points, shown }) => {
+        {series.map(({ slot, points, shown }) => {
           const yMax = niceMax(Math.max(0, ...points.flatMap((point) => [point.chance, point.plain])));
           const digits = yMax < 0.1 ? 1 : 0;
           return (

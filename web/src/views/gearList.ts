@@ -1,5 +1,5 @@
 import { copy } from "../copy";
-import type { Database, Item } from "../engine/database";
+import { isNone, type Database, type Item } from "../engine/database";
 import { iconKey } from "./icons";
 import { findMatch } from "./search";
 
@@ -61,13 +61,14 @@ export function neverRollEntries(database: Pick<Database, "item" | "armor_set" |
         group: "armor_set",
         icon: "body",
         pieces: set.pieces
-          .filter((id) => !id.startsWith("none_"))
+          .filter((id) => !isNone(id))
           .map((id) => items.get(id)?.name)
           .filter((name) => name !== undefined),
       }),
     );
+  // An empty slot is never something to rule out
   const rules = database.combat_rule
-    .filter((rule) => rule.odds > 0)
+    .filter((rule) => rule.odds > 0 && !isNone(rule.id))
     .map((rule): GearEntry => ({ key: `rule:${rule.id}`, name: rule.name, group: "rule", icon: null, pieces: [] }));
   return byCardOrder([...gear, ...sets, ...rules]);
 }

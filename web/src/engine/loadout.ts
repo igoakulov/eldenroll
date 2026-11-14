@@ -1,6 +1,6 @@
 import type { Item, LoadoutSlot, PoolSlot } from "./database";
 import { poolKey, type EngineData } from "./engineData";
-import type { CatchUpParams } from "./hyperparams";
+import type { CatchUp } from "./hyperparams";
 import type { RollState } from "./modifiers";
 import {
   sample,
@@ -37,7 +37,7 @@ export interface LoadoutInput {
   readonly neverRoll?: ReadonlySet<string>;
   readonly limits: StatLimits;
   readonly random: Random;
-  readonly catchUp?: CatchUpParams;
+  readonly catchUp?: CatchUp;
   readonly availableSince?: Readonly<Record<string, number>>;
   /** RH rolls from these first; `null` when the setting is off. */
   readonly shortlist?: ReadonlySet<string> | null;

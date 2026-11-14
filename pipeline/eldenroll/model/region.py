@@ -1,6 +1,4 @@
 """`region_level` is an ordering key only: it never filters and nothing is derived from its value.
-`run_left` is the share of a typical run still ahead when the region opens, for the catch-up boost
-(`data/balance.md#Hyperparameters`).
 The `DLC: ` prefix inside `name` is the only DLC marker; no `dlc` field is stored.
 """
 
@@ -21,7 +19,6 @@ class Region:
     id: str
     name: str
     region_level: int
-    run_left: float
 
     @property
     def is_dlc(self) -> bool:

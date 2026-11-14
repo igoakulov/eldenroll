@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { sampleOf } from "../../sim/aggregate";
 import { ALLOCATIONS, type Allocation } from "../../sim/player";
@@ -10,7 +10,8 @@ import { loadDatabase } from "../loadDatabase";
 import { BottomBar, GlowBand } from "../ui/BottomBar";
 import { ChipButton, Chips } from "../ui/Chips";
 import { Cycler } from "../ui/Cycler";
-import { HeadingAction, HeadingCount, ScreenHead, SectionHeading } from "../ui/Headings";
+import { ControlRow } from "../ui/Rows";
+import { HeadingAction, HeadingCount, ScreenHead, SectionHeading, SectionNote } from "../ui/Headings";
 import { LozengeCheckbox } from "../ui/LozengeCheckbox";
 import { SearchField } from "../ui/SearchField";
 import { Stepper } from "../ui/Stepper";
@@ -20,7 +21,6 @@ import { useHideOnScroll } from "../ui/useHideOnScroll";
 import { Synergies } from "./Synergies";
 import { Items } from "./Items";
 import { Slots } from "./Slots";
-import { Variety } from "./Variety";
 import {
   COMPLETION_STEP,
   MAX_RUNS,
@@ -155,15 +155,14 @@ export function SimulatePage() {
             correct={corrector(1, MAX_RUNS)}
             onChange={(runs) => setInputs((last) => ({ ...last, runs }))}
           />
-          <div className="simulate-control">
-            <span className="simulate-control-label">{words.allocation}</span>
+          <ControlRow label={words.allocation}>
             <Cycler<Allocation>
               label={words.allocation}
               options={ALLOCATIONS.map((value) => ({ value, label: words.allocations[value] }))}
               value={inputs.allocation}
               onChange={(allocation) => setInputs((last) => ({ ...last, allocation }))}
             />
-          </div>
+          </ControlRow>
           <Stepper
             id="simulate-seed"
             label={words.seed}
@@ -177,7 +176,7 @@ export function SimulatePage() {
 
         <SectionHeading>{words.completion}</SectionHeading>
         <div className="simulate-pad">
-          <p className="simulate-detail">{words.completionDetail(inputs.completion)}</p>
+          <SectionNote>{words.completionDetail(inputs.completion)}</SectionNote>
           <StopSlider
             stops={100 / COMPLETION_STEP}
             value={inputs.completion / COMPLETION_STEP - 1}
@@ -192,7 +191,7 @@ export function SimulatePage() {
           {words.regions} <HeadingCount>{ticked.length}</HeadingCount>
         </SectionHeading>
         <div className="simulate-pad">
-          <p className="simulate-detail">{words.regionsDetail}</p>
+          <SectionNote>{words.regionsDetail}</SectionNote>
         </div>
         <div>
           <LozengeCheckbox framed checked={ticked.length === order.length} onChange={(on) => setRegions(on ? order : [])}>
@@ -290,18 +289,20 @@ function Results({
   // The picked classes, compared by their ids: a new array of the same ids counts nothing again
   const picked = classes.join();
   const sample = useMemo(() => (runs === null ? null : sampleOf(data, runs, classes)), [data, runs, picked]);
-  const note = (text: string) => <p className="simulate-lede simulate-note">{text}</p>;
+  // The tables filter as the search changes, behind the typing rather than in its way
+  const search = useDeferredValue(view.search);
+  const sums = useMemo(() => chances ?? new Map(), [chances]);
+  const note = (text: string) => <div className="simulate-note"><SectionNote>{text}</SectionNote></div>;
   const panels =
     sample === null
       ? TABS.map(() => note(words.loading))
       : classes.length === 0
         ? TABS.map(() => note(words.noClasses))
         : [
-            <Overview key="overview" sample={sample} search={view.search} />,
-            <Slots key="slots" sample={sample} search={view.search} hands={view.hands} onHands={(hands) => onView({ hands })} />,
-            <Synergies key="synergies" sample={sample} search={view.search} />,
-            <Variety key="variety" sample={sample} search={view.search} />,
-            <Items key="items" sample={sample} chances={chances ?? new Map()} search={view.search} />,
+            <Overview key="overview" sample={sample} search={search} />,
+            <Slots key="slots" sample={sample} chances={sums} search={search} by={view.by} onBy={(by) => onView({ by })} />,
+            <Synergies key="synergies" sample={sample} search={search} />,
+            <Items key="items" sample={sample} chances={sums} search={search} />,
           ];
   const selected = TABS.indexOf(view.tab);
   // Only the selected panel is drawn: the others would count the whole sample again for nothing

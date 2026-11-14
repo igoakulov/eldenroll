@@ -1,12 +1,15 @@
 // The page's settings and view, kept in the address so a link reproduces a result (web/sim/README.md#The page)
-import type { HandView } from "../../sim/aggregate";
 import { ALLOCATIONS, type Allocation } from "../../sim/player";
 
 export const MAX_RUNS = 10;
 export const MAX_SEED = 999_999;
 export const COMPLETION_STEP = 10;
-export const TABS = ["overview", "slots", "synergies", "variety", "items"] as const;
+export const TABS = ["overview", "slots", "synergies", "items"] as const;
 export type Tab = (typeof TABS)[number];
+
+/** How Slots counts its tables: the hands by weapon class or weapon, the rest by item, or every table by region. */
+const SLOT_VIEWS = ["class", "item", "region"] as const;
+export type SlotView = (typeof SLOT_VIEWS)[number];
 
 /** What a run plays with: changing any of these needs `Simulate`. */
 export interface Inputs {
@@ -23,10 +26,10 @@ export interface View {
   readonly classes: readonly string[] | null;
   readonly tab: Tab;
   readonly search: string;
-  readonly hands: HandView;
+  readonly by: SlotView;
 }
 
-export const DEFAULT_INPUTS: Omit<Inputs, "seed"> = {
+const DEFAULT_INPUTS: Omit<Inputs, "seed"> = {
   runs: 1,
   allocation: "ALL",
   regions: null,
@@ -66,7 +69,7 @@ export function readAddress(search: string): { readonly inputs: Inputs; readonly
       classes: list(params.get("classes")),
       tab: TABS.find((one) => one === tab) ?? "overview",
       search: params.get("q") ?? "",
-      hands: params.get("hands") === "weapon" ? "weapon" : "class",
+      by: SLOT_VIEWS.find((one) => one === params.get("by")) ?? "class",
     },
   };
 }
@@ -81,7 +84,7 @@ export function writeAddress(inputs: Inputs, view: View): string {
   params.set("seed", String(inputs.seed));
   params.set("classes", view.classes === null ? ALL : view.classes.join(","));
   params.set("tab", view.tab);
-  params.set("hands", view.hands);
+  params.set("by", view.by);
   if (view.search !== "") params.set("q", view.search);
   return `?${params.toString().replaceAll("%2C", ",")}`;
 }

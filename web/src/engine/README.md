@@ -111,7 +111,7 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 | randomized, empty on purpose | `2H Warrior` LH, `Jester` RH | the pool holds the `none` row | `none` |
 | randomized, nothing survives the filters | a narrow pool | empty result | `none` |
 
-- **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it.
+- **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it. Any id starting `none_` is empty too (`isNone`), so one pool can hold two: `rule_2` leaves out what `rule_1` rolled, and the rule `None 2` lets both rule slots be empty.
 - **`any`** is a slot state, never sampled, owned or counted.
 - **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label.
 - **Ash line.** A rolled ash shows its name or label; no ash row or an empty pool shows `any`; a hand that rolled `none` shows `none`.

@@ -1,18 +1,18 @@
-id,name,region_level,run_left
-limgrave,"Limgrave, Weeping Peninsula & Siofra",1,1
-liurnia,"Liurnia, Mohgwyn & Ainsel Downstream",30,0.922
-caelid,Caelid & Dragonbarrow,50,0.817
-altus,Altus Plateau & Mt. Gelmir,60,0.706
-nokron,Nokron & Deeproot Depths,65,0.573
-ainsel,"Ainsel Main, Nokstella, Lake of Rot & Moonlight Altar",70,0.5
-leyndell,"Leyndell, Royal Capital & Shunning-Grounds",80,0.436
-mountaintops,Mountaintops of the Giants,100,0.394
-farumazula,Crumbling Farum Azula,110,0.35
-snowfield,Consecrated Snowfield,115,0.321
-haligtree,Miquella's Haligtree,120,0.101
-leyndell_ashen,"Leyndell, Ashen Capital & Shunning-Grounds",130,0.083
-dlc_gravesite,"DLC: Gravesite Plain, Scadu Altus & Rauh Base",140,0.29
-dlc_shadowkeep,"DLC: Shadow Keep, Storehouse & Rauh Ruins",150,0.212
-dlc_jaggedpeak,DLC: Jagged Peak & Charo,155,0.06
-dlc_abyssal,DLC: Abyssal Woods & Midra's Manse,160,0.142
-dlc_enirilim,DLC: Enir-Ilim,165,0.037
+id,name,region_level
+limgrave,"Limgrave, Weeping Peninsula & Siofra",1
+liurnia,"Liurnia, Mohgwyn & Ainsel Downstream",30
+caelid,Caelid & Dragonbarrow,50
+altus,Altus Plateau & Mt. Gelmir,60
+nokron,Nokron & Deeproot Depths,65
+ainsel,"Ainsel Main, Nokstella, Lake of Rot & Moonlight Altar",70
+leyndell,"Leyndell, Royal Capital & Shunning-Grounds",80
+mountaintops,Mountaintops of the Giants,100
+farumazula,Crumbling Farum Azula,110
+snowfield,Consecrated Snowfield,115
+haligtree,Miquella's Haligtree,120
+leyndell_ashen,"Leyndell, Ashen Capital & Shunning-Grounds",130
+dlc_gravesite,"DLC: Gravesite Plain, Scadu Altus & Rauh Base",140
+dlc_shadowkeep,"DLC: Shadow Keep, Storehouse & Rauh Ruins",150
+dlc_jaggedpeak,DLC: Jagged Peak & Charo,155
+dlc_abyssal,DLC: Abyssal Woods & Midra's Manse,160
+dlc_enirilim,DLC: Enir-Ilim,165

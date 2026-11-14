@@ -31,6 +31,11 @@ export function SlotHeading({ children }: { readonly children: ReactNode }) {
   );
 }
 
+/** A short, faint note under a heading: what a section counts, or what a control does. */
+export function SectionNote({ children }: { readonly children: ReactNode }) {
+  return <p className="section-note">{children}</p>;
+}
+
 /** A count leading a section heading, such as `3 selected`, its digits lined up. */
 export function HeadingCount({ children }: { readonly children: number }) {
   return <span className="section-heading-count">{children}</span>;

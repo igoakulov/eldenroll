@@ -61,3 +61,13 @@ export function ListRow({
     </button>
   );
 }
+
+/** A setting whose control is too wide to sit beside its name, such as a `Cycler`: the name above it, a rule on top. */
+export function ControlRow({ label, children }: { readonly label: ReactNode; readonly children: ReactNode }) {
+  return (
+    <div className="control-row">
+      <span className="row-title">{label}</span>
+      {children}
+    </div>
+  );
+}

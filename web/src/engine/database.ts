@@ -12,6 +12,12 @@ export const CATEGORIES = [
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
+/** An empty slot: `none`, or any id starting `none_`, so one pool can hold more than one, such as the rule `None`
+ * that may follow another (`data/balance.md#Base odds`). */
+export function isNone(id: string): boolean {
+  return id === "none" || id.startsWith("none_");
+}
+
 export const SELECTOR_KINDS = [
   "item",
   "subcategory",
@@ -50,7 +56,6 @@ export interface Region {
   readonly id: string;
   readonly name: string;
   readonly region_level: number;
-  readonly run_left: number;
 }
 
 export interface Location {

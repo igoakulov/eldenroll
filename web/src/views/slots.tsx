@@ -1,3 +1,4 @@
+import { isNone } from "../engine/database";
 import { ARMOR_PIECES, type SlotDisplay } from "../engine/display";
 import { ArmorSlot, HandSlot, SmallSlot, type SlotName, type SlotTile } from "../ui/Slot";
 import type { WikiLink } from "../ui/WikiLink";
@@ -5,7 +6,7 @@ import { ARMOR_PIECE_ICONS, iconKey } from "./icons";
 
 // The card's slots as the engine rolls them, drawn with the slot components in `src/ui/`
 
-/** The id the `none` item, the `None` armor pieces' alias and the rule `None` share. */
+/** The id the `none` item and the `None` armor pieces' alias share. */
 const NONE_ALIAS = "none";
 
 /** What a slot shows as its name: the item, `none` or `any`. */
@@ -19,7 +20,7 @@ export function nameOf(display: SlotDisplay): SlotName {
     case "alias":
       return { kind: "named", name: display.label };
     case "rule":
-      return display.rule.id === NONE_ALIAS ? { kind: "none" } : { kind: "named", name: display.rule.name };
+      return isNone(display.rule.id) ? { kind: "none" } : { kind: "named", name: display.rule.name };
     case "armor_set":
       return { kind: "named", name: display.set.name };
   }

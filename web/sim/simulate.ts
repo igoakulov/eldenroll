@@ -1,9 +1,10 @@
 // One full run from `Start run` until every boss is felled (web/sim/README.md#A run)
-import type { Database, LoadoutSlot } from "../src/engine/database";
+import { isNone, type Database, type LoadoutSlot } from "../src/engine/database";
 import type { RolledSlots } from "../src/engine/display";
 import { done, editRun, rollNext, startRun, type Engine, type Run } from "../src/engine/run";
 import { DEFAULT_STATS, defaultSettings, derivedLevel, type Stats } from "../src/engine/settings";
 import { repeatKey, type SlotRoll, type WeightedOption } from "../src/engine/slotRoll";
+import type { Option } from "../src/engine/selectors";
 import {
   ITEMS_MAX_STAT_GAP,
   bossesByRegion,
@@ -16,7 +17,7 @@ import {
   type Allocation,
 } from "./player";
 
-export interface SimOptions {
+interface SimOptions {
   readonly allocation: Allocation;
   readonly seed: number;
   /** The regions the run may open, in any order; null for every region. */
@@ -48,7 +49,7 @@ export interface ChanceSum {
   rolls: number;
 }
 
-export function chanceKey(characterClass: string, slot: LoadoutSlot, key: string, stretch: number): string {
+function chanceKey(characterClass: string, slot: LoadoutSlot, key: string, stretch: number): string {
   return `${characterClass}|${slot}|${key}|${stretch}`;
 }
 
@@ -116,10 +117,11 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
   const plain = options.map((row) => row.option.row.odds * boostOf(row));
   const plainTotal = plain.reduce((sum, value) => sum + value, 0);
   let none: number | null = null;
+  const keyOf = (option: Option) => (option.kind === "rule" && isNone(option.row.id) ? "rule:none" : repeatKey(option));
   const boostChance = new Map<string, number>();
   const byKey = new Map<string, Omit<ChanceSum, "rolls">>();
   options.forEach((row, index) => {
-    const key = repeatKey(row.option);
+    const key = keyOf(row.option);
     offered.add(key);
     const chance = row.weight / total;
     if (sum !== undefined) {
@@ -130,7 +132,7 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
       sums.boosted += chancePlain * row.catchUp;
       byKey.set(key, sums);
     }
-    if (row.option.kind !== "armor_set" && row.option.row.id === "none") none = chance;
+    if (row.option.kind !== "armor_set" && isNone(row.option.row.id)) none = (none ?? 0) + chance;
     for (const modifier of row.modifiers) {
       if (modifier.value > 1) boostChance.set(modifier.id, (boostChance.get(modifier.id) ?? 0) + chance);
     }
@@ -139,7 +141,7 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
   const chosen = roll.chosen;
   return {
     chosen: chosen?.option.row.id ?? null,
-    chosenKey: chosen === null ? null : repeatKey(chosen.option),
+    chosenKey: chosen === null ? null : keyOf(chosen.option),
     chance: roll.probability,
     catchUp: chosen?.catchUp ?? 1,
     pool: roll.pool,

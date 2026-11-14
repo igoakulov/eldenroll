@@ -88,3 +88,9 @@
   text-decoration: none;
   background: var(--dots) 0 100% / 100% 1px no-repeat;
 }
+
+.section-note {
+  font-size: var(--type-small);
+  line-height: var(--leading);
+  color: var(--text-3);
+}

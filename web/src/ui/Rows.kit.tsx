@@ -1,7 +1,10 @@
+import { useState } from "react";
+
 import { copy } from "../copy";
 import { objectiveNumber } from "../engine/run";
 import type { KitBlock } from "../kit/kit";
-import { FramedRow, ListRow } from "./Rows";
+import { Cycler } from "./Cycler";
+import { ControlRow, FramedRow, ListRow } from "./Rows";
 
 const noop = () => {};
 
@@ -61,4 +64,32 @@ export const kit: readonly KitBlock[] = [
     ),
     note: "On desktop, hover brightens a framed row's frame.",
   },
+  {
+    id: "control-row",
+    title: "Control row",
+    section: "simulation",
+    size: "phone",
+    states: [{ label: "a cycler", render: () => <AllocationRow /> }],
+    Live: AllocationRow,
+  },
 ];
+
+type Focus = "STR" | "DEX";
+
+function AllocationRow() {
+  const words = copy.simulate;
+  const [focus, setFocus] = useState<Focus>("STR");
+  return (
+    <ControlRow label={words.allocation}>
+      <Cycler<Focus>
+        label={words.allocation}
+        options={[
+          { value: "STR", label: words.allocations.STR },
+          { value: "DEX", label: words.allocations.DEX },
+        ]}
+        value={focus}
+        onChange={setFocus}
+      />
+    </ControlRow>
+  );
+}

@@ -9,7 +9,9 @@ import type { Engine } from "../src/engine/run";
 import { STATS } from "../src/engine/settings";
 import { LOADOUT_ORDER } from "../src/engine/loadout";
 import { ALLOCATIONS, type Allocation } from "./player";
-import { playOrder, runSeed, simulateRun, type RunResult } from "./simulate";
+import { sampleOf } from "./aggregate";
+import { report } from "./report";
+import { playOrder, runSeed, simulateRun, type ChanceSums, type RunResult } from "./simulate";
 
 const USAGE = `pnpm sim [--runs 20] [--allocations ITEMS,STR,DEX,INT,FTH,ARC,ALL] [--seed 1] [--no-dlc]
          [--regions limgrave,liurnia] [--completion 50] [--classes knight,jester]
@@ -69,6 +71,7 @@ export function main(argv: readonly string[], repo: string): void {
   const seed = Number(values.seed);
   const started = performance.now();
   const results: RunResult[] = [];
+  const chances: ChanceSums = new Map();
   for (const allocation of allocations as Allocation[]) {
     for (let run = 0; run < runs; run += 1) {
       results.push(
@@ -78,6 +81,7 @@ export function main(argv: readonly string[], repo: string): void {
           regions,
           completion,
           characterClasses: values.classes === undefined ? null : values.classes.split(","),
+          chances,
         }),
       );
     }
@@ -102,7 +106,7 @@ export function main(argv: readonly string[], repo: string): void {
   writeFileSync(
     path.join(out, "rolls.csv"),
     csv([
-      ["allocation", "run", "objective", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "catch_up", "pool", "none_chance", "boosts", "boost_chances", "chosen_boosts"],
+      ["allocation", "run", "objective", "region", "level", "character_class", "boss", "slot", "chosen", "chosen_key", "chance", "chosen_catch_up", "pool", "none_chance", "boosts", "boost_chances", "chosen_boosts"],
       ...results.flatMap((result, index) =>
         result.rolls.map((row) => [
           result.options.allocation, index, row.objective, row.region, row.level, row.characterClass, row.boss, row.slot,
@@ -113,6 +117,8 @@ export function main(argv: readonly string[], repo: string): void {
       ),
     ]),
   );
+  const classes = values.classes?.split(",") ?? database.character_class.map((row) => row.id);
+  writeFileSync(path.join(out, "metrics.md"), report(sampleOf(engine.data, results, classes), chances));
   const seconds = ((performance.now() - started) / 1000).toFixed(1);
-  console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/rolls.csv, objectives.csv`);
+  console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/metrics.md, rolls.csv, objectives.csv`);
 }

@@ -1,7 +1,7 @@
 import type { LoadoutSlot, Modifier } from "./database";
 import { isSetReachable } from "./eligibility";
 import { poolKey, type EngineData } from "./engineData";
-import { catchUpBoost, type CatchUpParams } from "./hyperparams";
+import type { CatchUp } from "./hyperparams";
 import { activeModifiers, type RollState } from "./modifiers";
 import { pickWeighted } from "./random";
 import { matchesOption, type Option } from "./selectors";
@@ -21,7 +21,7 @@ export interface WeightedOption {
   readonly option: Option;
   readonly weight: number;
   readonly modifiers: readonly Modifier[];
-  /** The catch-up boost in `weight` (`catchUpBoost`), on items and armor sets; 1 on anything else. */
+  /** The catch-up boost in `weight` (`Hyperparams.catchUp`), on items and armor sets; 1 on anything else. */
   readonly catchUp: number;
 }
 
@@ -54,24 +54,21 @@ export interface RollContext {
   /** `optionKey`s the player excluded; they win over every other input. */
   readonly neverRoll?: ReadonlySet<string>;
   /** Absent means no boost: most tests roll a pool in isolation and don't need one. */
-  readonly catchUp?: CatchUpParams;
-  /** `Run.availableSince`; absent means every option takes its ceiling, `EngineData.runLeft`. */
+  readonly catchUp?: CatchUp;
+  /** `Run.availableSince`; absent means no boost. */
   readonly availableSince?: Readonly<Record<string, number>>;
 }
 
 /** The catch-up boost on one option, as `WeightedOption.catchUp` holds it. */
-export function catchUpMultiplier(
-  data: EngineData,
+function catchUpMultiplier(
   option: Option,
-  catchUp: CatchUpParams | undefined,
-  availableSince?: Readonly<Record<string, number>>,
+  catchUp: CatchUp | undefined,
+  availableSince: Readonly<Record<string, number>> | undefined,
 ): number {
-  const key = optionKey(option);
-  const ceiling = data.runLeft.get(key);
-  if (catchUp === undefined || ceiling === undefined) return 1;
+  if (catchUp === undefined || availableSince === undefined) return 1;
+  if (option.kind !== "item" && option.kind !== "armor_set") return 1;
   // An option the run doesn't track, such as a shortlisted weapon out of reach, gets no boost
-  const left = availableSince === undefined ? ceiling : Math.max(ceiling, availableSince[key] ?? 1);
-  return catchUpBoost(left, catchUp);
+  return catchUp(availableSince[optionKey(option)] ?? 1);
 }
 
 export function optionKey(option: Option): string {
@@ -123,7 +120,7 @@ export function weighOptions(
   const active = activeModifiers(context.data, context.state);
   const weighted = candidates.map((option) => {
     const modifiers = active.filter((row) => matchesOption(row.target, option));
-    const catchUp = catchUpMultiplier(context.data, option, context.catchUp, context.availableSince);
+    const catchUp = catchUpMultiplier(option, context.catchUp, context.availableSince);
     const weight = modifiers.reduce((product, row) => product * row.value, option.row.odds * catchUp);
     return { option, weight, modifiers, catchUp };
   });

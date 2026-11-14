@@ -105,3 +105,15 @@ div.list-row {
     border-color: var(--frame-lit);
   }
 }
+
+.control-row {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--gutter) var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.control-row .row-title {
+  font-size: var(--type-name);
+  color: var(--text);
+}

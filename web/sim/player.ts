@@ -51,7 +51,7 @@ const BUILDS: Readonly<Record<Exclude<Allocation, "ITEMS">, readonly BuildStep[]
   ALL: [],
 };
 
-export interface PlayerState {
+interface PlayerState {
   readonly allocation: Allocation;
   stats: Record<Stat, number>;
   /** ITEMS keeps unspent levels until a rolled item needs them. */
@@ -86,7 +86,7 @@ export function bossesByRegion(database: Database): ReadonlyMap<string, number> 
   return counts;
 }
 
-export interface Progress {
+interface Progress {
   /** The run's regions in opening order. */
   readonly order: readonly string[];
   /** Every region's place in a run with every region, so a window still ends when the run leaves out the

@@ -13,6 +13,7 @@ CSV = Path(__file__).resolve().parents[2] / "data" / "overrides" / "combat_rules
 
 NAMES = {
     "None",
+    "None 2",
     "Do not get hit",
     "Apply status",
     "Land a riposte",
@@ -44,16 +45,17 @@ NAMES = {
 }
 
 
-def test_the_29_rules_match_the_prd() -> None:
+def test_the_30_rules_match_the_prd() -> None:
     rules = load_combat_rules(CSV)
-    assert len(rules) == 29
+    assert len(rules) == 30
     assert {rule.name for rule in rules} == NAMES
 
 
 def test_odds_other_than_one() -> None:
     rules = load_combat_rules(CSV)
     assert {rule.id: rule.odds for rule in rules if rule.odds != 1} == {
-        "none": 4,
+        "none": 12,
+        "none_2": 12,
         "do_not_get_hit": 0.5,
         "no_healing_flasks": 0.5,
         "no_armor": 0.5,

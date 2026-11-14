@@ -1,22 +1,30 @@
+import { useMemo } from "react";
+
 import {
   className,
   empties,
   gearShares,
   handShares,
+  NO_LOCATION,
   pairs,
+  regionShares,
   ruleNone,
   THIN_SAMPLE,
   type EmptyRow,
-  type HandView,
+  type GearTable,
   type PairRow,
+  type RegionTable,
   type Sample,
+  type ShareTable,
 } from "../../sim/aggregate";
+import type { ChanceSums } from "../../sim/simulate";
 import { copy } from "../copy";
 import { Cycler } from "../ui/Cycler";
 import { DataTable, ShareBar } from "../ui/DataTable";
-import { SectionHeading } from "../ui/Headings";
+import { SectionHeading, SectionNote } from "../ui/Headings";
 import { ListRow } from "../ui/Rows";
 import { FOLD, matches, percent, perRun } from "./format";
+import type { SlotView } from "./inputs";
 import { ShareSection } from "./ShareSection";
 
 const words = copy.simulate.slots;
@@ -25,43 +33,67 @@ const columns = copy.simulate.columns;
 export function Slots({
   sample,
   search,
-  hands,
-  onHands,
+  chances,
+  by,
+  onBy,
 }: {
   readonly sample: Sample;
+  readonly chances: ChanceSums;
   readonly search: string;
-  readonly hands: HandView;
-  readonly onHands: (hands: HandView) => void;
+  readonly by: SlotView;
+  readonly onBy: (by: SlotView) => void;
 }) {
-  const both = pairs(sample);
+  const region = by === "region";
+  // Counted once per sample and view; typing in the search only filters the rows
+  const tables = useMemo(() => {
+    const byRegion = (table: RegionTable): ShareTable | null => named(regionShares(sample, table, chances));
+    const count = (table: Exclude<GearTable, "rule">) => (region ? byRegion(table) : gearShares(sample, table, chances));
+    const hand = (slot: "rh" | "lh") => (region ? byRegion(slot) : handShares(sample, slot, by === "class" ? "class" : "weapon", chances));
+    return {
+      rh: hand("rh"),
+      lh: hand("lh"),
+      spell: count("spell"),
+      weaponAsh: count("weaponAsh"),
+      shieldAsh: count("shieldAsh"),
+      item: count("item"),
+      talisman: count("talisman"),
+      armor: count("armor"),
+      rule: gearShares(sample, "rule"),
+      both: pairs(sample),
+      none: ruleNone(sample),
+      empty: empties(sample),
+    };
+  }, [sample, chances, by, region]);
+  const both = tables.both;
   const pairRows = both.rows.filter((row) => matches(row.name, search));
   const scale = Math.max(0, ...both.rows.map((row) => row.share));
   const dualWieldOnly = sample.classes.length === 1 && sample.classes[0] === "warrior_dw";
-  const none = ruleNone(sample);
-  const empty = empties(sample);
+  const none = tables.none;
+  const empty = tables.empty;
   const runs = sample.results.length;
+  const gear = (table: Exclude<GearTable, "rule">, title: string, lede?: string) => (
+    <ShareSection
+      title={title}
+      {...(region
+        ? { lede: twoSlots(table) ? `${words.regionLede} ${words.regionBothSlots}` : words.regionLede, nameLabel: columns.region }
+        : lede === undefined
+          ? {}
+          : { lede })}
+      control={<CountBy hands={false} by={by} onBy={onBy} />}
+      table={tables[table]}
+      search={search}
+    />
+  );
   return (
     <>
       {(["rh", "lh"] as const).map((slot) => (
         <ShareSection
           key={slot}
           title={words[slot]}
-          lede={words.handLede[hands]}
-          // One switch for both hands, so they always read the same way
-          control={
-            <div className="simulate-switch">
-              <Cycler<HandView>
-                label={words.countBy}
-                options={[
-                  { value: "class", label: words.byClass },
-                  { value: "weapon", label: words.byWeapon },
-                ]}
-                value={hands}
-                onChange={onHands}
-              />
-            </div>
-          }
-          table={handShares(sample, slot, hands)}
+          lede={region ? words.regionLede : by === "class" ? words.handLede.class : words.handLede.weapon}
+          {...(region ? { nameLabel: columns.region } : {})}
+          control={<CountBy hands by={by} onBy={onBy} />}
+          table={tables[slot]}
           search={search}
         />
       ))}
@@ -69,7 +101,7 @@ export function Slots({
       {(search === "" || pairRows.length > 0) && (
         <section className="simulate-section">
           <SectionHeading>{words.pairs}</SectionHeading>
-          <p className="simulate-lede">
+          <SectionNote>
             {`${words.pairsLede} ${copy.simulate.counted(perRun(both.total / runs))}`}
             {both.sameClass.of > 0 && (
               <>
@@ -78,7 +110,7 @@ export function Slots({
                 {dualWieldOnly && ` ${words.dualWieldAim}`}
               </>
             )}
-          </p>
+          </SectionNote>
           <DataTable<PairRow>
             label={words.pairs}
             columns={[
@@ -103,26 +135,27 @@ export function Slots({
         </section>
       )}
 
-      <ShareSection title={words.spell} table={gearShares(sample, "spell")} search={search} />
-      <ShareSection title={words.weaponAsh} table={gearShares(sample, "weaponAsh")} search={search} />
-      <ShareSection title={words.shieldAsh} table={gearShares(sample, "shieldAsh")} search={search} />
-      <ShareSection title={words.item} table={gearShares(sample, "item")} search={search} />
-      <ShareSection title={words.talisman} lede={words.talismanLede} table={gearShares(sample, "talisman")} search={search} />
-      <ShareSection title={words.rule} lede={words.ruleLede} table={gearShares(sample, "rule")} search={search} />
+      {gear("spell", words.spell)}
+      {gear("weaponAsh", words.weaponAsh)}
+      {gear("shieldAsh", words.shieldAsh)}
+      {gear("item", words.item)}
+      {gear("talisman", words.talisman, words.talismanLede)}
+      <ShareSection title={words.rule} lede={words.ruleLede} table={tables.rule} search={search} />
       <section className="simulate-section">
         <SectionHeading>{words.ruleNone}</SectionHeading>
-        <p className="simulate-lede">{`${words.ruleNoneNote} ${copy.simulate.counted(perRun(none.total / runs))}`}</p>
+        <SectionNote>{copy.simulate.counted(perRun(none.total / runs))}</SectionNote>
         <div className="simulate-rows">
           <ListRow title={words.neither} value={percent(none.total === 0 ? NaN : none.neither / none.total)} />
           <ListRow title={words.one} value={percent(none.total === 0 ? NaN : none.one / none.total)} />
+          <ListRow title={words.both} value={percent(none.total === 0 ? NaN : none.both / none.total)} />
         </div>
       </section>
 
-      <ShareSection title={words.armor} table={gearShares(sample, "armor")} search={search} />
+      {gear("armor", words.armor)}
 
       <section className="simulate-section">
         <SectionHeading>{words.empties}</SectionHeading>
-        <p className="simulate-lede">{words.emptiesLede}</p>
+        <SectionNote>{words.emptiesLede}</SectionNote>
         <DataTable<EmptyRow>
           label={words.empties}
           columns={[
@@ -154,3 +187,30 @@ export function Slots({
     </>
   );
 }
+
+/** One switch for every table of items on the tab, so they always read the same way; the hands alone count by weapon
+ * class. */
+function CountBy({ hands, by, onBy }: { readonly hands: boolean; readonly by: SlotView; readonly onBy: (by: SlotView) => void }) {
+  const options: { value: SlotView; label: string }[] = hands
+    ? [
+        { value: "class", label: words.byClass },
+        { value: "item", label: words.byWeapon },
+        { value: "region", label: words.byRegion },
+      ]
+    : [
+        { value: "item", label: words.byItem },
+        { value: "region", label: words.byRegion },
+      ];
+  return (
+    <div className="simulate-switch">
+      <Cycler<SlotView> label={words.countBy} options={options} value={!hands && by === "class" ? "item" : by} onChange={onBy} />
+    </div>
+  );
+}
+
+function named(table: ShareTable | null): ShareTable | null {
+  if (table === null) return null;
+  return { ...table, rows: table.rows.map((row) => (row.key === NO_LOCATION ? { ...row, name: words.noLocation } : row)) };
+}
+
+const twoSlots = (table: RegionTable) => table === "weaponAsh" || table === "shieldAsh" || table === "talisman";

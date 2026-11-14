@@ -72,7 +72,8 @@ describe("slot pools on the real data", () => {
   });
 
   it("gives None its base odds as a rule", () => {
-    expect(weightOf(pool("knight", "rule_1"), "none")).toBe(4);
+    const odds = realDatabase.combat_rule.find((row) => row.id === "none")!.odds;
+    expect(weightOf(pool("knight", "rule_1"), "none")).toBe(odds);
   });
 
   it("gives Jester's empty hand its x6, and only there", () => {
@@ -388,14 +389,16 @@ describe("on a small database", () => {
 });
 
 describe("the catch-up boost", () => {
-  it("weighs a straight sword from the Haligtree against one from Liurnia by how much of the run each is in reach", () => {
+  it("weighs a straight sword by how much of the run was left when it came into reach", () => {
     const state = { characterClass: "knight", boss: null, rolled: new Map<PoolSlot, string | null>() };
-    const result = weighOptions(
-      { data: real, state, counted: EVERYTHING, catchUp: { strength: 1 } },
-      slotOptions(real, "knight", "rh"),
-    );
-    const left = (id: string) => realDatabase.region.find((row) => row.id === id)!.run_left;
-    const ratio = weightOf(result, "miquellan_knights_sword")! / weightOf(result, "crystal_sword")!;
-    expect(ratio).toBeCloseTo(left("liurnia") / left("haligtree"));
+    const weigh = (left: number) => {
+      const availableSince = { "item:crystal_sword": 1, "item:miquellan_knights_sword": left };
+      const result = weighOptions(
+        { data: real, state, counted: EVERYTHING, catchUp: (runLeft) => 1 / runLeft, availableSince },
+        slotOptions(real, "knight", "rh"),
+      );
+      return weightOf(result, "miquellan_knights_sword")! / weightOf(result, "crystal_sword")!;
+    };
+    expect(weigh(0.25) / weigh(1)).toBeCloseTo(4);
   });
 });

@@ -1,12 +1,11 @@
 // What the simulation page shows, counted from the rows a run records (web/sim/README.md#The page). Words are
 // the page's: this returns ids, game names and numbers.
-import type { Condition, LoadoutSlot, Modifier, Selector } from "../src/engine/database";
-import { POOL_SLOTS } from "../src/engine/database";
+import type { Condition, Item, LoadoutSlot, Modifier, Selector } from "../src/engine/database";
+import { isNone, POOL_SLOTS } from "../src/engine/database";
 import type { EngineData } from "../src/engine/engineData";
 import { STATS, type Stat } from "../src/engine/settings";
-import { catchUpMultiplier, repeatKey, slotOptions } from "../src/engine/slotRoll";
+import { optionKey, repeatKey, slotOptions } from "../src/engine/slotRoll";
 import { matchesOption, type Option } from "../src/engine/selectors";
-import { DEFAULT_HYPERPARAMS } from "../src/engine/hyperparams";
 import {
   BUCKET,
   CHANCE_SLOTS,
@@ -21,9 +20,9 @@ import {
 /** A share from fewer objectives than this reads as noise. */
 export const THIN_SAMPLE = 20;
 /** A repeat within this many objectives counts as soon. */
-export const SOON = 10;
+const SOON = 10;
 
-export interface Obj {
+interface Obj {
   readonly run: number;
   readonly row: ObjectiveRow;
   readonly rolls: ReadonlyMap<LoadoutSlot, RollRow>;
@@ -58,7 +57,7 @@ export function sampleOf(data: EngineData, results: readonly RunResult[], classe
 
 // Names
 
-export function humanise(id: string): string {
+function humanise(id: string): string {
   const words = id.replaceAll("_", " ");
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
@@ -78,7 +77,7 @@ export function className(data: EngineData, id: string): string {
   return nameOf(data, `character_class:${id}`);
 }
 
-export function regionName(data: EngineData, id: string): string {
+function regionName(data: EngineData, id: string): string {
   return data.database.region.find((row) => row.id === id)?.name ?? id;
 }
 
@@ -111,7 +110,7 @@ export interface ModifierText {
   readonly value: number;
 }
 
-export function modifierText(data: EngineData, modifier: Modifier): ModifierText {
+function modifierText(data: EngineData, modifier: Modifier): ModifierText {
   const trigger = (condition: Condition): Trigger =>
     condition.kind === "character_class"
       ? { kind: "classes", names: condition.ids.map((id) => className(data, id)) }
@@ -141,36 +140,53 @@ export interface ShareRow {
   readonly share: number;
   /** 0 to 1, of the runs, the share it showed in at least once. */
   readonly seenIn: number;
-  /** The most its catch-up boost can reach; null where none applies. */
-  readonly ceiling: number | null;
-  /** The share if every weapon class held as many weapons, where it applies. */
+  /** The mean catch-up boost while it was in a pool, won or not, each pool weighted by its chance there without the
+   * boost, as the Items charts read it; null where none applies: a rule, `none`, or with no chance sums. */
+  readonly boost: number | null;
+  /** The share it would have from pool size alone, where it applies: every weapon class holding as many weapons, or
+   * every item of a region's showing equally. */
   readonly adjusted?: number;
 }
 
 export interface ShareTable {
+  /** Of objectives, or for a table by region of showings, since one objective can show two. */
   readonly total: number;
+  readonly unit?: "showings";
   readonly runs: number;
   readonly rows: readonly ShareRow[];
 }
 
-/** `universe` adds a row at 0 for each key that never showed. */
+interface Tally {
+  /** Adds a row at 0 for each key that never showed. */
+  readonly universe?: Iterable<string>;
+  /** Each row's catch-up boost (`boostsInReach`). */
+  readonly boosts?: ReadonlyMap<string, number>;
+  /** `objectives`: an objective counts once under each key it shows, out of every objective. `showings`: every key
+   * counts, out of every showing, where two slots of one objective can share a key. */
+  readonly basis?: "objectives" | "showings";
+}
+
+/** Every share the page shows is counted here, so they all count alike. */
 function shareTable(
   sample: Sample,
   objectives: readonly Obj[],
   keysOf: (one: Obj) => readonly string[],
   name: (key: string) => string,
-  universe: Iterable<string> = [],
+  { universe = [], boosts = new Map(), basis = "objectives" }: Tally = {},
 ): ShareTable {
   const counted = new Map<string, number>();
   const inRuns = new Map<string, Set<number>>();
   for (const key of universe) counted.set(key, 0);
+  let showings = 0;
   for (const one of objectives) {
-    for (const key of new Set(keysOf(one))) {
+    const keys = keysOf(one);
+    for (const key of basis === "objectives" ? new Set(keys) : keys) {
+      showings += 1;
       counted.set(key, (counted.get(key) ?? 0) + 1);
       inRuns.set(key, (inRuns.get(key) ?? new Set()).add(one.run));
     }
   }
-  const total = objectives.length;
+  const total = basis === "objectives" ? objectives.length : showings;
   const runs = sample.results.length;
   const rows = [...counted]
     .map(([key, count]) => ({
@@ -180,10 +196,10 @@ function shareTable(
       perRun: count / runs,
       share: total === 0 ? 0 : count / total,
       seenIn: (inRuns.get(key)?.size ?? 0) / runs,
-      ceiling: ceilingOf(sample.data, key),
+      boost: boosts.get(key) ?? null,
     }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  return { total, runs, rows };
+  return { total, runs, rows, ...(basis === "showings" ? { unit: "showings" as const } : {}) };
 }
 
 const chosenKeys =
@@ -194,19 +210,82 @@ const chosenKeys =
       return roll !== undefined && roll.chosenKey !== null && test(roll) ? [roll.chosenKey] : [];
     });
 
+/** The mean catch-up boost on each option while it was in a pool of these slots, for the picked classes, each pool
+ * weighted by the option's chance there without the boost, as the Items charts read it. `group` folds options into a
+ * table's rows, undefined leaving one out; rules and `none` are left out. The sums cover the first of two slots only
+ * (`CHANCE_SLOTS`). */
+function boostsInReach(
+  sample: Sample,
+  chances: ChanceSums | undefined,
+  slots: readonly LoadoutSlot[],
+  group: (key: string) => string | undefined = (key) => key,
+): ReadonlyMap<string, number> {
+  const wanted = new Set<string>(slots);
+  const sums = foldChances(sample, chances, ({ slot, key }) => {
+    const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
+    return !wanted.has(slot) || kind === "rule" || isNone(id) ? undefined : group(key);
+  });
+  return new Map([...sums].flatMap(([row, total]) => (total.plain > 0 ? [[row, total.boosted / total.plain] as const] : [])));
+}
+
+interface ChanceEntry {
+  readonly slot: LoadoutSlot;
+  readonly key: string;
+  readonly stretch: number;
+}
+
+/** The picked classes' chance sums, added up into rows by `group`, undefined leaving an entry out. Every reading of
+ * `ChanceSums` goes through here, so the table's catch-up boost and the Items charts add up alike. */
+function foldChances(
+  sample: Sample,
+  chances: ChanceSums | undefined,
+  group: (entry: ChanceEntry) => string | undefined,
+): ReadonlyMap<string, ChanceSum> {
+  const rows = new Map<string, ChanceSum>();
+  if (chances === undefined) return rows;
+  const picked = new Set(sample.classes);
+  for (const [at, sum] of chances) {
+    const [characterClass = "", slot = "", key = "", stretch = ""] = at.split("|");
+    if (!picked.has(characterClass)) continue;
+    const row = group({ slot: slot as LoadoutSlot, key, stretch: Number(stretch) });
+    if (row === undefined) continue;
+    const total = rows.get(row) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0 };
+    total.chance += sum.chance;
+    total.plain += sum.plain;
+    total.boosted += sum.boosted;
+    total.rolls += sum.rolls;
+    rows.set(row, total);
+  }
+  return rows;
+}
+
+/** The items an option key stands for: an alias's members, or the item itself. */
+function membersOf(data: EngineData, key: string): readonly Item[] {
+  const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
+  if (kind === "alias") return data.database.item.filter((row) => row.alias === id);
+  const item = kind === "item" ? data.items.get(id) : undefined;
+  return item === undefined ? [] : [item];
+}
+
 function chosenItem(data: EngineData, roll: RollRow | undefined) {
   return roll?.chosen === null || roll?.chosen === undefined ? undefined : data.items.get(roll.chosen);
 }
 
 /** Options of the classes' pools for these slots that some roll of that class offered, so a table can list what was
- * in reach and never showed. */
-function inReach(sample: Sample, classes: readonly string[], slots: readonly LoadoutSlot[], test: (option: Option) => boolean = () => true): Option[] {
+ * in reach and never showed; with `offeredOnly` false, every option the pools hold at odds above 0. */
+function inReach(
+  sample: Sample,
+  classes: readonly string[],
+  slots: readonly LoadoutSlot[],
+  test: (option: Option) => boolean = () => true,
+  offeredOnly = true,
+): Option[] {
   const found: Option[] = [];
   for (const characterClass of classes) {
     const offered = new Set(sample.results.flatMap((result) => [...(result.offered.get(characterClass) ?? [])]));
     for (const slot of slots) {
       for (const option of slotOptions(sample.data, characterClass, slot)) {
-        if (option.row.odds > 0 && offered.has(repeatKey(option)) && test(option)) found.push(option);
+        if (option.row.odds > 0 && (!offeredOnly || offered.has(repeatKey(option))) && test(option)) found.push(option);
       }
     }
   }
@@ -220,9 +299,9 @@ function handClass(data: EngineData, roll: RollRow | undefined): string | undefi
 }
 
 /** Pools whose only possible roll is `none`: a bare pick, never a gap. */
-export function alwaysNone(data: EngineData, characterClass: string, slot: LoadoutSlot): boolean {
+function alwaysNone(data: EngineData, characterClass: string, slot: LoadoutSlot): boolean {
   const options = slotOptions(data, characterClass, slot);
-  return options.length === 1 && options[0]!.row.id === "none";
+  return options.length === 1 && isNone(options[0]!.row.id);
 }
 
 function poolSizes(data: EngineData, characterClass: string, slot: LoadoutSlot): ReadonlyMap<string, number> {
@@ -236,20 +315,27 @@ function poolSizes(data: EngineData, characterClass: string, slot: LoadoutSlot):
 }
 
 /** A hand counted by weapon class, or by the weapon itself. */
-export type HandView = "class" | "weapon";
+type HandView = "class" | "weapon";
 
 /** A hand by weapon, or by weapon class with each share beside the one it would have if every class held the same
  * number of weapons, so a skew from pool size reads apart from one from catch-up, stat gates or a modifier. With
  * several classes picked, each class's adjusted shares count by its objectives. */
-export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView): ShareTable | null {
+export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView, chances?: ChanceSums): ShareTable | null {
   const { data } = sample;
   const classes = sample.classes.filter((id) => !alwaysNone(data, id, slot));
   if (classes.length === 0) return null;
   const inClasses = sample.objectives.filter((one) => classes.includes(one.row.characterClass));
   if (by === "weapon") {
     const universe = inReach(sample, classes, [slot]).map(repeatKey);
-    return shareTable(sample, inClasses, chosenKeys([slot]), (key) => nameOf(data, key), universe);
+    return shareTable(sample, inClasses, chosenKeys([slot]), (key) => nameOf(data, key), {
+      universe,
+      boosts: boostsInReach(sample, chances, [slot]),
+    });
   }
+  const classOf = (key: string) => {
+    const item = membersOf(data, key)[0];
+    return item === undefined ? undefined : (item.subcategory ?? item.category);
+  };
   const table = shareTable(
     sample,
     inClasses,
@@ -258,9 +344,12 @@ export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView): Sha
       return key === undefined ? [] : [key];
     },
     humanise,
-    inReach(sample, classes, [slot]).flatMap((option) =>
-      option.kind === "item" ? [option.row.subcategory ?? option.row.category] : [],
-    ),
+    {
+      universe: inReach(sample, classes, [slot]).flatMap((option) =>
+        option.kind === "item" ? [option.row.subcategory ?? option.row.category] : [],
+      ),
+      boosts: boostsInReach(sample, chances, [slot], classOf),
+    },
   );
   const adjusted = new Map<string, number>();
   for (const characterClass of classes) {
@@ -286,7 +375,7 @@ export interface PairRow extends ShareRow {
   readonly lh: string;
 }
 
-export interface Pairs {
+interface Pairs {
   readonly total: number;
   readonly rows: readonly PairRow[];
   /** Of objectives with a weapon in each hand, the share whose two weapons share a class. */
@@ -331,14 +420,15 @@ function shieldAsh(data: EngineData, ashId: string): boolean {
 export type GearTable = "spell" | "weaponAsh" | "shieldAsh" | "item" | "talisman" | "rule" | "armor";
 
 /** Everything but the hands: a share of objectives showing each option, in either slot where there are two. */
-export function gearShares(sample: Sample, table: GearTable): ShareTable | null {
+export function gearShares(sample: Sample, table: GearTable, chances?: ChanceSums): ShareTable | null {
   const { data } = sample;
   const name = (key: string) => nameOf(data, key);
   if (table === "spell") {
     const classes = sample.classes.filter((id) => !alwaysNone(data, id, "spell"));
     if (classes.length === 0) return null;
     const objectives = sample.objectives.filter((one) => classes.includes(one.row.characterClass));
-    return shareTable(sample, objectives, chosenKeys(["spell"]), name, inReach(sample, classes, ["spell"]).map(repeatKey));
+    const universe = inReach(sample, classes, ["spell"]).map(repeatKey);
+    return shareTable(sample, objectives, chosenKeys(["spell"]), name, { universe, boosts: boostsInReach(sample, chances, ["spell"]) });
   }
   const ash = (shield: boolean) => (option: Option) => shieldAsh(data, option.row.id) === shield;
   const universe = {
@@ -357,12 +447,13 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
     rule: chosenKeys(["rule_1", "rule_2"]),
     armor: chosenKeys(["armor"]),
   }[table];
-  return shareTable(sample, sample.objectives, keysOf, name, universe);
+  const boosts = table === "rule" ? new Map<string, number>() : boostsInReach(sample, chances, REGION_SLOTS[table]);
+  return shareTable(sample, sample.objectives, keysOf, name, { universe, boosts });
 }
 
 // Overview
 
-export interface RunSummary {
+interface RunSummary {
   readonly runs: number;
   readonly objectives: number;
   readonly level: number;
@@ -394,24 +485,29 @@ export function classShares(sample: Sample): ShareTable {
     sample.all,
     (one) => [`character_class:${one.row.characterClass}`],
     (key) => nameOf(sample.data, key),
-    sample.classes.map((id) => `character_class:${id}`),
+    { universe: sample.classes.map((id) => `character_class:${id}`) },
   );
   return { ...table, rows: table.rows.filter((row) => sample.classes.includes(row.key.slice("character_class:".length))) };
 }
 
-/** How many of an objective's two rule slots show `None`; both never can, since `rule_2` leaves out `rule_1`. */
-export function ruleNone(sample: Sample): { readonly total: number; readonly neither: number; readonly one: number } {
-  let neither = 0;
-  let one = 0;
-  for (const objective of sample.objectives) {
-    const nones = (["rule_1", "rule_2"] as const).filter((slot) => objective.rolls.get(slot)?.chosen === "none").length;
-    if (nones === 0) neither += 1;
-    else one += 1;
-  }
-  return { total: sample.objectives.length, neither, one };
+interface RuleNone {
+  readonly total: number;
+  readonly neither: number;
+  readonly one: number;
+  readonly both: number;
 }
 
-export interface NeverRolled {
+/** How many of an objective's two rule slots show `None`. */
+export function ruleNone(sample: Sample): RuleNone {
+  const counts = [0, 0, 0];
+  for (const objective of sample.objectives) {
+    const nones = (["rule_1", "rule_2"] as const).filter((slot) => isNone(objective.rolls.get(slot)?.chosen ?? "")).length;
+    counts[nones]! += 1;
+  }
+  return { total: sample.objectives.length, neither: counts[0]!, one: counts[1]!, both: counts[2]! };
+}
+
+interface NeverRolled {
   /** In a pool of a picked class at some point, never shown. */
   readonly inReach: readonly string[];
   /** In none of their pools under these settings. */
@@ -420,15 +516,9 @@ export interface NeverRolled {
 
 export function neverRolled(sample: Sample): NeverRolled {
   const { data } = sample;
-  const universe = new Set<string>();
-  for (const characterClass of sample.classes) {
-    for (const slot of [...POOL_SLOTS, "armor"] as LoadoutSlot[]) {
-      for (const option of slotOptions(data, characterClass, slot)) if (option.row.odds > 0) universe.add(repeatKey(option));
-    }
-  }
-  const offered = new Set(
-    sample.results.flatMap((result) => sample.classes.flatMap((id) => [...(result.offered.get(id) ?? [])])),
-  );
+  const slots = [...POOL_SLOTS, "armor"] as LoadoutSlot[];
+  const universe = new Set(inReach(sample, sample.classes, slots, undefined, false).map(repeatKey));
+  const offered = new Set(inReach(sample, sample.classes, slots).map(repeatKey));
   const chosen = new Set(sample.objectives.flatMap((one) => [...one.rolls.values()].map((roll) => roll.chosenKey ?? "")));
   const names = (keys: string[]) => keys.map((key) => nameOf(data, key)).sort((a, b) => a.localeCompare(b));
   return {
@@ -437,10 +527,10 @@ export function neverRolled(sample: Sample): NeverRolled {
   };
 }
 
-export const REPEAT_KINDS = ["class", "rh", "lh", "ash", "spell", "item", "talisman", "rule", "armor"] as const;
-export type RepeatKind = (typeof REPEAT_KINDS)[number];
+const REPEAT_KINDS = ["class", "rh", "lh", "ash", "spell", "item", "talisman", "rule", "armor"] as const;
+type RepeatKind = (typeof REPEAT_KINDS)[number];
 
-const notNone = (roll: RollRow) => roll.chosen !== "none";
+const notNone = (roll: RollRow) => !isNone(roll.chosen ?? "");
 const REPEAT_KEYS: Readonly<Record<RepeatKind, (one: Obj) => readonly string[]>> = {
   class: (one) => [`character_class:${one.row.characterClass}`],
   rh: chosenKeys(["rh"], notNone),
@@ -512,62 +602,99 @@ export function empties(sample: Sample): readonly EmptyRow[] {
     .sort((a, b) => b.count - a.count);
 }
 
-// Boosts
+// By region
 
-export interface CatchUpRow {
-  readonly key: string;
-  readonly count: number;
-  readonly perRun: number;
-  /** Of the rolls that showed an item. */
-  readonly share: number;
-  /** The mean catch-up boost on the items that won. */
-  readonly catchUp: number;
-}
+/** Every share table but the combat rules', which have no location. */
+export type RegionTable = "rh" | "lh" | Exclude<GearTable, "rule">;
 
-const ceilingRegions = new WeakMap<EngineData, ReadonlyMap<string, string>>();
+const REGION_SLOTS: Readonly<Record<RegionTable, readonly LoadoutSlot[]>> = {
+  rh: ["rh"],
+  lh: ["lh"],
+  spell: ["spell"],
+  weaponAsh: ["rh_ash", "lh_ash"],
+  shieldAsh: ["rh_ash", "lh_ash"],
+  item: ["item"],
+  talisman: ["talisman_1", "talisman_2"],
+  armor: ["armor"],
+};
 
-/** The region setting each item's catch-up ceiling: its earliest, the one with the most `run_left`. */
-function ceilingRegion(data: EngineData, itemId: string): string | undefined {
-  let regions = ceilingRegions.get(data);
-  if (regions === undefined) {
-    const { database } = data;
-    const left = new Map(database.region.map((row) => [row.id, row.run_left]));
-    const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
-    const found = new Map<string, string>();
-    for (const row of database.item_location) {
-      const location = row.location_id ?? data.bosses.get(row.boss_instance_id ?? "")?.location_id;
-      const region = location === undefined ? undefined : locationRegion.get(location);
-      if (region === undefined) continue;
-      const current = found.get(row.item_id);
-      if (current === undefined || (left.get(region) ?? 0) > (left.get(current) ?? 0)) found.set(row.item_id, region);
-    }
-    regions = found;
-    ceilingRegions.set(data, regions);
+/** The key of a table's region with no location. */
+export const NO_LOCATION = "";
+
+const firstRegions = new WeakMap<EngineData, ReadonlyMap<string, string>>();
+
+/** By `optionKey`: the region in play order where an item first comes into reach, and where a set's last piece
+ * does. Items with no location row are left out. */
+function regionsOf(data: EngineData): ReadonlyMap<string, string> {
+  const cached = firstRegions.get(data);
+  if (cached !== undefined) return cached;
+  const { database } = data;
+  const rank = new Map(playOrder(database).map((id, index) => [id, index]));
+  const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
+  const items = new Map<string, string>();
+  for (const row of database.item_location) {
+    const location = row.location_id ?? data.bosses.get(row.boss_instance_id ?? "")?.location_id;
+    const region = location === undefined ? undefined : locationRegion.get(location);
+    if (region === undefined) continue;
+    const current = items.get(row.item_id);
+    if (current === undefined || (rank.get(region) ?? 0) < (rank.get(current) ?? 0)) items.set(row.item_id, region);
   }
-  return regions.get(itemId);
+  const found = new Map<string, string>([...items].map(([id, region]) => [`item:${id}`, region]));
+  for (const set of database.armor_set) {
+    const regions = set.pieces.flatMap((piece) => (items.has(piece) ? [items.get(piece)!] : []));
+    if (regions.length > 0) found.set(`armor_set:${set.id}`, regions.reduce((a, b) => ((rank.get(a) ?? 0) >= (rank.get(b) ?? 0) ? a : b)));
+  }
+  firstRegions.set(data, found);
+  return found;
 }
 
-/** Every roll that showed an item (`none` aside), grouped by the region setting its catch-up ceiling (`""` for an
- * item with no location). */
-export function catchUpByRegion(sample: Sample): readonly CatchUpRow[] {
+/** The region an option key counts in: an item's first, a set's last piece's, an alias's first member's, or
+ * `NO_LOCATION`. */
+function regionOfKey(data: EngineData, key: string): string {
+  const regions = regionsOf(data);
+  if (!key.startsWith("alias:")) return regions.get(key) ?? NO_LOCATION;
+  const rank = new Map(playOrder(data.database).map((id, index) => [id, index]));
+  const found = membersOf(data, key).flatMap((item) => {
+    const region = regions.get(`item:${item.id}`);
+    return region === undefined ? [] : [region];
+  });
+  return found.length === 0 ? NO_LOCATION : found.reduce((a, b) => ((rank.get(b) ?? 0) < (rank.get(a) ?? 0) ? b : a));
+}
+
+/** A slot's showings by the region each first comes into reach in, `none` left out, every roll counted, so two
+ * talisman slots count twice. `adjusted` is the share a region would get if every option in reach showed equally,
+ * so a skew from how many items a region holds reads apart from the rest. */
+export function regionShares(sample: Sample, table: RegionTable, chances?: ChanceSums): ShareTable | null {
   const { data } = sample;
-  const rolls = sample.objectives.flatMap((one) =>
-    [...one.rolls.values()].filter(
-      (roll) => roll.chosen !== null && roll.chosen !== "none" && data.items.has(roll.chosen),
-    ),
-  );
-  const groups = new Map<string, RollRow[]>();
-  for (const roll of rolls) {
-    const key = ceilingRegion(data, roll.chosen ?? "") ?? "";
-    groups.set(key, [...(groups.get(key) ?? []), roll]);
+  const slots = REGION_SLOTS[table];
+  const single = slots.length === 1 ? slots[0]! : undefined;
+  const classes = single === undefined ? sample.classes : sample.classes.filter((id) => !alwaysNone(data, id, single));
+  if (classes.length === 0) return null;
+  const ash = table === "weaponAsh" || table === "shieldAsh" ? table === "shieldAsh" : undefined;
+  const fits = (id: string) => ash === undefined || shieldAsh(data, id) === ash;
+  const regionOf = (key: string) => regionOfKey(data, key);
+  const reach = new Map<string, string>();
+  for (const option of inReach(sample, classes, slots, (option) => fits(option.row.id))) {
+    if (!isNone(option.row.id)) reach.set(optionKey(option), regionOf(optionKey(option)));
   }
-  return [...playOrder(data.database), ""]
-    .filter((key) => groups.has(key))
-    .map((key) => {
-      const list = groups.get(key)!;
-      return { key, count: list.length, perRun: list.length / sample.results.length, share: list.length / rolls.length, catchUp: mean(list.map((roll) => roll.catchUp)) };
-    });
+  const options = new Map<string, number>();
+  for (const region of reach.values()) options.set(region, (options.get(region) ?? 0) + 1);
+  const shares = shareTable(
+    sample,
+    sample.objectives.filter((one) => classes.includes(one.row.characterClass)),
+    (one) =>
+      slots.flatMap((slot) => {
+        const chosen = one.rolls.get(slot)?.chosen;
+        if (chosen === null || chosen === undefined || isNone(chosen) || !fits(chosen)) return [];
+        return [regionOf(`${slot === "armor" ? "armor_set" : "item"}:${chosen}`)];
+      }),
+    (region) => (region === NO_LOCATION ? NO_LOCATION : regionName(data, region)),
+    { universe: options.keys(), boosts: boostsInReach(sample, chances, slots, regionOf), basis: "showings" },
+  );
+  return { ...shares, rows: shares.rows.map((row) => ({ ...row, adjusted: (options.get(row.key) ?? 0) / Math.max(1, reach.size) })) };
 }
+
+// Boosts
 
 export interface SynergyRow {
   readonly modifier: ModifierText;
@@ -674,24 +801,13 @@ function showings(sample: Sample): ReadonlyMap<string, readonly (readonly number
 }
 
 /** The odds an option's own row gives it; an alias's members' odds added. */
-function baseOdds(data: EngineData, key: string): number {
+export function oddsOf(data: EngineData, key: string): number {
   const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
   if (kind === "item") return data.items.get(id)?.odds ?? 0;
   if (kind === "alias") return data.database.item.filter((row) => row.alias === id).reduce((sum, row) => sum + row.odds, 0);
   if (kind === "rule") return data.rules.get(id)?.odds ?? 0;
   if (kind === "armor_set") return data.armorSets.get(id)?.odds ?? 0;
   return 0;
-}
-
-/** The catch-up boost's ceiling on an item or armor set, the most it can get (`catchUpMultiplier`); null for
- * anything else, an alias included, whose members each carry their own. */
-function ceilingOf(data: EngineData, key: string): number | null {
-  const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
-  const item = kind === "item" ? data.items.get(id) : undefined;
-  const set = kind === "armor_set" ? data.armorSets.get(id) : undefined;
-  const option: Option | undefined =
-    item !== undefined ? { kind: "item", row: item } : set !== undefined ? { kind: "armor_set", row: set } : undefined;
-  return option === undefined ? null : catchUpMultiplier(data, option, DEFAULT_HYPERPARAMS.catchUp);
 }
 
 export interface ItemRow {
@@ -710,7 +826,7 @@ export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
   return [...keys].map((key) => ({ key, name: nameOf(sample.data, key) }));
 }
 
-export interface ItemPoint {
+interface ItemPoint {
   /** The stretch's first objective number. */
   readonly x: number;
   /** Mean chance per roll in the stretch, with the catch-up boost and with it removed from every option. */
@@ -737,17 +853,11 @@ export function itemSeries(
   chances: ChanceSums,
   key: string,
 ): readonly { readonly slot: LoadoutSlot; readonly points: readonly ItemPoint[]; readonly shown: readonly number[] }[] {
-  const picked = new Set(sample.classes);
   const bySlot = new Map<LoadoutSlot, Map<number, ChanceSum>>();
-  for (const [at, sums] of chances) {
-    const [characterClass = "", slot = "", option = "", stretch = ""] = at.split("|");
-    if (option !== key || !picked.has(characterClass)) continue;
+  const folded = foldChances(sample, chances, (entry) => (entry.key === key ? `${entry.slot}|${entry.stretch}` : undefined));
+  for (const [row, total] of folded) {
+    const [slot = "", stretch = ""] = row.split("|");
     const stretches = bySlot.get(slot as LoadoutSlot) ?? new Map<number, ChanceSum>();
-    const total = stretches.get(Number(stretch)) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0 };
-    total.chance += sums.chance;
-    total.plain += sums.plain;
-    total.boosted += sums.boosted;
-    total.rolls += sums.rolls;
     stretches.set(Number(stretch), total);
     bySlot.set(slot as LoadoutSlot, stretches);
   }
@@ -773,6 +883,3 @@ export function itemSeries(
   }));
 }
 
-export function oddsOf(data: EngineData, key: string): { readonly odds: number; readonly ceiling: number | null } {
-  return { odds: baseOdds(data, key), ceiling: ceilingOf(data, key) };
-}

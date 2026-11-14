@@ -1,27 +1,31 @@
+import { useMemo } from "react";
+
 import { Fragment } from "react";
 
 import { outsideSynergy, synergyWins, THIN_SAMPLE, type Sample, type SynergyRow } from "../../sim/aggregate";
 import { copy } from "../copy";
 import { DataTable } from "../ui/DataTable";
-import { SectionHeading } from "../ui/Headings";
+import { SectionHeading, SectionNote } from "../ui/Headings";
 import { FOLD, matches, modifierRule, percent, perRun } from "./format";
 
 const words = copy.simulate.synergies;
 const columns = copy.simulate.columns;
 
 export function Synergies({ sample, search }: { readonly sample: Sample; readonly search: string }) {
+  const wins = useMemo(() => synergyWins(sample), [sample]);
+  const outside = useMemo(() => outsideSynergy(sample), [sample]);
   const shown = (row: SynergyRow) => {
     const { when, target } = modifierRule(row.modifier);
     return matches(`${row.modifier.id} ${when} ${target}`, search);
   };
   return (
     <>
-      <SynergyTable title={words.wins} lede={words.winsLede} share={words.won} rows={synergyWins(sample).filter(shown)} />
+      <SynergyTable title={words.wins} lede={words.winsLede} share={words.won} rows={wins.filter(shown)} />
       <SynergyTable
         title={words.outside}
         lede={words.outsideLede}
         share={words.without}
-        rows={outsideSynergy(sample).filter(shown)}
+        rows={outside.filter(shown)}
         struck
       />
     </>
@@ -47,7 +51,7 @@ function SynergyTable({
   return (
     <section className="simulate-section">
       <SectionHeading>{title}</SectionHeading>
-      <p className="simulate-lede">{lede}</p>
+      <SectionNote>{lede}</SectionNote>
       <DataTable<SynergyRow>
         label={title}
         columns={[

@@ -150,7 +150,6 @@ def test_the_real_data_passes_the_gate(data: GateData) -> None:
         (_set_item("parry", str_bonus_2h=False), "bad infusable or str_bonus_2h on: parry"),
         (_set_item("longsword", str_bonus_2h=False), "no class or override says so: longsword"),
         (_set_item("caestus", str_bonus_2h=True), "bonus in a class"),
-        (_rule_odds("none", 1), "the rule None needs odds of 4"),
         (_rule_odds("r1_only", -1), "odds below 0 on: rule r1_only"),
         (_add_ash_row(AshCompatibility("longsword", "weapon", "dagger")), "names no ash"),
         (_add_ash_row(AshCompatibility("parry", "weapon", "small_shield")), "not in its category"),
