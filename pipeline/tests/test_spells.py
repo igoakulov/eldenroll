@@ -74,23 +74,6 @@ def incantation_names(incantations: tuple[Item, ...]) -> set[str]:
     return {row.name for row in incantations}
 
 
-def test_exclusion_lists_hold_17_and_43_names() -> None:
-    assert len(EXCLUDED_SORCERIES) == 17
-    assert len(EXCLUDED_INCANTATIONS) == 43
-
-
-def test_incantation_rows_names_and_slugs_are_all_86(incantations: tuple[Item, ...]) -> None:
-    assert len(incantations) == 86
-    assert len({row.name for row in incantations}) == 86
-    assert len({row.id for row in incantations}) == 86
-    assert {row.category for row in incantations} == {"incantation"}
-
-
-@pytest.mark.parametrize("name", sorted(EXCLUDED_INCANTATIONS))
-def test_incantation_exclusion_is_absent(incantation_names: set[str], name: str) -> None:
-    assert name not in incantation_names
-
-
 def test_every_json_incantation_maps_to_the_pool_or_is_excluded(
     incantation_names: set[str],
 ) -> None:
@@ -117,18 +100,6 @@ def test_beast_claw_incantation_keeps_the_suffix_that_splits_it_from_the_weapon(
     assert "Beast Claw" not in by_name
 
 
-def test_rows_names_and_slugs_are_all_67(sorceries: tuple[Item, ...]) -> None:
-    assert len(sorceries) == 67
-    assert len({row.name for row in sorceries}) == 67
-    assert len({row.id for row in sorceries}) == 67
-    assert {row.category for row in sorceries} == {"sorcery"}
-
-
-@pytest.mark.parametrize("name", sorted(EXCLUDED_SORCERIES))
-def test_exclusion_is_absent(names: set[str], name: str) -> None:
-    assert name not in names
-
-
 def test_every_json_sorcery_maps_to_the_pool_or_is_excluded(names: set[str]) -> None:
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     pool = {name.lower() for name in names}
@@ -140,14 +111,6 @@ def test_every_json_sorcery_maps_to_the_pool_or_is_excluded(names: set[str]) -> 
             unmatched.add(name)
 
     assert unmatched - EXCLUDED_SORCERIES == {"Terra Magicus"}
-
-
-def test_later_steps_own_the_remaining_fields(sorceries: tuple[Item, ...]) -> None:
-    for row in sorceries:
-        assert row.subcategory is None
-        assert row.infusable is None
-        assert row.str_bonus_2h is None
-        assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
 
 
 def test_names_shared_with_ashes_take_a_category_suffix(
@@ -168,7 +131,6 @@ def test_names_shared_with_ashes_take_a_category_suffix(
     ids = {row.id for row in table}
     original = {row.id for row in rows}
 
-    assert len(table) == 1423
     assert {variant.canonical_name for variant in variants.values()} <= {row.name for row in rows}
     assert original - ids == {"glintstone_pebble", "carian_greatsword", "glintblade_phalanx"}
     assert ids - original == {

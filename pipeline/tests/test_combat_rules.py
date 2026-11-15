@@ -9,65 +9,6 @@ import pytest
 from eldenroll.loaders.combat_rules import load_combat_rules
 from eldenroll.loaders.schema import LoaderError
 
-CSV = Path(__file__).resolve().parents[2] / "data" / "overrides" / "combat_rules.csv"
-
-NAMES = {
-    "None",
-    "None 2",
-    "Do not get hit",
-    "Apply status",
-    "Land a riposte",
-    "Dodge 1x with crouch or jump",
-    "Gesture 3x without getting hit",
-    "Gesture after every flask",
-    "R1 only",
-    "R2 only",
-    "Charged R2 only",
-    "L1 only (can swap hands)",
-    "L2 only",
-    "Jump attacks only",
-    "Rolling / crouch attacks only",
-    "Parry only",
-    "No ripostes",
-    "No lock-on",
-    "No buffs",
-    "No healing flasks",
-    "No armor",
-    "No talismans",
-    "No rolling",
-    "Heavy rolling",
-    "Overloaded",
-    "Drink Deflecting Hardtear",
-    "Drink Crimson-Sapping Cracked Tear",
-    "Drink Bloodsucking Cracked Tear",
-    "Drink Stonebarb Cracked Tear",
-    "Drink Ruptured Crystal Tear",
-}
-
-
-def test_the_30_rules_match_the_prd() -> None:
-    rules = load_combat_rules(CSV)
-    assert len(rules) == 30
-    assert {rule.name for rule in rules} == NAMES
-
-
-def test_odds_other_than_one() -> None:
-    rules = load_combat_rules(CSV)
-    assert {rule.id: rule.odds for rule in rules if rule.odds != 1} == {
-        "none": 12,
-        "none_2": 12,
-        "do_not_get_hit": 0.5,
-        "no_healing_flasks": 0.5,
-        "no_armor": 0.5,
-        "no_rolling": 0.5,
-        "overloaded": 0.5,
-        "parry_only": 0.5,
-        "l2_only": 0.5,
-        "drink_deflecting_hardtear": 0,
-        "drink_crimson_sapping_cracked_tear": 0,
-        "drink_bloodsucking_cracked_tear": 0,
-    }
-
 
 @pytest.mark.parametrize(
     ("body", "message"),

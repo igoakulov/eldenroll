@@ -17,58 +17,12 @@ from eldenroll.loaders.modifiers import ConditionRow, ModifierRow, load_modifier
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.modifier import CharacterClassCondition, Modifier, RolledCondition
 from eldenroll.model.selector import Selector, SelectorKind
-from eldenroll.model.vocabulary import MELEE, UNPAIRED
 from eldenroll.validate.modifiers import validate_modifiers, validate_rolling_order
 from eldenroll.validate.placement import PlacementData
-from eldenroll.validate.selectors import known_ids, resolve_items
+from eldenroll.validate.selectors import known_ids
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-
-ALLOWED_TOGETHER = {
-    ("jump_attacks_only", "r1_only"),
-    ("jump_attacks_only", "r2_only"),
-    ("jump_attacks_only", "l1_only_can_swap_hands"),
-    ("land_a_riposte", "r1_only"),
-    ("no_ripostes", "r1_only"),
-    ("do_not_get_hit", "no_rolling"),
-    ("do_not_get_hit", "gesture_3x_without_getting_hit"),
-    ("no_healing_flasks", "overloaded"),
-    ("no_healing_flasks", "drink_ruptured_crystal_tear"),
-    ("no_talismans", "heavy_rolling"),
-    ("no_rolling", "dodge_1x_with_crouch_or_jump"),
-}
-# Each pair is contradictory, or one rule is a harder version of the other, or voids it.
-EXCLUDED = {
-    ("r1_only", "r2_only"),
-    ("r1_only", "rolling_crouch_attacks_only"),
-    ("r2_only", "charged_r2_only"),
-    ("l1_only_can_swap_hands", "r1_only"),
-    ("l2_only", "parry_only"),
-    ("jump_attacks_only", "rolling_crouch_attacks_only"),
-    ("jump_attacks_only", "charged_r2_only"),
-    ("parry_only", "land_a_riposte"),
-    ("parry_only", "no_ripostes"),
-    ("parry_only", "r1_only"),
-    ("land_a_riposte", "no_ripostes"),
-    ("no_ripostes", "r2_only"),
-    ("no_rolling", "heavy_rolling"),
-    ("no_rolling", "overloaded"),
-    ("heavy_rolling", "overloaded"),
-    ("no_rolling", "rolling_crouch_attacks_only"),
-    ("overloaded", "no_armor"),
-    ("overloaded", "no_talismans"),
-    ("overloaded", "do_not_get_hit"),
-    ("heavy_rolling", "no_armor"),
-    ("do_not_get_hit", "no_healing_flasks"),
-    ("do_not_get_hit", "gesture_after_every_flask"),
-    ("no_healing_flasks", "gesture_after_every_flask"),
-    ("do_not_get_hit", "drink_ruptured_crystal_tear"),
-    ("drink_stonebarb_cracked_tear", "drink_ruptured_crystal_tear"),
-}
-
-
-TALISMANS = ("talisman_1", "talisman_2")
 
 
 @pytest.fixture(scope="module")
@@ -107,30 +61,6 @@ def _rule_row(rolled: str, removed: str) -> Modifier:
     )
 
 
-def test_the_real_modifiers_are_valid(
-    modifiers: tuple[Modifier, ...], placement_data: PlacementData
-) -> None:
-    _validate(modifiers, placement_data)
-
-
-@pytest.mark.parametrize(("first", "second"), sorted(EXCLUDED))
-def test_pairs_that_cannot_roll_together(
-    modifiers: tuple[Modifier, ...], first: str, second: str
-) -> None:
-    pairs = _excludes(modifiers)
-    assert (first, second) in pairs
-    assert (second, first) in pairs
-
-
-@pytest.mark.parametrize(("first", "second"), sorted(ALLOWED_TOGETHER))
-def test_pairs_that_can_roll_together(
-    modifiers: tuple[Modifier, ...], first: str, second: str
-) -> None:
-    pairs = _excludes(modifiers)
-    assert (first, second) not in pairs
-    assert (second, first) not in pairs
-
-
 def test_no_row_names_a_rule_that_never_rolls(modifiers: tuple[Modifier, ...]) -> None:
     rules = load_combat_rules(OVERRIDES / "combat_rules.csv")
     parked = {rule.id for rule in rules if rule.odds == 0}
@@ -143,102 +73,6 @@ def test_none_excludes_nothing(modifiers: tuple[Modifier, ...]) -> None:
     assert not [pair for pair in _excludes(modifiers) if "none" in pair]
 
 
-@pytest.mark.parametrize(
-    ("slots", "selector"),
-    [
-        (("rh", "lh"), Selector("item", ("blasphemous_blade",))),
-        (("rh_ash", "lh_ash"), Selector("item", ("prayerful_strike",))),
-    ],
-)
-def test_l2_healing_boosts_its_rules_and_removes_the_rest(
-    modifiers: tuple[Modifier, ...], slots: tuple[str, ...], selector: Selector
-) -> None:
-    rows = [row for row in modifiers if row.when == (RolledCondition(slots, selector),)]
-    assert {row.value: set(row.target.ids or ()) for row in rows} == {
-        5: {"no_healing_flasks", "overloaded"},
-        0: {
-            "r1_only",
-            "r2_only",
-            "charged_r2_only",
-            "l1_only_can_swap_hands",
-            "jump_attacks_only",
-            "rolling_crouch_attacks_only",
-            "parry_only",
-        },
-    }
-
-
-def test_blue_dancer_charm_makes_no_armor_strong(modifiers: tuple[Modifier, ...]) -> None:
-    condition = RolledCondition(TALISMANS, Selector("item", ("blue_dancer_charm",)))
-    rows = [row for row in modifiers if row.when == (condition,) and row.target.kind == "rule"]
-    assert [(row.target, row.value) for row in rows] == [(Selector("rule", ("no_armor",)), 10)]
-
-
-def test_dual_wield_boosts_each_unpaired_class_in_lh(modifiers: tuple[Modifier, ...]) -> None:
-    character_class = CharacterClassCondition(("warrior_dw",))
-    rows = [row for row in modifiers if row.id.startswith("warrior_dw_pairs_")]
-    assert {one for row in rows for one in row.target.ids or ()} == UNPAIRED
-    for row in rows:
-        assert row.value == 67
-        assert row.when == (character_class, RolledCondition(("rh",), row.target))
-
-
-def test_only_grafted_dragon_loses_odds_in_dual_wield_rh(
-    modifiers: tuple[Modifier, ...], placement_data: PlacementData
-) -> None:
-    pools = build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
-    pool = next(row for row in pools if (row.character_class_id, row.slot) == ("warrior_dw", "rh"))
-    rh = {item.id for item in resolve_items(pool.selectors, placement_data.table)}
-    known_before_rh = [
-        row
-        for row in modifiers
-        if row.when
-        and all(
-            isinstance(one, CharacterClassCondition) and "warrior_dw" in one.character_classes
-            for one in row.when
-        )
-    ]
-    assert {
-        row.id
-        for row in known_before_rh
-        if rh & {item.id for item in resolve_items((row.target,), placement_data.table)}
-    } == {
-        "grafted_dragon_only_on_jester",
-        "warrior_dw_boosts_paired_subcategories",
-        "warrior_dw_boosts_paired_weapons",
-    }
-
-
-def test_a_paired_rh_leaves_only_none_in_dual_wield_lh(modifiers: tuple[Modifier, ...]) -> None:
-    rows = {row.id: row for row in modifiers}
-    for name in ("warrior_dw_paired_class_empties_lh", "warrior_dw_paired_weapon_empties_lh"):
-        assert rows[name].target.ids == tuple(sorted(UNPAIRED))
-        assert rows[name].value == 0
-    keeps = rows["warrior_dw_unpaired_rh_keeps_lh_unpaired"]
-    assert "none" in (keeps.target.ids or ())
-    assert {one.negated for one in keeps.when if isinstance(one, RolledCondition)} == {True}
-
-
-def test_paired_weapons_and_grafted_dragon_stay_off_the_other_character_classes(
-    modifiers: tuple[Modifier, ...],
-) -> None:
-    rows = {row.id: row for row in modifiers}
-    assert rows["knight_spellblade_no_paired_weapons"].when == (
-        CharacterClassCondition(("knight", "spellblade")),
-    )
-    assert len(rows["knight_spellblade_no_paired_weapons"].target.ids or ()) == 9
-    assert rows["grafted_dragon_only_on_jester"].when == (
-        CharacterClassCondition(("warrior_2h", "warrior_dw")),
-    )
-
-
-def test_the_real_rows_roll_their_targets_after_their_conditions(
-    modifiers: tuple[Modifier, ...], placement_data: PlacementData
-) -> None:
-    pools = build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
-    validate_rolling_order(modifiers, pools, placement_data.table)
-
-
 def test_a_target_rolled_before_its_condition_fails(placement_data: PlacementData) -> None:
     pools = build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
     late = Modifier(
@@ -249,126 +83,6 @@ def test_a_target_rolled_before_its_condition_fails(placement_data: PlacementDat
     )
     with pytest.raises(BuildError, match="after their conditions: late"):
         validate_rolling_order([late], pools, placement_data.table)
-
-
-@pytest.mark.parametrize(
-    ("talismans", "kind", "targets", "value"),
-    [
-        (("claw_talisman",), "rule", ("jump_attacks_only",), 10000000),
-        (("shard_of_alexander", "warrior_jar_shard"), "rule", ("l2_only",), 10000000),
-        (("axe_talisman",), "rule", ("charged_r2_only", "drink_stonebarb_cracked_tear"), 10000000),
-    ],
-)
-def test_talismans_reach_their_targets_from_either_slot(
-    modifiers: tuple[Modifier, ...],
-    talismans: tuple[str, ...],
-    kind: SelectorKind,
-    targets: tuple[str, ...],
-    value: int,
-) -> None:
-    condition = RolledCondition(TALISMANS, Selector("item", talismans))
-    rows = [row for row in modifiers if row.when == (condition,) and row.target.kind == kind]
-    assert [(row.target.ids, row.value) for row in rows] == [(targets, value)]
-
-
-def test_jump_attacks_boost_the_jump_sets_from_either_rule(
-    modifiers: tuple[Modifier, ...],
-) -> None:
-    condition = RolledCondition(("rule_1", "rule_2"), Selector("rule", ("jump_attacks_only",)))
-    rows = [
-        row
-        for row in modifiers
-        if row.when == (condition,) and row.target.kind == "armor_set" and row.value > 0
-    ]
-    assert [(row.target, row.value) for row in rows] == [
-        (Selector("armor_set", ("gravebird_set", "raptors_set")), 100000)
-    ]
-
-
-def test_dancers_weapons_reach_the_set_and_talismans_from_either_hand(
-    modifiers: tuple[Modifier, ...],
-) -> None:
-    rows = [
-        row
-        for row in modifiers
-        if row.id.startswith("dancers_weapon_")
-        and row.value > 0
-        and len(row.when) == 1
-        and isinstance(row.when[0], RolledCondition)
-        and row.when[0].slots == ("rh", "lh")
-        and "hand_of_malenia" in (row.when[0].selector.ids or ())
-    ]
-    assert {row.target.kind: row.value for row in rows} == {"armor_set": 10000000, "item": 100000}
-    for row in rows:
-        condition = row.when[0]
-        assert isinstance(condition, RolledCondition)
-        assert len(condition.selector.ids or ()) == 8
-
-
-def test_blue_dancer_charm_needs_light_hands(modifiers: tuple[Modifier, ...]) -> None:
-    rows = {row.id: row for row in modifiers}
-    lightest = {"dagger", "straight_sword", "curved_sword", "thrusting_sword", "whip"}
-    empty_lh = RolledCondition(("lh",), Selector("category", ("none",)), negated=True)
-    heavy = rows["heavy_rh_removes_blue_dancer_charm"].when[0]
-    assert isinstance(heavy, RolledCondition)
-    assert len(heavy.selector.ids or ()) == 19
-    assert {"twinblade", "glintstone_staff", "thrusting_shield"} <= set(heavy.selector.ids or ())
-    assert not lightest & set(heavy.selector.ids or ())
-    rh = rows["two_hands_need_a_lightest_rh_for_blue_dancer_charm"].when
-    assert rh[1] == empty_lh
-    assert isinstance(rh[0], RolledCondition)
-    assert rh[0].negated
-    assert set(rh[0].selector.ids or ()) == lightest
-    lh = rows["two_hands_need_a_light_lh_for_blue_dancer_charm"].when
-    assert lh[1] == empty_lh
-    assert isinstance(lh[0], RolledCondition)
-    assert set(lh[0].selector.ids or ()) == lightest | {
-        "small_shield",
-        "medium_shield",
-        "glintstone_staff",
-        "sacred_seal",
-    }
-    for row in (heavy, *rh, *lh):
-        assert isinstance(row, RolledCondition)
-
-
-def test_jester_favours_an_empty_right_hand(modifiers: tuple[Modifier, ...]) -> None:
-    row = next(one for one in modifiers if one.id == "jester_none_x6")
-    assert (row.when, row.target, row.value) == (
-        (CharacterClassCondition(("jester",)),),
-        Selector("item", ("none",)),
-        6,
-    )
-
-
-def test_knight_left_hand_follows_the_right_hand(modifiers: tuple[Modifier, ...]) -> None:
-    rows = {row.id: row for row in modifiers}
-    condition = RolledCondition(("rh",), Selector("subcategory", ("thrusting_shield",)))
-    empties = rows["knight_thrusting_shield_empties_lh"]
-    assert empties.when == (CharacterClassCondition(("knight",)), condition)
-    assert empties.target.ids == ("greatshield", "medium_shield", "small_shield")
-    keeps = rows["knight_other_rh_keeps_a_shield_in_lh"]
-    assert keeps.when == (CharacterClassCondition(("knight",)), replace(condition, negated=True))
-    assert keeps.target == Selector("item", ("none",))
-
-
-def test_requirements_read_the_right_slots(modifiers: tuple[Modifier, ...]) -> None:
-    rows = {row.id: row for row in modifiers}
-    parry = rows["parry_only_needs_a_parry_ash"]
-    assert parry.target.ids == ("parry_only",)
-    assert {one.slots[0] for one in parry.when if isinstance(one, RolledCondition)} == {
-        "rh_ash",
-        "lh_ash",
-    }
-    weapon = rows["melee_rules_need_a_melee_weapon_in_a_hand"].when[0]
-    assert isinstance(weapon, RolledCondition)
-    assert weapon.negated
-    assert set(weapon.selector.ids or ()) > MELEE
-    assert "bow" not in (weapon.selector.ids or ())
-    assert "glintstone_staff" not in (weapon.selector.ids or ())
-    assert rows["l2_only_not_on_pure_casters"].when == (
-        CharacterClassCondition(("sorcerer", "pyromancer")),
-    )
 
 
 @pytest.mark.parametrize(

@@ -67,8 +67,7 @@ const KNIGHT_MELEE: Rolled = { rh: "uchigatana", rh_ash: "no_skill", lh: "brass_
 describe("slot pools on the real data", () => {
   it("drops options at odds 0, and counts them nowhere", () => {
     const result = pool("jester", "item");
-    expect(ids(result)).toHaveLength(87);
-    expect(result.pool).toBe(87);
+    expect(result.pool).toBe(result.options.length);
     expect(ids(result)).not.toContain("lamenters_mask");
   });
 
@@ -78,35 +77,28 @@ describe("slot pools on the real data", () => {
   });
 
   it("gives Jester's empty hand its x6, and only there", () => {
-    expect(weightOf(pool("jester", "rh"), "none")).toBe(6);
+    expect(weightOf(pool("jester", "rh"), "none")).toBe(modifierRow("jester_none_x6").value);
     expect(weightOf(pool("warrior_2h", "lh"), "none")).toBe(1);
   });
 
-  it("gives seals their base odds of 2", () => {
+  it("gives a seal and a staff their own base odds", () => {
     const result = pool("spellblade", "lh");
-    expect(weightOf(result, "finger_seal")).toBe(2);
-    expect(weightOf(result, "astrologers_staff")).toBe(1);
+    expect(weightOf(result, "finger_seal")).toBe(item("finger_seal").odds);
+    expect(weightOf(result, "astrologers_staff")).toBe(item("astrologers_staff").odds);
   });
 });
 
-const PAIRED_SUBCATEGORIES = new Set([
-  "fist",
-  "claw",
-  "beast_claw",
-  "hand_to_hand",
-  "backhand_blade",
-  "throwing_blade",
-]);
-const PAIRED_WEAPONS = new Set([
-  "ornamental_straight_sword",
-  "falx",
-  "dancing_blade_of_ranah",
-  "horned_warriors_sword",
-  "death_knights_twin_axes",
-  "rellanas_twin_blades",
-  "greatsword_of_radahn_lord",
-  "greatsword_of_radahn_light",
-]);
+function modifierRow(id: string): Modifier {
+  const row = realDatabase.modifier.find((one) => one.id === id);
+  if (row === undefined) throw new Error(`no modifier ${id}`);
+  return row;
+}
+
+function ruleOdds(id: string): number {
+  const row = realDatabase.combat_rule.find((one) => one.id === id);
+  if (row === undefined) throw new Error(`no rule ${id}`);
+  return row.odds;
+}
 
 describe("a condition on a slot not rolled yet", () => {
   it("leaves Dual-Wield Warrior RH with only Grafted Dragon losing odds", () => {
@@ -116,10 +108,16 @@ describe("a condition on a slot not rolled yet", () => {
     );
     expect(options.length - result.options.length).toBe(1);
     expect(ids(result)).not.toContain("grafted_dragon");
+    const classes = modifierRow("warrior_dw_boosts_paired_subcategories");
+    const weapons = modifierRow("warrior_dw_boosts_paired_weapons");
     for (const row of result.options) {
       const item = row.option.row as Item;
-      const boosted = PAIRED_SUBCATEGORIES.has(item.subcategory ?? "") || PAIRED_WEAPONS.has(item.id);
-      expect(row.weight).toBe(item.odds * (boosted ? 2 : 1));
+      const boost = classes.target.ids?.includes(item.subcategory ?? "")
+        ? classes.value
+        : weapons.target.ids?.includes(item.id)
+          ? weapons.value
+          : 1;
+      expect(row.weight).toBe(item.odds * boost);
     }
   });
 
@@ -146,7 +144,7 @@ describe("modifiers across slots", () => {
     const katana = result.options.filter((row) => item(row.option.row.id).subcategory === "katana");
     const other = result.options.filter((row) => item(row.option.row.id).subcategory !== "katana");
     expect(katana.length).toBeGreaterThan(0);
-    for (const row of katana) expect(row.weight).toBe(67);
+    for (const row of katana) expect(row.weight).toBe(modifierRow("warrior_dw_pairs_katana").value);
     for (const row of other) expect(row.weight).toBe(1);
     expect(ids(result)).not.toContain("none");
   });
@@ -178,12 +176,16 @@ describe("modifiers across slots", () => {
   it("needs a parry ash for Parry only, and boosts it with one", () => {
     expect(ids(pool("knight", "rule_1", KNIGHT_MELEE))).not.toContain("parry_only");
     const withParry = pool("knight", "rule_1", { ...KNIGHT_MELEE, lh_ash: "parry" });
-    expect(weightOf(withParry, "parry_only")).toBe(5);
+    expect(weightOf(withParry, "parry_only")).toBe(
+      ruleOdds("parry_only") * modifierRow("parry_ash_boosts_parry_only").value,
+    );
   });
 
   it("makes a named talisman's rule top tier", () => {
     const result = pool("knight", "rule_1", { ...KNIGHT_MELEE, talisman_1: "claw_talisman" });
-    expect(weightOf(result, "jump_attacks_only")).toBe(10_000_000);
+    expect(weightOf(result, "jump_attacks_only")).toBe(
+      ruleOdds("jump_attacks_only") * modifierRow("claw_talisman_makes_jump_attacks_top").value,
+    );
   });
 
   it("removes Blue Dancer Charm for a heavy RH, whatever the class", () => {

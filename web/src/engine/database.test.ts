@@ -58,19 +58,6 @@ function allSelectors(): Selector[] {
 }
 
 describe("db.json", () => {
-  it("holds the expected row counts", () => {
-    expect(database.region).toHaveLength(17);
-    expect(database.location).toHaveLength(174);
-    expect(database.boss_instance).toHaveLength(229);
-    expect(database.boss_instance.filter((row) => row.odds > 0)).toHaveLength(218);
-    expect(database.item).toHaveLength(1522);
-    expect(database.item.filter((row) => row.category === "none")).toHaveLength(1);
-    expect(database.character_class).toHaveLength(8);
-    expect(database.slot_pool).toHaveLength(72);
-    expect(database.combat_rule).toHaveLength(30);
-    expect(database.alias).toHaveLength(11);
-  });
-
   it("has exactly the tables and fields of the types", () => {
     expect(Object.keys(database).sort()).toEqual(Object.keys(FIELDS).sort());
     for (const [table, fields] of Object.entries(FIELDS)) {

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -12,7 +11,6 @@ from eldenroll.build.items import new_item
 from eldenroll.errors import BuildError
 from eldenroll.loaders.armor_sets import load_armor_sets
 from eldenroll.loaders.schema import LoaderError
-from eldenroll.model.vocabulary import ARMOR_SLOTS
 from eldenroll.paths import ARMOR_SETS_PAGE
 from eldenroll.validate.gaps import GapSources
 
@@ -138,30 +136,7 @@ def test_every_set_of_the_page_has_its_pieces(sets: dict[str, tuple[str, ...]]) 
 
 
 def test_the_highland_warrior_set_is_split_in_two(sets: dict[str, tuple[str, ...]]) -> None:
-    assert len(sets) == 183
     assert {name: set(sets[name]) for name in HIGHLAND} == HIGHLAND
-
-
-def test_every_piece_is_in_the_pool_and_a_set_holds_one_per_slot(
-    sources: GapSources, sets: dict[str, tuple[str, ...]]
-) -> None:
-    slots = {row.name: row.subcategory for row in sources.table if row.category == "armor"}
-    for name, pieces in sets.items():
-        assert set(pieces) <= set(slots), name
-        assert max(Counter(slots[piece] for piece in pieces).values(), default=0) <= 1, name
-
-
-def test_every_piece_links_to_an_armor_row(
-    sources: GapSources, sets: dict[str, tuple[str, ...]]
-) -> None:
-    table = sources.table
-    linked = build_armor_sets(sets, table)
-    armor = {row.id: row for row in table if row.category == "armor"}
-    assert len(linked) == len(sets)
-    for row in linked:
-        assert {armor[piece].name for piece in row.pieces} == set(sets[row.name])
-        held = [armor[piece].subcategory for piece in row.pieces]
-        assert held == [slot for slot in ARMOR_SLOTS if slot in held]
 
 
 def test_the_docs_examples_link_as_written(

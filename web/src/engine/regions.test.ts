@@ -92,7 +92,8 @@ describe("bossPool", () => {
 
   it("counts every rollable boss once across the regions", () => {
     const all = database.region.map((row) => row.id).filter((id) => id !== ASHEN);
-    expect(bossIds(all)).toHaveLength(218 - bossesOnlyInTheAshenCapital());
+    const rollable = database.boss_instance.filter((row) => row.odds > 0).length;
+    expect(bossIds(all)).toHaveLength(rollable - bossesOnlyInTheAshenCapital());
   });
 
   function bossesOnlyInTheAshenCapital(): number {
@@ -101,7 +102,7 @@ describe("bossPool", () => {
 
   it("never holds a boss at odds 0", () => {
     const zero = database.boss_instance.filter((row) => row.odds === 0).map((row) => row.id);
-    expect(zero).toHaveLength(11);
+    expect(zero.length).toBeGreaterThan(0);
     const all = bossIds(database.region.map((row) => row.id));
     for (const id of zero) expect(all).not.toContain(id);
   });

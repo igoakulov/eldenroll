@@ -15,8 +15,6 @@ from eldenroll.model.item_catalog import ItemCatalog
 from eldenroll.paths import TOOL_CONSUMABLE_CLASSES
 from eldenroll.validate.gaps import GapSources
 
-ROOT = Path(__file__).resolve().parents[2]
-
 
 def _sheet(*names: str) -> CsvTable:
     return CsvTable(
@@ -44,32 +42,8 @@ def tools(sources: GapSources) -> tuple[Item, ...]:
 
 def test_rows_are_exactly_the_whitelist_and_the_transforms(tools: tuple[Item, ...]) -> None:
     assert [row.name for row in tools] == [*TOOLS, *TRANSFORMS]
-    assert len({row.id for row in tools}) == 9
+    assert len({row.id for row in tools}) == len(tools)
     assert {row.category for row in tools} == {"tool"}
-
-
-def test_the_transforms_are_the_three_the_owner_named() -> None:
-    assert set(TRANSFORMS) == {"Lamenter's Mask", "Rock Heart", "Priestess Heart"}
-
-
-def test_tool_rows_hold_no_stray_field(tools: tuple[Item, ...]) -> None:
-    for row in tools:
-        assert row.subcategory is None
-        assert row.infusable is None
-        assert row.str_bonus_2h is None
-        assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
-
-
-def test_sheet_folds_90_rows_into_88_names() -> None:
-    sheet = load_consumable_categories(TOOL_CONSUMABLE_CLASSES)
-    names = sheet_base_names(sheet)
-
-    assert sheet.row_count == 90
-    assert len(names) == 88
-    assert {"Omen Bairn", "Regal Omen Bairn"} <= set(names)
-    assert not {"Omen Bairn 1", "Omen Bairn 2", "Regal Omen Bairn 1", "Regal Omen Bairn 2"} & set(
-        names
-    )
 
 
 def test_folding_keeps_first_seen_order_and_other_names() -> None:

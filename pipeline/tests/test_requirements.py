@@ -15,7 +15,6 @@ from eldenroll.model.name_variant import NameVariant
 from eldenroll.normalize.requirements import assign_requirements, readable_stats
 from eldenroll.validate.gaps import GapSources
 
-ROOT = Path(__file__).resolve().parents[2]
 BEARS_STATS = ("weapon", "shield", "sorcery", "incantation")
 
 

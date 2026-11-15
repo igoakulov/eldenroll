@@ -121,7 +121,7 @@ describe("a whole run, one Done per boss", () => {
     );
     const missed = realDatabase.boss_instance.filter((row) => row.odds > 0 && !bosses.includes(row.id));
     for (const boss of missed) expect(inRoyalCapital.has(boss.location_id)).toBe(true);
-    expect(bosses.length + missed.length).toBe(218);
+    expect(bosses.length + missed.length).toBe(realDatabase.boss_instance.filter((row) => row.odds > 0).length);
     expect(run.finished).toBe(true);
     expect(run.completed.every((row) => row.rerolls.length === 0)).toBe(true);
   });

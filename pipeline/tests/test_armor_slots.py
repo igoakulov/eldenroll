@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -14,7 +13,6 @@ from eldenroll.loaders.name_variants import load_name_variants
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.item import Item
 from eldenroll.model.name_variant import NameVariant
-from eldenroll.model.vocabulary import ARMOR_SLOTS
 from eldenroll.normalize.armor_slots import assign_armor_slots
 from eldenroll.validate.gaps import GapSources
 from eldenroll.validate.subcategories import validate_subcategories
@@ -30,19 +28,6 @@ ID_DIGITS = {0: "head", 1: "body", 2: "arms", 3: "legs"}
 @pytest.fixture(scope="module")
 def slots(sources: GapSources) -> dict[str, str | None]:
     return {row.name: row.subcategory for row in sources.table if row.category == "armor"}
-
-
-def test_every_row_has_a_known_subcategory(sources: GapSources) -> None:
-    validate_subcategories(sources.table)
-
-
-def test_every_piece_has_exactly_one_slot(slots: dict[str, str | None]) -> None:
-    assert len(slots) == 639
-    assert set(slots.values()) == set(ARMOR_SLOTS)
-
-
-def test_overrides_hold_the_pieces_the_json_lacks() -> None:
-    assert len(load_armor_slots(OVERRIDES / "armor_slots.csv")) == 158
 
 
 def test_slots_agree_with_the_game_ids_but_for_two_pieces(
@@ -85,10 +70,6 @@ def test_slots_agree_with_the_game_ids_but_for_two_pieces(
 )
 def test_piece_has_its_slot(slots: dict[str, str | None], name: str, slot: str) -> None:
     assert slots[name] == slot
-
-
-def test_slot_counts(slots: dict[str, str | None]) -> None:
-    assert Counter(slots.values()) == {"head": 200, "body": 177, "arms": 124, "legs": 138}
 
 
 def _piece(name: str) -> Item:

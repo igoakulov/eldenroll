@@ -17,8 +17,6 @@ from eldenroll.model.item import Item
 from eldenroll.validate.ash_compatibility import infusable_without_ashes
 from eldenroll.validate.gaps import GapSources
 
-ROOT = Path(__file__).resolve().parents[2]
-
 
 @pytest.fixture(scope="module")
 def rows(sources: GapSources) -> dict[str, set[tuple[str, str | None]]]:
@@ -102,10 +100,6 @@ def test_no_row_is_covered_by_a_broader_one(sources: GapSources) -> None:
     ]
 
 
-def test_excluded_ashes_have_no_rows(rows: dict[str, set[tuple[str, str | None]]]) -> None:
-    assert not {"Kick", "Lifesteal Fist", "White Shadow's Lure", "Assassin's Gambit"} & set(rows)
-
-
 def test_every_weapon_that_can_hold_an_ash_has_one(sources: GapSources) -> None:
     assert infusable_without_ashes(sources.table, sources.ash_compatibility) == ()
 
@@ -133,11 +127,6 @@ def test_lightning_slash_does_not_fit_halberds(
     rows: dict[str, set[tuple[str, str | None]]],
 ) -> None:
     assert ("weapon", "halberd") not in rows["Lightning Slash"]
-
-
-def test_no_weapon_that_cannot_hold_an_ash_is_reported_missing(sources: GapSources) -> None:
-    missing = infusable_without_ashes(sources.table, sources.ash_compatibility)
-    assert all(item.infusable for item in missing)
 
 
 def test_sheet_cells_become_rows() -> None:

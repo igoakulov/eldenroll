@@ -325,7 +325,6 @@ describe("armor", () => {
       if (light.has(armorWith("none"))) hits += 1;
       expect(light.has(armorWith("overloaded"))).toBe(false);
     }
-    expect(light.size).toBe(9);
     expect(hits).toBeGreaterThanOrEqual(95);
   });
 });

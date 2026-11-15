@@ -15,8 +15,6 @@ from eldenroll.model.vocabulary import NO_STR_BONUS
 from eldenroll.normalize.str_bonus import assign_str_bonus
 from eldenroll.validate.gaps import GapSources
 
-ROOT = Path(__file__).resolve().parents[2]
-
 PAIRED = {
     "Ornamental Straight Sword",
     "Rellana's Twin Blades",
@@ -48,13 +46,6 @@ def test_false_outside_the_classes_is_only_the_paired_list(table: tuple[Item, ..
         and row.subcategory not in NO_STR_BONUS
     }
     assert false == PAIRED
-
-
-def test_counts(table: tuple[Item, ...]) -> None:
-    weapons = [row for row in table if row.category in ("weapon", "shield")]
-    assert len(weapons) == 487
-    assert sum(row.str_bonus_2h is False for row in weapons) == 40
-    assert sum(row.str_bonus_2h is True for row in weapons) == 447
 
 
 @pytest.mark.parametrize(

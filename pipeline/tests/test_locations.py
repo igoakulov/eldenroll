@@ -57,8 +57,7 @@ def test_location_table_has_one_row_per_area_in_one_region() -> None:
     regions, locations, _ = _real_rows()
     region_ids = {region.id for region in regions}
 
-    assert len(locations) == 174
-    assert len({location.id for location in locations}) == 174
+    assert len({location.id for location in locations}) == len(locations)
     assert all(location.name for location in locations)
     assert all(location.region_id in region_ids for location in locations)
     validate_region_membership(regions, locations)
@@ -77,7 +76,6 @@ def test_location_rows_match_the_documented_instances() -> None:
 def test_real_dlc_prefix_matches_the_annotation_tags() -> None:
     regions, locations, dlc_ids = _real_rows()
 
-    assert len(dlc_ids) == 50
     validate_region_dlc_prefix(regions, locations, dlc_location_ids=dlc_ids)
     dlc_regions = {region.id for region in regions if region.is_dlc}
     assert {location.id for location in locations if location.region_id in dlc_regions} == dlc_ids

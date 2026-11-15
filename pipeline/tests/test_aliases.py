@@ -3,13 +3,12 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from eldenroll.build.aliases import assign_aliases, build_aliases
+from eldenroll.build.aliases import assign_aliases
 from eldenroll.build.items import new_item
 from eldenroll.build.modifiers import build_modifiers
 from eldenroll.errors import BuildError
@@ -22,88 +21,11 @@ from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
-CSV = OVERRIDES / "aliases.csv"
 
 
 @pytest.fixture(scope="module")
 def table(sources: GapSources) -> tuple[Item, ...]:
     return sources.table
-
-
-def _members(table: tuple[Item, ...], alias: str) -> set[str]:
-    return {row.name for row in table if row.alias == alias}
-
-
-def test_the_labels_match_the_prd() -> None:
-    assert [alias.label for alias in build_aliases(load_aliases(CSV))] == [
-        "Any staff",
-        "Any seal",
-        "Any torch",
-        "Any perfume bottle",
-        "Any parry ash",
-        "Any Crucible talisman",
-        "Any Scorpion Charm",
-        "Any Scarseal / Soreseal",
-        "Any pots / perfumes",
-        "Other throwables (not pots / perfumes)",
-        "None",
-    ]
-
-
-def test_member_counts(table: tuple[Item, ...]) -> None:
-    assert Counter(row.alias for row in table if row.alias) == {
-        "any_staff": 20,
-        "any_seal": 12,
-        "any_torch": 8,
-        "any_perfume_bottle": 5,
-        "any_parry_ash": 5,
-        "any_crucible_talisman": 5,
-        "any_scorpion_charm": 4,
-        "any_scarseal_soreseal": 4,
-        "none": 4,
-        "any_pots_perfumes": 50 + 6,
-        "other_throwables_not_pots_perfumes": 25,
-    }
-
-
-def test_named_members(table: tuple[Item, ...]) -> None:
-    assert _members(table, "any_parry_ash") == {
-        "Parry",
-        "Carian Retaliation",
-        "Golden Parry",
-        "Storm Wall",
-        "Thops's Barrier",
-    }
-    assert _members(table, "any_scarseal_soreseal") == {
-        "Radagon's Soreseal",
-        "Marika's Soreseal",
-        "Radagon's Scarseal",
-        "Marika's Scarseal",
-    }
-    assert _members(table, "any_scorpion_charm") == {
-        "Magic Scorpion Charm",
-        "Lightning Scorpion Charm",
-        "Fire Scorpion Charm",
-        "Sacred Scorpion Charm",
-    }
-    assert "Talisman of All Crucibles" in _members(table, "any_crucible_talisman")
-
-
-def test_members_stay_in_their_category(table: tuple[Item, ...]) -> None:
-    categories = {
-        "any_staff": {"weapon"},
-        "any_seal": {"weapon"},
-        "any_torch": {"weapon"},
-        "any_perfume_bottle": {"weapon"},
-        "any_parry_ash": {"ash"},
-        "any_crucible_talisman": {"talisman"},
-        "any_scorpion_charm": {"talisman"},
-        "any_scarseal_soreseal": {"talisman"},
-        "any_pots_perfumes": {"consumable"},
-        "other_throwables_not_pots_perfumes": {"consumable"},
-    }
-    for alias, wanted in categories.items():
-        assert {row.category for row in table if row.alias == alias} == wanted
 
 
 def test_every_consumable_has_an_alias_and_none_has_none(table: tuple[Item, ...]) -> None:

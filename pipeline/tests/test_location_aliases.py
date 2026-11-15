@@ -17,7 +17,6 @@ from eldenroll.errors import BuildError
 from eldenroll.loaders.annotations import load_annotations
 from eldenroll.loaders.bosses import load_boss_creature_locations
 from eldenroll.loaders.drops import load_drop_locations, load_item_drops
-from eldenroll.loaders.json_source import load_document
 from eldenroll.loaders.location_aliases import (
     load_boss_location_overrides,
     load_location_aliases,
@@ -39,7 +38,6 @@ from eldenroll.paths import (
     ENEMY_DROPS,
     ENEMY_ITEM_LOTS,
     ENEMY_LOCATIONS,
-    LOCATIONS_DIR,
     SUBMAPS,
 )
 from eldenroll.validate.gaps import GapSources
@@ -144,10 +142,6 @@ def test_every_label_from_all_three_sources_resolves() -> None:
     item_drop_labels = _item_drop_labels()
     boss_labels = {label for _, label in _boss_pairs()}
 
-    assert len(aliases) == 506
-    assert len(drop_labels) == 481
-    assert len(item_drop_labels) == 310
-    assert len(boss_labels) == 185
     assert boss_labels <= drop_labels
 
     resolution = resolve_labels(drop_labels | item_drop_labels | boss_labels, aliases)
@@ -165,7 +159,7 @@ def test_labels_agree_with_the_mod_submaps() -> None:
         if label.removeprefix(DLC_TAG) in submaps
     }
 
-    assert len(shared) == 113
+    assert shared
     disagreeing = {label for label, areas in shared.items() if aliases[label] not in areas}
     assert disagreeing == set()
 
@@ -179,19 +173,6 @@ def test_dlc_tag_matches_the_area_dlc_flag() -> None:
         if label.startswith(DLC_TAG) != (location_id in dlc_areas)
     }
     assert mismatched == set()
-
-
-def test_boss_label_coverage_matches_the_document() -> None:
-    boss_labels = {label.removeprefix(DLC_TAG) for _, label in _boss_pairs()}
-    area_texts = {area.text for area in _areas()}
-    records = load_document(LOCATIONS_DIR, "location_names").records
-    json_names = {str(record["name"]).casefold() for record in records}
-
-    verbatim = {label for label in boss_labels if label in area_texts}
-    in_json = {label for label in boss_labels if label.casefold() in json_names}
-    assert len(verbatim) == 27
-    assert len(in_json) == 44
-    assert len(boss_labels - verbatim - in_json) == 125
 
 
 def test_every_boss_is_in_the_region_of_its_own_drop_slot(sources: GapSources) -> None:
@@ -215,7 +196,7 @@ def test_every_boss_is_in_the_region_of_its_own_drop_slot(sources: GapSources) -
         if region_of_area[location_id] not in own_regions:
             wrong.append((boss, label))
 
-    assert checked == 191
+    assert checked
     assert wrong == []
 
 

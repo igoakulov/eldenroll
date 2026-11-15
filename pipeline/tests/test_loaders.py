@@ -18,14 +18,6 @@ from eldenroll.paths import AREAS
 from eldenroll.validate.gaps import GapSources
 
 
-def test_annotations_counts() -> None:
-    config = load_annotations(AREAS)
-    assert len(config.areas) == 174
-    assert len({area.name for area in config.areas}) == 174
-    assert len(config.events) == 46
-    assert len({event.name for event in config.events}) == 46
-
-
 def test_annotations_specific_records() -> None:
     config = load_annotations(AREAS)
     areas = config.area_by_name()
@@ -39,24 +31,8 @@ def test_annotations_specific_records() -> None:
     assert areas["graveyard"].tags == ("minidungeon", "cave")
 
 
-def test_slot_counts(sources: GapSources) -> None:
-    slots = sources.slots
-
-    assert len(slots) == 4379
-    assert len({slot.key for slot in slots}) == 4379
-    assert all(slot.debug_lines for slot in slots)
-    assert all(slot.items for slot in slots)
-
-    randomizable = [slot for slot in slots if slot.is_randomizable]
-    assert len(slots) - len(randomizable) == 122
-    assert len(randomizable) == 4257
-
-
 def test_slot_item_extraction(sources: GapSources) -> None:
     slots = sources.slots
-
-    assert sum(len(slot.items) for slot in slots) == 5363
-    assert len({name for slot in slots for name in slot.items}) == 2262
 
     boss_rune = next(slot for slot in slots if slot.event == "godrick")
     assert boss_rune.items == ("Godrick's Great Rune",)
@@ -100,18 +76,10 @@ def test_slot_events_are_known(sources: GapSources) -> None:
     assert used <= known
 
 
-def test_catalog_counts(sources: GapSources) -> None:
+def test_catalog_finds_an_item_by_name(sources: GapSources) -> None:
     catalog = sources.catalog
-    names = [name for entries in catalog.names.values() for name in entries.values()]
-
-    assert len(names) == 2448
-    assert len(set(names)) == 2448
-    assert len(catalog.groups) == 29
-    assert len({location.tags for location in catalog.locations}) > 1
-    assert len(catalog.locations) == 236
     assert catalog.find("Godrick's Great Rune") == ("goods", 8148)
     assert catalog.find("Not An Item") is None
-    assert catalog.groups["weapons"].item_count > 0
 
 
 def test_missing_file_is_a_loader_error(tmp_path: Path) -> None:

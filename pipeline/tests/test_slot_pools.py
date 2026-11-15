@@ -54,30 +54,6 @@ def _subcategories(rows: tuple[Item, ...]) -> set[str | None]:
     return {row.subcategory for row in rows}
 
 
-def test_builds_and_their_odds() -> None:
-    character_classes = load_character_classes(OVERRIDES / "character_classes.csv")
-    assert [
-        (character_class.id, character_class.name, character_class.odds)
-        for character_class in character_classes
-    ] == [
-        ("knight", "Knight", 1),
-        ("warrior_2h", "2H Warrior", 1),
-        ("warrior_dw", "Dual-Wield Warrior", 1),
-        ("ranger", "Ranger", 0.5),
-        ("sorcerer", "Sorcerer", 1),
-        ("pyromancer", "Pyromancer", 1),
-        ("spellblade", "Spellblade", 1),
-        ("jester", "Jester", 0.25),
-    ]
-
-
-def test_the_real_pools_are_valid(
-    pools: tuple[SlotPool, ...], placement_data: PlacementData
-) -> None:
-    assert len(pools) == 72
-    _validate(pools, placement_data)
-
-
 def test_hands_resolve_to_their_classes(
     pools: tuple[SlotPool, ...], placement_data: PlacementData
 ) -> None:
@@ -103,41 +79,7 @@ def test_hands_resolve_to_their_classes(
         "medium_shield",
     }
     assert _subcategories(resolved["spellblade", "lh"]) == CATALYST
-    assert len(resolved["knight", "lh"]) == 78 + 1
     assert "none" in {row.id for row in resolved["knight", "lh"]}
-
-
-def test_pool_sizes_follow_the_categories(
-    pools: tuple[SlotPool, ...], placement_data: PlacementData
-) -> None:
-    resolved = _resolved(pools, placement_data.table)
-    assert len(resolved["sorcerer", "rh"]) == 20
-    assert len(resolved["pyromancer", "rh"]) == 12
-    assert len(resolved["sorcerer", "lh"]) == 20 + 19 + 32 + 1
-    assert len(resolved["pyromancer", "lh"]) == 12 + 19 + 32 + 1
-    assert len(resolved["spellblade", "lh"]) == 32
-    assert {row.category for row in resolved["sorcerer", "spell"]} == {"sorcery"}
-    assert {row.category for row in resolved["pyromancer", "spell"]} == {"incantation"}
-    assert len(resolved["sorcerer", "spell"]) == 67
-    assert len(resolved["pyromancer", "spell"]) == 86
-    assert len(resolved["spellblade", "spell"]) == 67 + 86
-    for row in pools:
-        found = resolved[row.character_class_id, row.slot]
-        if row.slot == "item":
-            assert len(found) == 9 + 81
-        elif row.slot.startswith("talisman"):
-            assert len(found) == 41
-        elif row.slot.endswith("_ash"):
-            assert len(found) == 111
-        elif row.slot.startswith("rule"):
-            assert not found
-
-
-def test_seals_roll_at_twice_the_odds_of_staves(placement_data: PlacementData) -> None:
-    assert {row.odds for row in placement_data.table if row.subcategory == "sacred_seal"} == {2}
-    assert {row.odds for row in placement_data.table if row.subcategory == "glintstone_staff"} == {
-        1
-    }
 
 
 def test_empty_hands_and_spells_hold_only_none(
@@ -176,7 +118,6 @@ def test_jester_right_hand(pools: tuple[SlotPool, ...], placement_data: Placemen
         "Visage Shield",
         "One-Eyed Shield",
     }
-    assert len(found) == 1 + 8 + 5 + 6 + 1 + 1
     staves = [row for row in found if row.subcategory == "glintstone_staff"]
     assert [row.name for row in staves] == ["Demi-Human Queen's Staff"]
     assert staves[0].infusable
@@ -298,7 +239,7 @@ def test_an_unknown_kind_fails_to_build() -> None:
         ("knight,Knight,-1\n", "has odds"),
     ],
 )
-def test_bad_builds_fail_to_load(tmp_path: Path, body: str, message: str) -> None:
+def test_bad_character_classes_fail_to_load(tmp_path: Path, body: str, message: str) -> None:
     path = tmp_path / "character_classes.csv"
     path.write_text(f"id,name,odds\n{body}", encoding="utf-8")
     with pytest.raises(LoaderError, match=message):

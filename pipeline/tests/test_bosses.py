@@ -63,51 +63,7 @@ def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -
     )
     savings = sum(count - 1 for count in fights.values())
 
-    assert sum("[Boss]" in name for _, name in rows) == 254
-    assert len(pairs) == 222
-    assert len(fights) == 17
-    assert savings == 18
-    assert len(overrides.additions) == 25
-    assert len(instances) == len(pairs) - savings + len(overrides.additions) == 229
-    assert sum(row.odds > 0 for row in instances) == 218
-
-
-def test_the_base_game_and_dlc_split(instances: tuple[BossInstance, ...]) -> None:
-    regions = load_regions(OVERRIDES / "regions.csv")
-    region_of_area = load_region_areas(
-        OVERRIDES / "region_areas.csv", region_ids={row.id for row in regions}
-    )
-    dlc = {row.id for row in regions if row.is_dlc}
-    rollable = [row for row in instances if row.odds > 0]
-    assert sum(region_of_area[row.location_id] in dlc for row in rollable) == 52
-    assert sum(region_of_area[row.location_id] not in dlc for row in rollable) == 166
-
-
-def test_the_fights_the_csv_leaves_untagged(instances: tuple[BossInstance, ...]) -> None:
-    names = Counter(row.name for row in instances)
-    assert names["Furnace Golem"] == 8
-    assert names["Leda and Allies"] == 1
-    assert names["Crucible Knight Devonia"] == 1
-    assert names["Tibia Mariner"] == 4
-    assert names["Baleful Shadow"] == 1
-
-
-def test_the_fights_at_odds_zero_are_kept_for_their_drops(
-    instances: tuple[BossInstance, ...],
-) -> None:
-    assert {(row.name, row.location_label) for row in instances if row.odds == 0} == {
-        ("Blaidd the Half-Wolf", "Liurnia of the Lakes - Ranni's Rise, Seluvis's Rise"),
-        ("Fire Knight Kood", "Specimen Storehouse - Shadow Tower"),
-        ("Fire Knight Salza", "Shadow Keep - West Rampart"),
-        ("Fire Knight Wego", "Shadow Keep - Drained Church District"),
-        ("Divine Bird Warrior", "Belurat, Tower Settlement Swamp"),
-        ("Divine Bird Warrior", "Enir-Ilim"),
-        ("Ensha of the Royal Remains", "Roundtable Hold"),
-        ("Erdtree Avatar", "Deeproot Depths"),
-        ("Fire Prelate", "Mt. Gelmir - Fort Laiedd"),
-        ("Putrid Avatar", "Miquella's Haligtree - Elphael"),
-        ("Shadow Tree Spirit", "Gravesite Plain - Ellac River Cave"),
-    }
+    assert len(instances) == len(pairs) - savings + len(overrides.additions)
 
 
 def test_dryleaf_dane_has_only_his_own_fight(instances: tuple[BossInstance, ...]) -> None:

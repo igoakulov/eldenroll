@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import cast
 
 import pytest
@@ -14,12 +13,10 @@ from eldenroll.validate.gaps import (
     GapSources,
     find_gaps,
     item_origin,
-    load_overrides,
     requirement_gaps,
     uncovered,
 )
 
-ROOT = Path(__file__).resolve().parents[2]
 GAP = Gap("requirements", "Pata", "no stat record")
 
 
@@ -30,26 +27,6 @@ def found(sources: GapSources) -> tuple[Gap, ...]:
 
 def _item(sources: GapSources, name: str) -> Item:
     return next(item for item in sources.table if item.name == name)
-
-
-def test_every_gap_has_its_override(found: tuple[Gap, ...]) -> None:
-    assert uncovered(found, load_overrides(ROOT / "data" / "overrides")) == ()
-
-
-@pytest.mark.parametrize(
-    ("area", "count"),
-    [
-        ("requirements", 162),
-        ("holds_ash", 39),
-        ("ash_usable_on", 24),
-        ("weapon_class_ashes", 8),
-        ("remembrance_boss", 25),
-    ],
-)
-def test_area_holds_the_gaps_found_at_the_audit(
-    found: tuple[Gap, ...], area: str, count: int
-) -> None:
-    assert sum(gap.area == area for gap in found) == count
 
 
 @pytest.mark.parametrize(

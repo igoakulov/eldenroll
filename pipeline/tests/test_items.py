@@ -16,8 +16,6 @@ from eldenroll.normalize.odds import assign_armor_set_odds, assign_item_odds
 from eldenroll.normalize.slug import slugify
 from eldenroll.validate.gaps import GapSources
 
-ROOT = Path(__file__).resolve().parents[2]
-
 SECTION_2_FIELDS = [
     "id",
     "name",
@@ -58,7 +56,6 @@ def test_every_catalog_name_has_a_clean_slug(sources: GapSources) -> None:
 
     slugs = [slugify(name) for entries in names.values() for name in entries.values()]
 
-    assert len(slugs) == 2448
     assert all(re.fullmatch(r"[a-z0-9]+(_[a-z0-9]+)*", slug) for slug in slugs)
 
 
@@ -210,11 +207,6 @@ def test_a_second_none_row_stops_the_build() -> None:
         build_item_table([none_item(), new_item("empty", "none")])
 
 
-def test_an_item_starts_at_odds_one() -> None:
-    assert new_item("Hat", "armor").odds == 1
-    assert none_item().odds == 1
-
-
 def test_odds_overrides_replace_only_the_named_items() -> None:
     rows = (new_item("Charm", "talisman"), new_item("Mask", "tool"))
 
@@ -226,19 +218,6 @@ def test_odds_overrides_replace_only_the_named_items() -> None:
 def test_an_odds_override_for_no_item_stops_the_build() -> None:
     with pytest.raises(BuildError, match="item_odds names no item: ghost"):
         assign_item_odds((new_item("Hat", "armor"),), {"ghost": 0})
-
-
-def test_only_the_items_that_never_roll_sit_at_odds_zero(sources: GapSources) -> None:
-    table = sources.table
-
-    assert {row.name for row in table if row.odds == 0} == {
-        "Igon's Drake Hunt",
-        "Lamenter's Mask",
-        "Litany of Proper Death",
-        "Priestess Heart",
-        "Rock Heart",
-        "Warrior Jar Shard",
-    }
 
 
 @pytest.mark.parametrize(

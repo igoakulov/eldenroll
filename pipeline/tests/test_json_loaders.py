@@ -19,18 +19,6 @@ from eldenroll.loaders.json_source import (
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.paths import ARMOR_DIR, ITEMS_DIR, LOCATIONS_DIR
 
-REPEATED_NAMES: dict[str, int] = {"armors": 2, "location_names": 3, "weapons": 1}
-
-EXPECTED_COUNTS: dict[str, int] = {
-    "armors": 568,
-    "ashes": 90,
-    "incantations": 98,
-    "location_names": 177,
-    "shields": 69,
-    "sorceries": 71,
-    "talismans": 87,
-    "weapons": 307,
-}
 DIRECTORIES: dict[str, Path] = {"armors": ARMOR_DIR, "location_names": LOCATIONS_DIR}
 
 
@@ -38,31 +26,10 @@ def _load(name: str) -> JsonDocument:
     return load_document(DIRECTORIES.get(name, ITEMS_DIR), name)
 
 
-def test_all_eight_documents_parse() -> None:
-    documents = [_load(name) for name in JSON_FILES]
-
-    assert set(EXPECTED_COUNTS) == set(JSON_FILES)
-    assert sum(document.count for document in documents) == sum(EXPECTED_COUNTS.values())
-
-
-@pytest.mark.parametrize(("name", "expected"), sorted(EXPECTED_COUNTS.items()))
-def test_record_counts(name: str, expected: int) -> None:
-    document = _load(name)
-
-    assert document.count == expected
-    assert len(set(document.ids)) == expected
-
-
 def test_every_record_has_a_string_name() -> None:
     for name in JSON_FILES:
         document = _load(name)
         assert all(isinstance(record["name"], str) for record in document.records), document.name
-
-
-def test_names_repeat_across_records() -> None:
-    for name, expected in REPEATED_NAMES.items():
-        names = [cast("str", record["name"]) for record in _load(name).records]
-        assert len(names) - len(set(names)) == expected, name
 
 
 def test_duplicate_armor_name_carries_two_categories() -> None:

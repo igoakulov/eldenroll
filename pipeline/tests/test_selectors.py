@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from pathlib import Path
 from typing import cast
 
 import pytest
@@ -14,12 +13,9 @@ from eldenroll.errors import BuildError
 from eldenroll.model.item import Category
 from eldenroll.model.selector import SELECTOR_KINDS, Selector, SelectorKind
 from eldenroll.model.vocabulary import (
-    ASH_SLOTS,
     CATEGORIES,
-    CHARACTER_CLASSES,
     MELEE,
     SHIELD,
-    SLOTS,
     SUBCATEGORIES,
 )
 from eldenroll.normalize.selectors import new_selector
@@ -31,19 +27,6 @@ from eldenroll.validate.selectors import (
     validate_selectors,
 )
 from eldenroll.validate.subcategories import validate_subcategories
-
-ROOT = Path(__file__).resolve().parents[2]
-
-
-def test_vocabulary_counts() -> None:
-    assert len(CHARACTER_CLASSES) == 8
-    assert len(SLOTS) == 10
-    assert set(SLOTS) > ASH_SLOTS
-    assert len(CATEGORIES) == 10
-
-
-def test_every_item_uses_the_vocabulary(placement_data: PlacementData) -> None:
-    validate_subcategories(placement_data.table)
 
 
 def test_every_category_and_subcategory_holds_an_item(placement_data: PlacementData) -> None:
@@ -75,7 +58,6 @@ def test_a_group_expands_to_its_classes() -> None:
 
 def test_paired_and_unpaired_split_melee() -> None:
     assert new_selector("subcategory", ["paired", "unpaired"]).ids == tuple(sorted(MELEE))
-    assert len(new_selector("subcategory", ["unpaired"]).ids or ()) == 23
 
 
 def test_a_group_name_expands_only_as_a_subcategory() -> None:

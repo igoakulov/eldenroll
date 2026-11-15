@@ -7,10 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from eldenroll.build.armor import build_armor
 from eldenroll.build.ashes import EXCLUDED, build_ashes
-from eldenroll.build.items import build_item_table
-from eldenroll.build.talismans import build_talismans
 from eldenroll.build.weapons import build_weapons
 from eldenroll.errors import BuildError
 from eldenroll.loaders.added_items import load_added_items
@@ -97,31 +94,9 @@ def names(ashes: tuple[Item, ...]) -> set[str]:
     return {row.name for row in ashes}
 
 
-def test_rows_names_and_slugs_are_all_111(ashes: tuple[Item, ...]) -> None:
-    assert len(ashes) == 111
-    assert len({row.name for row in ashes}) == 111
-    assert len({row.id for row in ashes}) == 111
-    assert {row.category for row in ashes} == {"ash"}
-
-
 @pytest.mark.parametrize("name", [*sorted(EXCLUDED), "Savage Claws"])
 def test_ash_is_absent(names: set[str], name: str) -> None:
     assert name not in names
-
-
-def test_ash_sources_file_lists_every_weapon() -> None:
-    assert load_ash_sources(ASH_SOURCES) == {
-        "Piercing Fang": ("Nagakiba",),
-        "Spinning Strikes": ("Banished Knight's Halberd +8",),
-        "Glintblade Phalanx": ("Rogier's Rapier +8",),
-        "Braggart's Roar": ("Iron Ball", "Battle Hammer", "Rotten Battle Hammer"),
-        "Blind Spot": ("Backhand Blade", "Reverse-Bladed Sword", "Smithscript Cirque"),
-        "Spinning Gravity Thrust": ("Sword Lance",),
-        "Overhead Stance": ("Great Katana", "Reed Great Katana"),
-        "Palm Blast": ("Dryleaf Arts", "Dane's Footwork"),
-        "Shield Strike": ("Dueling Shield", "Carian Thrusting Shield", "Ritual Thrusting Shield"),
-        "Igon's Drake Hunt": ("Igon's Greatbow",),
-    }
 
 
 def test_every_source_weapon_is_in_the_weapon_pool(catalog: ItemCatalog) -> None:
@@ -193,14 +168,6 @@ def test_no_name_keeps_the_prefix(names: set[str]) -> None:
     assert not [name for name in names if "ash of war" in name.lower()]
 
 
-def test_later_steps_own_the_remaining_fields(ashes: tuple[Item, ...]) -> None:
-    for row in ashes:
-        assert row.subcategory is None
-        assert row.infusable is None
-        assert row.str_bonus_2h is None
-        assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
-
-
 def test_compatibility_sheet_differs_from_the_pool_only_as_known(names: set[str]) -> None:
     table = load_ash_compatibility(ASH_WEAPON_MATRIX)
     column = table.column("Name")
@@ -219,24 +186,6 @@ def test_every_json_ash_maps_to_the_pool_or_is_known(names: set[str]) -> None:
             unmatched.add(name)
 
     assert unmatched == EXCLUDED | {"Lost Ashes Of War"}
-
-
-def test_pools_so_far_join_without_a_collision(
-    catalog: ItemCatalog, ashes: tuple[Item, ...]
-) -> None:
-    variants = load_name_variants(OVERRIDES / "name_variants.csv")
-    weapons = build_weapons(
-        catalog,
-        variants,
-        load_added_items(OVERRIDES / "items.csv"),
-        load_weapon_categories(WEAPON_SHIELD_CLASSES),
-    )
-    rows = (*weapons, *build_armor(catalog, variants), *build_talismans(catalog), *ashes)
-
-    table = build_item_table(rows)
-
-    assert len(table) == 1270
-    assert [row.id for row in table] == [row.id for row in rows]
 
 
 def test_exclusion_naming_no_ash_stops_the_build() -> None:

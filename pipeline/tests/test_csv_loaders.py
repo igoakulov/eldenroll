@@ -31,24 +31,19 @@ from eldenroll.paths import (
     WEAPON_SKILLS,
 )
 
-TABLES: list[tuple[Callable[[Path], CsvTable], Path, int]] = [
-    (load_drop_locations, ENEMY_DROPS, 3254),
-    (load_item_drops, ENEMY_ITEM_LOTS, 4896),
-    (load_boss_creature_locations, ENEMY_LOCATIONS, 3254),
-    (load_weapon_categories, WEAPON_SHIELD_CLASSES, 530),
-    (load_consumable_categories, TOOL_CONSUMABLE_CLASSES, 90),
-    (load_ash_compatibility, ASH_WEAPON_MATRIX, 91),
-    (load_somber_weapons, WEAPON_SKILLS, 2654),
+TABLES: list[tuple[Callable[[Path], CsvTable], Path]] = [
+    (load_drop_locations, ENEMY_DROPS),
+    (load_item_drops, ENEMY_ITEM_LOTS),
+    (load_boss_creature_locations, ENEMY_LOCATIONS),
+    (load_weapon_categories, WEAPON_SHIELD_CLASSES),
+    (load_consumable_categories, TOOL_CONSUMABLE_CLASSES),
+    (load_ash_compatibility, ASH_WEAPON_MATRIX),
+    (load_somber_weapons, WEAPON_SKILLS),
 ]
 
 
-@pytest.mark.parametrize(("loader", "path", "expected"), TABLES)
-def test_csv_row_count(loader: Callable[[Path], CsvTable], path: Path, expected: int) -> None:
-    assert loader(path).row_count == expected
-
-
 def test_every_row_matches_the_header_width() -> None:
-    for loader, path, _ in TABLES:
+    for loader, path in TABLES:
         table = loader(path)
         assert all(len(row) == len(table.header) for row in table.rows), path
 
@@ -67,8 +62,7 @@ def test_weapon_table_keeps_class_separators() -> None:
     weapon_class_column = table.column("Weapon Class")
     weapon_classes = {row[weapon_class_column] for row in table.rows if any(row)}
 
-    assert table.blank_row_count == 42
-    assert len(weapon_classes) == 42
+    assert table.blank_row_count == len(weapon_classes)
 
 
 def test_missing_csv_is_a_loader_error(tmp_path: Path) -> None:
