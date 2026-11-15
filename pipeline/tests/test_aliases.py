@@ -18,7 +18,7 @@ from eldenroll.loaders.modifiers import load_modifiers
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.item import Item
 from eldenroll.model.modifier import RolledCondition
-from eldenroll.validate.gaps import load_sources
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
@@ -26,8 +26,8 @@ CSV = OVERRIDES / "aliases.csv"
 
 
 @pytest.fixture(scope="module")
-def table() -> tuple[Item, ...]:
-    return load_sources(ROOT).table
+def table(sources: GapSources) -> tuple[Item, ...]:
+    return sources.table
 
 
 def _members(table: tuple[Item, ...], alias: str) -> set[str]:

@@ -11,11 +11,11 @@ from pathlib import Path
 import pytest
 
 from eldenroll.loaders.annotations import load_annotations
-from eldenroll.loaders.iteminfo import load_item_catalog
-from eldenroll.loaders.itemslots import extract_items, load_slots
+from eldenroll.loaders.itemslots import extract_items
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.loaders.yaml_source import load_mapping
-from eldenroll.paths import AREAS, ITEM_INFO, ITEM_SLOTS
+from eldenroll.paths import AREAS
+from eldenroll.validate.gaps import GapSources
 
 
 def test_annotations_counts() -> None:
@@ -39,8 +39,8 @@ def test_annotations_specific_records() -> None:
     assert areas["graveyard"].tags == ("minidungeon", "cave")
 
 
-def test_slot_counts() -> None:
-    slots = load_slots(ITEM_SLOTS)
+def test_slot_counts(sources: GapSources) -> None:
+    slots = sources.slots
 
     assert len(slots) == 4379
     assert len({slot.key for slot in slots}) == 4379
@@ -52,8 +52,8 @@ def test_slot_counts() -> None:
     assert len(randomizable) == 4257
 
 
-def test_slot_item_extraction() -> None:
-    slots = load_slots(ITEM_SLOTS)
+def test_slot_item_extraction(sources: GapSources) -> None:
+    slots = sources.slots
 
     assert sum(len(slot.items) for slot in slots) == 5363
     assert len({name for slot in slots for name in slot.items}) == 2262
@@ -81,9 +81,9 @@ def test_extract_items_ignores_prose() -> None:
     assert extract_items(lines) == ("Golden Rune [1]", "Ash of War: Spinning Weapon")
 
 
-def test_slot_areas_are_known() -> None:
+def test_slot_areas_are_known(sources: GapSources) -> None:
     config = load_annotations(AREAS)
-    slots = load_slots(ITEM_SLOTS)
+    slots = sources.slots
     known = {area.name for area in config.areas}
 
     used = {slot.area for slot in slots if slot.is_randomizable}
@@ -91,17 +91,17 @@ def test_slot_areas_are_known() -> None:
     assert {slot.area for slot in slots} - known == {"unknown"}
 
 
-def test_slot_events_are_known() -> None:
+def test_slot_events_are_known(sources: GapSources) -> None:
     config = load_annotations(AREAS)
-    slots = load_slots(ITEM_SLOTS)
+    slots = sources.slots
     known = {event.name for event in config.events}
 
     used = {slot.event for slot in slots if slot.event is not None}
     assert used <= known
 
 
-def test_catalog_counts() -> None:
-    catalog = load_item_catalog(ITEM_INFO)
+def test_catalog_counts(sources: GapSources) -> None:
+    catalog = sources.catalog
     names = [name for entries in catalog.names.values() for name in entries.values()]
 
     assert len(names) == 2448
@@ -122,11 +122,7 @@ def test_missing_file_is_a_loader_error(tmp_path: Path) -> None:
 def test_unexpected_field_is_a_loader_error(tmp_path: Path) -> None:
     source = tmp_path / "annotations.txt"
     source.write_text(
-        "Areas:\n"
-        "- Name: limgrave\n"
-        "  Text: Limgrave\n"
-        "  Surprise: yes\n"
-        "Events: []\n",
+        "Areas:\n- Name: limgrave\n  Text: Limgrave\n  Surprise: yes\nEvents: []\n",
         encoding="utf-8",
     )
     with pytest.raises(LoaderError, match="unexpected field"):

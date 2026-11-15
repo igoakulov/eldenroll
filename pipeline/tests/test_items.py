@@ -9,14 +9,12 @@ import pytest
 
 from eldenroll.build.items import build_item_table, new_item, none_item
 from eldenroll.errors import BuildError
-from eldenroll.loaders.iteminfo import load_item_catalog
 from eldenroll.loaders.odds import load_odds
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.armor_set import ArmorSet
 from eldenroll.normalize.odds import assign_armor_set_odds, assign_item_odds
 from eldenroll.normalize.slug import slugify
-from eldenroll.paths import ITEM_INFO
-from eldenroll.validate.gaps import load_sources
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -55,8 +53,8 @@ def test_slug_of_a_name(name: str, slug: str) -> None:
     assert slugify(name) == slug
 
 
-def test_every_catalog_name_has_a_clean_slug() -> None:
-    names = load_item_catalog(ITEM_INFO).names
+def test_every_catalog_name_has_a_clean_slug(sources: GapSources) -> None:
+    names = sources.catalog.names
 
     slugs = [slugify(name) for entries in names.values() for name in entries.values()]
 
@@ -230,8 +228,8 @@ def test_an_odds_override_for_no_item_stops_the_build() -> None:
         assign_item_odds((new_item("Hat", "armor"),), {"ghost": 0})
 
 
-def test_only_the_items_that_never_roll_sit_at_odds_zero() -> None:
-    table = load_sources(ROOT).table
+def test_only_the_items_that_never_roll_sit_at_odds_zero(sources: GapSources) -> None:
+    table = sources.table
 
     assert {row.name for row in table if row.odds == 0} == {
         "Igon's Drake Hunt",

@@ -15,18 +15,12 @@ from eldenroll.validate.gaps import (
     find_gaps,
     item_origin,
     load_overrides,
-    load_sources,
     requirement_gaps,
     uncovered,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
 GAP = Gap("requirements", "Pata", "no stat record")
-
-
-@pytest.fixture(scope="module")
-def sources() -> GapSources:
-    return load_sources(ROOT)
 
 
 @pytest.fixture(scope="module")

@@ -14,7 +14,7 @@ from typing import Any, cast
 import pytest
 
 from eldenroll.build import database as build_database
-from eldenroll.build.database import gate_problems, import_report, main, write_artifacts
+from eldenroll.build.database import gate_problems, import_report, main
 from eldenroll.build.serialize import TABLE_FIELDS, database_rows, render
 from eldenroll.errors import BuildError
 from eldenroll.model.ash_compatibility import AshCompatibility
@@ -22,18 +22,13 @@ from eldenroll.model.database import Database
 from eldenroll.model.item_location import ItemLocation
 from eldenroll.model.modifier import CharacterClassCondition, Modifier
 from eldenroll.model.selector import Selector
-from eldenroll.validate.gate_data import GateData, load_gate_data
+from eldenroll.validate.gate_data import GateData
 from eldenroll.validate.quality import quality_problems
 from eldenroll.validate.structure import several_top_tiers, structure_problems
 
 ROOT = Path(__file__).resolve().parents[2]
 PIPELINE = ROOT / "pipeline"
 Change = Callable[[Database], Database]
-
-
-@pytest.fixture(scope="module")
-def data() -> GateData:
-    return load_gate_data(ROOT)
 
 
 def _without_item(item_id: str) -> Change:
@@ -96,9 +91,7 @@ def _add_location_row(row: ItemLocation) -> Change:
 
 
 def _add_ash_row(row: AshCompatibility) -> Change:
-    return lambda database: replace(
-        database, ash_compatibility=(*database.ash_compatibility, row)
-    )
+    return lambda database: replace(database, ash_compatibility=(*database.ash_compatibility, row))
 
 
 def _drop_rows_of(item_id: str) -> Change:
@@ -132,8 +125,8 @@ def _alias_nobody_uses(database: Database) -> Database:
     return replace(database, aliases=(*database.aliases, alias))
 
 
-def test_the_real_data_passes_the_gate(data: GateData) -> None:
-    assert gate_problems(data) == ()
+def test_the_real_data_passes_the_gate(gate_data: GateData) -> None:
+    assert gate_problems(gate_data) == ()
 
 
 @pytest.mark.parametrize(
@@ -173,22 +166,22 @@ def test_the_real_data_passes_the_gate(data: GateData) -> None:
     ],
 )
 def test_a_broken_table_is_a_structure_problem(
-    data: GateData, change: Change, message: str
+    gate_data: GateData, change: Change, message: str
 ) -> None:
-    problems = structure_problems(replace(data, database=change(data.database)))
+    problems = structure_problems(replace(gate_data, database=change(gate_data.database)))
     assert any(message in problem for problem in problems), problems
 
 
-def test_off_tier_values_do_not_fail_the_spacing(data: GateData) -> None:
-    assert {0.5, 3, 5, 67} <= {row.value for row in data.database.modifiers}
+def test_off_tier_values_do_not_fail_the_spacing(gate_data: GateData) -> None:
+    assert {0.5, 3, 5, 67} <= {row.value for row in gate_data.database.modifiers}
     change = _add_modifier(_modifier("just_under_a_guarantee", 99))
-    assert structure_problems(replace(data, database=change(data.database))) == ()
+    assert structure_problems(replace(gate_data, database=change(gate_data.database))) == ()
 
 
-def test_several_top_tiers_are_reported_not_rejected(data: GateData) -> None:
-    top = several_top_tiers(data.database.modifiers, data.database.items)
+def test_several_top_tiers_are_reported_not_rejected(gate_data: GateData) -> None:
+    top = several_top_tiers(gate_data.database.modifiers, gate_data.database.items)
     assert {"jump_attacks_only", "l2_only", "charged_r2_only"} <= set(top["rule"])
-    assert not any("top" in problem for problem in structure_problems(data))
+    assert not any("top" in problem for problem in structure_problems(gate_data))
 
 
 @pytest.mark.parametrize(
@@ -204,26 +197,28 @@ def test_several_top_tiers_are_reported_not_rejected(data: GateData) -> None:
         (_set_item("serpent_hunter", name="Spear"), "listed name has no row: Serpent-Hunter"),
     ],
 )
-def test_a_broken_table_is_a_quality_problem(data: GateData, change: Change, message: str) -> None:
-    problems = quality_problems(replace(data, database=change(data.database)))
+def test_a_broken_table_is_a_quality_problem(
+    gate_data: GateData, change: Change, message: str
+) -> None:
+    problems = quality_problems(replace(gate_data, database=change(gate_data.database)))
     assert any(message in problem for problem in problems), problems
 
 
-def test_a_gap_with_no_override_is_a_quality_problem(data: GateData) -> None:
-    problems = quality_problems(replace(data, override_items={}))
+def test_a_gap_with_no_override_is_a_quality_problem(gate_data: GateData) -> None:
+    problems = quality_problems(replace(gate_data, override_items={}))
     assert any("answer it in requirements.csv" in problem for problem in problems)
 
 
-def test_the_tables_hold_exactly_the_documented_fields(data: GateData) -> None:
-    rows = database_rows(data.database)
+def test_the_tables_hold_exactly_the_documented_fields(gate_data: GateData) -> None:
+    rows = database_rows(gate_data.database)
     assert set(rows) == set(TABLE_FIELDS)
     for table, fields in TABLE_FIELDS.items():
         assert rows[table]
         assert all(tuple(row) == fields for row in rows[table])
 
 
-def test_a_modifier_writes_both_kinds_of_condition(data: GateData) -> None:
-    rows = {str(row["id"]): row for row in database_rows(data.database)["modifier"]}
+def test_a_modifier_writes_both_kinds_of_condition(gate_data: GateData) -> None:
+    rows = {str(row["id"]): row for row in database_rows(gate_data.database)["modifier"]}
     assert rows["jester_none_x6"] == {
         "id": "jester_none_x6",
         "when": [{"kind": "character_class", "ids": ["jester"]}],
@@ -240,8 +235,8 @@ def test_a_modifier_writes_both_kinds_of_condition(data: GateData) -> None:
     ]
 
 
-def test_whole_odds_read_as_whole_numbers(data: GateData) -> None:
-    rows = {str(row["id"]): row for row in database_rows(data.database)["character_class"]}
+def test_whole_odds_read_as_whole_numbers(gate_data: GateData) -> None:
+    rows = {str(row["id"]): row for row in database_rows(gate_data.database)["character_class"]}
     assert rows["knight"]["odds"] == 1
     assert isinstance(rows["knight"]["odds"], int)
     assert rows["jester"]["odds"] == 0.25
@@ -253,8 +248,8 @@ def test_render_is_json_with_a_row_on_a_line() -> None:
     assert '{"x": "é"}' in text.splitlines()
 
 
-def test_the_report_names_where_a_dropped_value_came_from(data: GateData) -> None:
-    report = import_report(data)
+def test_the_report_names_where_a_dropped_value_came_from(gate_data: GateData) -> None:
+    report = import_report(gate_data)
     dropped = cast("list[dict[str, object]]", report["dropped"])
     assert dropped
     assert all(set(row) == {"file", "key", "value", "count"} for row in dropped)
@@ -264,34 +259,42 @@ def test_the_report_names_where_a_dropped_value_came_from(data: GateData) -> Non
     assert any(row["file"] == "placement/enemy_item_lots.csv" for row in dropped)
 
 
-def test_a_pool_item_named_on_a_slot_is_not_dropped(data: GateData) -> None:
-    dropped = {row.value for row in data.dropped if row.file == "placement/item_slots.yaml"}
+def test_a_pool_item_named_on_a_slot_is_not_dropped(gate_data: GateData) -> None:
+    dropped = {row.value for row in gate_data.dropped if row.file == "placement/item_slots.yaml"}
     assert "Bloodhound's Fang" not in dropped
     assert "Smithing Stone [1]" in dropped
 
 
-def test_the_report_counts_the_tables(data: GateData) -> None:
-    report = import_report(data)
+def test_the_report_counts_the_tables(gate_data: GateData) -> None:
+    report = import_report(gate_data)
     counts = cast("dict[str, int]", report["counts"])
     assert counts["item"] == 1522
     assert counts["boss_instance"] == 229
     assert counts["slot_pool"] == 72
 
 
-def test_main_writes_both_files(tmp_path: Path) -> None:
+def test_main_writes_both_files_with_no_timestamp_or_path(
+    gate_data: GateData, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(build_database, "load_gate_data", _loaded(gate_data))
     assert main(["--out", str(tmp_path)]) == 0
-    tables = json.loads((tmp_path / "db.json").read_text(encoding="utf-8"))
-    assert set(tables) == set(TABLE_FIELDS)
-    assert len(tables["item"]) == 1522
+    text = (tmp_path / "db.json").read_text(encoding="utf-8")
+    assert set(json.loads(text)) == set(TABLE_FIELDS)
+    assert str(ROOT) not in text
+    assert "builtAt" not in text
     assert (tmp_path / "import-report.json").exists()
 
 
 def test_main_fails_and_writes_nothing_on_a_problem(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    gate_data: GateData,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     def broken(_: GateData) -> tuple[str, ...]:
         return ("something broke",)
 
+    monkeypatch.setattr(build_database, "load_gate_data", _loaded(gate_data))
     monkeypatch.setattr(build_database, "structure_problems", broken)
     assert main(["--out", str(tmp_path)]) == 1
     assert list(tmp_path.iterdir()) == []
@@ -310,11 +313,8 @@ def test_main_fails_when_a_source_cannot_be_built(
     assert "no such boss" in capsys.readouterr().err
 
 
-def test_write_artifacts_holds_no_timestamp_or_path(data: GateData, tmp_path: Path) -> None:
-    write_artifacts(data, tmp_path)
-    text = (tmp_path / "db.json").read_text(encoding="utf-8")
-    assert str(ROOT) not in text
-    assert "builtAt" not in text
+def _loaded(data: GateData) -> Callable[[Path], GateData]:
+    return lambda _: data
 
 
 def _run_build(folder: Path, seed: str) -> None:

@@ -14,7 +14,7 @@ from eldenroll.loaders.armor_sets import load_armor_sets
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.vocabulary import ARMOR_SLOTS
 from eldenroll.paths import ARMOR_SETS_PAGE
-from eldenroll.validate.gaps import load_sources
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 SETS = ROOT / "data" / "overrides" / "armor_sets.csv"
@@ -143,18 +143,18 @@ def test_the_highland_warrior_set_is_split_in_two(sets: dict[str, tuple[str, ...
 
 
 def test_every_piece_is_in_the_pool_and_a_set_holds_one_per_slot(
-    sets: dict[str, tuple[str, ...]],
+    sources: GapSources, sets: dict[str, tuple[str, ...]]
 ) -> None:
-    slots = {
-        row.name: row.subcategory for row in load_sources(ROOT).table if row.category == "armor"
-    }
+    slots = {row.name: row.subcategory for row in sources.table if row.category == "armor"}
     for name, pieces in sets.items():
         assert set(pieces) <= set(slots), name
         assert max(Counter(slots[piece] for piece in pieces).values(), default=0) <= 1, name
 
 
-def test_every_piece_links_to_an_armor_row(sets: dict[str, tuple[str, ...]]) -> None:
-    table = load_sources(ROOT).table
+def test_every_piece_links_to_an_armor_row(
+    sources: GapSources, sets: dict[str, tuple[str, ...]]
+) -> None:
+    table = sources.table
     linked = build_armor_sets(sets, table)
     armor = {row.id: row for row in table if row.category == "armor"}
     assert len(linked) == len(sets)
@@ -164,8 +164,10 @@ def test_every_piece_links_to_an_armor_row(sets: dict[str, tuple[str, ...]]) -> 
         assert held == [slot for slot in ARMOR_SLOTS if slot in held]
 
 
-def test_the_docs_examples_link_as_written(sets: dict[str, tuple[str, ...]]) -> None:
-    linked = {row.id: row for row in build_armor_sets(sets, load_sources(ROOT).table)}
+def test_the_docs_examples_link_as_written(
+    sources: GapSources, sets: dict[str, tuple[str, ...]]
+) -> None:
+    linked = {row.id: row for row in build_armor_sets(sets, sources.table)}
     assert linked["raptors_set"].pieces == (
         "skeletal_mask",
         "raptors_black_feathers",

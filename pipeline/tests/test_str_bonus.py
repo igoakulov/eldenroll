@@ -13,7 +13,7 @@ from eldenroll.loaders.str_bonus import load_str_bonus
 from eldenroll.model.item import Item
 from eldenroll.model.vocabulary import NO_STR_BONUS
 from eldenroll.normalize.str_bonus import assign_str_bonus
-from eldenroll.validate.gaps import GapSources, load_sources
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -30,8 +30,7 @@ PAIRED = {
 
 
 @pytest.fixture(scope="module")
-def table() -> tuple[Item, ...]:
-    sources: GapSources = load_sources(ROOT)
+def table(sources: GapSources) -> tuple[Item, ...]:
     return sources.table
 
 

@@ -22,22 +22,20 @@ from eldenroll.errors import BuildError
 from eldenroll.loaders.added_items import load_added_items
 from eldenroll.loaders.ash_sources import load_ash_sources
 from eldenroll.loaders.consumables import load_consumable_categories
-from eldenroll.loaders.iteminfo import load_item_catalog
-from eldenroll.loaders.itemslots import load_slots
 from eldenroll.loaders.name_variants import load_name_variants
 from eldenroll.loaders.weapons import load_weapon_categories
 from eldenroll.model.item import Item
 from eldenroll.model.item_catalog import ItemCatalog
+from eldenroll.model.item_slot import ItemSlot
 from eldenroll.model.name_variant import NameVariant
 from eldenroll.normalize.placement_names import PlacementNames, placement_names
 from eldenroll.paths import (
     ENEMY_DROPS,
     ENEMY_ITEM_LOTS,
-    ITEM_INFO,
-    ITEM_SLOTS,
     TOOL_CONSUMABLE_CLASSES,
     WEAPON_SHIELD_CLASSES,
 )
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
@@ -75,8 +73,8 @@ SECTION_8_4: tuple[tuple[str, str], ...] = (
 
 
 @pytest.fixture(scope="module")
-def catalog() -> ItemCatalog:
-    return load_item_catalog(ITEM_INFO)
+def catalog(sources: GapSources) -> ItemCatalog:
+    return sources.catalog
 
 
 @pytest.fixture(scope="module")
@@ -114,9 +112,9 @@ def names(
     return placement_names(table, catalog, variants)
 
 
-def _slot_lines() -> Iterator[tuple[str, str]]:
+def _slot_lines(slots: tuple[ItemSlot, ...]) -> Iterator[tuple[str, str]]:
     """Yield `(area, line)` for every line of a randomizable slot."""
-    for slot in load_slots(ITEM_SLOTS):
+    for slot in slots:
         if slot.is_randomizable:
             for line in slot.debug_lines:
                 yield slot.area, line
@@ -241,17 +239,19 @@ def test_name_outside_the_pool_resolves_to_nothing(names: PlacementNames, source
     ],
 )
 def test_slot_line_id_tells_the_two_beast_claws_apart(
-    names: PlacementNames, needle: str, area: str, item_id: str
+    sources: GapSources, names: PlacementNames, needle: str, area: str, item_id: str
 ) -> None:
-    lines = [line for where, line in _slot_lines() if where == area and needle in line]
+    lines = [line for where, line in _slot_lines(sources.slots) if where == area and needle in line]
     assert len(lines) == 1
     item = names.resolve_slot_line(lines[0])
     assert item is not None
     assert item.id == item_id
 
 
-def test_golden_vow_slot_lines_never_reach_the_ash(names: PlacementNames) -> None:
-    lines = [line for _, line in _slot_lines() if line.startswith("Golden Vow - ")]
+def test_golden_vow_slot_lines_never_reach_the_ash(
+    sources: GapSources, names: PlacementNames
+) -> None:
+    lines = [line for _, line in _slot_lines(sources.slots) if line.startswith("Golden Vow - ")]
     assert len(lines) == 4
     assert [names.resolve_slot_line(line) for line in lines] == [None] * 4
 
@@ -261,9 +261,11 @@ def test_prose_line_resolves_to_nothing(names: PlacementNames) -> None:
 
 
 def test_every_rollable_item_but_the_weapon_only_ashes_is_named(
-    table: tuple[Item, ...], names: PlacementNames
+    sources: GapSources, table: tuple[Item, ...], names: PlacementNames
 ) -> None:
-    found = {item.id for _, line in _slot_lines() if (item := names.resolve_slot_line(line))}
+    found = {
+        item.id for _, line in _slot_lines(sources.slots) if (item := names.resolve_slot_line(line))
+    }
     found |= {item.id for name in _drop_names() if (item := names.resolve(name))}
     unnamed = {
         row.name
@@ -273,16 +275,22 @@ def test_every_rollable_item_but_the_weapon_only_ashes_is_named(
     assert unnamed == set(load_ash_sources(OVERRIDES / "ash_sources.csv"))
 
 
-def test_nox_pieces_come_only_from_the_drop_sheet(names: PlacementNames) -> None:
-    slot_ids = {item.id for _, line in _slot_lines() if (item := names.resolve_slot_line(line))}
+def test_nox_pieces_come_only_from_the_drop_sheet(
+    sources: GapSources, names: PlacementNames
+) -> None:
+    slot_ids = {
+        item.id for _, line in _slot_lines(sources.slots) if (item := names.resolve_slot_line(line))
+    }
     assert not {"nox_bracelets", "nox_greaves"} & slot_ids
     drop_ids = {item.id for name in _drop_names() if (item := names.resolve(name))}
     assert {"nox_bracelets", "nox_greaves"} <= drop_ids
 
 
-def test_new_unmatched_placement_name_fails(catalog: ItemCatalog, names: PlacementNames) -> None:
+def test_new_unmatched_placement_name_fails(
+    sources: GapSources, catalog: ItemCatalog, names: PlacementNames
+) -> None:
     known = {name for entries in catalog.names.values() for name in entries.values()}
-    slots = load_slots(ITEM_SLOTS)
+    slots = sources.slots
     slot_names = {name for slot in slots if slot.is_randomizable for name in slot.items}
     unknown = {
         name

@@ -12,14 +12,14 @@ from eldenroll.loaders.infusable import load_infusable
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.item import Item
 from eldenroll.normalize.infusable import assign_infusable
-from eldenroll.validate.gaps import load_sources
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 @pytest.fixture(scope="module")
-def table() -> tuple[Item, ...]:
-    return load_sources(ROOT).table
+def table(sources: GapSources) -> tuple[Item, ...]:
+    return sources.table
 
 
 @pytest.mark.parametrize(

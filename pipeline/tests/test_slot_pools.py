@@ -23,7 +23,7 @@ from eldenroll.model.item import Item
 from eldenroll.model.selector import Selector
 from eldenroll.model.vocabulary import CATALYST, MELEE, RANGED, UNPAIRED
 from eldenroll.normalize.selectors import new_selector
-from eldenroll.validate.placement import PlacementData, load_placement_data
+from eldenroll.validate.placement import PlacementData
 from eldenroll.validate.selectors import known_ids, resolve_items
 from eldenroll.validate.slot_pools import validate_slot_pools
 
@@ -33,18 +33,13 @@ RULES = tuple(rule.id for rule in load_combat_rules(OVERRIDES / "combat_rules.cs
 
 
 @pytest.fixture(scope="module")
-def data() -> PlacementData:
-    return load_placement_data(ROOT)
-
-
-@pytest.fixture(scope="module")
 def pools() -> tuple[SlotPool, ...]:
     return build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
 
 
-def _validate(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
-    known = known_ids(data.table, data.armor_sets, data.bosses, RULES)
-    validate_slot_pools(pools, data.table, known)
+def _validate(pools: tuple[SlotPool, ...], placement_data: PlacementData) -> None:
+    known = known_ids(placement_data.table, placement_data.armor_sets, placement_data.bosses, RULES)
+    validate_slot_pools(pools, placement_data.table, known)
 
 
 def _resolved(
@@ -76,13 +71,17 @@ def test_builds_and_their_odds() -> None:
     ]
 
 
-def test_the_real_pools_are_valid(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
+def test_the_real_pools_are_valid(
+    pools: tuple[SlotPool, ...], placement_data: PlacementData
+) -> None:
     assert len(pools) == 72
-    _validate(pools, data)
+    _validate(pools, placement_data)
 
 
-def test_hands_resolve_to_their_classes(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
-    resolved = _resolved(pools, data.table)
+def test_hands_resolve_to_their_classes(
+    pools: tuple[SlotPool, ...], placement_data: PlacementData
+) -> None:
+    resolved = _resolved(pools, placement_data.table)
     assert _subcategories(resolved["knight", "rh"]) == UNPAIRED | {"thrusting_shield"}
     assert _subcategories(resolved["warrior_2h", "rh"]) == MELEE | {"thrusting_shield"}
     assert _subcategories(resolved["warrior_dw", "rh"]) == MELEE
@@ -109,9 +108,9 @@ def test_hands_resolve_to_their_classes(pools: tuple[SlotPool, ...], data: Place
 
 
 def test_pool_sizes_follow_the_categories(
-    pools: tuple[SlotPool, ...], data: PlacementData
+    pools: tuple[SlotPool, ...], placement_data: PlacementData
 ) -> None:
-    resolved = _resolved(pools, data.table)
+    resolved = _resolved(pools, placement_data.table)
     assert len(resolved["sorcerer", "rh"]) == 20
     assert len(resolved["pyromancer", "rh"]) == 12
     assert len(resolved["sorcerer", "lh"]) == 20 + 19 + 32 + 1
@@ -134,15 +133,17 @@ def test_pool_sizes_follow_the_categories(
             assert not found
 
 
-def test_seals_roll_at_twice_the_odds_of_staves(data: PlacementData) -> None:
-    assert {row.odds for row in data.table if row.subcategory == "sacred_seal"} == {2}
-    assert {row.odds for row in data.table if row.subcategory == "glintstone_staff"} == {1}
+def test_seals_roll_at_twice_the_odds_of_staves(placement_data: PlacementData) -> None:
+    assert {row.odds for row in placement_data.table if row.subcategory == "sacred_seal"} == {2}
+    assert {row.odds for row in placement_data.table if row.subcategory == "glintstone_staff"} == {
+        1
+    }
 
 
 def test_empty_hands_and_spells_hold_only_none(
-    pools: tuple[SlotPool, ...], data: PlacementData
+    pools: tuple[SlotPool, ...], placement_data: PlacementData
 ) -> None:
-    resolved = _resolved(pools, data.table)
+    resolved = _resolved(pools, placement_data.table)
     empty = [
         ("warrior_2h", "lh"),
         ("ranger", "lh"),
@@ -155,8 +156,8 @@ def test_empty_hands_and_spells_hold_only_none(
         assert [row.id for row in resolved[key]] == ["none"], key
 
 
-def test_jester_right_hand(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
-    found = _resolved(pools, data.table)["jester", "rh"]
+def test_jester_right_hand(pools: tuple[SlotPool, ...], placement_data: PlacementData) -> None:
+    found = _resolved(pools, placement_data.table)["jester", "rh"]
     assert "none" in {row.id for row in found}
     assert _subcategories(found) == {
         None,
@@ -176,16 +177,16 @@ def test_jester_right_hand(pools: tuple[SlotPool, ...], data: PlacementData) -> 
         "One-Eyed Shield",
     }
     assert len(found) == 1 + 8 + 5 + 6 + 1 + 1
-    staves =[row for row in found if row.subcategory == "glintstone_staff"]
+    staves = [row for row in found if row.subcategory == "glintstone_staff"]
     assert [row.name for row in staves] == ["Demi-Human Queen's Staff"]
     assert staves[0].infusable
 
 
-def test_jester_staff_is_reachable_exactly_with_its_ash(data: PlacementData) -> None:
+def test_jester_staff_is_reachable_exactly_with_its_ash(placement_data: PlacementData) -> None:
     def regions(item: str) -> set[str]:
-        rows = [one.row for one in data.placements if one.row.item_id == item]
+        rows = [one.row for one in placement_data.placements if one.row.item_id == item]
         assert all(row.location_id for row in rows), f"{item} has a boss-tied row"
-        return {data.region_of_location[row.location_id or ""] for row in rows}
+        return {placement_data.region_of_location[row.location_id or ""] for row in rows}
 
     assert regions("demi_human_queens_staff") == regions("spinning_weapon") == {"limgrave"}
 
@@ -220,35 +221,35 @@ def _swap(
 )
 def test_out_of_scope_pools_fail(
     pools: tuple[SlotPool, ...],
-    data: PlacementData,
+    placement_data: PlacementData,
     character_class: str,
     slot: str,
     cell: str,
     message: str,
 ) -> None:
     with pytest.raises(BuildError, match=message):
-        _validate(_swap(pools, character_class, slot, cell), data)
+        _validate(_swap(pools, character_class, slot, cell), placement_data)
 
 
-def test_an_unknown_id_fails(pools: tuple[SlotPool, ...], data: PlacementData) -> None:
+def test_an_unknown_id_fails(pools: tuple[SlotPool, ...], placement_data: PlacementData) -> None:
     with pytest.raises(BuildError, match="selector matches nothing: item: typo"):
-        _validate(_swap(pools, "knight", "item", "item:typo"), data)
+        _validate(_swap(pools, "knight", "item", "item:typo"), placement_data)
 
 
 def test_missing_extra_repeated_and_empty_rows_fail(
-    pools: tuple[SlotPool, ...], data: PlacementData
+    pools: tuple[SlotPool, ...], placement_data: PlacementData
 ) -> None:
     missing = tuple(row for row in pools if (row.character_class_id, row.slot) != ("knight", "lh"))
     with pytest.raises(BuildError, match="knight lacks lh"):
-        _validate(missing, data)
+        _validate(missing, placement_data)
     extra = (*pools, SlotPool("sorcerer", "rh_ash", (Selector("category", ("ash",)),)))
     with pytest.raises(BuildError, match="sorcerer should not have rh_ash"):
-        _validate(extra, data)
+        _validate(extra, placement_data)
     with pytest.raises(BuildError, match="knight rh repeats"):
-        _validate((*pools, pools[0]), data)
+        _validate((*pools, pools[0]), placement_data)
     empty = (replace(pools[0], selectors=()), *pools[1:])
     with pytest.raises(BuildError, match="knight rh has no selector"):
-        _validate(empty, data)
+        _validate(empty, placement_data)
 
 
 def test_selector_cells_parse(tmp_path: Path) -> None:

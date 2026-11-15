@@ -15,14 +15,9 @@ from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.ash_compatibility import AshCompatibility
 from eldenroll.model.item import Item
 from eldenroll.validate.ash_compatibility import infusable_without_ashes
-from eldenroll.validate.gaps import GapSources, load_sources
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
-
-
-@pytest.fixture(scope="module")
-def sources() -> GapSources:
-    return load_sources(ROOT)
 
 
 @pytest.fixture(scope="module")
@@ -240,7 +235,5 @@ def test_bad_override_row_stops_the_load(tmp_path: Path, line: str, message: str
 
 def test_blank_subcategory_is_the_whole_category(tmp_path: Path) -> None:
     path = tmp_path / "ash_compatibility.csv"
-    path.write_text(
-        "ash,category,subcategory,reason\nA,shield,,why\n", encoding="utf-8"
-    )
+    path.write_text("ash,category,subcategory,reason\nA,shield,,why\n", encoding="utf-8")
     assert load_ash_overrides(path) == (AshOverride("A", "shield", None),)

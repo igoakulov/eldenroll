@@ -12,11 +12,11 @@ from pathlib import Path
 import pytest
 
 from eldenroll.loaders.annotations import load_annotations
-from eldenroll.loaders.itemslots import load_slots
 from eldenroll.loaders.region_areas import load_region_areas
 from eldenroll.loaders.regions import load_regions
 from eldenroll.loaders.schema import LoaderError
-from eldenroll.paths import AREAS, ITEM_SLOTS
+from eldenroll.paths import AREAS
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 REGIONS_CSV = ROOT / "data" / "overrides" / "regions.csv"
@@ -84,10 +84,10 @@ def test_area_counts_per_region_match_the_document() -> None:
     assert {level: counts[region_id] for region_id, level in region_ids.items()} == EXPECTED_AREAS
 
 
-def test_slot_counts_per_region_match_the_document() -> None:
+def test_slot_counts_per_region_match_the_document(sources: GapSources) -> None:
     region_ids = _region_ids()
     areas = load_region_areas(AREAS_CSV, region_ids=region_ids)
-    slots = load_slots(ITEM_SLOTS)
+    slots = sources.slots
     per_area = Counter(slot.area for slot in slots if slot.is_randomizable)
 
     assert all(area in per_area for area in areas)

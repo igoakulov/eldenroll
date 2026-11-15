@@ -17,7 +17,6 @@ from eldenroll.errors import BuildError
 from eldenroll.loaders.annotations import load_annotations
 from eldenroll.loaders.bosses import load_boss_creature_locations
 from eldenroll.loaders.drops import load_drop_locations, load_item_drops
-from eldenroll.loaders.itemslots import load_slots
 from eldenroll.loaders.json_source import load_document
 from eldenroll.loaders.location_aliases import (
     load_boss_location_overrides,
@@ -34,15 +33,16 @@ from eldenroll.loaders.schema import (
 )
 from eldenroll.loaders.yaml_source import load_mapping
 from eldenroll.model.annotations import Area
+from eldenroll.model.item_slot import ItemSlot
 from eldenroll.paths import (
     AREAS,
     ENEMY_DROPS,
     ENEMY_ITEM_LOTS,
     ENEMY_LOCATIONS,
-    ITEM_SLOTS,
     LOCATIONS_DIR,
     SUBMAPS,
 )
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
@@ -106,9 +106,7 @@ def _boss_pairs() -> set[tuple[str, str]]:
     table = load_boss_creature_locations(ENEMY_LOCATIONS)
     label = table.column("Location")
     name = table.column("Name")
-    return {
-        (_boss_identity(row[name]), row[label]) for row in table.rows if "[Boss]" in row[name]
-    }
+    return {(_boss_identity(row[name]), row[label]) for row in table.rows if "[Boss]" in row[name]}
 
 
 def _submap_areas() -> dict[str, set[str]]:
@@ -127,10 +125,10 @@ def _submap_areas() -> dict[str, set[str]]:
     return named
 
 
-def _slot_lines_by_label() -> dict[str, list[tuple[str, str]]]:
+def _slot_lines_by_label(slots: tuple[ItemSlot, ...]) -> dict[str, list[tuple[str, str]]]:
     """Return `{label: [(slot area, lowercase placement line)]}` for randomizable slots."""
     lines: dict[str, list[tuple[str, str]]] = defaultdict(list)
-    for slot in load_slots(ITEM_SLOTS):
+    for slot in slots:
         if not slot.is_randomizable:
             continue
         for line in slot.debug_lines:
@@ -196,11 +194,11 @@ def test_boss_label_coverage_matches_the_document() -> None:
     assert len(boss_labels - verbatim - in_json) == 125
 
 
-def test_every_boss_is_in_the_region_of_its_own_drop_slot() -> None:
+def test_every_boss_is_in_the_region_of_its_own_drop_slot(sources: GapSources) -> None:
     aliases = _aliases()
     overrides = _boss_overrides(aliases)
     region_of_area = _region_of_area()
-    lines = _slot_lines_by_label()
+    lines = _slot_lines_by_label(sources.slots)
 
     checked = 0
     wrong: list[tuple[str, str]] = []

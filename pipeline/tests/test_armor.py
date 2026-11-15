@@ -12,14 +12,14 @@ from eldenroll.build.items import build_item_table
 from eldenroll.build.weapons import build_weapons
 from eldenroll.errors import BuildError
 from eldenroll.loaders.added_items import load_added_items
-from eldenroll.loaders.iteminfo import load_item_catalog
 from eldenroll.loaders.json_source import load_document
 from eldenroll.loaders.name_variants import load_name_variants
 from eldenroll.loaders.weapons import load_weapon_categories
 from eldenroll.model.item import Item
 from eldenroll.model.item_catalog import CatalogGroup, ItemCatalog
 from eldenroll.model.name_variant import NameVariant
-from eldenroll.paths import ARMOR_DIR, ITEM_INFO, WEAPON_SHIELD_CLASSES
+from eldenroll.paths import ARMOR_DIR, WEAPON_SHIELD_CLASSES
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
@@ -69,8 +69,8 @@ def _catalog(names: dict[int, str]) -> ItemCatalog:
 
 
 @pytest.fixture(scope="module")
-def catalog() -> ItemCatalog:
-    return load_item_catalog(ITEM_INFO)
+def catalog(sources: GapSources) -> ItemCatalog:
+    return sources.catalog
 
 
 @pytest.fixture(scope="module")

@@ -10,15 +10,13 @@ import pytest
 from eldenroll.build.items import new_item
 from eldenroll.errors import BuildError
 from eldenroll.loaders.armor_slots import load_armor_slots
-from eldenroll.loaders.iteminfo import load_item_catalog
 from eldenroll.loaders.name_variants import load_name_variants
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.item import Item
 from eldenroll.model.name_variant import NameVariant
 from eldenroll.model.vocabulary import ARMOR_SLOTS
 from eldenroll.normalize.armor_slots import assign_armor_slots
-from eldenroll.paths import ITEM_INFO
-from eldenroll.validate.gaps import GapSources, load_sources
+from eldenroll.validate.gaps import GapSources
 from eldenroll.validate.subcategories import validate_subcategories
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,11 +25,6 @@ OVERRIDES = ROOT / "data" / "overrides"
 # armors.json lists these as chests, though their game ids read as head pieces.
 ID_MISLEADS = {"Commoner's Simple Garb", "Lazuli Robe"}
 ID_DIGITS = {0: "head", 1: "body", 2: "arms", 3: "legs"}
-
-
-@pytest.fixture(scope="module")
-def sources() -> GapSources:
-    return load_sources(ROOT)
 
 
 @pytest.fixture(scope="module")
@@ -52,8 +45,10 @@ def test_overrides_hold_the_pieces_the_json_lacks() -> None:
     assert len(load_armor_slots(OVERRIDES / "armor_slots.csv")) == 158
 
 
-def test_slots_agree_with_the_game_ids_but_for_two_pieces(slots: dict[str, str | None]) -> None:
-    catalog = load_item_catalog(ITEM_INFO)
+def test_slots_agree_with_the_game_ids_but_for_two_pieces(
+    sources: GapSources, slots: dict[str, str | None]
+) -> None:
+    catalog = sources.catalog
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     by_id = {
         variants[str(item_id)].canonical_name if str(item_id) in variants else name: item_id

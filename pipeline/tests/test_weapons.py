@@ -13,7 +13,6 @@ from eldenroll.build.weapons import build_weapons
 from eldenroll.errors import BuildError
 from eldenroll.loaders.added_items import load_added_items
 from eldenroll.loaders.csv_source import CsvTable
-from eldenroll.loaders.iteminfo import load_item_catalog
 from eldenroll.loaders.json_source import load_document
 from eldenroll.loaders.name_variants import load_name_variants
 from eldenroll.loaders.schema import LoaderError
@@ -21,7 +20,8 @@ from eldenroll.loaders.weapons import load_weapon_categories
 from eldenroll.model.item import Item
 from eldenroll.model.item_catalog import CatalogGroup, ItemCatalog
 from eldenroll.model.name_variant import NameVariant
-from eldenroll.paths import ITEM_INFO, ITEMS_DIR, WEAPON_SHIELD_CLASSES
+from eldenroll.paths import ITEMS_DIR, WEAPON_SHIELD_CLASSES
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
@@ -110,9 +110,9 @@ def _sheet(*rows: tuple[str, str]) -> CsvTable:
 
 
 @pytest.fixture(scope="module")
-def weapons() -> tuple[Item, ...]:
+def weapons(sources: GapSources) -> tuple[Item, ...]:
     return build_weapons(
-        load_item_catalog(ITEM_INFO),
+        sources.catalog,
         load_name_variants(OVERRIDES / "name_variants.csv"),
         load_added_items(OVERRIDES / "items.csv"),
         load_weapon_categories(WEAPON_SHIELD_CLASSES),
@@ -278,9 +278,7 @@ def test_added_weapon_without_a_class_stops_the_build() -> None:
 
 def test_sheet_name_that_is_no_weapon_stops_the_build() -> None:
     with pytest.raises(BuildError, match="unknown weapon"):
-        build_weapons(
-            _catalog({1: "Dagger"}), {}, (), _sheet(("Axe", "Dagger"), ("Axe", "Stray"))
-        )
+        build_weapons(_catalog({1: "Dagger"}), {}, (), _sheet(("Axe", "Dagger"), ("Axe", "Stray")))
 
 
 def test_sheet_repeating_a_name_stops_the_build() -> None:

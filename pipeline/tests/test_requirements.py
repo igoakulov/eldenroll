@@ -13,15 +13,15 @@ from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.item import Item
 from eldenroll.model.name_variant import NameVariant
 from eldenroll.normalize.requirements import assign_requirements, readable_stats
-from eldenroll.validate.gaps import load_sources
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 BEARS_STATS = ("weapon", "shield", "sorcery", "incantation")
 
 
 @pytest.fixture(scope="module")
-def table() -> tuple[Item, ...]:
-    return load_sources(ROOT).table
+def table(sources: GapSources) -> tuple[Item, ...]:
+    return sources.table
 
 
 def _stats(row: Item) -> tuple[int, int, int, int, int]:

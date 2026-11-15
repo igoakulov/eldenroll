@@ -20,11 +20,11 @@ from eldenroll.loaders.added_items import load_added_items
 from eldenroll.loaders.ash_sources import load_ash_sources
 from eldenroll.loaders.consumables import load_consumable_categories
 from eldenroll.loaders.csv_source import CsvTable
-from eldenroll.loaders.iteminfo import load_item_catalog
 from eldenroll.loaders.name_variants import load_name_variants
 from eldenroll.loaders.weapons import load_weapon_categories
 from eldenroll.model.item import Item
-from eldenroll.paths import ITEM_INFO, TOOL_CONSUMABLE_CLASSES, WEAPON_SHIELD_CLASSES
+from eldenroll.paths import TOOL_CONSUMABLE_CLASSES, WEAPON_SHIELD_CLASSES
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
@@ -103,8 +103,10 @@ def test_later_steps_own_the_remaining_fields(consumables: tuple[Item, ...]) -> 
         assert (row.req_str, row.req_dex, row.req_int, row.req_fth, row.req_arc) == (0, 0, 0, 0, 0)
 
 
-def test_the_whole_catalog_joins_into_1514_rows(consumables: tuple[Item, ...]) -> None:
-    catalog = load_item_catalog(ITEM_INFO)
+def test_the_whole_catalog_joins_into_1514_rows(
+    sources: GapSources, consumables: tuple[Item, ...]
+) -> None:
+    catalog = sources.catalog
     variants = load_name_variants(OVERRIDES / "name_variants.csv")
     pools = {
         "weapons": build_weapons(

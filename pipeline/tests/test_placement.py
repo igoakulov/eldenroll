@@ -27,12 +27,11 @@ from eldenroll.model.item_location import ItemLocation
 from eldenroll.model.item_slot import ItemSlot
 from eldenroll.model.region import ASHEN_CAPITAL, ROYAL_CAPITAL, SHUNNING_GROUNDS
 from eldenroll.normalize.placement_names import PlacementNames, placement_names
-from eldenroll.validate.gaps import GapSources, load_sources
+from eldenroll.validate.gaps import GapSources
 from eldenroll.validate.placement import (
     PlacementData,
     eligible_items,
     eligible_sets,
-    load_placement_data,
     needs_location,
     row_counts,
     selected_locations,
@@ -44,66 +43,61 @@ RAMPARTSIDE = "Altus Plateau - Rampartside Path, Altus Tunnel Entrance"
 MOONFOLK = "Moonlight Altar - Moonfolk Ruins"
 
 
-@pytest.fixture(scope="module")
-def sources() -> GapSources:
-    return load_sources(ROOT)
-
-
-@pytest.fixture(scope="module")
-def data(sources: GapSources) -> PlacementData:
-    return load_placement_data(ROOT, sources)
-
-
-def _item(data: PlacementData, name: str, category: str | None = None) -> Item:
+def _item(placement_data: PlacementData, name: str, category: str | None = None) -> Item:
     return next(
         item
-        for item in data.table
+        for item in placement_data.table
         if item.name == name and category in (None, item.category)
     )
 
 
-def _places(data: PlacementData, name: str, category: str | None = None) -> set[str]:
+def _places(placement_data: PlacementData, name: str, category: str | None = None) -> set[str]:
     """Return an item's rows, a location as its id and a boss as `name @ label`."""
-    item_id = _item(data, name, category).id
-    bosses = {boss.id: boss for boss in data.bosses}
+    item_id = _item(placement_data, name, category).id
+    bosses = {boss.id: boss for boss in placement_data.bosses}
     return {
-        row.location_id or f"{bosses[str(row.boss_instance_id)].name} @ "
+        row.location_id
+        or f"{bosses[str(row.boss_instance_id)].name} @ "
         f"{bosses[str(row.boss_instance_id)].location_label}"
-        for row in item_locations(data.placements)
+        for row in item_locations(placement_data.placements)
         if row.item_id == item_id
     }
 
 
-def _bosses_of(data: PlacementData, name: str, category: str | None = None) -> set[str]:
+def _bosses_of(placement_data: PlacementData, name: str, category: str | None = None) -> set[str]:
     """Return the names of the bosses an item is tied to."""
-    item_id = _item(data, name, category).id
-    bosses = {boss.id: boss for boss in data.bosses}
+    item_id = _item(placement_data, name, category).id
+    bosses = {boss.id: boss for boss in placement_data.bosses}
     return {
         bosses[row.boss_instance_id].name
-        for row in item_locations(data.placements)
+        for row in item_locations(placement_data.placements)
         if row.item_id == item_id and row.boss_instance_id is not None
     }
 
 
-def test_every_item_but_consumables_has_a_row(data: PlacementData) -> None:
-    placed = {row.item_id for row in item_locations(data.placements)}
-    wanted = {item.id for item in data.table if needs_location(item, data.found_nowhere)}
+def test_every_item_but_consumables_has_a_row(placement_data: PlacementData) -> None:
+    placed = {row.item_id for row in item_locations(placement_data.placements)}
+    wanted = {
+        item.id
+        for item in placement_data.table
+        if needs_location(item, placement_data.found_nowhere)
+    }
 
     assert len(wanted) == 1436
     assert wanted - placed == set()
 
 
-def test_no_consumable_and_not_none_has_a_row(data: PlacementData) -> None:
-    placed = {row.item_id for row in item_locations(data.placements)}
-    consumables = {item.id for item in data.table if item.category == "consumable"}
+def test_no_consumable_and_not_none_has_a_row(placement_data: PlacementData) -> None:
+    placed = {row.item_id for row in item_locations(placement_data.placements)}
+    consumables = {item.id for item in placement_data.table if item.category == "consumable"}
 
     assert len(consumables) == 81
     assert placed & consumables == set()
     assert "none" not in placed
 
 
-def test_rows_are_distinct(data: PlacementData) -> None:
-    rows = item_locations(data.placements)
+def test_rows_are_distinct(placement_data: PlacementData) -> None:
+    rows = item_locations(placement_data.placements)
 
     assert len(rows) == len(set(rows))
 
@@ -123,11 +117,11 @@ def test_every_boss_tag_in_the_sources_is_known(sources: GapSources) -> None:
     assert tags == BOSS_SLOT_TAGS | BOSS_SHOP_TAGS
 
 
-def test_no_row_is_at_the_roundtable(data: PlacementData) -> None:
-    locations = {row.location_id for row in item_locations(data.placements)}
+def test_no_row_is_at_the_roundtable(placement_data: PlacementData) -> None:
+    locations = {row.location_id for row in item_locations(placement_data.placements)}
 
     assert "roundtable" not in locations
-    assert _places(data, "Rogier's Rapier") == {"limgrave"}
+    assert _places(placement_data, "Rogier's Rapier") == {"limgrave"}
 
 
 @pytest.mark.parametrize(
@@ -163,8 +157,10 @@ def test_no_row_is_at_the_roundtable(data: PlacementData) -> None:
         ("Serpent-Hunter", "Godskin Noble"),
     ],
 )
-def test_a_fight_drop_is_tied_to_its_boss(data: PlacementData, item: str, boss: str) -> None:
-    assert boss in _bosses_of(data, item)
+def test_a_fight_drop_is_tied_to_its_boss(
+    placement_data: PlacementData, item: str, boss: str
+) -> None:
+    assert boss in _bosses_of(placement_data, item)
 
 
 @pytest.mark.parametrize(
@@ -179,24 +175,24 @@ def test_a_fight_drop_is_tied_to_its_boss(data: PlacementData, item: str, boss: 
     ],
 )
 def test_an_item_a_later_quest_unlocks_is_found_only_there(
-    data: PlacementData, item: str, areas: set[str]
+    placement_data: PlacementData, item: str, areas: set[str]
 ) -> None:
-    item_id = _item(data, item).id
-    rows = [row for row in item_locations(data.placements) if row.item_id == item_id]
+    item_id = _item(placement_data, item).id
+    rows = [row for row in item_locations(placement_data.placements) if row.item_id == item_id]
     assert {row.location_id for row in rows} == areas
 
 
-def test_gostoc_sells_before_godrick_dies(data: PlacementData) -> None:
-    assert _bosses_of(data, "Bandit Garb") == set()
+def test_gostoc_sells_before_godrick_dies(placement_data: PlacementData) -> None:
+    assert _bosses_of(placement_data, "Bandit Garb") == set()
 
 
-def test_either_of_two_bosses_can_open_one_item(data: PlacementData) -> None:
-    item = _item(data, "Erdtree Bow", None).id
-    rows = [row for row in item_locations(data.placements) if row.item_id == item]
+def test_either_of_two_bosses_can_open_one_item(placement_data: PlacementData) -> None:
+    item = _item(placement_data, "Erdtree Bow", None).id
+    rows = [row for row in item_locations(placement_data.placements) if row.item_id == item]
     assert all(row.location_id is None for row in rows)
     labels = {
         (boss.name, boss.location_label)
-        for boss in data.bosses
+        for boss in placement_data.bosses
         if boss.id in {row.boss_instance_id for row in rows}
     }
     assert labels == {
@@ -221,14 +217,16 @@ def test_either_of_two_bosses_can_open_one_item(data: PlacementData) -> None:
         ("Horned Bairn", "Shadow Tree Spirit"),
     ],
 )
-def test_a_boss_at_odds_zero_holds_its_drop(data: PlacementData, item: str, boss: str) -> None:
-    assert boss in _bosses_of(data, item)
+def test_a_boss_at_odds_zero_holds_its_drop(
+    placement_data: PlacementData, item: str, boss: str
+) -> None:
+    assert boss in _bosses_of(placement_data, item)
 
 
-def test_every_boss_at_odds_zero_ties_an_item(data: PlacementData) -> None:
-    tied = {row.boss_instance_id for row in item_locations(data.placements)}
+def test_every_boss_at_odds_zero_ties_an_item(placement_data: PlacementData) -> None:
+    tied = {row.boss_instance_id for row in item_locations(placement_data.placements)}
 
-    assert {boss.id for boss in data.bosses if boss.odds == 0} <= tied
+    assert {boss.id for boss in placement_data.bosses if boss.odds == 0} <= tied
 
 
 @pytest.mark.parametrize(
@@ -244,98 +242,106 @@ def test_every_boss_at_odds_zero_ties_an_item(data: PlacementData) -> None:
         ("Rennala's Full Moon", "Rennala, Queen of the Full Moon @ Academy of Raya Lucaria"),
     ],
 )
-def test_what_enia_sells_is_tied_to_the_boss(data: PlacementData, item: str, place: str) -> None:
-    assert _places(data, item) == {place}
+def test_what_enia_sells_is_tied_to_the_boss(
+    placement_data: PlacementData, item: str, place: str
+) -> None:
+    assert _places(placement_data, item) == {place}
 
 
-def test_enia_gives_no_row_at_the_roundtable_or_limgrave(data: PlacementData) -> None:
-    assert not any(place == "limgrave" for place in _places(data, "Hand of Malenia"))
+def test_enia_gives_no_row_at_the_roundtable_or_limgrave(placement_data: PlacementData) -> None:
+    assert not any(place == "limgrave" for place in _places(placement_data, "Hand of Malenia"))
 
 
-def test_ash_takes_its_weapons_rows_boss_tied_ones_too(data: PlacementData) -> None:
-    assert _places(data, "Spinning Gravity Thrust") == _places(data, "Sword Lance")
-    assert _bosses_of(data, "Spinning Gravity Thrust") == {"Commander Gaius"}
-    assert _places(data, "Glintblade Phalanx", "ash") == _places(data, "Rogier's Rapier")
-    assert _places(data, "Piercing Fang") == _places(data, "Nagakiba")
-    assert _places(data, "Braggart's Roar") >= _places(data, "Battle Hammer")
-    assert _bosses_of(data, "Palm Blast") == {"Leda and Allies", "Dryleaf Dane"}
+def test_ash_takes_its_weapons_rows_boss_tied_ones_too(placement_data: PlacementData) -> None:
+    assert _places(placement_data, "Spinning Gravity Thrust") == _places(
+        placement_data, "Sword Lance"
+    )
+    assert _bosses_of(placement_data, "Spinning Gravity Thrust") == {"Commander Gaius"}
+    assert _places(placement_data, "Glintblade Phalanx", "ash") == _places(
+        placement_data, "Rogier's Rapier"
+    )
+    assert _places(placement_data, "Piercing Fang") == _places(placement_data, "Nagakiba")
+    assert _places(placement_data, "Braggart's Roar") >= _places(placement_data, "Battle Hammer")
+    assert _bosses_of(placement_data, "Palm Blast") == {"Leda and Allies", "Dryleaf Dane"}
 
 
-def test_a_fleeing_dragon_is_at_its_final_location_only(data: PlacementData) -> None:
-    assert _places(data, "Lansseax's Glaive") == {f"Ancient Dragon Lansseax @ {RAMPARTSIDE}"}
-    assert _places(data, "Adula's Moonblade") == {f"Glintstone Dragon Adula @ {MOONFOLK}"}
-    locations = {boss.name: boss.location_id for boss in data.bosses}
-    assert data.region_of_location[locations["Ancient Dragon Lansseax"]] == "altus"
-    assert data.region_of_location[locations["Glintstone Dragon Adula"]] == "ainsel"
+def test_a_fleeing_dragon_is_at_its_final_location_only(placement_data: PlacementData) -> None:
+    assert _places(placement_data, "Lansseax's Glaive") == {
+        f"Ancient Dragon Lansseax @ {RAMPARTSIDE}"
+    }
+    assert _places(placement_data, "Adula's Moonblade") == {f"Glintstone Dragon Adula @ {MOONFOLK}"}
+    locations = {boss.name: boss.location_id for boss in placement_data.bosses}
+    assert placement_data.region_of_location[locations["Ancient Dragon Lansseax"]] == "altus"
+    assert placement_data.region_of_location[locations["Glintstone Dragon Adula"]] == "ainsel"
 
 
-def test_only_the_upgraded_copy_gives_its_ash(data: PlacementData) -> None:
-    ash = _places(data, "Spinning Strikes")
+def test_only_the_upgraded_copy_gives_its_ash(placement_data: PlacementData) -> None:
+    ash = _places(placement_data, "Spinning Strikes")
 
     assert ash
-    assert ash < _places(data, "Banished Knight's Halberd")
+    assert ash < _places(placement_data, "Banished Knight's Halberd")
 
 
-def test_the_incantation_and_the_weapon_stay_apart(data: PlacementData) -> None:
-    assert _places(data, "Beast Claw") == {"gravesite"}
-    assert _places(data, "Beast Claw (Incantation)") == {"dragonbarrow"}
+def test_the_incantation_and_the_weapon_stay_apart(placement_data: PlacementData) -> None:
+    assert _places(placement_data, "Beast Claw") == {"gravesite"}
+    assert _places(placement_data, "Beast Claw (Incantation)") == {"dragonbarrow"}
 
 
-def test_an_item_from_one_drop_csv_only_is_placed(data: PlacementData) -> None:
+def test_an_item_from_one_drop_csv_only_is_placed(placement_data: PlacementData) -> None:
     for name in ("Night Maiden Armor", "Bloodsoaked Tabard", "Gelmir Glintstone Staff"):
-        assert _places(data, name)
+        assert _places(placement_data, name)
 
 
-def test_named_placements_hold(data: PlacementData) -> None:
-    assert _places(data, "Butchering Knife") == {"altus"}
-    assert _places(data, "Guardian Garb (Full Bloom)") == {"leyndell"}
-    assert _places(data, "Mushroom Crown") == {"lakeofrot"}
-    assert _places(data, "White Mask") == {"mohgwyn"}
-    assert _places(data, "Finger Robe (High Priest Robe, Altered)") == _places(
-        data, "High Priest Robe"
+def test_named_placements_hold(placement_data: PlacementData) -> None:
+    assert _places(placement_data, "Butchering Knife") == {"altus"}
+    assert _places(placement_data, "Guardian Garb (Full Bloom)") == {"leyndell"}
+    assert _places(placement_data, "Mushroom Crown") == {"lakeofrot"}
+    assert _places(placement_data, "White Mask") == {"mohgwyn"}
+    assert _places(placement_data, "Finger Robe (High Priest Robe, Altered)") == _places(
+        placement_data, "High Priest Robe"
     )
 
 
-def test_every_tool_is_placed(data: PlacementData) -> None:
-    placed = {row.item_id for row in item_locations(data.placements)}
-    tools = [item for item in data.table if item.category == "tool"]
+def test_every_tool_is_placed(placement_data: PlacementData) -> None:
+    placed = {row.item_id for row in item_locations(placement_data.placements)}
+    tools = [item for item in placement_data.table if item.category == "tool"]
 
     assert len(tools) == 9
     assert all(tool.id in placed for tool in tools)
 
 
 def test_a_staff_and_a_seal_are_reachable_at_every_cumulative_selection(
-    data: PlacementData,
+    placement_data: PlacementData,
 ) -> None:
-    bosses = {boss.id: boss for boss in data.bosses}
-    rows = item_locations(data.placements)
-    items = {item.id: item for item in data.table}
+    bosses = {boss.id: boss for boss in placement_data.bosses}
+    rows = item_locations(placement_data.placements)
+    items = {item.id: item for item in placement_data.table}
     selected: list[str] = []
-    for region in data.regions:
+    for region in placement_data.regions:
         selected.append(region.id)
-        found = eligible_items(rows, selected, (), bosses, data.region_of_location)
+        found = eligible_items(rows, selected, (), bosses, placement_data.region_of_location)
         weapon_classes = {items[item_id].subcategory for item_id in found}
         assert {"glintstone_staff", "sacred_seal"} <= weapon_classes, region.id
 
 
-def test_every_armor_set_can_roll_under_some_selection(data: PlacementData) -> None:
-    bosses = {boss.id: boss for boss in data.bosses}
-    rows = item_locations(data.placements)
+def test_every_armor_set_can_roll_under_some_selection(placement_data: PlacementData) -> None:
+    bosses = {boss.id: boss for boss in placement_data.bosses}
+    rows = item_locations(placement_data.placements)
     dead = set(bosses)
-    regions = [region.id for region in data.regions]
-    with_ashen = eligible_items(rows, regions, dead, bosses, data.region_of_location)
+    regions = [region.id for region in placement_data.regions]
+    with_ashen = eligible_items(rows, regions, dead, bosses, placement_data.region_of_location)
     without = eligible_items(
-        rows, set(regions) - {ASHEN_CAPITAL}, dead, bosses, data.region_of_location
+        rows, set(regions) - {ASHEN_CAPITAL}, dead, bosses, placement_data.region_of_location
     )
 
     placed = {row.item_id for row in rows}
-    reachable = {*eligible_sets(data.armor_sets, with_ashen, placed)}
-    reachable |= {*eligible_sets(data.armor_sets, without, placed)}
-    assert reachable == set(data.armor_sets)
+    reachable = {*eligible_sets(placement_data.armor_sets, with_ashen, placed)}
+    reachable |= {*eligible_sets(placement_data.armor_sets, without, placed)}
+    assert reachable == set(placement_data.armor_sets)
 
 
-def test_a_set_with_an_unreachable_piece_is_filtered(data: PlacementData) -> None:
-    mushroom = next(row for row in data.armor_sets if row.name == "Mushroom Set")
+def test_a_set_with_an_unreachable_piece_is_filtered(placement_data: PlacementData) -> None:
+    mushroom = next(row for row in placement_data.armor_sets if row.name == "Mushroom Set")
 
     placed = set(mushroom.pieces)
 
@@ -343,11 +349,11 @@ def test_a_set_with_an_unreachable_piece_is_filtered(data: PlacementData) -> Non
     assert mushroom in eligible_sets([mushroom], set(mushroom.pieces), placed)
 
 
-def test_a_piece_found_nowhere_counts_everywhere(data: PlacementData) -> None:
-    naked = next(row for row in data.armor_sets if row.name == "Naked Set")
-    placed = {row.item_id for row in item_locations(data.placements)}
+def test_a_piece_found_nowhere_counts_everywhere(placement_data: PlacementData) -> None:
+    naked = next(row for row in placement_data.armor_sets if row.name == "Naked Set")
+    placed = {row.item_id for row in item_locations(placement_data.placements)}
 
-    assert set(naked.pieces) == data.found_nowhere
+    assert set(naked.pieces) == placement_data.found_nowhere
     assert naked in eligible_sets([naked], set(), placed)
 
 
@@ -380,9 +386,9 @@ def test_row_eligibility_follows_the_prd_table(
 
 
 def test_the_ashen_capital_replaces_the_royal_one_but_not_the_shunning_grounds(
-    data: PlacementData,
+    placement_data: PlacementData,
 ) -> None:
-    regions = data.region_of_location
+    regions = placement_data.region_of_location
     royal = selected_locations({ROYAL_CAPITAL}, regions)
     ashen = selected_locations({ASHEN_CAPITAL}, regions)
     both = selected_locations({ROYAL_CAPITAL, ASHEN_CAPITAL}, regions)
@@ -395,14 +401,16 @@ def test_the_ashen_capital_replaces_the_royal_one_but_not_the_shunning_grounds(
     assert {regions[location] for location in SHUNNING_GROUNDS} == {ROYAL_CAPITAL}
 
 
-def test_the_shunning_grounds_keep_their_items_in_the_ashen_capital(data: PlacementData) -> None:
-    bosses = {boss.id: boss for boss in data.bosses}
-    rows = item_locations(data.placements)
-    found = eligible_items(rows, {ASHEN_CAPITAL}, (), bosses, data.region_of_location)
+def test_the_shunning_grounds_keep_their_items_in_the_ashen_capital(
+    placement_data: PlacementData,
+) -> None:
+    bosses = {boss.id: boss for boss in placement_data.bosses}
+    rows = item_locations(placement_data.placements)
+    found = eligible_items(rows, {ASHEN_CAPITAL}, (), bosses, placement_data.region_of_location)
 
-    assert _item(data, "Frenzied Flame Seal").id in found
-    assert _item(data, "Omen Armor").id in found
-    assert _item(data, "Coded Sword").id not in found
+    assert _item(placement_data, "Frenzied Flame Seal").id in found
+    assert _item(placement_data, "Omen Armor").id in found
+    assert _item(placement_data, "Coded Sword").id not in found
 
 
 def _item_row(name: str) -> Item:

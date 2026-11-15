@@ -23,7 +23,7 @@ from eldenroll.model.vocabulary import (
     SUBCATEGORIES,
 )
 from eldenroll.normalize.selectors import new_selector
-from eldenroll.validate.placement import PlacementData, load_placement_data
+from eldenroll.validate.placement import PlacementData
 from eldenroll.validate.selectors import (
     known_ids,
     resolve_items,
@@ -35,11 +35,6 @@ from eldenroll.validate.subcategories import validate_subcategories
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@pytest.fixture(scope="module")
-def data() -> PlacementData:
-    return load_placement_data(ROOT)
-
-
 def test_vocabulary_counts() -> None:
     assert len(CHARACTER_CLASSES) == 8
     assert len(SLOTS) == 10
@@ -47,13 +42,13 @@ def test_vocabulary_counts() -> None:
     assert len(CATEGORIES) == 10
 
 
-def test_every_item_uses_the_vocabulary(data: PlacementData) -> None:
-    validate_subcategories(data.table)
+def test_every_item_uses_the_vocabulary(placement_data: PlacementData) -> None:
+    validate_subcategories(placement_data.table)
 
 
-def test_every_category_and_subcategory_holds_an_item(data: PlacementData) -> None:
-    assert {row.category for row in data.table} == CATEGORIES
-    used = {row.subcategory for row in data.table if row.subcategory is not None}
+def test_every_category_and_subcategory_holds_an_item(placement_data: PlacementData) -> None:
+    assert {row.category for row in placement_data.table} == CATEGORIES
+    used = {row.subcategory for row in placement_data.table if row.subcategory is not None}
     assert used == set().union(*SUBCATEGORIES.values())
 
 
@@ -105,28 +100,35 @@ def test_an_unknown_kind_fails() -> None:
     ],
 )
 def test_known_ids_pass_and_unknown_fail(
-    data: PlacementData, kind: SelectorKind, good: str
+    placement_data: PlacementData, kind: SelectorKind, good: str
 ) -> None:
-    known = known_ids(data.table, data.armor_sets, data.bosses, ["parry_only"])
+    known = known_ids(
+        placement_data.table, placement_data.armor_sets, placement_data.bosses, ["parry_only"]
+    )
     validate_selectors([Selector(kind, (good,))], known)
     with pytest.raises(BuildError, match=f"selector matches nothing: {kind}: typo"):
         validate_selectors([Selector(kind, (good, "typo"))], known)
 
 
-def test_every_kind_has_options(data: PlacementData) -> None:
-    known = known_ids(data.table, data.armor_sets, data.bosses, ["parry_only"])
+def test_every_kind_has_options(placement_data: PlacementData) -> None:
+    known = known_ids(
+        placement_data.table, placement_data.armor_sets, placement_data.bosses, ["parry_only"]
+    )
     validate_selectors([Selector(kind, None) for kind in SELECTOR_KINDS], known)
 
 
-def test_every_option_of_an_empty_kind_fails(data: PlacementData) -> None:
-    known = known_ids(data.table, data.armor_sets, data.bosses, [])
+def test_every_option_of_an_empty_kind_fails(placement_data: PlacementData) -> None:
+    known = known_ids(placement_data.table, placement_data.armor_sets, placement_data.bosses, [])
     with pytest.raises(BuildError, match="selector matches nothing: rule: every option"):
         validate_selectors([Selector("rule", None)], known)
 
 
-def test_a_boss_selector_is_known_but_no_target(data: PlacementData) -> None:
-    boss = Selector("boss", (data.bosses[0].id,))
-    validate_selectors([boss], known_ids(data.table, data.armor_sets, data.bosses, []))
+def test_a_boss_selector_is_known_but_no_target(placement_data: PlacementData) -> None:
+    boss = Selector("boss", (placement_data.bosses[0].id,))
+    validate_selectors(
+        [boss],
+        known_ids(placement_data.table, placement_data.armor_sets, placement_data.bosses, []),
+    )
     with pytest.raises(BuildError, match="a boss cannot be a modifier target"):
         validate_modifier_target(boss)
     validate_modifier_target(Selector("item", ("none",)))

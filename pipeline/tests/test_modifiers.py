@@ -19,7 +19,7 @@ from eldenroll.model.modifier import CharacterClassCondition, Modifier, RolledCo
 from eldenroll.model.selector import Selector, SelectorKind
 from eldenroll.model.vocabulary import MELEE, UNPAIRED
 from eldenroll.validate.modifiers import validate_modifiers, validate_rolling_order
-from eldenroll.validate.placement import PlacementData, load_placement_data
+from eldenroll.validate.placement import PlacementData
 from eldenroll.validate.selectors import known_ids, resolve_items
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -72,21 +72,19 @@ TALISMANS = ("talisman_1", "talisman_2")
 
 
 @pytest.fixture(scope="module")
-def data() -> PlacementData:
-    return load_placement_data(ROOT)
-
-
-@pytest.fixture(scope="module")
-def modifiers(data: PlacementData) -> tuple[Modifier, ...]:
+def modifiers(placement_data: PlacementData) -> tuple[Modifier, ...]:
     return build_modifiers(
         load_modifiers(OVERRIDES / "modifiers.csv"),
-        bosses_of_region(data.bosses, data.region_of_location),
+        bosses_of_region(placement_data.bosses, placement_data.region_of_location),
     )
 
 
-def _validate(rows: tuple[Modifier, ...], data: PlacementData) -> None:
+def _validate(rows: tuple[Modifier, ...], placement_data: PlacementData) -> None:
     rules = [rule.id for rule in load_combat_rules(OVERRIDES / "combat_rules.csv")]
-    validate_modifiers(rows, known_ids(data.table, data.armor_sets, data.bosses, rules))
+    validate_modifiers(
+        rows,
+        known_ids(placement_data.table, placement_data.armor_sets, placement_data.bosses, rules),
+    )
 
 
 def _excludes(rows: tuple[Modifier, ...]) -> set[tuple[str, str]]:
@@ -109,8 +107,10 @@ def _rule_row(rolled: str, removed: str) -> Modifier:
     )
 
 
-def test_the_real_modifiers_are_valid(modifiers: tuple[Modifier, ...], data: PlacementData) -> None:
-    _validate(modifiers, data)
+def test_the_real_modifiers_are_valid(
+    modifiers: tuple[Modifier, ...], placement_data: PlacementData
+) -> None:
+    _validate(modifiers, placement_data)
 
 
 @pytest.mark.parametrize(("first", "second"), sorted(EXCLUDED))
@@ -184,11 +184,11 @@ def test_dual_wield_boosts_each_unpaired_class_in_lh(modifiers: tuple[Modifier, 
 
 
 def test_only_grafted_dragon_loses_odds_in_dual_wield_rh(
-    modifiers: tuple[Modifier, ...], data: PlacementData
+    modifiers: tuple[Modifier, ...], placement_data: PlacementData
 ) -> None:
     pools = build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
     pool = next(row for row in pools if (row.character_class_id, row.slot) == ("warrior_dw", "rh"))
-    rh = {item.id for item in resolve_items(pool.selectors, data.table)}
+    rh = {item.id for item in resolve_items(pool.selectors, placement_data.table)}
     known_before_rh = [
         row
         for row in modifiers
@@ -201,7 +201,7 @@ def test_only_grafted_dragon_loses_odds_in_dual_wield_rh(
     assert {
         row.id
         for row in known_before_rh
-        if rh & {item.id for item in resolve_items((row.target,), data.table)}
+        if rh & {item.id for item in resolve_items((row.target,), placement_data.table)}
     } == {
         "grafted_dragon_only_on_jester",
         "warrior_dw_boosts_paired_subcategories",
@@ -233,13 +233,13 @@ def test_paired_weapons_and_grafted_dragon_stay_off_the_other_character_classes(
 
 
 def test_the_real_rows_roll_their_targets_after_their_conditions(
-    modifiers: tuple[Modifier, ...], data: PlacementData
+    modifiers: tuple[Modifier, ...], placement_data: PlacementData
 ) -> None:
     pools = build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
-    validate_rolling_order(modifiers, pools, data.table)
+    validate_rolling_order(modifiers, pools, placement_data.table)
 
 
-def test_a_target_rolled_before_its_condition_fails(data: PlacementData) -> None:
+def test_a_target_rolled_before_its_condition_fails(placement_data: PlacementData) -> None:
     pools = build_slot_pools(load_slot_pools(OVERRIDES / "slot_pools.csv"))
     late = Modifier(
         "late",
@@ -248,7 +248,7 @@ def test_a_target_rolled_before_its_condition_fails(data: PlacementData) -> None
         0,
     )
     with pytest.raises(BuildError, match="after their conditions: late"):
-        validate_rolling_order([late], pools, data.table)
+        validate_rolling_order([late], pools, placement_data.table)
 
 
 @pytest.mark.parametrize(
@@ -398,29 +398,34 @@ def test_requirements_read_the_right_slots(modifiers: tuple[Modifier, ...]) -> N
         ),
     ],
 )
-def test_bad_rows_fail(rows: tuple[Modifier, ...], message: str, data: PlacementData) -> None:
+def test_bad_rows_fail(
+    rows: tuple[Modifier, ...], message: str, placement_data: PlacementData
+) -> None:
     with pytest.raises(BuildError, match=message):
-        _validate(rows, data)
+        _validate(rows, placement_data)
 
 
 @pytest.mark.parametrize("kind", ["rule", "item"])
-def test_an_unknown_id_fails(kind: SelectorKind, data: PlacementData) -> None:
+def test_an_unknown_id_fails(kind: SelectorKind, placement_data: PlacementData) -> None:
     row = Modifier("x", (CharacterClassCondition(("sorcerer",)),), Selector(kind, ("typo",)), 0)
     with pytest.raises(BuildError, match=f"selector matches nothing: {kind}: typo"):
-        _validate((row,), data)
+        _validate((row,), placement_data)
 
 
-def test_a_boss_target_fails(data: PlacementData) -> None:
+def test_a_boss_target_fails(placement_data: PlacementData) -> None:
     row = Modifier(
-        "x", (CharacterClassCondition(("sorcerer",)),), Selector("boss", (data.bosses[0].id,)), 2
+        "x",
+        (CharacterClassCondition(("sorcerer",)),),
+        Selector("boss", (placement_data.bosses[0].id,)),
+        2,
     )
     with pytest.raises(BuildError, match="a boss cannot be a modifier target"):
-        _validate((row,), data)
+        _validate((row,), placement_data)
 
 
-def test_a_boss_condition_passes(data: PlacementData) -> None:
-    condition = RolledCondition(("rh",), Selector("boss", (data.bosses[0].id,)))
-    _validate((Modifier("x", (condition,), Selector("rule", ("r1_only",)), 2),), data)
+def test_a_boss_condition_passes(placement_data: PlacementData) -> None:
+    condition = RolledCondition(("rh",), Selector("boss", (placement_data.bosses[0].id,)))
+    _validate((Modifier("x", (condition,), Selector("rule", ("r1_only",)), 2),), placement_data)
 
 
 def test_cells_parse(tmp_path: Path) -> None:

@@ -41,9 +41,9 @@ class GateData:
     found_nowhere: frozenset[str]
 
 
-def load_gate_data(root: Path) -> GateData:
+def load_gate_data(root: Path, sources: GapSources | None = None) -> GateData:
     overrides = root / "data" / "overrides"
-    sources = load_sources(root)
+    sources = load_sources(root) if sources is None else sources
     placement = load_placement_data(root, sources)
     areas = load_annotations(AREAS).areas
     alias_rows = load_aliases(overrides / "aliases.csv")

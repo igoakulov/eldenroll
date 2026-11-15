@@ -10,10 +10,10 @@ from eldenroll.build.tools import TOOLS, TRANSFORMS, build_tools, sheet_base_nam
 from eldenroll.errors import BuildError
 from eldenroll.loaders.consumables import load_consumable_categories
 from eldenroll.loaders.csv_source import CsvTable
-from eldenroll.loaders.iteminfo import load_item_catalog
 from eldenroll.model.item import Item
 from eldenroll.model.item_catalog import ItemCatalog
-from eldenroll.paths import ITEM_INFO, TOOL_CONSUMABLE_CLASSES
+from eldenroll.paths import TOOL_CONSUMABLE_CLASSES
+from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -38,10 +38,8 @@ def _catalog(*names: str) -> ItemCatalog:
 
 
 @pytest.fixture(scope="module")
-def tools() -> tuple[Item, ...]:
-    return build_tools(
-        load_item_catalog(ITEM_INFO), load_consumable_categories(TOOL_CONSUMABLE_CLASSES)
-    )
+def tools(sources: GapSources) -> tuple[Item, ...]:
+    return build_tools(sources.catalog, load_consumable_categories(TOOL_CONSUMABLE_CLASSES))
 
 
 def test_rows_are_exactly_the_whitelist_and_the_transforms(tools: tuple[Item, ...]) -> None:
