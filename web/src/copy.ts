@@ -263,8 +263,8 @@ export const copy = {
     clearSearch: "Clear search",
   },
 
-  // The simulation page at /simulate/ (web/sim/README.md#The page): its own page, not part of a run
-  simulate: {
+  // The simulation page at /sim/ (web/sim/README.md#The page): its own page, not part of a run
+  sim: {
     title: "Simulation",
     lede: "Plays whole runs the way a player would and counts what they were shown.",
     toApp: "Open EldenRoll",
@@ -321,6 +321,8 @@ export const copy = {
       perRun: "Per run",
       seenIn: "Runs",
       catchUp: "Catch-up",
+      fair: "Vs fair",
+      fairPerRun: "Fair per run",
     },
     overview: {
       runs: "Runs",
@@ -349,12 +351,15 @@ export const copy = {
       rh: "Right hand",
       lh: "Left hand",
       handLede: {
-        class: "By weapon class. The bright tick is the share pool size alone would give, if every class held as many weapons.",
+        class: "By weapon class. Vs fair: the share against what pool size alone would give, if every class held as many weapons; 1.00 is even.",
         weapon: "By weapon.",
       },
       regionLede:
-        "By the region where each first comes into reach, empty slots left out. The bright tick is the share if every option in reach showed equally. Catch-up: the mean boost while in a pool, won or not.",
+        "By the region where each first comes into reach, empty slots left out. Vs fair: the share against what it would be if every option in reach showed equally; 1.00 is even. Catch-up: the mean boost while in a pool, won or not.",
       regionBothSlots: "Both slots count.",
+      furthest: "Furthest from fair",
+      furthestLede: (share: string) =>
+        `The ${share} of lines furthest from fair, at least 10, under and over alike, half and double being as far: each one region of one slot for one picked class alone, with enough sample. Fair per run: its showings a run at its fair share. The item slot is left out, its odds differing by design.`,
       noLocation: "No location",
       countBy: "Count by",
       byClass: "Weapon class",
@@ -382,7 +387,7 @@ export const copy = {
       one: "One slot",
       both: "Both slots",
       empties: "Empty results",
-      emptiesLede: "Rolls that found nothing at all, not even none. A slot whose only roll is none is left out.",
+      emptiesLede: "Rolls that found nothing at all, not even none. A slot whose only roll is none is left out, and so is an ash slot whose hand can't hold an ash, such as a somber weapon.",
       noEmpties: "Every slot found something to roll.",
     },
     synergies: {

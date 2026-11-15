@@ -1,24 +1,18 @@
 /* The simulation page (web/sim/README.md#The page): settings beside the results on a wide screen, above them on a
    phone. Controls keep their kit spacing; this only places them. */
-.simulate {
+.sim {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-height: 100dvh;
 }
 
-.simulate-loading {
-  padding: var(--space-8) var(--gutter);
-  font-style: italic;
-  color: var(--text-3);
-}
-
-.simulate-settings {
+.sim-settings {
   display: flex;
   flex-direction: column;
   background: radial-gradient(120% 60% at 0% 0%, var(--mist), transparent 70%);
 }
 
-.simulate-to-app {
+.sim-to-app {
   display: inline-block;
   margin-bottom: var(--space-4);
   font-size: var(--type-small);
@@ -26,94 +20,62 @@
 }
 
 /* Steppers and checkbox rows bring their own gutter and rules */
-.simulate-pad {
+.sim-pad {
   padding: 0 var(--gutter);
 }
 
-.simulate-bottom {
+.sim-bottom {
   margin-top: auto;
 }
 
-.simulate-results {
+.sim-results {
   min-width: 0;
   padding-bottom: var(--space-10);
 }
 
-/* Results from earlier settings, or being replaced: still readable, plainly not current; the header stays lit */
-.simulate-results-stale .tab-panels {
-  opacity: var(--dimmed);
-}
-
-.simulate-results .tab-panels {
-  transition: opacity var(--dur-state) var(--ease-out);
-}
-
-/* The class filter, the search and the tabs, back in view on any scroll up */
-.simulate-header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--ground);
-  transition: transform var(--dur-sheet) var(--ease-out);
-}
-
-.simulate-header-hidden {
-  transform: translateY(-100%);
-  transition-timing-function: var(--ease-in);
-}
-
-.simulate-classes {
+.sim-classes {
   padding: var(--space-3) var(--gutter) 0;
 }
 
-/* Headings bring their own gutter */
-.simulate-section > :not(.section-heading, .slot-heading) {
-  margin-left: var(--gutter);
-  margin-right: var(--gutter);
-}
-
-.simulate-switch {
+.sim-switch {
   margin-bottom: var(--space-4);
 }
 
-.simulate-section .section-note {
-  margin-bottom: var(--space-4);
+/* A note standing in for results, set down from the tabs */
+.sim-note {
+  padding-top: var(--space-6);
 }
 
-.simulate-note {
-  padding: var(--space-6) var(--gutter);
-}
-
-.simulate-names-list {
+.sim-names-list {
   margin-top: var(--space-2);
   font-size: var(--type-body);
   line-height: var(--leading);
   color: var(--text-2);
 }
 
-.simulate-item + .simulate-item {
+.sim-item + .sim-item {
   margin-top: var(--space-7);
 }
 
-.simulate-item-name {
+.sim-item-name {
   font-weight: 500;
   font-size: var(--type-name);
   line-height: var(--leading-tight);
   color: var(--text);
 }
 
-.simulate-charts {
+.sim-charts {
   display: grid;
   gap: var(--space-6);
 }
 
 /* Settings beside the results: the settings column scrolls on its own, its button always in reach */
 @media (min-width: 960px) {
-  .simulate {
+  .sim {
     grid-template-columns: 400px minmax(0, 1fr);
   }
 
-  .simulate-settings {
+  .sim-settings {
     position: sticky;
     top: 0;
     height: 100dvh;
@@ -122,6 +84,3 @@
   }
 }
 
-.simulate-section .data-table-frame + .data-table-frame {
-  margin-top: var(--space-7);
-}

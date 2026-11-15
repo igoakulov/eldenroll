@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 
+import { copy } from "../src/copy";
 import type { Database, LoadoutSlot } from "../src/engine/database";
 import { indexDatabase } from "../src/engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "../src/engine/hyperparams";
@@ -9,7 +10,7 @@ import type { Engine } from "../src/engine/run";
 import { STATS } from "../src/engine/settings";
 import { LOADOUT_ORDER } from "../src/engine/loadout";
 import { ALLOCATIONS, type Allocation } from "./player";
-import { sampleOf } from "./aggregate";
+import { NO_LOCATION, REGION_TABLES, regionShares, sampleOf, vsFair } from "./aggregate";
 import { report } from "./report";
 import { playOrder, runSeed, simulateRun, type ChanceSums, type RunResult } from "./simulate";
 
@@ -21,7 +22,9 @@ const USAGE = `pnpm sim [--runs 20] [--allocations ITEMS,STR,DEX,INT,FTH,ARC,ALL
 function timestamp(): string {
   const now = new Date();
   const pad = (value: number) => String(value).padStart(2, "0");
-  return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  const day = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  // Milliseconds too, so two dumps started in the same second still get folders of their own
+  return `${day}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}${String(now.getMilliseconds()).padStart(3, "0")}`;
 }
 
 function csv(rows: readonly (readonly (string | number | boolean | null)[])[]): string {
@@ -31,6 +34,29 @@ function csv(rows: readonly (readonly (string | number | boolean | null)[])[]): 
     return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
   };
   return rows.map((row) => row.map(cell).join(",")).join("\n") + "\n";
+}
+
+/** Every slot's regions with Vs fair (web/sim/README.md#Reading the dump), for the classes together (`all`) and for
+ * each class alone, from the page's own counting over the same runs. */
+function vsFairRows(engine: Engine, results: readonly RunResult[], classes: readonly string[], chances: ChanceSums) {
+  const rows: (string | number | null)[][] = [
+    ["character_class", "slot", "region_number", "region", "per_run", "share", "fair_share", "vs_fair", "fair_per_run"],
+  ];
+  for (const scope of ["all", ...classes]) {
+    const sample = sampleOf(engine.data, results, scope === "all" ? classes : [scope]);
+    for (const table of REGION_TABLES) {
+      const shares = regionShares(sample, table, chances);
+      if (shares === null) continue;
+      for (const row of shares.rows) {
+        const fair = row.adjusted ?? 0;
+        rows.push([
+          scope, table, row.order ?? null, row.key === NO_LOCATION ? copy.sim.slots.noLocation : row.name, row.perRun, row.share, fair,
+          fair > 0 ? vsFair(row) : null, (fair * shares.total) / shares.runs,
+        ]);
+      }
+    }
+  }
+  return rows;
 }
 
 export function main(argv: readonly string[], repo: string): void {
@@ -68,7 +94,12 @@ export function main(argv: readonly string[], repo: string): void {
     throw new Error(`--completion takes a whole percentage from 1 to 100, not ${values.completion}`);
   }
   const runs = Number(values.runs);
+  if (!Number.isInteger(runs) || runs < 1) throw new Error(`--runs takes a whole number from 1, not ${values.runs}`);
   const seed = Number(values.seed);
+  if (!Number.isInteger(seed)) throw new Error(`--seed takes a whole number, not ${values.seed}`);
+  const playing = values.classes?.split(",").map((one) => one.trim()) ?? null;
+  const unknownClasses = (playing ?? []).filter((id) => !database.character_class.some((row) => row.id === id));
+  if (unknownClasses.length > 0) throw new Error(`Unknown class ${unknownClasses.join(", ")}`);
   const started = performance.now();
   const results: RunResult[] = [];
   const chances: ChanceSums = new Map();
@@ -80,7 +111,7 @@ export function main(argv: readonly string[], repo: string): void {
           seed: runSeed(seed, allocation, run),
           regions,
           completion,
-          characterClasses: values.classes === undefined ? null : values.classes.split(","),
+          characterClasses: playing,
           chances,
         }),
       );
@@ -117,8 +148,9 @@ export function main(argv: readonly string[], repo: string): void {
       ),
     ]),
   );
-  const classes = values.classes?.split(",") ?? database.character_class.map((row) => row.id);
+  const classes = playing ?? database.character_class.map((row) => row.id);
   writeFileSync(path.join(out, "metrics.md"), report(sampleOf(engine.data, results, classes), chances));
+  writeFileSync(path.join(out, "vs-fair.csv"), csv(vsFairRows(engine, results, classes, chances)));
   const seconds = ((performance.now() - started) / 1000).toFixed(1);
-  console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/metrics.md, rolls.csv, objectives.csv`);
+  console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/metrics.md, vs-fair.csv, rolls.csv, objectives.csv`);
 }

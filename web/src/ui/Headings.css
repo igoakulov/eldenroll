@@ -94,3 +94,13 @@
   line-height: var(--leading);
   color: var(--text-3);
 }
+
+/* Headings bring their own gutter */
+.section > :not(.section-heading, .slot-heading) {
+  margin-left: var(--gutter);
+  margin-right: var(--gutter);
+}
+
+.section > .section-note {
+  margin-bottom: var(--space-4);
+}

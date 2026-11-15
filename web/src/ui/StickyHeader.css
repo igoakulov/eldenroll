@@ -1,0 +1,12 @@
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--ground);
+  transition: transform var(--dur-sheet) var(--ease-out);
+}
+
+.sticky-header-hidden {
+  transform: translateY(-100%);
+  transition-timing-function: var(--ease-in);
+}

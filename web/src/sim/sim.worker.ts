@@ -3,12 +3,14 @@ import { runSeed, simulateRun, type ChanceSums, type RunResult } from "../../sim
 import { indexDatabase } from "../engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "../engine/hyperparams";
 import type { Engine } from "../engine/run";
-import { loadDatabase } from "../loadDatabase";
+import type { Database } from "../engine/database";
 import type { Inputs } from "./inputs";
 
 export interface Request {
   readonly id: number;
   readonly inputs: Inputs;
+  /** The page's own copy, so the worker never fetches it again; indexed on the first request only. */
+  readonly database: Database;
 }
 
 export type Reply =
@@ -22,13 +24,13 @@ const scope = self as unknown as {
   postMessage: (message: Reply) => void;
 };
 
-let engine: Promise<Engine> | null = null;
+let engine: Engine | null = null;
 
-scope.onmessage = async (event) => {
-  const { id, inputs } = event.data;
+scope.onmessage = (event) => {
+  const { id, inputs, database } = event.data;
   try {
-    engine ??= loadDatabase().then((database) => ({ data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS }));
-    const ready = await engine;
+    engine ??= { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
+    const ready = engine;
     const results: RunResult[] = [];
     const chances: ChanceSums = new Map();
     for (let run = 0; run < inputs.runs; run += 1) {

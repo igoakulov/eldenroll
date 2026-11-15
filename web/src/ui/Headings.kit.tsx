@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { copy } from "../copy";
 import type { KitBlock, KitProps } from "../kit/kit";
-import { HeadingAction, HeadingCount, ScreenHead, SectionHeading, SectionNote, SlotHeading } from "./Headings";
+import { HeadingAction, HeadingCount, ScreenHead, Section, SectionHeading, SectionNote, SlotHeading } from "./Headings";
 import { LozengeCheckbox } from "./LozengeCheckbox";
 
 const noop = () => {};
@@ -56,19 +56,16 @@ export const kit: readonly KitBlock[] = [
   },
   {
     id: "section-note",
-    title: "Section note",
+    title: "Section and its note",
     section: "simulation",
     size: "phone",
     states: [
       {
-        label: "under a heading",
+        label: "a section: heading, note, body",
         render: () => (
-          <>
-            <SectionHeading>{copy.simulate.slots.item}</SectionHeading>
-            <div className="kit-pad">
-              <SectionNote>{copy.simulate.counted("217.9")}</SectionNote>
-            </div>
-          </>
+          <Section title={copy.sim.slots.item} lede={copy.sim.counted("217.9")}>
+            <SectionNote>{copy.sim.nothing}</SectionNote>
+          </Section>
         ),
       },
     ],

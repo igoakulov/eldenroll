@@ -43,6 +43,11 @@
    accessibility tree */
 .tab-panels {
   display: grid;
+  transition: opacity var(--dur-state) var(--ease-out);
+}
+
+.tab-panels-dimmed {
+  opacity: var(--dimmed);
 }
 
 .tab-panel {

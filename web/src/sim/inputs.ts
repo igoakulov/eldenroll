@@ -5,7 +5,7 @@ export const MAX_RUNS = 10;
 export const MAX_SEED = 999_999;
 export const COMPLETION_STEP = 10;
 export const TABS = ["overview", "slots", "synergies", "items"] as const;
-export type Tab = (typeof TABS)[number];
+type Tab = (typeof TABS)[number];
 
 /** How Slots counts its tables: the hands by weapon class or weapon, the rest by item, or every table by region. */
 const SLOT_VIEWS = ["class", "item", "region"] as const;

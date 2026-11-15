@@ -5,6 +5,16 @@ Why the data rolls the way it does: every odds value other than 1 and every cond
 - How modifier rows combine: `data/overrides/README.md#Selectors and modifiers`.
 - Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×67`, `×6`, `×5`, `×3.5`, `×3`, `×0.5`) are deliberate placeholders for it.
 
+## Levers
+
+Three places decide how often anything rolls, and nothing else does:
+
+- **Base odds**, per row, in `data/overrides/` (#Base odds).
+- **Conditional rules**, the rows of `modifiers.csv` that multiply odds while a condition holds (#Conditional rules).
+- **`web/src/engine/hyperparams.ts`**, for what applies to every row (#Hyperparameters). Each formula is written out there in full, over inputs the engine computes and passes in by name, such as `runLeft`.
+
+Engine code holds no balance of its own: no weight, multiplier, cap or curve that changes a roll lives anywhere else, so every effect on a roll traces to one of the three while tuning. Owner, 2026-11-15.
+
 ## Tiers
 
 A modifier multiplies an option's odds. Pick its value from these tiers, or `0` to remove the option:
@@ -42,7 +52,11 @@ When two boosted options meet in one pool, compare them with each other, not wit
 
 `web/src/engine/hyperparams.ts` holds the balance values that apply to every row, and is where they are tuned against the simulation; the engine takes them as an argument, so a run can override them.
 
-- **`catchUp`** evens out how often items show over a whole run. With every option at its odds, an item in reach from Limgrave gets every objective of the run while a Haligtree one gets the last tenth, so early regions take most of the rolls. The boost is `(1 / runLeft) ^ 3`, capped at ×20,000, where `runLeft` is the share of the run's bosses still to fell when the item last came into reach, by whichever gate let it in: its region ticked, its boss felled, or the stats and `Max stat gap` reaching it. So an item in reach for the last tenth of a run rolls at ×1,000 its odds; this is inverse-exposure weighting, as in fair-share scheduling. An item with no location row is in reach everywhere, so only stats can boost it. An item that drops out of reach, by unticking a region or lowering the gap, starts afresh when it comes back, so a region left unticked until the end of a run gets a late region's boost. The share counts bosses felled since the start against the rollable ones neither dead at the start, skipped nor locked out alive (the Royal Capital after Maliketh), assuming the player plays to the end, so a player who ticks every region at the start, as on New Game+, gets a boost only from bosses and stats. The exponent is above 1 because the pool grows as regions open and boss gear waits for its boss, so a late item meets more rivals than the formula counts; the cap keeps what comes into reach in the last objectives, where the formula grows without bound, below the `guarantee` tier (#Tiers). Owner, 2026-11-14: exponent 3 and cap ×20,000 to start, tuned at the simulation. Rules and bosses don't get it.
+- **`catchUp`** evens out how often items show over a whole run. With every option at its odds, an item in reach from Limgrave gets every objective of the run while a Haligtree one gets the last tenth, so early regions take most of the rolls. It works in two steps, both written out in `hyperparams.ts`; modifiers apply on top of both, so a synergy keeps its full strength. Rules and bosses don't get it.
+  - **`boost`** is `(1 / runLeft) ^ 5`, capped at ×20,000, where `runLeft` is the share of the run's bosses still to fell when the item last came into reach, by whichever gate let it in: its region ticked, its boss felled, or the stats and `Max stat gap` reaching it. This is inverse-exposure weighting, as in fair-share scheduling. An item that drops out of reach, by unticking a region or lowering the gap, starts afresh when it comes back, so a region left unticked until late gets a late region's boost. The share counts bosses felled since the start against the rollable ones neither dead at the start, skipped nor locked out alive (the Royal Capital after Maliketh), assuming the player plays to the end, so a player who ticks every region at the start, as on New Game+, gets a boost only from bosses and stats. The exponent is well above 1 because the pool grows as regions open and boss gear waits for its boss, so a late item meets more rivals than the formula counts: at 5 the left hand's earliest and latest regions show at their fair share and the other slots come close, where a higher one overshoots. A lower cap only hides the last regions' gear; the cap keeps what comes into reach in the last objectives, where the formula grows without bound, below the `guarantee` tier (#Tiers).
+  - **`inPool`** rescales the boosts within each pool so that the options with a location (an item with a location row, a set with a piece that has one) keep their base odds' share between them: catch-up moves chance only among them. `none`, consumables and anything else found everywhere get no boost and keep their base share, which would otherwise fade as late items' boosts grow, in a way odds can't undo without breaking the early share. In a pool where every option has a location it changes nothing.
+
+  Owner, 2026-11-15: exponent 5, cap ×20,000 and the rescaling, chosen on the simulation.
 
 - **`defaultMaxStatGap`** is how far above the player's stats an item may be. It is per item, never a shared budget, so a loadout of several near-reach items is fine.
 

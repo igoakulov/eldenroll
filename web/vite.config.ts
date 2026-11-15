@@ -14,7 +14,7 @@ if (!existsSync(databasePath)) {
   );
 }
 
-/** `/kit` and `/simulate` without their trailing slash go to the page, as a static host sends a folder's address;
+/** `/kit` and `/sim` without their trailing slash go to the page, as a static host sends a folder's address;
  * Vite's dev and preview servers would otherwise open the app. */
 const pageSlash: Plugin = {
   name: "page-slash",
@@ -27,7 +27,7 @@ const pageSlash: Plugin = {
 };
 
 function redirect(request: IncomingMessage, response: ServerResponse, next: () => void): void {
-  const match = /^\/(kit|simulate)(\?.*)?$/.exec(request.url ?? "");
+  const match = /^\/(kit|sim)(\?.*)?$/.exec(request.url ?? "");
   if (match === null) return next();
   response.statusCode = 301;
   response.setHeader("Location", `/${match[1]}/${match[2] ?? ""}`);
@@ -43,7 +43,7 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL("index.html", import.meta.url)),
         kit: fileURLToPath(new URL("kit/index.html", import.meta.url)),
-        simulate: fileURLToPath(new URL("simulate/index.html", import.meta.url)),
+        sim: fileURLToPath(new URL("sim/index.html", import.meta.url)),
       },
     },
   },

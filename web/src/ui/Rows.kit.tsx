@@ -77,7 +77,7 @@ export const kit: readonly KitBlock[] = [
 type Focus = "STR" | "DEX";
 
 function AllocationRow() {
-  const words = copy.simulate;
+  const words = copy.sim;
   const [focus, setFocus] = useState<Focus>("STR");
   return (
     <ControlRow label={words.allocation}>

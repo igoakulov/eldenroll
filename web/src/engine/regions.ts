@@ -85,3 +85,11 @@ export function bossPool(
   const bosses = reachable.filter((row) => !out(row.id));
   return bosses.length === 0 ? { status: "regions_cleared" } : { status: "ready", bosses };
 }
+
+/** A DLC region's name starts with this in the data; views show a DLC mark in its place. */
+const DLC_PREFIX = "DLC: ";
+
+/** A region's name without its DLC prefix, and whether it had one. */
+export function splitDlc(name: string): { readonly dlc: boolean; readonly name: string } {
+  return name.startsWith(DLC_PREFIX) ? { dlc: true, name: name.slice(DLC_PREFIX.length) } : { dlc: false, name };
+}

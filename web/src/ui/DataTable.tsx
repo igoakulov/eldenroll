@@ -138,19 +138,16 @@ function byNumber(x: number, y: number): number {
   return at(x) === at(y) ? 0 : at(y) > at(x) ? 1 : -1;
 }
 
-/** A share as a number over a rail: the fill is the share, against the table's largest; `mark`, where given, is a
- * second share on the same scale, drawn as a tick, such as what pool size alone would give. */
+/** A share as a number over a rail: the fill is the share, against the table's largest. */
 export function ShareBar({
   share,
   scale,
   text,
-  mark,
 }: {
   readonly share: number;
   /** The share that fills the rail, usually the table's largest. */
   readonly scale: number;
   readonly text: string;
-  readonly mark?: number;
 }) {
   const at = (value: number) => (scale > 0 ? Math.min(1, value / scale) : 0);
   return (
@@ -159,10 +156,9 @@ export function ShareBar({
       <span
         className="share-bar-rail"
         aria-hidden="true"
-        style={{ "--fill": at(share), "--mark": at(mark ?? 0) } as CSSProperties}
+        style={{ "--fill": at(share) } as CSSProperties}
       >
         <span className="share-bar-fill" />
-        {mark !== undefined && <span className="share-bar-mark" />}
       </span>
     </span>
   );

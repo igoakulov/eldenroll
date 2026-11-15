@@ -13,6 +13,7 @@ export function Tabs({
   onSelect,
   panels,
   bar,
+  dimmed = false,
 }: {
   readonly label: string;
   readonly tabs: readonly string[];
@@ -21,6 +22,9 @@ export function Tabs({
   readonly panels: readonly ReactNode[];
   /** Wraps the tab row, such as in a sticky header with more controls; the panels stay where they are. */
   readonly bar?: (tabs: ReactNode) => ReactNode;
+  /** The panels hold results that are no longer current, such as while new ones are counted: still readable,
+   * plainly not current, the tab row still lit. */
+  readonly dimmed?: boolean;
 }) {
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -93,7 +97,7 @@ export function Tabs({
   return (
     <>
       {bar === undefined ? row : bar(row)}
-      <div className="tab-panels">
+      <div className={`tab-panels${dimmed ? " tab-panels-dimmed" : ""}`}>
         {tabs.map((tab, index) => (
           <div
             key={tab}

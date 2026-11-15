@@ -3,10 +3,9 @@ import type { Region } from "../engine/database";
 import { MAX_STAT, MIN_STAT, STATS, correctedStat, type Stat, type Stats } from "../engine/settings";
 import { LozengeCheckbox } from "../ui/LozengeCheckbox";
 import { Stepper } from "../ui/Stepper";
+import { splitDlc } from "../engine/regions";
 
 export const STAT_NAMES: Readonly<Record<Stat, string>> = copy.statsAndRegions.stats;
-
-export const DLC_PREFIX = "DLC: ";
 
 /** The 8 stats on Start and `Level up`. Given `before`, a stat above it shows raised. */
 export function StatSteppers({
@@ -55,7 +54,7 @@ export function RegionCheck({
   readonly onRegions: (regions: readonly string[]) => void;
   readonly className?: string;
 }) {
-  const dlc = region.name.startsWith(DLC_PREFIX);
+  const { dlc, name } = splitDlc(region.name);
   return (
     <LozengeCheckbox
       checked={selected.includes(region.id)}
@@ -71,7 +70,7 @@ export function RegionCheck({
       {...(dlc ? { tag: copy.statsAndRegions.dlc } : {})}
       {...(className === undefined ? {} : { className })}
     >
-      {dlc ? region.name.slice(DLC_PREFIX.length) : region.name}
+      {name}
     </LozengeCheckbox>
   );
 }

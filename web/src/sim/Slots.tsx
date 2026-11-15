@@ -2,10 +2,11 @@ import { useMemo } from "react";
 
 import {
   className,
+  FAIR_TABLES,
   empties,
+  fairLines,
   gearShares,
   handShares,
-  NO_LOCATION,
   pairs,
   regionShares,
   ruleNone,
@@ -20,15 +21,18 @@ import {
 import type { ChanceSums } from "../../sim/simulate";
 import { copy } from "../copy";
 import { Cycler } from "../ui/Cycler";
-import { DataTable, ShareBar } from "../ui/DataTable";
-import { SectionHeading, SectionNote } from "../ui/Headings";
+import { DataTable } from "../ui/DataTable";
+import { perRunColumn, shareColumn } from "./columns";
+import { Section } from "../ui/Headings";
 import { ListRow } from "../ui/Rows";
 import { FOLD, matches, percent, perRun } from "./format";
 import type { SlotView } from "./inputs";
+import { FurthestFromFair } from "./FurthestFromFair";
+import { countOnce } from "./countOnce";
 import { ShareSection } from "./ShareSection";
 
-const words = copy.simulate.slots;
-const columns = copy.simulate.columns;
+const words = copy.sim.slots;
+const columns = copy.sim.columns;
 
 export function Slots({
   sample,
@@ -45,8 +49,8 @@ export function Slots({
 }) {
   const region = by === "region";
   // Counted once per sample and view; typing in the search only filters the rows
-  const tables = useMemo(() => {
-    const byRegion = (table: RegionTable): ShareTable | null => named(regionShares(sample, table, chances));
+  const tables = useMemo(() => countOnce(sample, `slots:${by}`, () => {
+    const byRegion = (table: RegionTable): ShareTable | null => regionShares(sample, table, chances);
     const count = (table: Exclude<GearTable, "rule">) => (region ? byRegion(table) : gearShares(sample, table, chances));
     const hand = (slot: "rh" | "lh") => (region ? byRegion(slot) : handShares(sample, slot, by === "class" ? "class" : "weapon", chances));
     return {
@@ -63,22 +67,22 @@ export function Slots({
       none: ruleNone(sample),
       empty: empties(sample),
     };
-  }, [sample, chances, by, region]);
+  }), [sample, chances, by, region]);
+  // Each picked class alone, every slot but the item slot: counted only while the tables count by region
+  const lines = useMemo(() => (region ? countOnce(sample, "fair-lines", () => fairLines(sample, FAIR_TABLES, chances)) : []), [sample, chances, region]);
+  const regionLede = (table: RegionTable) => (twoSlots(table) ? `${words.regionLede} ${words.regionBothSlots}` : words.regionLede);
   const both = tables.both;
   const pairRows = both.rows.filter((row) => matches(row.name, search));
   const scale = Math.max(0, ...both.rows.map((row) => row.share));
   const dualWieldOnly = sample.classes.length === 1 && sample.classes[0] === "warrior_dw";
   const none = tables.none;
-  const empty = tables.empty;
+  const empty = tables.empty.filter((row) => matches(className(sample.data, row.characterClass), search));
+  const emptyScale = Math.max(0, ...tables.empty.map((row) => row.share));
   const runs = sample.results.length;
   const gear = (table: Exclude<GearTable, "rule">, title: string, lede?: string) => (
     <ShareSection
       title={title}
-      {...(region
-        ? { lede: twoSlots(table) ? `${words.regionLede} ${words.regionBothSlots}` : words.regionLede, nameLabel: columns.region }
-        : lede === undefined
-          ? {}
-          : { lede })}
+      {...(region ? { lede: regionLede(table), nameLabel: columns.region } : lede === undefined ? {} : { lede })}
       control={<CountBy hands={false} by={by} onBy={onBy} />}
       table={tables[table]}
       search={search}
@@ -90,7 +94,7 @@ export function Slots({
         <ShareSection
           key={slot}
           title={words[slot]}
-          lede={region ? words.regionLede : by === "class" ? words.handLede.class : words.handLede.weapon}
+          lede={region ? regionLede(slot) : by === "class" ? words.handLede.class : words.handLede.weapon}
           {...(region ? { nameLabel: columns.region } : {})}
           control={<CountBy hands by={by} onBy={onBy} />}
           table={tables[slot]}
@@ -99,40 +103,37 @@ export function Slots({
       ))}
 
       {(search === "" || pairRows.length > 0) && (
-        <section className="simulate-section">
-          <SectionHeading>{words.pairs}</SectionHeading>
-          <SectionNote>
-            {`${words.pairsLede} ${copy.simulate.counted(perRun(both.total / runs))}`}
-            {both.sameClass.of > 0 && (
-              <>
-                <br />
-                {words.sameClass(percent(both.sameClass.count / both.sameClass.of), perRun(both.sameClass.of / runs))}
-                {dualWieldOnly && ` ${words.dualWieldAim}`}
-              </>
-            )}
-          </SectionNote>
+        <Section
+          title={words.pairs}
+          lede={
+            <>
+              {`${words.pairsLede} ${copy.sim.counted(perRun(both.total / runs))}`}
+              {both.sameClass.of > 0 && (
+                <>
+                  <br />
+                  {words.sameClass(percent(both.sameClass.count / both.sameClass.of), perRun(both.sameClass.of / runs))}
+                  {dualWieldOnly && ` ${words.dualWieldAim}`}
+                </>
+              )}
+            </>
+          }
+        >
           <DataTable<PairRow>
             label={words.pairs}
             columns={[
               { id: "rh", label: words.rhColumn, sortValue: (row) => row.rh, render: (row) => row.rh },
               { id: "lh", label: words.lhColumn, sortValue: (row) => row.lh, render: (row) => row.lh },
-              { id: "per-run", label: columns.perRun, numeric: true, sortValue: (row) => row.count, render: (row) => perRun(row.perRun) },
-              {
-                id: "share",
-                label: columns.share,
-                numeric: true,
-                sortValue: (row) => row.share,
-                render: (row) => <ShareBar share={row.share} scale={scale} text={percent(row.share)} />,
-              },
+              perRunColumn((row) => row.count),
+              shareColumn(scale),
             ]}
             rows={pairRows}
             rowKey={(row) => row.key}
             fold={FOLD}
             faded={() => both.total < THIN_SAMPLE}
             initialSort="share"
-            empty={copy.simulate.nothing}
+            empty={copy.sim.nothing}
           />
-        </section>
+        </Section>
       )}
 
       {gear("spell", words.spell)}
@@ -141,21 +142,19 @@ export function Slots({
       {gear("item", words.item)}
       {gear("talisman", words.talisman, words.talismanLede)}
       <ShareSection title={words.rule} lede={words.ruleLede} table={tables.rule} search={search} />
-      <section className="simulate-section">
-        <SectionHeading>{words.ruleNone}</SectionHeading>
-        <SectionNote>{copy.simulate.counted(perRun(none.total / runs))}</SectionNote>
-        <div className="simulate-rows">
+      <Section title={words.ruleNone} lede={copy.sim.counted(perRun(none.total / runs))}>
+        <div>
           <ListRow title={words.neither} value={percent(none.total === 0 ? NaN : none.neither / none.total)} />
           <ListRow title={words.one} value={percent(none.total === 0 ? NaN : none.one / none.total)} />
           <ListRow title={words.both} value={percent(none.total === 0 ? NaN : none.both / none.total)} />
         </div>
-      </section>
+      </Section>
 
       {gear("armor", words.armor)}
 
-      <section className="simulate-section">
-        <SectionHeading>{words.empties}</SectionHeading>
-        <SectionNote>{words.emptiesLede}</SectionNote>
+      {region && <FurthestFromFair sample={sample} lines={lines} search={search} />}
+
+      <Section title={words.empties} lede={words.emptiesLede}>
         <DataTable<EmptyRow>
           label={words.empties}
           columns={[
@@ -165,17 +164,9 @@ export function Slots({
               sortValue: (row) => className(sample.data, row.characterClass),
               render: (row) => className(sample.data, row.characterClass),
             },
-            { id: "slot", label: columns.slot, render: (row) => copy.simulate.slotNames[row.slot] },
-            { id: "per-run", label: columns.perRun, numeric: true, sortValue: (row) => row.count, render: (row) => perRun(row.perRun) },
-            {
-              id: "share",
-              label: columns.share,
-              numeric: true,
-              sortValue: (row) => row.share,
-              render: (row) => (
-                <ShareBar share={row.share} scale={Math.max(...empty.map((one) => one.share))} text={percent(row.share)} />
-              ),
-            },
+            { id: "slot", label: columns.slot, render: (row) => copy.sim.slotNames[row.slot] },
+            perRunColumn((row) => row.count),
+            shareColumn(emptyScale),
           ]}
           rows={empty}
           rowKey={(row) => `${row.characterClass}/${row.slot}`}
@@ -183,7 +174,7 @@ export function Slots({
           initialSort="per-run"
           empty={words.noEmpties}
         />
-      </section>
+      </Section>
     </>
   );
 }
@@ -202,15 +193,11 @@ function CountBy({ hands, by, onBy }: { readonly hands: boolean; readonly by: Sl
         { value: "region", label: words.byRegion },
       ];
   return (
-    <div className="simulate-switch">
+    <div className="sim-switch">
       <Cycler<SlotView> label={words.countBy} options={options} value={!hands && by === "class" ? "item" : by} onChange={onBy} />
     </div>
   );
 }
 
-function named(table: ShareTable | null): ShareTable | null {
-  if (table === null) return null;
-  return { ...table, rows: table.rows.map((row) => (row.key === NO_LOCATION ? { ...row, name: words.noLocation } : row)) };
-}
 
 const twoSlots = (table: RegionTable) => table === "weaponAsh" || table === "shieldAsh" || table === "talisman";

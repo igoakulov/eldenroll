@@ -21,7 +21,7 @@ export interface WeightedOption {
   readonly option: Option;
   readonly weight: number;
   readonly modifiers: readonly Modifier[];
-  /** The catch-up boost in `weight` (`Hyperparams.catchUp`), on items and armor sets; 1 on anything else. */
+  /** The catch-up boost in `weight` (`Hyperparams.catchUp`), after `inPool`; 1 on anything without a location. */
   readonly catchUp: number;
 }
 
@@ -59,16 +59,18 @@ export interface RollContext {
   readonly availableSince?: Readonly<Record<string, number>>;
 }
 
-/** The catch-up boost on one option, as `WeightedOption.catchUp` holds it. */
-function catchUpMultiplier(
-  option: Option,
-  catchUp: CatchUp | undefined,
-  availableSince: Readonly<Record<string, number>> | undefined,
-): number {
-  if (catchUp === undefined || availableSince === undefined) return 1;
-  if (option.kind !== "item" && option.kind !== "armor_set") return 1;
+/** Whether catch-up moves chance to or from an option: an item with a location row, or a set with a piece that has
+ * one. `none`, consumables and the rest found everywhere keep their base share of the pool. */
+function located(data: EngineData, option: Option): boolean {
+  if (option.kind === "item") return !data.foundEverywhere.has(option.row.id);
+  if (option.kind === "armor_set") return option.row.pieces.some((piece) => !data.foundEverywhere.has(piece));
+  return false;
+}
+
+/** `CatchUp.boost` on one located option, before `CatchUp.inPool`. */
+function rawBoost(option: Option, catchUp: CatchUp, availableSince: Readonly<Record<string, number>> | undefined): number {
   // An option the run doesn't track, such as a shortlisted weapon out of reach, gets no boost
-  return catchUp(availableSince[optionKey(option)] ?? 1);
+  return availableSince === undefined ? 1 : catchUp.boost(availableSince[optionKey(option)] ?? 1);
 }
 
 export function optionKey(option: Option): string {
@@ -118,14 +120,27 @@ export function weighOptions(
 ): SlotPoolResult {
   const candidates = options.filter((option) => allowed(option, context, filters));
   const active = activeModifiers(context.data, context.state);
-  const weighted = candidates.map((option) => {
-    const modifiers = active.filter((row) => matchesOption(row.target, option));
-    const catchUp = catchUpMultiplier(option, context.catchUp, context.availableSince);
-    const weight = modifiers.reduce((product, row) => product * row.value, option.row.odds * catchUp);
-    return { option, weight, modifiers, catchUp };
+  const { catchUp } = context;
+  const kept = candidates
+    .map((option) => {
+      const modifiers = active.filter((row) => matchesOption(row.target, option));
+      const plain = modifiers.reduce((product, row) => product * row.value, option.row.odds);
+      const boost = catchUp !== undefined && located(context.data, option) ? rawBoost(option, catchUp, context.availableSince) : null;
+      return { option, modifiers, plain, boost };
+    })
+    .filter((row) => row.plain > 0);
+  let odds = 0;
+  let boostedOdds = 0;
+  for (const row of kept) {
+    if (row.boost === null) continue;
+    odds += row.option.row.odds;
+    boostedOdds += row.option.row.odds * row.boost;
+  }
+  const weighted = kept.map(({ option, modifiers, plain, boost }) => {
+    const multiplier = boost === null || catchUp === undefined ? 1 : catchUp.inPool({ boost, odds, boostedOdds });
+    return { option, weight: plain * multiplier, modifiers, catchUp: multiplier };
   });
-  const kept = weighted.filter((row) => row.weight > 0);
-  return { pool: kept.length, options: kept };
+  return { pool: weighted.length, options: weighted };
 }
 
 export function sample(result: SlotPoolResult, random: Random): SlotRoll {

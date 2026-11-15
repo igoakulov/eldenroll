@@ -25,7 +25,7 @@ const BASE_WINDOWS: readonly BaseWindow[] = [
   { until: null, targets: { vig: 60, mind: 20, end: 25 } },
 ];
 
-/** One step of a build: raise these to their targets, the first lowest first, before the next step. */
+/** One step of a build: raise these to their targets, the first listed first, before the next step. */
 interface BuildStep {
   readonly targets: Partial<Record<ItemStat, number>>;
   /** Every `every`-th point goes to these in turn instead. */

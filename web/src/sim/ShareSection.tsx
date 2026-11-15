@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 
-import { THIN_SAMPLE, type ShareRow, type ShareTable } from "../../sim/aggregate";
+import { THIN_SAMPLE, vsFair, type ShareRow, type ShareTable } from "../../sim/aggregate";
 import { copy } from "../copy";
-import { DataTable, ShareBar, type DataColumn } from "../ui/DataTable";
-import { SectionHeading, SectionNote } from "../ui/Headings";
-import { FOLD, matches, multiplier, percent, perRun } from "./format";
+import { DataTable, type DataColumn } from "../ui/DataTable";
+import { perRunColumn, shareColumn } from "./columns";
+import { Section } from "../ui/Headings";
+import { decimal, FOLD, matches, multiplier, percent, perRun, rowName } from "./format";
 
-const words = copy.simulate;
+const words = copy.sim;
+
 
 /** A section of shares: its heading, a line on what it counts, a `control` such as a switch of how it counts, and
  * the table, filtered by the search. */
@@ -27,27 +29,32 @@ export function ShareSection({
   readonly search: string;
 }) {
   if (table === null) return null;
-  const rows = table.rows.filter((row) => matches(row.name, search));
+  const rows = table.rows.filter((row) => matches(rowName(row), search));
   const counted = (table.unit === "showings" ? words.countedShowings : words.counted)(perRun(table.total / table.runs));
   if (search !== "" && rows.length === 0) return null;
-  const scale = Math.max(0, ...table.rows.flatMap((row) => [row.share, row.adjusted ?? 0]));
+  const scale = Math.max(0, ...table.rows.map((row) => row.share));
   const columns: DataColumn<ShareRow>[] = [
-    { id: "name", label: nameLabel, sortValue: (row) => row.name, render: (row) => row.name },
-    { id: "per-run", label: words.columns.perRun, numeric: true, sortValue: (row) => row.count, render: (row) => perRun(row.perRun) },
     {
-      id: "share",
-      label: words.columns.share,
-      numeric: true,
-      sortValue: (row) => row.share,
-      render: (row) => (
-        <ShareBar
-          share={row.share}
-          scale={scale}
-          text={percent(row.share)}
-          {...(row.adjusted === undefined ? {} : { mark: row.adjusted })}
-        />
-      ),
+      id: "name",
+      label: nameLabel,
+      // Names sort A to Z; a region's by its number, padded so 10 follows 9
+      sortValue: (row) => (row.order === undefined ? row.name : String(row.order).padStart(3, "0")),
+      render: (row) => rowName(row),
     },
+    perRunColumn((row) => row.count),
+    shareColumn(scale),
+    // Only tables with a share from pool size alone, by weapon class or by region, say how far each row is from it
+    ...(table.rows.some((row) => row.adjusted !== undefined)
+      ? [
+          {
+            id: "fair",
+            label: words.columns.fair,
+            numeric: true,
+            sortValue: (row: ShareRow) => vsFair(row),
+            render: (row: ShareRow) => decimal(vsFair(row)),
+          },
+        ]
+      : []),
     {
       id: "seen-in",
       label: words.columns.seenIn,
@@ -69,11 +76,7 @@ export function ShareSection({
       : []),
   ];
   return (
-    <section className="simulate-section">
-      <SectionHeading>{title}</SectionHeading>
-      <SectionNote>
-        {lede === undefined ? counted : `${lede} ${counted}`}
-      </SectionNote>
+    <Section title={title} lede={lede === undefined ? counted : `${lede} ${counted}`}>
       {control}
       <DataTable
         label={title}
@@ -85,6 +88,6 @@ export function ShareSection({
         initialSort="share"
         empty={words.nothing}
       />
-    </section>
+    </Section>
   );
 }

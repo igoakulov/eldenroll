@@ -1,11 +1,17 @@
-import type { ModifierText, Trigger } from "../../sim/aggregate";
+import { NO_LOCATION, type ModifierText, type ShareRow, type Trigger } from "../../sim/aggregate";
 import { copy } from "../copy";
 import type { TableFold } from "../ui/DataTable";
 
-const words = copy.simulate.synergies;
+const words = copy.sim.synergies;
 
 /** Every long table shows its first 10 rows and folds the rest behind `Show all`. */
-export const FOLD: TableFold = { after: 10, showAll: copy.simulate.showAll, showLess: copy.simulate.showLess };
+export const FOLD: TableFold = { after: 10, showAll: copy.sim.showAll, showLess: copy.sim.showLess };
+
+/** A share row's name as the page and `metrics.md` show it: a region numbered in play order, `No location` named. */
+export function rowName(row: Pick<ShareRow, "key" | "name" | "order">): string {
+  if (row.key === NO_LOCATION) return copy.sim.slots.noLocation;
+  return row.order === undefined ? row.name : copy.sim.regionNumbered(row.order, row.name);
+}
 
 export function percent(share: number, digits = 1): string {
   return Number.isFinite(share) ? `${(share * 100).toFixed(digits)}%` : "–";
@@ -14,6 +20,13 @@ export function percent(share: number, digits = 1): string {
 /** Showings per run, the unit a run is judged by: two decimals below 10, so a rare option still reads. */
 export function perRun(value: number): string {
   return decimal(value, value < 10 ? 2 : 1);
+}
+
+/** The smallest round number at or above `top`, one significant digit: each chart's own scale. */
+export function niceMax(top: number): number {
+  if (top <= 0) return 1;
+  const step = 10 ** Math.floor(Math.log10(top));
+  return Math.ceil(top / step - 1e-9) * step;
 }
 
 export function decimal(value: number, digits = 2): string {

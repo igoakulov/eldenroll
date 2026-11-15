@@ -2,14 +2,16 @@
 // the page's: this returns ids, game names and numbers.
 import type { Condition, Item, LoadoutSlot, Modifier, Selector } from "../src/engine/database";
 import { isNone, POOL_SLOTS } from "../src/engine/database";
+import { ashFits } from "../src/engine/loadout";
 import type { EngineData } from "../src/engine/engineData";
-import { STATS, type Stat } from "../src/engine/settings";
+import { derivedLevel, STATS, type Stat } from "../src/engine/settings";
 import { optionKey, repeatKey, slotOptions } from "../src/engine/slotRoll";
 import { matchesOption, type Option } from "../src/engine/selectors";
 import {
   BUCKET,
   CHANCE_SLOTS,
-  playOrder,
+  playRank,
+  readChanceKey,
   type ChanceSum,
   type ChanceSums,
   type ObjectiveRow,
@@ -63,7 +65,7 @@ function humanise(id: string): string {
 }
 
 /** A repeat key's game name: `item:…`, `alias:…`, `rule:…`, `armor_set:…`, `character_class:…`. */
-export function nameOf(data: EngineData, key: string): string {
+function nameOf(data: EngineData, key: string): string {
   const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
   if (kind === "alias") return data.aliases.get(id)?.label ?? id;
   if (kind === "item") return data.items.get(id)?.name ?? id;
@@ -146,6 +148,14 @@ export interface ShareRow {
   /** The share it would have from pool size alone, where it applies: every weapon class holding as many weapons, or
    * every item of a region's showing equally. */
   readonly adjusted?: number;
+  /** A region's number in play order, from 1, which the page and `metrics.md` show before its name and sort by. */
+  readonly order?: number;
+}
+
+/** A row's share against the one pool size alone would give: 1 even, above 1 more than its fair share; NaN where
+ * none applies. */
+export function vsFair(row: ShareRow): number {
+  return row.adjusted === undefined || row.adjusted === 0 ? NaN : row.share / row.adjusted;
 }
 
 export interface ShareTable {
@@ -245,9 +255,9 @@ function foldChances(
   if (chances === undefined) return rows;
   const picked = new Set(sample.classes);
   for (const [at, sum] of chances) {
-    const [characterClass = "", slot = "", key = "", stretch = ""] = at.split("|");
+    const { characterClass, slot, key, stretch } = readChanceKey(at);
     if (!picked.has(characterClass)) continue;
-    const row = group({ slot: slot as LoadoutSlot, key, stretch: Number(stretch) });
+    const row = group({ slot, key, stretch });
     if (row === undefined) continue;
     const total = rows.get(row) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0 };
     total.chance += sum.chance;
@@ -292,10 +302,15 @@ function inReach(
   return found;
 }
 
+/** An item's weapon or shield class, or its category where it has none. */
+function classOfItem(item: Item): string {
+  return item.subcategory ?? item.category;
+}
+
 /** A weapon class, a shield class or a category: what the hand holds, `none` for an empty one. */
 function handClass(data: EngineData, roll: RollRow | undefined): string | undefined {
   const item = chosenItem(data, roll);
-  return item === undefined ? undefined : (item.subcategory ?? item.category);
+  return item === undefined ? undefined : classOfItem(item);
 }
 
 /** Pools whose only possible roll is `none`: a bare pick, never a gap. */
@@ -308,7 +323,7 @@ function poolSizes(data: EngineData, characterClass: string, slot: LoadoutSlot):
   const counts = new Map<string, number>();
   for (const option of slotOptions(data, characterClass, slot)) {
     if (option.kind !== "item" || option.row.odds <= 0) continue;
-    const key = option.row.subcategory ?? option.row.category;
+    const key = classOfItem(option.row);
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
   return counts;
@@ -334,7 +349,7 @@ export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView, chan
   }
   const classOf = (key: string) => {
     const item = membersOf(data, key)[0];
-    return item === undefined ? undefined : (item.subcategory ?? item.category);
+    return item === undefined ? undefined : classOfItem(item);
   };
   const table = shareTable(
     sample,
@@ -346,7 +361,7 @@ export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView, chan
     humanise,
     {
       universe: inReach(sample, classes, [slot]).flatMap((option) =>
-        option.kind === "item" ? [option.row.subcategory ?? option.row.category] : [],
+        option.kind === "item" ? [classOfItem(option.row)] : [],
       ),
       boosts: boostsInReach(sample, chances, [slot], classOf),
     },
@@ -466,7 +481,7 @@ const mean = (values: readonly number[]) =>
 /** Per run, averaged: whole runs, so the class filter doesn't apply. */
 export function runSummary(sample: Sample): RunSummary {
   const { results } = sample;
-  const levels = results.map((result) => STATS.reduce((sum, stat) => sum + result.finalStats[stat], 0) - 79);
+  const levels = results.map((result) => derivedLevel(result.finalStats));
   return {
     runs: results.length,
     objectives: mean(results.map((result) => result.objectives.length)),
@@ -584,12 +599,25 @@ export interface EmptyRow {
   readonly share: number;
 }
 
-/** Rolls that found nothing, not even `none`, where `none` isn't the only possible roll. */
+const ASH_HANDS: Partial<Record<LoadoutSlot, LoadoutSlot>> = { rh_ash: "rh", lh_ash: "lh" };
+
+/** Whether the hand an ash slot belongs to holds something some ash fits: a somber weapon, a catalyst or an empty
+ * hand rolls no ash by design. */
+function takesAnAsh(data: EngineData, one: Obj, slot: LoadoutSlot): boolean {
+  const hand = ASH_HANDS[slot];
+  if (hand === undefined) return true;
+  const item = chosenItem(data, one.rolls.get(hand));
+  return item !== undefined && [...data.ashFits.keys()].some((ash) => ashFits(data, ash, item));
+}
+
+/** Rolls that found nothing, not even `none`, where `none` isn't the only possible roll and, for an ash, its hand
+ * could hold one. */
 export function empties(sample: Sample): readonly EmptyRow[] {
   const counts = new Map<string, EmptyRow>();
   for (const one of sample.objectives) {
     for (const [slot, roll] of one.rolls) {
       if (roll.chosen !== null || alwaysNone(sample.data, one.row.characterClass, slot)) continue;
+      if (!takesAnAsh(sample.data, one, slot)) continue;
       const key = `${one.row.characterClass}/${slot}`;
       const row = counts.get(key) ?? { characterClass: one.row.characterClass, slot, count: 0, perRun: 0, share: 0 };
       counts.set(key, { ...row, count: row.count + 1 });
@@ -606,6 +634,9 @@ export function empties(sample: Sample): readonly EmptyRow[] {
 
 /** Every share table but the combat rules', which have no location. */
 export type RegionTable = "rh" | "lh" | Exclude<GearTable, "rule">;
+
+/** Every table by region, in the page's order. */
+export const REGION_TABLES: readonly RegionTable[] = ["rh", "lh", "spell", "weaponAsh", "shieldAsh", "item", "talisman", "armor"];
 
 const REGION_SLOTS: Readonly<Record<RegionTable, readonly LoadoutSlot[]>> = {
   rh: ["rh"],
@@ -629,7 +660,7 @@ function regionsOf(data: EngineData): ReadonlyMap<string, string> {
   const cached = firstRegions.get(data);
   if (cached !== undefined) return cached;
   const { database } = data;
-  const rank = new Map(playOrder(database).map((id, index) => [id, index]));
+  const rank = playRank(database);
   const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
   const items = new Map<string, string>();
   for (const row of database.item_location) {
@@ -648,12 +679,12 @@ function regionsOf(data: EngineData): ReadonlyMap<string, string> {
   return found;
 }
 
-/** The region an option key counts in: an item's first, a set's last piece's, an alias's first member's, or
- * `NO_LOCATION`. */
+/** The region an option key counts in: an item's first, a set's last piece's, an alias's earliest member's in play
+ * order, or `NO_LOCATION`. */
 function regionOfKey(data: EngineData, key: string): string {
   const regions = regionsOf(data);
   if (!key.startsWith("alias:")) return regions.get(key) ?? NO_LOCATION;
-  const rank = new Map(playOrder(data.database).map((id, index) => [id, index]));
+  const rank = playRank(data.database);
   const found = membersOf(data, key).flatMap((item) => {
     const region = regions.get(`item:${item.id}`);
     return region === undefined ? [] : [region];
@@ -673,6 +704,8 @@ export function regionShares(sample: Sample, table: RegionTable, chances?: Chanc
   const ash = table === "weaponAsh" || table === "shieldAsh" ? table === "shieldAsh" : undefined;
   const fits = (id: string) => ash === undefined || shieldAsh(data, id) === ash;
   const regionOf = (key: string) => regionOfKey(data, key);
+  const rank = playRank(data.database);
+  const orderOf = (region: string) => (rank.get(region) ?? -1) + 1;
   const reach = new Map<string, string>();
   for (const option of inReach(sample, classes, slots, (option) => fits(option.row.id))) {
     if (!isNone(option.row.id)) reach.set(optionKey(option), regionOf(optionKey(option)));
@@ -691,7 +724,14 @@ export function regionShares(sample: Sample, table: RegionTable, chances?: Chanc
     (region) => (region === NO_LOCATION ? NO_LOCATION : regionName(data, region)),
     { universe: options.keys(), boosts: boostsInReach(sample, chances, slots, regionOf), basis: "showings" },
   );
-  return { ...shares, rows: shares.rows.map((row) => ({ ...row, adjusted: (options.get(row.key) ?? 0) / Math.max(1, reach.size) })) };
+  return {
+    ...shares,
+    rows: shares.rows.map((row) => ({
+      ...row,
+      adjusted: (options.get(row.key) ?? 0) / Math.max(1, reach.size),
+      ...(row.key === NO_LOCATION ? {} : { order: orderOf(row.key) }),
+    })),
+  };
 }
 
 // Boosts
@@ -820,7 +860,7 @@ export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
   const picked = new Set(sample.classes);
   const keys = new Set<string>();
   for (const at of chances.keys()) {
-    const [characterClass = "", , key = ""] = at.split("|");
+    const { characterClass, key } = readChanceKey(at);
     if (picked.has(characterClass)) keys.add(key);
   }
   return [...keys].map((key) => ({ key, name: nameOf(sample.data, key) }));
@@ -834,8 +874,6 @@ interface ItemPoint {
   readonly plain: number;
   /** The mean catch-up boost on it in the stretch. */
   readonly catchUp: number;
-  /** Rolls of the picked classes in the stretch where it was in reach. */
-  readonly rolls: number;
   /** Times shown by the stretch's end, averaged over runs. */
   readonly shown: number;
 }
@@ -876,10 +914,77 @@ export function itemSeries(
           chance: total.chance / total.rolls,
           plain: total.plain / total.rolls,
           catchUp: total.plain > 0 ? total.boosted / total.plain : 1,
-          rolls: total.rolls,
           shown: mean(counts),
         };
       }),
   }));
 }
 
+
+// Furthest from fair
+
+/** A line expecting fewer showings than this at its fair share, over its class's objectives in the sample, is left
+ * out: however far from 1 it reads, it is noise. */
+const LINE_SAMPLE = 8;
+/** The share of lines, furthest from fair first, that Furthest from fair lists. */
+export const WORST_SHARE = 0.3;
+const WORST_AT_LEAST = 10;
+/** Region tables Furthest from fair reads: the item slot's shares follow odds that differ by design, so its Vs fair
+ * says little. */
+export const FAIR_TABLES: readonly RegionTable[] = REGION_TABLES.filter((table) => table !== "item");
+
+/** One region of one slot for one class alone. */
+export interface FairLine {
+  readonly characterClass: string;
+  readonly table: RegionTable;
+  readonly key: string;
+  readonly region: string;
+  readonly order: number | undefined;
+  readonly vsFair: number;
+  /** Showings a run at its fair share. */
+  readonly fairPerRun: number;
+}
+
+/** The sample as one class alone would read it, over the same runs. */
+function forClass(sample: Sample, characterClass: string): Sample {
+  return { ...sample, objectives: sample.all.filter((one) => one.row.characterClass === characterClass), classes: [characterClass] };
+}
+
+/** Every region of the region tables for each picked class alone, with enough sample (`LINE_SAMPLE`); `No location`
+ * is left out. */
+export function fairLines(sample: Sample, tables: readonly RegionTable[], chances?: ChanceSums): readonly FairLine[] {
+  const lines: FairLine[] = [];
+  for (const characterClass of sample.classes) {
+    const own = forClass(sample, characterClass);
+    for (const table of tables) {
+      const shares = regionShares(own, table, chances);
+      if (shares === null) continue;
+      for (const row of shares.rows) {
+        const fair = row.adjusted ?? 0;
+        if (row.key === NO_LOCATION || fair === 0 || fair * shares.total < LINE_SAMPLE) continue;
+        lines.push({
+          characterClass,
+          table,
+          key: row.key,
+          region: row.name,
+          order: row.order,
+          vsFair: vsFair(row),
+          fairPerRun: (fair * shares.total) / shares.runs,
+        });
+      }
+    }
+  }
+  return lines;
+}
+
+/** How far a line is from fair on a log scale, so half and double are equally far; one that never showed is
+ * furthest. */
+function distance(line: FairLine): number {
+  return line.vsFair > 0 ? Math.abs(Math.log2(line.vsFair)) : Infinity;
+}
+
+/** The lines furthest from fair, worst first: `WORST_SHARE` of them, at least 10 where there are as many. */
+export function worstLines(lines: readonly FairLine[]): readonly FairLine[] {
+  const sorted = [...lines].sort((a, b) => distance(b) - distance(a));
+  return sorted.slice(0, Math.min(sorted.length, Math.max(WORST_AT_LEAST, Math.ceil(sorted.length * WORST_SHARE))));
+}

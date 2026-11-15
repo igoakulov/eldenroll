@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Database, Item, Modifier, PoolSlot } from "./database";
 import { countedItems } from "./eligibility";
 import { indexDatabase, type EngineData } from "./engineData";
+import { DEFAULT_HYPERPARAMS } from "./hyperparams";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
 import {
@@ -394,11 +395,25 @@ describe("the catch-up boost", () => {
     const weigh = (left: number) => {
       const availableSince = { "item:crystal_sword": 1, "item:miquellan_knights_sword": left };
       const result = weighOptions(
-        { data: real, state, counted: EVERYTHING, catchUp: (runLeft) => 1 / runLeft, availableSince },
+        { data: real, state, counted: EVERYTHING, catchUp: { ...DEFAULT_HYPERPARAMS.catchUp, boost: (runLeft) => 1 / runLeft }, availableSince },
         slotOptions(real, "knight", "rh"),
       );
       return weightOf(result, "miquellan_knights_sword")! / weightOf(result, "crystal_sword")!;
     };
     expect(weigh(0.25) / weigh(1)).toBeCloseTo(4);
+  });
+
+  it("leaves consumables, found everywhere, their share of the item slot when a late tool comes into reach", () => {
+    const state = { characterClass: "knight", boss: null, rolled: new Map<PoolSlot, string | null>() };
+    const everywhere = (availableSince: Record<string, number>) => {
+      const result = weighOptions(
+        { data: real, state, counted: EVERYTHING, catchUp: DEFAULT_HYPERPARAMS.catchUp, availableSince },
+        slotOptions(real, "knight", "item"),
+      );
+      const total = result.options.reduce((sum, row) => sum + row.weight, 0);
+      const found = result.options.filter((row) => real.foundEverywhere.has(row.option.row.id));
+      return found.reduce((sum, row) => sum + row.weight, 0) / total;
+    };
+    expect(everywhere({ "item:horned_bairn": 0.05 })).toBeCloseTo(everywhere({}));
   });
 });

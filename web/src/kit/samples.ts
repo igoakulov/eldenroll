@@ -1,4 +1,5 @@
 import { isNone, type ArmorSet, type BossInstance, type CharacterClass, type CombatRule, type Database, type Item, type Region } from "../engine/database";
+import { splitDlc } from "../engine/regions";
 
 /** The rows with the longest labels in `db.json`, so the kit stresses a layout the way real data does
  * (web/src/ui/README.md#UI kit). Only rollable rows count: nothing else reaches a screen. */
@@ -24,7 +25,6 @@ export interface Samples {
   readonly dlcRegion: Region;
 }
 
-const DLC_PREFIX = "DLC: ";
 
 function longest<T>(rows: readonly T[], label: (row: T) => string): T {
   const found = rows.reduce<T | undefined>(
@@ -44,7 +44,7 @@ export function samples(database: Database): Samples {
     );
   const rollableSets = database.armor_set.filter((set) => set.odds > 0);
   const bosses = database.boss_instance.filter((boss) => boss.odds > 0);
-  const regionLabel = (region: Region) => region.name.replace(DLC_PREFIX, "");
+  const regionLabel = (region: Region) => splitDlc(region.name).name;
   return {
     weapon: longestIn("weapon"),
     shield: longestIn("shield"),
@@ -66,11 +66,11 @@ export function samples(database: Database): Samples {
     bossByLocation: longest(bosses, (boss) => boss.location),
     characterClass: longest(database.character_class, (row) => row.name),
     region: longest(
-      database.region.filter((region) => !region.name.startsWith(DLC_PREFIX)),
+      database.region.filter((region) => !splitDlc(region.name).dlc),
       regionLabel,
     ),
     dlcRegion: longest(
-      database.region.filter((region) => region.name.startsWith(DLC_PREFIX)),
+      database.region.filter((region) => splitDlc(region.name).dlc),
       regionLabel,
     ),
   };

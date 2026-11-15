@@ -2,6 +2,11 @@
   overflow-x: auto;
 }
 
+/* Two tables in one section read as two */
+.data-table-frame + .data-table-frame {
+  margin-top: var(--space-7);
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -112,15 +117,6 @@
   background: var(--gold-dim);
 }
 
-.share-bar-mark {
-  position: absolute;
-  top: -3px;
-  bottom: -3px;
-  /* Centred on its share, but kept inside the rail, so a tick at either end never widens the table */
-  left: clamp(0px, calc(var(--mark) * 100% - 1px), calc(100% - 2px));
-  width: 2px;
-  background: var(--grace);
-}
 
 @media (hover: hover) {
   .data-table th button:hover {

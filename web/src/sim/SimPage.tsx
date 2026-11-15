@@ -11,13 +11,13 @@ import { BottomBar, GlowBand } from "../ui/BottomBar";
 import { ChipButton, Chips } from "../ui/Chips";
 import { Cycler } from "../ui/Cycler";
 import { ControlRow } from "../ui/Rows";
-import { HeadingAction, HeadingCount, ScreenHead, SectionHeading, SectionNote } from "../ui/Headings";
+import { HeadingAction, HeadingCount, ScreenHead, Section, SectionHeading, SectionNote } from "../ui/Headings";
 import { LozengeCheckbox } from "../ui/LozengeCheckbox";
 import { SearchField } from "../ui/SearchField";
 import { Stepper } from "../ui/Stepper";
 import { StopSlider } from "../ui/StopSlider";
 import { Tabs } from "../ui/Tabs";
-import { useHideOnScroll } from "../ui/useHideOnScroll";
+import { StickyHeader } from "../ui/StickyHeader";
 import { Synergies } from "./Synergies";
 import { Items } from "./Items";
 import { Slots } from "./Slots";
@@ -33,12 +33,12 @@ import {
   type Inputs,
   type View,
 } from "./inputs";
-import { DLC_PREFIX } from "../views/StatsAndRegions";
 import { Overview } from "./Overview";
-import type { Reply, Request } from "./simulate.worker";
-import "./SimulatePage.css";
+import type { Reply, Request } from "./sim.worker";
+import "./SimPage.css";
+import { splitDlc } from "../engine/regions";
 
-const words = copy.simulate;
+const words = copy.sim;
 
 type Loaded =
   | { readonly status: "loading" }
@@ -56,7 +56,7 @@ const corrector = (min: number, max: number) => (entered: string, previous: numb
   return Number.isNaN(value) ? previous : Math.min(max, Math.max(min, value));
 };
 
-export function SimulatePage() {
+export function SimPage() {
   const initial = useMemo(() => readAddress(window.location.search), []);
   const [inputs, setInputs] = useState<Inputs>(initial.inputs);
   const [view, setView] = useState<View>(initial.view);
@@ -69,9 +69,12 @@ export function SimulatePage() {
   } | null>(null);
   const worker = useRef<Worker | null>(null);
   const nextId = useRef(0);
+  // Fetched once: the page reads it, and every run request hands it to the worker
+  const fetched = useRef<Promise<Database> | null>(null);
+  const loadOnce = () => (fetched.current ??= loadDatabase());
 
   useEffect(() => {
-    loadDatabase().then(
+    loadOnce().then(
       (database) => setLoaded({ status: "ready", database, data: indexDatabase(database) }),
       (error: unknown) => setLoaded({ status: "failed", message: String(error) }),
     );
@@ -82,7 +85,7 @@ export function SimulatePage() {
   }, [inputs, view]);
 
   const simulate = (with_: Inputs) => {
-    worker.current ??= new Worker(new URL("./simulate.worker.ts", import.meta.url), { type: "module" });
+    worker.current ??= new Worker(new URL("./sim.worker.ts", import.meta.url), { type: "module" });
     const id = (nextId.current += 1);
     setSimulation({ status: "running", id, inputs: with_, done: 0 });
     worker.current.onmessage = (event: MessageEvent<Reply>) => {
@@ -96,7 +99,9 @@ export function SimulatePage() {
       }
     };
     worker.current.onerror = (event) => setSimulation({ status: "failed", message: event.message });
-    worker.current.postMessage({ id, inputs: with_ } satisfies Request);
+    void loadOnce().then((loadedDatabase) =>
+      worker.current?.postMessage({ id, inputs: with_, database: loadedDatabase } satisfies Request),
+    );
   };
 
   // A link reproduces its result: the first one plays as the page opens
@@ -110,15 +115,17 @@ export function SimulatePage() {
 
   if (loaded.status !== "ready") {
     return (
-      <main className="simulate-loading">
-        <p>{loaded.status === "loading" ? words.loading : loaded.message}</p>
+      <main className="sim">
+        <div className="sim-note">
+          <Section lede={loaded.status === "loading" ? words.loading : loaded.message} />
+        </div>
       </main>
     );
   }
   const { database, data } = loaded;
   const order = playOrder(database);
   const regions = order.map((id) => database.region.find((row) => row.id === id)!);
-  const ticked = inputs.regions ?? order;
+  const checked = inputs.regions ?? order;
   const setRegions = (next: readonly string[]) =>
     setInputs((last) => ({ ...last, regions: next.length === order.length ? null : order.filter((id) => next.includes(id)) }));
   const running = simulation.status === "running";
@@ -131,10 +138,10 @@ export function SimulatePage() {
   };
 
   return (
-    <main className="simulate">
-      <aside className="simulate-settings">
+    <main className="sim">
+      <aside className="sim-settings">
         <ScreenHead title={words.title} lede={words.lede}>
-          <a className="simulate-to-app" href="../">
+          <a className="sim-to-app" href="../">
             {words.toApp}
           </a>
         </ScreenHead>
@@ -146,7 +153,7 @@ export function SimulatePage() {
         </SectionHeading>
         <div>
           <Stepper
-            id="simulate-runs"
+            id="sim-runs"
             label={words.runs}
             detail={words.runsDetail}
             value={inputs.runs}
@@ -164,7 +171,7 @@ export function SimulatePage() {
             />
           </ControlRow>
           <Stepper
-            id="simulate-seed"
+            id="sim-seed"
             label={words.seed}
             value={inputs.seed}
             min={0}
@@ -175,7 +182,7 @@ export function SimulatePage() {
         </div>
 
         <SectionHeading>{words.completion}</SectionHeading>
-        <div className="simulate-pad">
+        <div className="sim-pad">
           <SectionNote>{words.completionDetail(inputs.completion)}</SectionNote>
           <StopSlider
             stops={100 / COMPLETION_STEP}
@@ -188,33 +195,33 @@ export function SimulatePage() {
         </div>
 
         <SectionHeading>
-          {words.regions} <HeadingCount>{ticked.length}</HeadingCount>
+          {words.regions} <HeadingCount>{checked.length}</HeadingCount>
         </SectionHeading>
-        <div className="simulate-pad">
+        <div className="sim-pad">
           <SectionNote>{words.regionsDetail}</SectionNote>
         </div>
         <div>
-          <LozengeCheckbox framed checked={ticked.length === order.length} onChange={(on) => setRegions(on ? order : [])}>
+          <LozengeCheckbox framed checked={checked.length === order.length} onChange={(on) => setRegions(on ? order : [])}>
             {words.allRegions}
           </LozengeCheckbox>
           {regions.map((region, index) => {
-            const dlc = region.name.startsWith(DLC_PREFIX);
+            const { dlc, name } = splitDlc(region.name);
             return (
               <LozengeCheckbox
                 key={region.id}
-                checked={ticked.includes(region.id)}
-                onChange={(on) => setRegions(on ? [...ticked, region.id] : ticked.filter((id) => id !== region.id))}
+                checked={checked.includes(region.id)}
+                onChange={(on) => setRegions(on ? [...checked, region.id] : checked.filter((id) => id !== region.id))}
                 {...(dlc ? { tag: copy.statsAndRegions.dlc } : {})}
               >
-                {words.regionNumbered(index + 1, dlc ? region.name.slice(DLC_PREFIX.length) : region.name)}
+                {words.regionNumbered(index + 1, name)}
               </LozengeCheckbox>
             );
           })}
         </div>
 
         <BottomBar
-          className="simulate-bottom"
-          {...(ticked.length === 0
+          className="sim-bottom"
+          {...(checked.length === 0
             ? { notice: words.noRegions }
             : simulation.status === "failed"
               ? { notice: words.failed(simulation.message) }
@@ -224,7 +231,7 @@ export function SimulatePage() {
         >
           <GlowBand
             onClick={() => {
-              if (!running && ticked.length > 0) simulate(inputs);
+              if (!running && checked.length > 0) simulate(inputs);
             }}
           >
             {running ? words.simulating(simulation.done, simulation.inputs.runs) : words.simulate}
@@ -232,8 +239,9 @@ export function SimulatePage() {
         </BottomBar>
       </aside>
 
-      <section className={`simulate-results${stale || running ? " simulate-results-stale" : ""}`} aria-busy={running}>
+      <section className="sim-results" aria-busy={running}>
         <Results
+          dimmed={stale || running}
           data={data}
           runs={results?.runs ?? null}
           chances={results?.chances ?? null}
@@ -242,24 +250,27 @@ export function SimulatePage() {
           onView={(change) => setView((last) => ({ ...last, ...change }))}
           filters={
             <>
-            <div className="simulate-classes">
-              <Chips label={words.classes}>
-                {database.character_class.map((row) => (
-                  <ChipButton key={row.id} pressed={classes.includes(row.id)} onToggle={(on) => toggleClass(row.id, on)}>
-                    {row.name}
+              <div className="sim-classes">
+                <Chips label={words.classes}>
+                  {database.character_class.map((row) => (
+                    <ChipButton key={row.id} pressed={classes.includes(row.id)} onToggle={(on) => toggleClass(row.id, on)}>
+                      {row.name}
+                    </ChipButton>
+                  ))}
+                  <ChipButton
+                    pressed={view.classes === null}
+                    onToggle={() => setView((last) => ({ ...last, classes: last.classes === null ? [] : null }))}
+                  >
+                    {words.allClasses}
                   </ChipButton>
-                ))}
-                <ChipButton
-                  pressed={view.classes === null}
-                  onToggle={() => setView((last) => ({ ...last, classes: last.classes === null ? [] : null }))}
-                >
-                  {words.allClasses}
-                </ChipButton>
-              </Chips>
-            </div>
-            <div className="simulate-search">
-              <SearchField label={words.searchLabel} placeholder={words.searchPlaceholder} value={view.search} onChange={(search) => setView((last) => ({ ...last, search }))} />
-            </div>
+                </Chips>
+              </div>
+              <SearchField
+                label={words.searchLabel}
+                placeholder={words.searchPlaceholder}
+                value={view.search}
+                onChange={(search) => setView((last) => ({ ...last, search }))}
+              />
             </>
           }
         />
@@ -276,6 +287,7 @@ function Results({
   view,
   onView,
   filters,
+  dimmed,
 }: {
   readonly data: EngineData;
   readonly runs: readonly RunResult[] | null;
@@ -285,6 +297,8 @@ function Results({
   readonly onView: (change: Partial<View>) => void;
   /** The class filter and the search, in the sticky header above the tabs. */
   readonly filters: ReactNode;
+  /** Results from earlier settings, or being replaced. */
+  readonly dimmed: boolean;
 }) {
   // The picked classes, compared by their ids: a new array of the same ids counts nothing again
   const picked = classes.join();
@@ -292,7 +306,11 @@ function Results({
   // The tables filter as the search changes, behind the typing rather than in its way
   const search = useDeferredValue(view.search);
   const sums = useMemo(() => chances ?? new Map(), [chances]);
-  const note = (text: string) => <div className="simulate-note"><SectionNote>{text}</SectionNote></div>;
+  const note = (text: string) => (
+    <div className="sim-note">
+      <Section lede={text} />
+    </div>
+  );
   const panels =
     sample === null
       ? TABS.map(() => note(words.loading))
@@ -305,6 +323,8 @@ function Results({
             <Items key="items" sample={sample} chances={sums} search={search} />,
           ];
   const selected = TABS.indexOf(view.tab);
+  // The tab answers at once; its panel draws behind it, a note standing in until it is ready
+  const drawn = useDeferredValue(selected);
   // Only the selected panel is drawn: the others would count the whole sample again for nothing
   return (
     <Tabs
@@ -312,20 +332,16 @@ function Results({
       tabs={words.tabs}
       selected={selected}
       onSelect={(index) => onView({ tab: TABS[index]! })}
-      panels={panels.map((panel, index) => (index === selected ? panel : null))}
+      panels={panels.map((panel, index) => (index !== selected ? null : index === drawn ? panel : note(words.loading)))}
       bar={(row) => (
-        <ResultsHeader>
+        // The class filter, the search and the tabs, back in view on any scroll up
+        <StickyHeader>
           {filters}
           {row}
-        </ResultsHeader>
+        </StickyHeader>
       )}
+      dimmed={dimmed}
     />
   );
 }
 
-/** The class filter, the search and the tabs: stuck to the top, out of the way while the page scrolls down and back
- * as soon as it scrolls up, as on the UI kit's page. */
-function ResultsHeader({ children }: { readonly children: ReactNode }) {
-  const hidden = useHideOnScroll();
-  return <div className={`simulate-header${hidden ? " simulate-header-hidden" : ""}`}>{children}</div>;
-}

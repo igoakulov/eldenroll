@@ -36,6 +36,26 @@ export function SectionNote({ children }: { readonly children: ReactNode }) {
   return <p className="section-note">{children}</p>;
 }
 
+/** A section of a long page, such as the simulation's: its heading, a note on what it counts, then its body, all
+ * inside the gutter but headings, which bring their own. */
+export function Section({
+  title,
+  lede,
+  children,
+}: {
+  readonly title?: ReactNode;
+  readonly lede?: ReactNode;
+  readonly children?: ReactNode;
+}) {
+  return (
+    <section className="section">
+      {title !== undefined && <SectionHeading>{title}</SectionHeading>}
+      {lede !== undefined && <SectionNote>{lede}</SectionNote>}
+      {children}
+    </section>
+  );
+}
+
 /** A count leading a section heading, such as `3 selected`, its digits lined up. */
 export function HeadingCount({ children }: { readonly children: number }) {
   return <span className="section-heading-count">{children}</span>;

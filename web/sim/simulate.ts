@@ -25,7 +25,7 @@ interface SimOptions {
   /** The percentage of a region's bosses felled, rounding up, before the next one opens. */
   readonly completion: number;
   readonly characterClasses: readonly string[] | null;
-  /** Where to add every option's chance at roll time, for the page's item charts; left out by the dump. */
+  /** Where to add every option's chance at roll time, for the item charts and the catch-up columns. */
   readonly chances?: ChanceSums;
 }
 
@@ -53,6 +53,17 @@ function chanceKey(characterClass: string, slot: LoadoutSlot, key: string, stret
   return `${characterClass}|${slot}|${key}|${stretch}`;
 }
 
+/** A `ChanceSums` key's parts. */
+export function readChanceKey(at: string): {
+  readonly characterClass: string;
+  readonly slot: LoadoutSlot;
+  readonly key: string;
+  readonly stretch: number;
+} {
+  const [characterClass = "", slot = "", key = "", stretch = ""] = at.split("|");
+  return { characterClass, slot: slot as LoadoutSlot, key, stretch: Number(stretch) };
+}
+
 /** The stretch an objective falls in, by its first objective number. */
 export function stretchOf(objective: number): number {
   return Math.floor((objective - 1) / BUCKET) * BUCKET + 1;
@@ -72,7 +83,6 @@ export interface RollRow {
   readonly catchUp: number;
   readonly pool: number;
   readonly noneChance: number | null;
-  /** Summed chance of options boosted ×100,000 or more, if any. */
   /** Ids of boosting modifiers (×>1) active on any option in the pool. */
   readonly boosts: readonly string[];
   /** Summed chance of the options each boost hits, in `boosts` order. */
@@ -170,11 +180,28 @@ export function runSeed(seed: number, allocation: Allocation, run: number): numb
   return (Math.imul(seed, 2654435761) + Math.imul(ALLOCATIONS.indexOf(allocation), 97_003) + run * 40503) | 0;
 }
 
-/** Every region in the order a run opens them. */
+const orders = new WeakMap<Database, { readonly order: readonly string[]; readonly rank: ReadonlyMap<string, number> }>();
+
+function ordered(database: Database) {
+  let found = orders.get(database);
+  if (found === undefined) {
+    const order = [...database.region]
+      .sort((a, b) => (DLC_ORDER[a.id] ?? a.region_level) - (DLC_ORDER[b.id] ?? b.region_level))
+      .map((row) => row.id);
+    found = { order, rank: new Map(order.map((id, index) => [id, index])) };
+    orders.set(database, found);
+  }
+  return found;
+}
+
+/** Every region in the order a run opens them, worked out once per database. */
 export function playOrder(database: Database): readonly string[] {
-  return [...database.region]
-    .sort((a, b) => (DLC_ORDER[a.id] ?? a.region_level) - (DLC_ORDER[b.id] ?? b.region_level))
-    .map((row) => row.id);
+  return ordered(database).order;
+}
+
+/** Each region's place in `playOrder`, from 0. */
+export function playRank(database: Database): ReadonlyMap<string, number> {
+  return ordered(database).rank;
 }
 
 export function simulateRun(base: Engine, options: SimOptions): RunResult {
@@ -182,7 +209,7 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
   const engine: Engine = { ...base, observe: (slot, roll) => observed.push({ slot, roll }) };
   const database = engine.data.database;
   const order = playOrder(database).filter((id) => options.regions === null || options.regions.includes(id));
-  const rank = new Map(playOrder(database).map((id, index) => [id, index]));
+  const rank = playRank(database);
   const bosses = bossesByRegion(database);
   const regionOfBoss = bossRegions(database);
   const settings = {

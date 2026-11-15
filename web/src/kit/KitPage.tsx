@@ -1,9 +1,9 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { Database } from "../engine/database";
 import { loadDatabase } from "../loadDatabase";
 import { WordmarkO } from "../ui/Icon";
-import { useHideOnScroll } from "../ui/useHideOnScroll";
+import { StickyHeader } from "../ui/StickyHeader";
 import { Blocks, MissingEntries } from "./Blocks";
 import { KitFrame } from "./kit";
 import { kitData, type KitData } from "./kitData";
@@ -19,7 +19,7 @@ const SECTIONS = [
   { id: "groups", title: "Groups" },
   { id: "sequences", title: "Sequences" },
   { id: "views", title: "Views" },
-  { id: "simulation", title: "Simulation page" },
+  { id: "simulation", title: "Sim" },
 ] as const;
 
 type Loaded =
@@ -113,9 +113,9 @@ function Sections({ kit }: { readonly kit: KitData }) {
         <Views views={views} sheets={false} />
       </section>
       <section id="simulation" className="kit-section">
-        <h2 className="kit-section-title">Simulation page</h2>
+        <h2 className="kit-section-title">Sim</h2>
         <p className="kit-note">
-          Only the simulation page at <a href="/simulate/">/simulate/</a> uses these; the app never shows them.
+          Only the simulation page at <a href="/sim/">/sim/</a> uses these; the app never shows them.
         </p>
         <Blocks kit={kit} section="simulation" />
       </section>
@@ -167,7 +167,7 @@ export function KitPage() {
 
   return (
     <div className="kit-page">
-      <KitHeader>
+      <StickyHeader className="kit-header">
         <h1 className="kit-title" aria-label="EldenRoll UI kit">
           <span className="kit-wordmark" aria-hidden="true">
             ELDENR
@@ -187,15 +187,10 @@ export function KitPage() {
             ))}
           </ul>
         </nav>
-      </KitHeader>
+      </StickyHeader>
       <MissingEntries />
       {state.status === "ready" ? <Page database={state.database} /> : waiting}
     </div>
   );
 }
 
-/** Sticks to the top and hides while the page scrolls down (`useHideOnScroll`). */
-function KitHeader({ children }: { readonly children: ReactNode }) {
-  const hidden = useHideOnScroll();
-  return <header className={`kit-header${hidden ? " kit-header-hidden" : ""}`}>{children}</header>;
-}

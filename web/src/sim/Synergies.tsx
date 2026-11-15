@@ -1,19 +1,19 @@
-import { useMemo } from "react";
-
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 
 import { outsideSynergy, synergyWins, THIN_SAMPLE, type Sample, type SynergyRow } from "../../sim/aggregate";
 import { copy } from "../copy";
 import { DataTable } from "../ui/DataTable";
-import { SectionHeading, SectionNote } from "../ui/Headings";
-import { FOLD, matches, modifierRule, percent, perRun } from "./format";
+import { Section } from "../ui/Headings";
+import { perRunColumn } from "./columns";
+import { countOnce } from "./countOnce";
+import { FOLD, matches, modifierRule, multiplier, percent } from "./format";
 
-const words = copy.simulate.synergies;
-const columns = copy.simulate.columns;
+const words = copy.sim.synergies;
+const columns = copy.sim.columns;
 
 export function Synergies({ sample, search }: { readonly sample: Sample; readonly search: string }) {
-  const wins = useMemo(() => synergyWins(sample), [sample]);
-  const outside = useMemo(() => outsideSynergy(sample), [sample]);
+  const wins = useMemo(() => countOnce(sample, "synergy-wins", () => synergyWins(sample)), [sample]);
+  const outside = useMemo(() => countOnce(sample, "outside-synergy", () => outsideSynergy(sample)), [sample]);
   const shown = (row: SynergyRow) => {
     const { when, target } = modifierRule(row.modifier);
     return matches(`${row.modifier.id} ${when} ${target}`, search);
@@ -49,9 +49,7 @@ function SynergyTable({
   readonly struck?: boolean;
 }) {
   return (
-    <section className="simulate-section">
-      <SectionHeading>{title}</SectionHeading>
-      <SectionNote>{lede}</SectionNote>
+    <Section title={title} lede={lede}>
       <DataTable<SynergyRow>
         label={title}
         columns={[
@@ -87,18 +85,18 @@ function SynergyTable({
             label: columns.boost,
             numeric: true,
             sortValue: (row) => row.modifier.value,
-            render: (row) => words.times(row.modifier.value.toLocaleString("en-GB")),
+            render: (row) => words.times(multiplier(row.modifier.value)),
           },
           { id: "share", label: share, numeric: true, sortValue: (row) => row.share, render: (row) => percent(row.share) },
-          { id: "per-run", label: columns.perRun, numeric: true, sortValue: (row) => row.perRun, render: (row) => perRun(row.perRun) },
+          perRunColumn((row) => row.perRun),
         ]}
         rows={rows}
         rowKey={(row) => row.modifier.id}
         fold={FOLD}
         faded={(row) => row.count < THIN_SAMPLE}
         initialSort="boost"
-        empty={copy.simulate.nothing}
+        empty={copy.sim.nothing}
       />
-    </section>
+    </Section>
   );
 }

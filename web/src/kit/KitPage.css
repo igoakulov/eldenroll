@@ -2,22 +2,12 @@
   padding: var(--space-7) var(--gutter) var(--space-10);
 }
 
-/* Back in view on any scroll up, under the mist a screen's top carries; the page's own padding becomes its
-   padding */
+/* The kit's sticky header, under the mist a screen's top carries; the page's own padding becomes its padding */
 .kit-header {
-  position: sticky;
-  top: 0;
-  z-index: 2;
   margin: calc(-1 * var(--space-7)) calc(-1 * var(--gutter)) 0;
   padding: var(--space-5) var(--gutter);
   border-bottom: 1px solid var(--line);
   background: radial-gradient(130% 160% at 24% -30%, var(--mist) 0%, var(--mist-2) 44%, var(--ground) 76%) var(--ground);
-  transition: transform var(--dur-sheet) var(--ease-out);
-}
-
-.kit-header-hidden {
-  transform: translateY(-100%);
-  transition-timing-function: var(--ease-in);
 }
 
 /* The app's wordmark, as Start draws it, over the page's name */
