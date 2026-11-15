@@ -110,14 +110,6 @@ def test_jester_right_hand(pools: tuple[SlotPool, ...], placement_data: Placemen
         "fist",
     }
     assert [row.name for row in found if row.subcategory == "fist"] == ["Grafted Dragon"]
-    assert {row.name for row in found if row.subcategory == "greatshield"} == {
-        "Briar Greatshield",
-        "Spiked Palisade Shield",
-        "Fingerprint Stone Shield",
-        "Jellyfish Shield",
-        "Visage Shield",
-        "One-Eyed Shield",
-    }
     staves = [row for row in found if row.subcategory == "glintstone_staff"]
     assert [row.name for row in staves] == ["Demi-Human Queen's Staff"]
     assert staves[0].infusable

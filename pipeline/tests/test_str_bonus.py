@@ -52,16 +52,10 @@ def test_false_outside_the_classes_is_only_the_paired_list(table: tuple[Item, ..
     ("name", "expected"),
     [
         ("Longsword", True),
-        ("Starscourge Greatsword", True),
         ("Grafted Dragon", True),
         ("Caestus", False),
         ("Falx", False),
-        ("Greatbow", True),
         ("Hand Ballista", True),
-        ("Light Crossbow", True),
-        ("Backhand Blade", False),
-        ("Lordsworn's Straight Sword", True),
-        ("Brass Shield", True),
     ],
 )
 def test_weapon_has_its_bonus(table: tuple[Item, ...], name: str, expected: bool) -> None:

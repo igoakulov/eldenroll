@@ -53,10 +53,6 @@ SHACK_LABEL = (
     "Mountaintops of the Giants - Shack of the Lofty; Consecrated Snowfield - Minor Erdtree, "
     "Albinauric Rise, Cave of the Forlorn Entrance"
 )
-CASTLE_SOL_LABEL = (
-    "Mountaintops of the Giants - West of Castle Sol; Consecrated Snowfield - North of "
-    "Minor Erdtree"
-)
 JORI_LABEL = "[DLC] Abyssal Woods - Forsaken Graveyard, Darklight Catacombs Exit"
 
 
@@ -210,24 +206,9 @@ def test_every_boss_override_names_a_real_boss_on_that_label() -> None:
     ("boss", "label", "region"),
     [
         ("Great Wyrm Theodorix", SHACK_LABEL, "snowfield"),
-        ("Putrid Avatar", CASTLE_SOL_LABEL, "snowfield"),
-        ("Death Rite Bird", CASTLE_SOL_LABEL, "mountaintops"),
         ("Night's Cavalry", "Southwest Mountaintops", "snowfield"),
-        ("Starscourge Radahn", "Southeast Caelid", "caelid"),
-        ("Putrid Tree Spirit", "War-Dead Catacombs", "caelid"),
-        ("Metyr, Mother of Fingers", "[DLC] Finger Birthing Grounds", "dlc_gravesite"),
         ("Jori, Elder Inquisitor", JORI_LABEL, "dlc_shadowkeep"),
         ("Grafted Scion", "Chapel of Anticipation", "liurnia"),
-        (
-            "Count Ymir, Mother of Fingers",
-            "[DLC] Scadu Altus - Cathedral of Manus Metyr",
-            "dlc_gravesite",
-        ),
-        (
-            "Dryleaf Dane",
-            "[DLC] Scadu Altus - Moorth Ruins, Bonny Village West Entrance",
-            "dlc_gravesite",
-        ),
     ],
 )
 def test_owner_confirmed_boss_regions(boss: str, label: str, region: str) -> None:

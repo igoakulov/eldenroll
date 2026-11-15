@@ -98,11 +98,8 @@ def test_thrusting_shields_are_weapons(weapons: tuple[Item, ...]) -> None:
 @pytest.mark.parametrize(
     ("name", "subcategory"),
     [
-        ("Smithscript Shield", "small_shield"),
         ("Smithscript Dagger", "throwing_blade"),
         ("Butchering Knife", "greataxe"),
-        ("Gargoyle's Black Axe", "greataxe"),
-        ("Vulgar Militia Shotel", "halberd"),
         ("Beastman's Jar-Shield", "medium_shield"),
     ],
 )
@@ -117,16 +114,8 @@ def test_name_is_absent(by_name: dict[str, Item], name: str) -> None:
     assert name not in by_name
 
 
-@pytest.mark.parametrize("name", ["Serpent-Hunter", "Sword of Light", "Sword of Darkness"])
-def test_added_weapons_are_present(by_name: dict[str, Item], name: str) -> None:
-    assert by_name[name].category == "weapon"
-
-
-@pytest.mark.parametrize("name", TARNISHED_TAGGED)
-def test_weapons_the_mod_tags_tarnished_stay_in_the_pool(
-    by_name: dict[str, Item], name: str
-) -> None:
-    assert name in by_name
+def test_weapons_the_mod_tags_tarnished_stay_in_the_pool(by_name: dict[str, Item]) -> None:
+    assert set(TARNISHED_TAGGED) <= set(by_name)
 
 
 @pytest.mark.parametrize(

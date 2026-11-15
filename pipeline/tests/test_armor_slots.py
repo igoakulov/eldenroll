@@ -52,20 +52,9 @@ def test_slots_agree_with_the_game_ids_but_for_two_pieces(
     ("name", "slot"),
     [
         ("Pelt of Ralva", "head"),
-        ("St. Trina's Blossom", "head"),
-        ("Greatjar", "head"),
-        ("Ascetic's Loincloth", "body"),
-        ("Commoner's Simple Garb", "body"),
         ("Lazuli Robe", "body"),
-        ("Leda's Armor", "body"),
         ("Gold Tattoo (Arm)", "arms"),
         ("Gauntlets", "arms"),
-        ("Redmane Knight Gauntlets", "arms"),
-        ("Spellblade's Gloves", "arms"),
-        ("Leontiel's Boots", "legs"),
-        ("High Priest Undergarments", "legs"),
-        ("Dryleaf Cuissardes", "legs"),
-        ("Redmane Knight Helm", "head"),
     ],
 )
 def test_piece_has_its_slot(slots: dict[str, str | None], name: str, slot: str) -> None:

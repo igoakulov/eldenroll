@@ -125,33 +125,10 @@ def test_no_row_is_at_the_roundtable(placement_data: PlacementData) -> None:
 @pytest.mark.parametrize(
     ("item", "boss"),
     [
-        ("Gargoyle's Black Blades", "Black Blade Kindred"),
-        ("Gargoyle's Blackblade", "Black Blade Kindred"),
-        ("Greatblade Phalanx", "Bols, Carian Knight"),
-        ("Golden Order Greatsword", "Misbegotten Crusader"),
-        ("Great Omenkiller Cleaver", "Omenkiller & Miranda the Blighted Bloom"),
-        ("Red-Feathered Branchsword", "Deathbird"),
-        ("Blue-Feathered Branchsword", "Deathbird"),
-        ("Sacrificial Axe", "Deathbird"),
-        ("Black Flame Tornado", "Godskin Duo"),
-        ("Nox Flowing Sword", "Nox Swordstress & Nox Monk"),
-        ("Gargoyle's Greatsword", "Valiant Gargoyle"),
-        ("Siluria's Tree", "Crucible Knight Siluria"),
-        ("Scepter of the All-Knowing", "Sir Gideon Ofnir, the All-Knowing"),
         ("Night's Cavalry Helm", "Night's Cavalry Duo"),
         ("Bloodhound's Fang", "Bloodhound Knight Darriwil"),
-        ("Frozen Needle", "Royal Revenant"),
-        ("Devonia's Hammer", "Crucible Knight Devonia"),
         ("Leda's Sword", "Leda and Allies"),
-        ("Leda's Armor", "Leda and Allies"),
-        ("Dane's Footwork", "Leda and Allies"),
-        ("Dane's Hat", "Dryleaf Dane"),
-        ("Divine Beast Head", "Divine Beast Dancing Lion"),
-        ("Circlet of Light", "Promised Consort Radahn"),
-        ("Agheel's Flame", "Flying Dragon Agheel"),
-        ("Bayle's Tyranny", "Bayle the Dread"),
         ("Parrying Dagger", "Patches"),
-        ("Horse Crest Wooden Shield", "Patches"),
         ("Serpent-Hunter", "Godskin Noble"),
     ],
 )
@@ -165,11 +142,7 @@ def test_a_fight_drop_is_tied_to_its_boss(
     ("item", "areas"),
     [
         ("Scaled Helm", {"volcano"}),
-        ("Bull-Goat Helm", {"volcano"}),
-        ("Beast Champion Armor", {"farumazula"}),
         ("Eleonora's Poleblade", {"altus", "mountaintops"}),
-        ("Twinned Armor", {"deeproot_dream"}),
-        ("Giantsflame Take Thee", {"mountaintops"}),
     ],
 )
 def test_an_item_a_later_quest_unlocks_is_found_only_there(
@@ -199,28 +172,6 @@ def test_either_of_two_bosses_can_open_one_item(placement_data: PlacementData) -
     }
 
 
-@pytest.mark.parametrize(
-    ("item", "boss"),
-    [
-        ("Royal Greatsword", "Blaidd the Half-Wolf"),
-        ("Flame Spear", "Fire Knight Kood"),
-        ("Rain of Fire", "Fire Knight Salza"),
-        ("Death Mask Helm", "Fire Knight Wego"),
-        ("Horned Warrior's Sword", "Divine Bird Warrior"),
-        ("Horned Warrior's Greatsword", "Divine Bird Warrior"),
-        ("Clinging Bone", "Ensha of the Royal Remains"),
-        ("Staff of the Avatar", "Erdtree Avatar"),
-        ("Prelate's Inferno Crozier", "Fire Prelate"),
-        ("Rotten Staff", "Putrid Avatar"),
-        ("Horned Bairn", "Shadow Tree Spirit"),
-    ],
-)
-def test_a_boss_at_odds_zero_holds_its_drop(
-    placement_data: PlacementData, item: str, boss: str
-) -> None:
-    assert boss in _bosses_of(placement_data, item)
-
-
 def test_every_boss_at_odds_zero_ties_an_item(placement_data: PlacementData) -> None:
     tied = {row.boss_instance_id for row in item_locations(placement_data.placements)}
 
@@ -231,13 +182,7 @@ def test_every_boss_at_odds_zero_ties_an_item(placement_data: PlacementData) -> 
     ("item", "place"),
     [
         ("Morgott's Cursed Sword", "Morgott, the Omen King @ Leyndell, Royal Capital"),
-        ("Regal Omen Bairn", "Morgott, the Omen King @ Leyndell, Royal Capital"),
         ("Rellana's Twin Blades", f"Rellana, Twin Moon Knight @ {ENSIS}"),
-        ("Radahn's Lion Armor", "Starscourge Radahn @ Southeast Caelid"),
-        ("Young Lion's Armor", "Promised Consort Radahn @ Enir-Ilim"),
-        ("Elden Lord Armor", "Godfrey, First Elden Lord @ Leyndell, Ashen Capital"),
-        ("Sacred Relic Sword", "Radagon / Elden Beast @ Stone Platform"),
-        ("Rennala's Full Moon", "Rennala, Queen of the Full Moon @ Academy of Raya Lucaria"),
     ],
 )
 def test_what_enia_sells_is_tied_to_the_boss(

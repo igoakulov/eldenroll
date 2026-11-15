@@ -62,13 +62,11 @@ def test_parry_fits_what_the_docs_say(rows: dict[str, set[tuple[str, str | None]
     }
 
 
-@pytest.mark.parametrize(
-    "name", ["Carian Retaliation", "Golden Parry", "Storm Wall", "Thops's Barrier"]
-)
 def test_shield_parry_ash_fits_small_and_medium_shields_only(
-    rows: dict[str, set[tuple[str, str | None]]], name: str
+    rows: dict[str, set[tuple[str, str | None]]],
 ) -> None:
-    assert rows[name] == {("shield", "small_shield"), ("shield", "medium_shield")}
+    for name in ("Carian Retaliation", "Golden Parry", "Storm Wall", "Thops's Barrier"):
+        assert rows[name] == {("shield", "small_shield"), ("shield", "medium_shield")}, name
 
 
 def test_only_spinning_weapon_fits_staves_and_nothing_fits_seals(
@@ -108,13 +106,8 @@ def test_every_weapon_that_can_hold_an_ash_has_one(sources: GapSources) -> None:
     ("ash", "fit"),
     [
         ("Wall of Sparks", {("weapon", "perfume_bottle")}),
-        ("Overhead Stance", {("weapon", "great_katana")}),
         ("Palm Blast", {("weapon", "hand_to_hand")}),
-        ("Blind Spot", {("weapon", "backhand_blade")}),
-        ("Igon's Drake Hunt", {("weapon", "greatbow")}),
         ("Shield Strike", {("shield", None), ("weapon", "thrusting_shield")}),
-        ("Piercing Throw", {("weapon", "throwing_blade")}),
-        ("Wing Stance", {("weapon", "light_greatsword")}),
     ],
 )
 def test_dlc_ash_fits_its_classes(

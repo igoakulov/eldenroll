@@ -33,6 +33,7 @@ Run both before and after a change, and expect them clean with no skips:
 - Look up only data we lack. No wiki is authoritative, so a disagreement with an existing record is reported, not a reason to re-verify everything.
 - Tests are few and judged on the outcome for the player. The full-run simulation is the main balance tool.
 - Never write a test value from memory: the JSON sources can be wrong while looking normal.
+- A test never restates a count, odds or modifier value, or override row from the data: it breaks on every tuning and proves nothing. The build's gate holds the expected counts (`pipeline/eldenroll/validate/quality.py`), `data/balance.md` the reasons; a web test that needs a tuned value reads it from `db.json`. A few real-data cases per mechanism are enough, since the build stops on any override row that matches nothing.
 
 ## Traps
 

@@ -44,14 +44,8 @@ def test_name_outside_the_pool_is_absent(names: set[str], name: str) -> None:
     ("name", "subcategory"),
     [
         ("Hefty Fire Pot", "pots"),
-        ("Roped Fire Pot", "pots"),
         ("Bloodboil Aromatic", "perfumes"),
-        ("Poison Spraymist", "perfumes"),
         ("Kukri", "throwables"),
-        ("Explosive Stone Clump", "throwables"),
-        ("Innard Meat", "throwables"),
-        ("Spritestone", "throwables"),
-        ("Surging Frenzied Flame", "throwables"),
     ],
 )
 def test_consumable_has_its_class(

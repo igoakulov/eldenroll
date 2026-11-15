@@ -64,21 +64,9 @@ def test_only_serpent_hunter_has_no_requirements(table: tuple[Item, ...]) -> Non
     [
         ("Oracle Bubbles", (0, 0, 19, 0, 15)),
         ("Hand of Malenia", (16, 48, 0, 0, 0)),
-        ("Moonveil", (12, 18, 23, 0, 0)),
-        ("Grave Scythe", (17, 13, 0, 0, 0)),
-        ("Ripple Crescent Halberd", (12, 12, 0, 0, 20)),
-        ("Cleanrot Knight's Sword", (11, 13, 0, 0, 0)),
-        ("Lordsworn's Shield", (16, 0, 0, 0, 0)),
         ("Varré's Bouquet", (8, 16, 0, 0, 24)),
-        ("Brass Shield", (16, 0, 0, 0, 0)),
-        ("Burn, O Flame!", (0, 0, 0, 27, 0)),
         ("Siluria's Tree", (27, 13, 0, 20, 0)),
-        ("Beast Claw", (13, 11, 0, 0, 0)),
-        ("Land of Shadow", (0, 0, 0, 58, 0)),
-        ("Impenetrable Thorns", (0, 0, 0, 24, 0)),
-        ("Rabbath's Cannon", (28, 16, 0, 0, 0)),
         ("Sword of Night and Flame", (12, 12, 24, 24, 0)),
-        ("Clayman's Harpoon", (12, 10, 12, 0, 0)),
     ],
 )
 def test_item_has_its_requirements(

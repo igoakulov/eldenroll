@@ -33,16 +33,8 @@ def _item(sources: GapSources, name: str) -> Item:
     ("name", "origin"),
     [
         ("Bandit's Curved Sword", "base"),
-        ("Inseparable Sword", "base"),
-        ("Gravel Stone Seal", "base"),
-        ("Serpent-Hunter", "base"),
-        ("Catch Flame", "base"),
         ("Hefty Scimitar", "tarnished"),
-        ("Reed Great Katana", "tarnished"),
         ("Pata", "dlc"),
-        ("Sword of Light", "dlc"),
-        ("Glintblade Trio", "dlc"),
-        ("Dryleaf Whirlwind", "dlc"),
     ],
 )
 def test_item_origin(sources: GapSources, name: str, origin: str) -> None:
@@ -70,9 +62,6 @@ def test_every_weapon_in_the_base_game_files_reads_as_base_or_tarnished(
     "name",
     [
         "Siluria's Tree",
-        "Serpent-Hunter",
-        "Clayman's Harpoon",
-        "Glintstone Breath",
         "Oracle Bubbles",
     ],
 )

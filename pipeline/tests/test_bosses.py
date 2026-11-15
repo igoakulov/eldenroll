@@ -38,8 +38,6 @@ OVERRIDES = ROOT / "data" / "overrides"
 ASHEN = "Leyndell, Ashen Capital"
 ROYAL = "Leyndell, Royal Capital"
 FARUM = "Crumbling Farum Azula"
-GELMIR = "Mt. Gelmir - Primeval Sorcerer Azur, Gelmir Hero's Grave Entrance"
-SELLIA = "Caelid - West Sellia, Sellia Crystal Tunnel Entrance"
 DARRIWIL_ID = "bloodhound_knight_darriwil_limgrave_agheel_lake_south_forlorn_hound_evergaol"
 
 
@@ -99,24 +97,9 @@ def test_the_docs_ids_are_built_as_written(instances: tuple[BossInstance, ...]) 
     ("label", "instance", "gone"),
     [
         (ASHEN, "Godfrey, First Elden Lord", "Godfrey - Hoarah Loux, Warrior"),
-        ("Miquella's Haligtree - Elphael", "Malenia, Blade of Miquella", "Malenia, Goddess of Rot"),
         ("Stone Platform", "Radagon / Elden Beast", "EB - Elden Beast"),
-        ("Enir-Ilim", "Promised Consort Radahn", "PCR - Radahn, Consort of Miquella"),
-        (
-            "Specimen Storehouse - Shadow Tower",
-            "Messmer the Impaler",
-            "Messmer - Base Serpent Messmer",
-        ),
         (FARUM, "Maliketh, the Black Blade", "Beast Clergyman"),
-        ("Volcano Manor", "Rykard, Lord of Blasphemy", "God-Devouring Serpent"),
-        ("Auriza Hero's Grave", "Crucible Knight Ordovis", "Crucible Knight"),
-        ("Caelid - Redmane Castle", "Misbegotten Warrior / Crucible Knight", "Crucible Knight"),
         (FARUM, "Godskin Duo", "Godskin Apostle"),
-        ("Spiritcaller Cave", "Spiritcaller Snail", "Godskin Noble"),
-        (SELLIA, "Nox Swordstress & Nox Monk", "Nox Priest"),
-        ("Perfumer's Grotto", "Omenkiller & Miranda the Blighted Bloom", "Omenkiller"),
-        ("Unsightly Catacombs", "Perfumer Tricia & Misbegotten Warrior", "Misbegotten Warrior"),
-        ("Scaduview - Hinterland", "Tree Sentinel Duo", "Tree Sentinel (Torch)"),
     ],
 )
 def test_one_fight_is_one_instance(
@@ -129,30 +112,8 @@ def test_one_fight_is_one_instance(
 @pytest.mark.parametrize(
     ("label", "name"),
     [
-        ("Liurnia of the Lakes - Scenic Isle, Laskyar Ruins", "Deathbird"),
-        ("Stormhill - Warmaster's Shack, Stormgate", "Deathbird"),
-        ("Weeping Peninsula - Castle Morne Approach North", "Deathbird"),
-        ("Capital Outskirts - Minor Erdtree", "Deathbird"),
-        ("Liurnia of the Lakes - Gate Town Northwest", "Death Rite Bird"),
-        ("Consecrated Snowfield - Ordina, Liturgical Town", "Death Rite Bird"),
-        ("Caelid - Southern Aeonia Swamp Bank", "Death Rite Bird"),
-        ("Charo's Hidden Grave - South Central Lake", "Death Rite Bird"),
         ("Tombsward Cave", "Miranda the Blighted Bloom"),
-        ("Cliffbottom Catacombs", "Erdtree Burial Watchdog"),
-        ("Wyndham Catacombs", "Erdtree Burial Watchdog"),
-        ("Altus Plateau - Erdtree-Gazing Hill, Lux Ruins", "Demi-Human Queen Gilika"),
-        (GELMIR, "Demi-Human Queen Maggie"),
-        ("Volcano Cave", "Demi-Human Queen Margot"),
-        ("Cerulean Coast - Demi-Human Beach, Ravine North", "Demi-Human Queen Marigga"),
-        ("Nokron, Eternal City - Boss", "Regal Ancestor Spirit"),
-        ("Siofra River - Boss", "Ancestor Spirit"),
-        ("Nokron", "Valiant Gargoyle"),
-        ("Altus Plateau - Woodfolk Ruins, Minor Erdtree", "Wormface"),
         ("Limgrave - Agheel Lake South, Forlorn Hound Evergaol", "Bloodhound Knight Darriwil"),
-        (ROYAL, "Godfrey, First Elden Lord"),
-        ("Jagged Peak - Jagged Peak Summit, Bayle Arena", "Bayle the Dread"),
-        ("Subterranean Shunning-Grounds", "Mohg, the Omen"),
-        (ASHEN, "Sir Gideon Ofnir, the All-Knowing"),
     ],
 )
 def test_the_owner_names_are_applied(
@@ -173,24 +134,6 @@ def test_every_instance_resolves_to_a_location_and_region(
     [
         (ASHEN, "Godfrey, First Elden Lord", "leyndell_ashen"),
         (ROYAL, "Godfrey, First Elden Lord", "leyndell"),
-        ("Stone Platform", "Radagon / Elden Beast", "leyndell_ashen"),
-        ("Enir-Ilim", "Promised Consort Radahn", "dlc_enirilim"),
-        (
-            "Scadu Altus - Cathedral of Manus Metyr",
-            "Count Ymir, Mother of Fingers",
-            "dlc_gravesite",
-        ),
-        (
-            "Scadu Altus - Moorth Ruins, Bonny Village West Entrance",
-            "Dryleaf Dane",
-            "dlc_gravesite",
-        ),
-        ("Enir-Ilim", "Leda and Allies", "dlc_enirilim"),
-        ("Ainsel River Main", "Baleful Shadow", "ainsel"),
-        ("Scaduview - Hinterland", "Tree Sentinel Duo", "dlc_shadowkeep"),
-        ("Charo's Hidden Grave - Southeast Mariner Area", "Tibia Mariner", "dlc_jaggedpeak"),
-        ("Ancient Ruins of Rauh - Furnace Golem Area", "Furnace Golem", "dlc_gravesite"),
-        ("Scadu Altus - South Ruins of Unte (inactive)", "Furnace Golem", "dlc_shadowkeep"),
         (
             "Mountaintops of the Giants - West of Castle Sol; Consecrated Snowfield - North of "
             "Minor Erdtree",
@@ -202,11 +145,6 @@ def test_every_instance_resolves_to_a_location_and_region(
             "Minor Erdtree",
             "Death Rite Bird",
             "mountaintops",
-        ),
-        (
-            "Limgrave - Agheel Lake South, Forlorn Hound Evergaol",
-            "Bloodhound Knight Darriwil",
-            "limgrave",
         ),
     ],
 )

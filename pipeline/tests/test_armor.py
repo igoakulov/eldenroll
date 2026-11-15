@@ -82,9 +82,8 @@ def test_no_name_carries_altered(names: set[str]) -> None:
     assert not [name for name in names if "altered" in name.lower()]
 
 
-@pytest.mark.parametrize("name", MERGED + RENAMED)
-def test_altered_piece_survives_under_its_plain_name(names: set[str], name: str) -> None:
-    assert name in names
+def test_altered_piece_survives_under_its_plain_name(names: set[str]) -> None:
+    assert set(MERGED + RENAMED) <= names
 
 
 def test_exactly_six_altered_pieces_merge(catalog: ItemCatalog) -> None:
@@ -118,17 +117,12 @@ def test_every_json_piece_maps_to_the_pool_or_is_not_in_the_game(names: set[str]
     assert unmatched == NOT_OBTAINABLE
 
 
-@pytest.mark.parametrize("name", ["Nox Bracelets", "Nox Greaves", "Gauntlets", "Champion Bracers"])
-def test_piece_keeps_the_mods_name(names: set[str], name: str) -> None:
-    assert name in names
-
-
-@pytest.mark.parametrize(
-    "name",
-    ["Nox Monk Bracelets", "Nox Monk Greaves", "Chain Gauntlets", "Champion Gauntlets"],
-)
-def test_other_sources_spelling_is_not_a_row(names: set[str], name: str) -> None:
-    assert name not in names
+def test_piece_keeps_the_mods_name_not_another_sources(names: set[str]) -> None:
+    assert {"Nox Bracelets", "Nox Greaves", "Gauntlets", "Champion Bracers"} <= names
+    assert (
+        not {"Nox Monk Bracelets", "Nox Monk Greaves", "Chain Gauntlets", "Champion Gauntlets"}
+        & names
+    )
 
 
 def test_altered_piece_merges_into_its_plain_row() -> None:

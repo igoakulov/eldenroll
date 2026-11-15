@@ -146,22 +146,8 @@ def test_repeated_ash_source_stops_the_load(tmp_path: Path) -> None:
         load_ash_sources(path)
 
 
-@pytest.mark.parametrize(
-    "name",
-    [
-        "Wall of Sparks",
-        "Rolling Sparks",
-        "Parry",
-        "Carian Retaliation",
-        "Golden Parry",
-        "Storm Wall",
-        "Thops's Barrier",
-        "Spinning Weapon",
-        "No Skill",
-    ],
-)
-def test_ash_is_present(names: set[str], name: str) -> None:
-    assert name in names
+def test_ash_is_present(names: set[str]) -> None:
+    assert {"Wall of Sparks", "Rolling Sparks", "Parry", "Spinning Weapon", "No Skill"} <= names
 
 
 def test_no_name_keeps_the_prefix(names: set[str]) -> None:
