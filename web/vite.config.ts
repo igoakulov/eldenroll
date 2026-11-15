@@ -48,5 +48,5 @@ export default defineConfig({
     },
   },
   server: { fs: { allow: [".."] } },
-  test: { include: ["src/**/*.test.ts", "src/**/*.test.tsx"] },
+  test: { include: ["src/**/*.test.ts", "src/**/*.test.tsx", "sim/**/*.test.ts"] },
 });
