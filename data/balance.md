@@ -282,7 +282,7 @@ Rows: `no_armor_rule_makes_naked_set_top`
 
 ### 32. A second catalyst for casters
 
-P2. Small and medium shields crowd a caster's LH at equal odds, so catalysts go `×3` for `Sorcerer` and `Pyromancer`. RH holds only catalysts, so only LH changes; the aim is a second catalyst about half the time once most catalysts are in reach.
+P2. Small and medium shields crowd a caster's LH at equal odds, so catalysts go `×3` for `Sorcerer` and `Pyromancer`. RH holds only catalysts, so only LH changes. Aim, owner 2026-11-16: a catalyst about two thirds of the time over a run, the rest split evenly between small and medium shields, since a second catalyst often boosts the spell's school or casting speed (`Azur's Glintstone Staff`), while shields are there for defence and variety.
 
 Rows: `casters_lh_prefers_a_second_catalyst`
 

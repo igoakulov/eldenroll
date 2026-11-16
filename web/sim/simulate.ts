@@ -3,7 +3,8 @@ import { isNone, type Database, type LoadoutSlot } from "../src/engine/database"
 import type { RolledSlots } from "../src/engine/display";
 import { done, editRun, rollNext, startRun, type Engine, type Run } from "../src/engine/run";
 import { DEFAULT_STATS, defaultSettings, derivedLevel, type Stats } from "../src/engine/settings";
-import { repeatKey, type SlotRoll, type WeightedOption } from "../src/engine/slotRoll";
+import { optionKey, repeatKey, type SlotRoll, type WeightedOption } from "../src/engine/slotRoll";
+import type { EngineData } from "../src/engine/engineData";
 import type { Option } from "../src/engine/selectors";
 import {
   ITEMS_MAX_STAT_GAP,
@@ -109,6 +110,21 @@ export interface RunResult {
   readonly finalStats: Stats;
   /** Every option key any pool offered, by class, to tell "never rolled" from "never in reach". */
   readonly offered: Map<string, Set<string>>;
+  /** What the pools offered by class, by `optionKey`, so a region table counts as in reach only what could roll. */
+  readonly reached: Map<string, Reached>;
+}
+
+/** Ashes apart by the hand's kind: an ash fitting both, such as `Parry`, counts where it could roll. */
+export interface Reached {
+  readonly options: Set<string>;
+  readonly weaponAshes: Set<string>;
+  readonly shieldAshes: Set<string>;
+}
+
+/** Whether an ash slot's hand holds a shield (a thrusting shield is a weapon). */
+export function ashOnShield(data: EngineData, slots: RolledSlots, slot: LoadoutSlot): boolean {
+  const hand = slots[slot === "lh_ash" ? "lh" : "rh"];
+  return hand !== null && hand !== undefined && data.items.get(hand)?.category === "shield";
 }
 
 function boostOf(row: WeightedOption): number {
@@ -218,7 +234,14 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
     ...(options.characterClasses === null ? {} : { characterClasses: options.characterClasses }),
   };
   const player = newPlayer(options.allocation, DEFAULT_STATS);
-  const result: RunResult = { options, rolls: [], objectives: [], finalStats: DEFAULT_STATS, offered: new Map() };
+  const result: RunResult = {
+    options,
+    rolls: [],
+    objectives: [],
+    finalStats: DEFAULT_STATS,
+    offered: new Map(),
+    reached: new Map(),
+  };
 
   let open = 1;
   const started = startRun(
@@ -247,7 +270,23 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
     });
     const offered = result.offered.get(objective.characterClass) ?? new Set<string>();
     result.offered.set(objective.characterClass, offered);
+    const reached = result.reached.get(objective.characterClass) ?? {
+      options: new Set<string>(),
+      weaponAshes: new Set<string>(),
+      shieldAshes: new Set<string>(),
+    };
+    result.reached.set(objective.characterClass, reached);
     for (const one of rolls) {
+      const ashes =
+        one.slot !== "rh_ash" && one.slot !== "lh_ash"
+          ? null
+          : ashOnShield(engine.data, objective.slots, one.slot)
+            ? reached.shieldAshes
+            : reached.weaponAshes;
+      for (const row of one.roll.options) {
+        reached.options.add(optionKey(row.option));
+        ashes?.add(optionKey(row.option));
+      }
       result.rolls.push({
         objective: objectiveNumber,
         region,

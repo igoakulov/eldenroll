@@ -55,6 +55,9 @@ function sample(picks: readonly string[], times: number): Sample {
     objectives: shown.map((_, objective) => ({ objective, characterClass: "only" })),
     rolls: shown.map((chosen, objective) => ({ objective, slot: "talisman_1", chosen, chosenKey: `item:${chosen}` })),
     offered: new Map([["only", new Set(Object.keys(PLACES).map((id) => `item:${id}`))]]),
+    reached: new Map([
+      ["only", { options: new Set(Object.keys(PLACES).map((id) => `item:${id}`)), weaponAshes: new Set(), shieldAshes: new Set() }],
+    ]),
   } as unknown as RunResult;
   return sampleOf(indexDatabase(database), [run], ["only"]);
 }

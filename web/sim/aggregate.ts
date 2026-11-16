@@ -8,6 +8,7 @@ import { derivedLevel, STATS, type Stat } from "../src/engine/settings";
 import { optionKey, repeatKey, slotOptions } from "../src/engine/slotRoll";
 import { matchesOption, type Option } from "../src/engine/selectors";
 import {
+  ashOnShield,
   BUCKET,
   CHANCE_SLOTS,
   playRank,
@@ -287,7 +288,6 @@ function inReach(
   sample: Sample,
   classes: readonly string[],
   slots: readonly LoadoutSlot[],
-  test: (option: Option) => boolean = () => true,
   offeredOnly = true,
 ): Option[] {
   const found: Option[] = [];
@@ -295,7 +295,7 @@ function inReach(
     const offered = new Set(sample.results.flatMap((result) => [...(result.offered.get(characterClass) ?? [])]));
     for (const slot of slots) {
       for (const option of slotOptions(sample.data, characterClass, slot)) {
-        if (option.row.odds > 0 && (!offeredOnly || offered.has(repeatKey(option))) && test(option)) found.push(option);
+        if (option.row.odds > 0 && (!offeredOnly || offered.has(repeatKey(option)))) found.push(option);
       }
     }
   }
@@ -427,9 +427,39 @@ export function pairs(sample: Sample): Pairs {
   return { total: table.total, rows, sameClass: { count: same, of: both } };
 }
 
-/** Whether an ash fits shields rather than weapons. */
-function shieldAsh(data: EngineData, ashId: string): boolean {
-  return (data.ashFits.get(ashId) ?? []).some((row) => row.category === "shield");
+/** The two ash tables: an ash counts by the hand that rolled it, so one fitting both, such as `Parry`, counts in each
+ * where it rolled. */
+type AshTable = "weaponAsh" | "shieldAsh";
+
+const ASH_SLOTS: readonly LoadoutSlot[] = ["rh_ash", "lh_ash"];
+
+function isAshTable(table: string): table is AshTable {
+  return table === "weaponAsh" || table === "shieldAsh";
+}
+
+function onTable(one: Obj, slot: LoadoutSlot, table: AshTable, data: EngineData): boolean {
+  return ashOnShield(data, one.row.slots, slot) === (table === "shieldAsh");
+}
+
+/** Options of the classes' pools for these slots that a pool of that class offered, each by itself rather than by its
+ * alias, and for an ash table only those offered to a hand of its kind. */
+function reachedOptions(sample: Sample, classes: readonly string[], slots: readonly LoadoutSlot[], ash?: AshTable): Option[] {
+  const found: Option[] = [];
+  for (const characterClass of classes) {
+    const reached = new Set(
+      sample.results.flatMap((result) => {
+        const row = result.reached.get(characterClass);
+        if (row === undefined) return [];
+        return [...(ash === undefined ? row.options : ash === "shieldAsh" ? row.shieldAshes : row.weaponAshes)];
+      }),
+    );
+    for (const slot of slots) {
+      for (const option of slotOptions(sample.data, characterClass, slot)) {
+        if (option.row.odds > 0 && reached.has(optionKey(option))) found.push(option);
+      }
+    }
+  }
+  return found;
 }
 
 export type GearTable = "spell" | "weaponAsh" | "shieldAsh" | "item" | "talisman" | "rule" | "armor";
@@ -445,18 +475,19 @@ export function gearShares(sample: Sample, table: GearTable, chances?: ChanceSum
     const universe = inReach(sample, classes, ["spell"]).map(repeatKey);
     return shareTable(sample, objectives, chosenKeys(["spell"]), name, { universe, boosts: boostsInReach(sample, chances, ["spell"]) });
   }
-  const ash = (shield: boolean) => (option: Option) => shieldAsh(data, option.row.id) === shield;
   const universe = {
-    weaponAsh: inReach(sample, sample.classes, ["rh_ash", "lh_ash"], ash(false)),
-    shieldAsh: inReach(sample, sample.classes, ["rh_ash", "lh_ash"], ash(true)),
+    weaponAsh: reachedOptions(sample, sample.classes, ASH_SLOTS, "weaponAsh"),
+    shieldAsh: reachedOptions(sample, sample.classes, ASH_SLOTS, "shieldAsh"),
     item: inReach(sample, sample.classes, ["item"]),
     talisman: inReach(sample, sample.classes, ["talisman_1", "talisman_2"]),
     rule: inReach(sample, sample.classes, ["rule_1", "rule_2"]),
     armor: inReach(sample, sample.classes, ["armor"]),
   }[table].map(repeatKey);
+  const ashKeys = (ash: AshTable) => (one: Obj) =>
+    ASH_SLOTS.filter((slot) => onTable(one, slot, ash, data)).flatMap((slot) => chosenKeys([slot])(one));
   const keysOf = {
-    weaponAsh: chosenKeys(["rh_ash", "lh_ash"], (roll) => !shieldAsh(data, roll.chosen ?? "")),
-    shieldAsh: chosenKeys(["rh_ash", "lh_ash"], (roll) => shieldAsh(data, roll.chosen ?? "")),
+    weaponAsh: ashKeys("weaponAsh"),
+    shieldAsh: ashKeys("shieldAsh"),
     item: chosenKeys(["item"]),
     talisman: chosenKeys(["talisman_1", "talisman_2"]),
     rule: chosenKeys(["rule_1", "rule_2"]),
@@ -532,7 +563,7 @@ interface NeverRolled {
 export function neverRolled(sample: Sample): NeverRolled {
   const { data } = sample;
   const slots = [...POOL_SLOTS, "armor"] as LoadoutSlot[];
-  const universe = new Set(inReach(sample, sample.classes, slots, undefined, false).map(repeatKey));
+  const universe = new Set(inReach(sample, sample.classes, slots, false).map(repeatKey));
   const offered = new Set(inReach(sample, sample.classes, slots).map(repeatKey));
   const chosen = new Set(sample.objectives.flatMap((one) => [...one.rolls.values()].map((roll) => roll.chosenKey ?? "")));
   const names = (keys: string[]) => keys.map((key) => nameOf(data, key)).sort((a, b) => a.localeCompare(b));
@@ -701,13 +732,12 @@ export function regionShares(sample: Sample, table: RegionTable, chances?: Chanc
   const single = slots.length === 1 ? slots[0]! : undefined;
   const classes = single === undefined ? sample.classes : sample.classes.filter((id) => !alwaysNone(data, id, single));
   if (classes.length === 0) return null;
-  const ash = table === "weaponAsh" || table === "shieldAsh" ? table === "shieldAsh" : undefined;
-  const fits = (id: string) => ash === undefined || shieldAsh(data, id) === ash;
+  const ash = isAshTable(table) ? table : undefined;
   const regionOf = (key: string) => regionOfKey(data, key);
   const rank = playRank(data.database);
   const orderOf = (region: string) => (rank.get(region) ?? -1) + 1;
   const reach = new Map<string, string>();
-  for (const option of inReach(sample, classes, slots, (option) => fits(option.row.id))) {
+  for (const option of reachedOptions(sample, classes, slots, ash)) {
     if (!isNone(option.row.id)) reach.set(optionKey(option), regionOf(optionKey(option)));
   }
   const options = new Map<string, number>();
@@ -718,7 +748,8 @@ export function regionShares(sample: Sample, table: RegionTable, chances?: Chanc
     (one) =>
       slots.flatMap((slot) => {
         const chosen = one.rolls.get(slot)?.chosen;
-        if (chosen === null || chosen === undefined || isNone(chosen) || !fits(chosen)) return [];
+        if (chosen === null || chosen === undefined || isNone(chosen)) return [];
+        if (ash !== undefined && !onTable(one, slot, ash, data)) return [];
         return [regionOf(`${slot === "armor" ? "armor_set" : "item"}:${chosen}`)];
       }),
     (region) => (region === NO_LOCATION ? NO_LOCATION : regionName(data, region)),
