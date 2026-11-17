@@ -318,7 +318,7 @@ function Results({
         ? TABS.map(() => note(words.noClasses))
         : [
             <Overview key="overview" sample={sample} search={search} />,
-            <Slots key="slots" sample={sample} chances={sums} search={search} by={view.by} onBy={(by) => onView({ by })} />,
+            <Slots key="slots" sample={sample} search={search} by={view.by} onBy={(by) => onView({ by })} />,
             <Synergies key="synergies" sample={sample} search={search} />,
             <Items key="items" sample={sample} chances={sums} search={search} />,
           ];

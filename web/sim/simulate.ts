@@ -26,7 +26,7 @@ interface SimOptions {
   /** The percentage of a region's bosses felled, rounding up, before the next one opens. */
   readonly completion: number;
   readonly characterClasses: readonly string[] | null;
-  /** Where to add every option's chance at roll time, for the item charts and the catch-up columns. */
+  /** Where to add every option's chance at roll time, for the Items charts. */
   readonly chances?: ChanceSums;
 }
 

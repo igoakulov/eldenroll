@@ -169,26 +169,31 @@ describe("aliases", () => {
   });
 });
 
-describe("catch-up boost", () => {
-  const LATE = "item:miquellan_knights_sword";
+describe("catch-up", () => {
+  const knight = { settings: { ...defaultSettings(realDatabase), characterClasses: ["knight"] } };
 
-  it("gives gear in reach from the start nothing over the rest", () => {
+  it("rolls everything at its odds on the first objective, when nothing has had any chance yet", () => {
     const rolls = observed((observing) => start({}, 7, observing));
-    expect(rolls.flatMap(([, roll]) => roll.options).every((row) => row.catchUp === 1)).toBe(true);
+    for (const [, roll] of rolls) for (const row of roll.options) expect(row.catchUp).toBeCloseTo(1);
   });
 
-  it("boosts gear from when it comes into reach, and anew when it comes back", () => {
-    let run = start({ regions: ["limgrave"] });
+  it("favours a sword that comes into reach late over the ones in reach from the start", () => {
+    let run = start({ ...knight, regions: ["limgrave"] });
     for (let step = 0; step < 10; step += 1) run = doneAndRoll(run);
-    run = rollNext(engine, done(engine, editRun(run, { regions: ["limgrave", "haligtree"] })));
-    const first = run.availableSince[LATE];
-    expect(first).toBeLessThan(1);
+    const rolls = observed((observing) => rollNext(observing, done(observing, editRun(run, { regions: ["limgrave", "haligtree"] }))));
+    const rh = rolls.find(([slot]) => slot === "rh")?.[1];
+    const late = rh?.options.find((row) => row.option.row.id === "miquellan_knights_sword");
+    expect(late?.catchUp).toBeGreaterThan(1);
+    expect(rh?.options.every((row) => row.catchUp <= (late?.catchUp ?? 0))).toBe(true);
+  });
 
-    run = rollNext(engine, done(engine, editRun(run, { regions: ["limgrave"] })));
-    expect(run.availableSince[LATE]).toBeUndefined();
-    for (let step = 0; step < 5; step += 1) run = doneAndRoll(run);
-    run = rollNext(engine, done(engine, editRun(run, { regions: ["limgrave", "haligtree"] })));
-    expect(run.availableSince[LATE]).toBeLessThan(first ?? 0);
+  it("counts an objective once however often its slots were rerolled", () => {
+    const total = (tally: Readonly<Record<string, number>>) => Object.values(tally).reduce((sum, value) => sum + value, 0);
+    let run = start(knight);
+    const slots = Object.keys(current(run).slots).length;
+    for (let step = 0; step < 5; step += 1) run = reroll(engine, run, "rh");
+    // Each kept roll adds at most its whole chance, so five discarded loadouts counted would add far more
+    expect(total(done(engine, run).tally)).toBeLessThanOrEqual(slots + 1e-9);
   });
 });
 

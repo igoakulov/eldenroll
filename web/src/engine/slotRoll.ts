@@ -21,15 +21,20 @@ export interface WeightedOption {
   readonly option: Option;
   readonly weight: number;
   readonly modifiers: readonly Modifier[];
-  /** The catch-up boost in `weight` (`Hyperparams.catchUp`), after `inPool`; 1 on anything without a location. */
+  /** What catch-up multiplies the option's odds by in `weight` (`Hyperparams.catchUp`); 1 on anything without a
+   * location. */
   readonly catchUp: number;
 }
 
+/** What a roll adds to the run's tally: each option with a location's chance in it, rules left out, by `tallyKey`. */
+export type TallyAdded = Readonly<Record<string, number>>;
+
 export interface SlotPoolResult {
-  /** Options that can still roll. */
+  /** Options past the filters and removals; catch-up may weigh some at 0 this roll. */
   readonly pool: number;
-  /** In table order, holding only options that can still roll. */
+  /** In table order, holding only the options `pool` counts. */
   readonly options: readonly WeightedOption[];
+  readonly tally: TallyAdded;
 }
 
 export interface SlotRoll {
@@ -41,6 +46,7 @@ export interface SlotRoll {
   readonly fromShortlist: boolean;
   /** The pool it was drawn from, so the simulation can read every option's chance. */
   readonly options: readonly WeightedOption[];
+  readonly tally: TallyAdded;
 }
 
 /** Sees every slot roll, discarded ones included; the simulation's only way in. */
@@ -53,10 +59,45 @@ export interface RollContext {
   readonly counted: ReadonlySet<string>;
   /** `optionKey`s the player excluded; they win over every other input. */
   readonly neverRoll?: ReadonlySet<string>;
-  /** Absent means no boost: most tests roll a pool in isolation and don't need one. */
+  /** Absent means no catch-up: most tests roll a pool in isolation and don't need one. */
   readonly catchUp?: CatchUp;
-  /** `Run.availableSince`; absent means no boost. */
-  readonly availableSince?: Readonly<Record<string, number>>;
+  /** The chance each option has had so far (`Run.tally` and this objective's earlier slots), by `tallyKey`, and the
+   * scope this roll's options are tallied under (`tallyScope`). */
+  readonly tally?: { readonly had: Readonly<Record<string, number>>; readonly scope: string };
+}
+
+/** Slots that share one tally: a second slot of a kind counts with the first. */
+export type TallyGroup = "rh" | "rh_ash" | "lh" | "spell" | "item" | "talisman_1" | "rule_1" | "armor";
+
+const TALLY_GROUP: Readonly<Record<LoadoutSlot, TallyGroup>> = {
+  rh: "rh",
+  rh_ash: "rh_ash",
+  lh: "lh",
+  lh_ash: "rh_ash",
+  spell: "spell",
+  item: "item",
+  talisman_1: "talisman_1",
+  talisman_2: "talisman_1",
+  rule_1: "rule_1",
+  rule_2: "rule_1",
+  armor: "armor",
+};
+
+/** Whose rolls a slot's tally counts: one class's for `CatchUp.perCharacterClass`, every class's for the rest. */
+export function tallyScope(catchUp: CatchUp, characterClass: string, slot: LoadoutSlot): string {
+  const group = TALLY_GROUP[slot];
+  return `${catchUp.perCharacterClass.includes(group) ? characterClass : "*"}|${group}`;
+}
+
+export function tallyKey(scope: string, option: Option): string {
+  return `${scope}|${optionKey(option)}`;
+}
+
+/** Adds tallies together, as a run does after each roll it keeps. */
+export function addTally(...tallies: readonly TallyAdded[]): Record<string, number> {
+  const sum: Record<string, number> = {};
+  for (const tally of tallies) for (const [key, value] of Object.entries(tally)) sum[key] = (sum[key] ?? 0) + value;
+  return sum;
 }
 
 /** Whether catch-up moves chance to or from an option: an item with a location row, or a set with a piece that has
@@ -65,12 +106,6 @@ function located(data: EngineData, option: Option): boolean {
   if (option.kind === "item") return !data.foundEverywhere.has(option.row.id);
   if (option.kind === "armor_set") return option.row.pieces.some((piece) => !data.foundEverywhere.has(piece));
   return false;
-}
-
-/** `CatchUp.boost` on one located option, before `CatchUp.inPool`. */
-function rawBoost(option: Option, catchUp: CatchUp, availableSince: Readonly<Record<string, number>> | undefined): number {
-  // An option the run doesn't track, such as a shortlisted weapon out of reach, gets no boost
-  return availableSince === undefined ? 1 : catchUp.boost(availableSince[optionKey(option)] ?? 1);
 }
 
 export function optionKey(option: Option): string {
@@ -120,27 +155,39 @@ export function weighOptions(
 ): SlotPoolResult {
   const candidates = options.filter((option) => allowed(option, context, filters));
   const active = activeModifiers(context.data, context.state);
-  const { catchUp } = context;
   const kept = candidates
     .map((option) => {
       const modifiers = active.filter((row) => matchesOption(row.target, option));
       const plain = modifiers.reduce((product, row) => product * row.value, option.row.odds);
-      const boost = catchUp !== undefined && located(context.data, option) ? rawBoost(option, catchUp, context.availableSince) : null;
-      return { option, modifiers, plain, boost };
+      return { option, modifiers, plain, located: located(context.data, option) };
     })
     .filter((row) => row.plain > 0);
-  let odds = 0;
-  let boostedOdds = 0;
-  for (const row of kept) {
-    if (row.boost === null) continue;
-    odds += row.option.row.odds;
-    boostedOdds += row.option.row.odds * row.boost;
+  const { catchUp, tally } = context;
+  const multipliers = new Map<Option, number>();
+  const added: Record<string, number> = {};
+  const evening = kept.filter((row) => row.located);
+  if (catchUp !== undefined && tally !== undefined && evening.length > 0) {
+    // Catch-up moves chance only among options with a location: `none`, consumables and the rest found everywhere
+    // keep their base share of the pool
+    const odds = kept.reduce((sum, row) => sum + row.option.row.odds, 0);
+    const locatedOdds = evening.reduce((sum, row) => sum + row.option.row.odds, 0);
+    const keys = evening.map((row) => tallyKey(tally.scope, row.option));
+    const chances = catchUp.even(
+      evening.map((row, index) => ({ odds: row.option.row.odds, had: tally.had[keys[index]!] ?? 0 })),
+      locatedOdds / odds,
+    );
+    evening.forEach((row, index) => {
+      const chance = chances[index] ?? 0;
+      const evened = (chance * odds) / row.option.row.odds;
+      multipliers.set(row.option, row.modifiers.some((modifier) => modifier.value > 1) ? catchUp.boosted(evened) : evened);
+      added[keys[index]!] = chance;
+    });
   }
-  const weighted = kept.map(({ option, modifiers, plain, boost }) => {
-    const multiplier = boost === null || catchUp === undefined ? 1 : catchUp.inPool({ boost, odds, boostedOdds });
+  const weighted = kept.map(({ option, modifiers, plain }) => {
+    const multiplier = multipliers.get(option) ?? 1;
     return { option, weight: plain * multiplier, modifiers, catchUp: multiplier };
   });
-  return { pool: weighted.length, options: weighted };
+  return { pool: weighted.length, options: weighted, tally: added };
 }
 
 export function sample(result: SlotPoolResult, random: Random): SlotRoll {
@@ -153,6 +200,7 @@ export function sample(result: SlotPoolResult, random: Random): SlotRoll {
     pool: result.pool,
     fromShortlist: false,
     options: result.options,
+    tally: result.tally,
   };
   return picked === null
     ? { ...shared, chosen: null, probability: 0 }

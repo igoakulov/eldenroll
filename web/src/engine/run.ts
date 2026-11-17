@@ -1,12 +1,12 @@
 import { copy } from "../copy";
 import type { LoadoutSlot } from "./database";
 import type { RolledSlots } from "./display";
-import { countedItems, isSetReachable } from "./eligibility";
+import { countedItems } from "./eligibility";
 import type { EngineData } from "./engineData";
 import type { Hyperparams } from "./hyperparams";
 import { LOADOUT_ORDER, rollLoadout } from "./loadout";
 import { pickWeighted, seededRandom } from "./random";
-import { bossPool, lockedOutBosses, selectedLocations, type BossPool } from "./regions";
+import { bossPool, selectedLocations, type BossPool } from "./regions";
 import {
   derivedLevel,
   settingsProblems,
@@ -14,8 +14,7 @@ import {
   type Settings,
   type Stats,
 } from "./settings";
-import type { Random, RollObserver } from "./slotRoll";
-import { inStatReach } from "./stats";
+import { addTally, type Random, type RollObserver, type TallyAdded } from "./slotRoll";
 
 export interface Engine {
   readonly data: EngineData;
@@ -38,6 +37,8 @@ export interface Objective {
   readonly shortlistRh: boolean;
   /** Every reroll since the last `Done`, carried across `Reroll objective` and `Reroll items`. */
   readonly rerolls: readonly RerollTarget[];
+  /** What each slot's roll adds to `Run.tally` once the objective is done; a reroll replaces its slot's. */
+  readonly tally: Readonly<Partial<Record<LoadoutSlot, TallyAdded>>>;
 }
 
 export interface CompletedObjective extends Objective {
@@ -70,9 +71,9 @@ export interface Run {
   readonly current: Objective | null;
   readonly waiting: Waiting | null;
   readonly completed: readonly CompletedObjective[];
-  /** The share of the run left when each option last came into reach, by `optionKey`, for the
-   * catch-up boost; an option dropping out of reach loses its entry, so coming back sets it anew. */
-  readonly availableSince: Readonly<Record<string, number>>;
+  /** The chance each option with a location has had in the objectives done, rules left out, by `tallyKey`: what
+   * catch-up evens out (`data/balance.md#Hyperparameters`). A rerolled or discarded roll adds nothing. */
+  readonly tally: Readonly<Record<string, number>>;
 }
 
 export interface RunInputs {
@@ -98,40 +99,6 @@ function counted(engine: Engine, run: Run): ReadonlySet<string> {
     locations: selectedLocations(engine.data.database, new Set(run.regions), deadSet(run)),
     deadBosses: deadSet(run),
   });
-}
-
-/** Bosses felled since the start against every rollable boss the run can still reach: dead at the
- * start, skipped, and locked out alive (the Royal Capital after Maliketh) don't count. */
-function runShareLeft(engine: Engine, run: Run): number {
-  const { database } = engine.data;
-  const dead = deadSet(run);
-  const lockedOut = lockedOutBosses(database, dead);
-  const atStart = new Set(run.deadBosses.filter((row) => row.objectiveIndex === 0).map((row) => row.instanceId));
-  const skipped = new Set(run.skippedBosses);
-  const inRun = database.boss_instance.filter(
-    (row) => row.odds > 0 && !atStart.has(row.id) && !skipped.has(row.id) && !(lockedOut.has(row.id) && !dead.has(row.id)),
-  );
-  const felled = inRun.filter((row) => dead.has(row.id)).length;
-  return inRun.length === 0 ? 1 : 1 - felled / inRun.length;
-}
-
-/** In reach means by location, felled boss and stats; an item with no location row is in reach everywhere, and a
- * set needs every piece. */
-function refreshAvailable(engine: Engine, run: Run): Run {
-  const { data } = engine;
-  const reach = counted(engine, run);
-  const limits = { stats: run.stats, maxStatGap: run.settings.maxStatGap };
-  const left = runShareLeft(engine, run);
-  const availableSince: Record<string, number> = {};
-  const keep = (key: string) => {
-    availableSince[key] = run.availableSince[key] ?? left;
-  };
-  for (const id of [...reach, ...data.foundEverywhere]) {
-    const item = data.items.get(id);
-    if (item !== undefined && inStatReach(item, limits)) keep(`item:${id}`);
-  }
-  for (const set of data.armorSets.values()) if (isSetReachable(set, reach)) keep(`armor_set:${set.id}`);
-  return { ...run, availableSince };
 }
 
 function rollBoss(
@@ -168,6 +135,7 @@ function rollCharacterClass(engine: Engine, run: Run, random: Random, exclude: s
 interface RolledSlotsResult {
   readonly slots: RolledSlots;
   readonly shortlistRh: boolean | null;
+  readonly tally: Partial<Record<LoadoutSlot, TallyAdded>>;
 }
 
 function rollSlots(
@@ -178,6 +146,7 @@ function rollSlots(
   from: LoadoutSlot = "rh",
   kept: RolledSlots = {},
   exclude: string | null = null,
+  keptTally: Readonly<Partial<Record<LoadoutSlot, TallyAdded>>> = {},
 ): RolledSlotsResult {
   const loadout = rollLoadout({
     data: engine.data,
@@ -187,7 +156,8 @@ function rollSlots(
     limits: { stats: run.stats, maxStatGap: run.settings.maxStatGap },
     random,
     catchUp: engine.hyperparams.catchUp,
-    availableSince: run.availableSince,
+    tally: run.tally,
+    keptTally,
     shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,
     neverRoll: new Set(run.neverRoll),
     from,
@@ -197,12 +167,17 @@ function rollSlots(
   });
   const start = LOADOUT_ORDER.indexOf(from);
   const slots: Partial<Record<LoadoutSlot, string | null>> = {};
+  const tally: Partial<Record<LoadoutSlot, TallyAdded>> = {};
   for (const slot of LOADOUT_ORDER.slice(0, start)) {
     if (kept[slot] !== undefined) slots[slot] = kept[slot];
+    if (keptTally[slot] !== undefined) tally[slot] = keptTally[slot];
   }
-  for (const [slot, roll] of loadout) slots[slot] = roll.chosen?.option.row.id ?? null;
+  for (const [slot, roll] of loadout) {
+    slots[slot] = roll.chosen?.option.row.id ?? null;
+    tally[slot] = roll.tally;
+  }
   const rh = loadout.get("rh");
-  return { slots, shortlistRh: rh === undefined ? null : rh.fromShortlist };
+  return { slots, shortlistRh: rh === undefined ? null : rh.fromShortlist, tally };
 }
 
 function stopped(run: Run, status: Exclude<BossPool["status"], "ready">, rngState: number): Run {
@@ -213,11 +188,10 @@ function stopped(run: Run, status: Exclude<BossPool["status"], "ready">, rngStat
 /** Rolls a whole new objective, or leaves the run waiting or finished when no boss can roll. */
 function rollObjective(
   engine: Engine,
-  played: Run,
+  run: Run,
   rerolls: readonly RerollTarget[],
   excludeBoss: string | null,
 ): Run {
-  const run = refreshAvailable(engine, played);
   const { random, state } = seededRandom(run.rngState);
   const boss = rollBoss(engine, run, random, excludeBoss);
   if (typeof boss === "string") return stopped(run, boss, state());
@@ -234,6 +208,7 @@ function rollObjective(
       slots: loadout.slots,
       shortlistRh: loadout.shortlistRh ?? false,
       rerolls,
+      tally: loadout.tally,
     },
   };
 }
@@ -264,7 +239,7 @@ export function startRun(engine: Engine, inputs: RunInputs, seed: number): Start
     current: null,
     waiting: null,
     completed: [],
-    availableSince: {},
+    tally: {},
   };
   return { ok: true, run: rollObjective(engine, run, [], null) };
 }
@@ -323,6 +298,7 @@ export function done(engine: Engine, run: Run): Run {
   };
   const next: Run = {
     ...run,
+    tally: addTally(run.tally, ...Object.values(objective.tally)),
     completed: [...run.completed, completed],
     deadBosses: [
       ...run.deadBosses,
@@ -348,13 +324,12 @@ export function rollNext(engine: Engine, run: Run): Run {
 }
 
 /** Rerolls the target and everything after it; only the target avoids its current result. */
-export function reroll(engine: Engine, played: Run, target: RerollTarget): Run {
-  const objective = played.current;
-  if (objective === null || played.finished) return played;
+export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
+  const objective = run.current;
+  if (objective === null || run.finished) return run;
   const rerolls = [...objective.rerolls, target];
 
-  if (target === "boss") return rollObjective(engine, played, rerolls, objective.boss);
-  const run = refreshAvailable(engine, played);
+  if (target === "boss") return rollObjective(engine, run, rerolls, objective.boss);
 
   const { random, state } = seededRandom(run.rngState);
   if (target === "character_class") {
@@ -370,10 +345,11 @@ export function reroll(engine: Engine, played: Run, target: RerollTarget): Run {
         slots: loadout.slots,
         shortlistRh: loadout.shortlistRh ?? false,
         rerolls,
+        tally: loadout.tally,
       },
     };
   }
-  if (objective.slots[target] === undefined) return played;
+  if (objective.slots[target] === undefined) return run;
   const loadout = rollSlots(
     engine,
     run,
@@ -382,6 +358,7 @@ export function reroll(engine: Engine, played: Run, target: RerollTarget): Run {
     target,
     objective.slots,
     objective.slots[target] ?? null,
+    objective.tally,
   );
   return {
     ...run,
@@ -391,6 +368,7 @@ export function reroll(engine: Engine, played: Run, target: RerollTarget): Run {
       slots: loadout.slots,
       shortlistRh: loadout.shortlistRh ?? objective.shortlistRh,
       rerolls,
+      tally: loadout.tally,
     },
   };
 }

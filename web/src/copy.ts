@@ -322,7 +322,6 @@ export const copy = {
       value: "Mean",
       perRun: "Per run",
       seenIn: "Runs",
-      catchUp: "Catch-up",
       fair: "Vs fair",
       fairPerRun: "Fair per run",
     },
@@ -357,7 +356,7 @@ export const copy = {
         weapon: "By weapon.",
       },
       regionLede:
-        "By the region where each first comes into reach, empty slots left out. Vs fair: the share against what it would be if every option in reach showed equally; 1.00 is even. Catch-up: the mean boost while in a pool, won or not.",
+        "By the region where each first comes into reach, empty slots left out. Vs fair: the share against what it would be if every option in reach showed equally; 1.00 is even.",
       regionBothSlots: "Both slots count.",
       furthest: "Furthest from fair",
       furthestLede: (runs: number, found: number) =>

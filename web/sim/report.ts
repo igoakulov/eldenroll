@@ -27,12 +27,8 @@ import {
 } from "./aggregate";
 import { STATS } from "../src/engine/settings";
 import { decimal, lineClasses, multiplier, percent, perRun, rowName, signedPerRun } from "../src/sim/format";
-import type { ChanceSums } from "./simulate";
 
 const words = copy.sim;
-
-// The page's own formats, so a number reads the same in both
-const times = (value: number | null) => (value === null ? "–" : words.items.times(multiplier(value)));
 
 function table(header: readonly string[], rows: readonly (readonly string[])[]): string {
   const line = (cells: readonly string[]) => `| ${cells.map((cell) => cell.replaceAll("|", "/")).join(" | ")} |`;
@@ -51,12 +47,11 @@ function shares(title: string, shared: ShareTable | null, nameLabel: string = co
     percent(row.share),
     ...(fair ? [decimal(vsFair(row))] : []),
     percent(row.seenIn, 0),
-    times(row.boost),
   ]);
   return [
     `### ${title}`,
     counted(perRun(shared.total / shared.runs)),
-    table([nameLabel, columns.perRun, columns.share, ...(fair ? [columns.fair] : []), columns.seenIn, columns.catchUp], rows),
+    table([nameLabel, columns.perRun, columns.share, ...(fair ? [columns.fair] : []), columns.seenIn], rows),
   ].join("\n\n");
 }
 
@@ -71,9 +66,9 @@ function synergies(title: string, share: string, rows: readonly SynergyRow[]): s
 }
 
 /** The lines whose gap from fair matters for play. */
-function furthest(sample: Sample, chances: ChanceSums | undefined): string[] {
+function furthest(sample: Sample): string[] {
   const runs = sample.results.length;
-  const worst = worstLines(fairLines(sample, FAIR_TABLES, chances), runs);
+  const worst = worstLines(fairLines(sample, FAIR_TABLES), runs);
   return [
     `### ${words.slots.furthest}`,
     words.slots.furthestLede(runs, worst.length),
@@ -92,7 +87,7 @@ function furthest(sample: Sample, chances: ChanceSums | undefined): string[] {
   ];
 }
 
-export function report(sample: Sample, chances: ChanceSums | undefined): string {
+export function report(sample: Sample): string {
   const summary = runSummary(sample);
   const none = ruleNone(sample);
   const both = pairs(sample);
@@ -111,20 +106,20 @@ export function report(sample: Sample, chances: ChanceSums | undefined): string 
       repeats(sample).map((row) => [words.overview.repeatKinds[row.kind], perRun(row.perRun), decimal(row.gap, 1), percent(row.soon)]),
     ),
     `## ${words.tabs[1]}`,
-    shares(`${words.slots.rh}, ${words.slots.byClass}`, handShares(sample, "rh", "class", chances)),
-    shares(`${words.slots.rh}, ${words.slots.byWeapon}`, handShares(sample, "rh", "weapon", chances)),
-    shares(`${words.slots.lh}, ${words.slots.byClass}`, handShares(sample, "lh", "class", chances)),
-    shares(`${words.slots.lh}, ${words.slots.byWeapon}`, handShares(sample, "lh", "weapon", chances)),
+    shares(`${words.slots.rh}, ${words.slots.byClass}`, handShares(sample, "rh", "class")),
+    shares(`${words.slots.rh}, ${words.slots.byWeapon}`, handShares(sample, "rh", "weapon")),
+    shares(`${words.slots.lh}, ${words.slots.byClass}`, handShares(sample, "lh", "class")),
+    shares(`${words.slots.lh}, ${words.slots.byWeapon}`, handShares(sample, "lh", "weapon")),
     `### ${words.slots.pairs}`,
     both.sameClass.of > 0
       ? words.slots.sameClass(percent(both.sameClass.count / both.sameClass.of), perRun(both.sameClass.of / summary.runs))
       : "",
     table([words.slots.rhColumn, words.slots.lhColumn, columns.perRun, columns.share], both.rows.map((row) => [row.rh, row.lh, perRun(row.perRun), percent(row.share)])),
-    shares(words.slots.spell, gearShares(sample, "spell", chances)),
-    shares(words.slots.weaponAsh, gearShares(sample, "weaponAsh", chances)),
-    shares(words.slots.shieldAsh, gearShares(sample, "shieldAsh", chances)),
-    shares(words.slots.item, gearShares(sample, "item", chances)),
-    shares(words.slots.talisman, gearShares(sample, "talisman", chances)),
+    shares(words.slots.spell, gearShares(sample, "spell")),
+    shares(words.slots.weaponAsh, gearShares(sample, "weaponAsh")),
+    shares(words.slots.shieldAsh, gearShares(sample, "shieldAsh")),
+    shares(words.slots.item, gearShares(sample, "item")),
+    shares(words.slots.talisman, gearShares(sample, "talisman")),
     shares(words.slots.rule, gearShares(sample, "rule")),
     `### ${words.slots.ruleNone}`,
     table(
@@ -135,11 +130,11 @@ export function report(sample: Sample, chances: ChanceSums | undefined): string 
         [words.slots.both, percent(none.both / none.total)],
       ],
     ),
-    shares(words.slots.armor, gearShares(sample, "armor", chances)),
+    shares(words.slots.armor, gearShares(sample, "armor")),
     ...REGION_TABLES.map((slot) =>
-      shares(`${words.slots[slot]}, ${words.slots.byRegion}`, regionShares(sample, slot, chances), columns.region),
+      shares(`${words.slots[slot]}, ${words.slots.byRegion}`, regionShares(sample, slot), columns.region),
     ),
-    ...furthest(sample, chances),
+    ...furthest(sample),
     `### ${words.slots.empties}`,
     table(
       [columns.klass, columns.slot, columns.perRun, columns.share],

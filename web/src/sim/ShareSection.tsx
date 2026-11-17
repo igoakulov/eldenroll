@@ -5,7 +5,7 @@ import { copy } from "../copy";
 import { DataTable, type DataColumn } from "../ui/DataTable";
 import { perRunColumn, shareColumn } from "./columns";
 import { Section } from "../ui/Headings";
-import { decimal, FOLD, matches, multiplier, percent, perRun, rowName } from "./format";
+import { decimal, FOLD, matches, percent, perRun, rowName } from "./format";
 
 const words = copy.sim;
 
@@ -62,18 +62,6 @@ export function ShareSection({
       sortValue: (row) => row.seenIn,
       render: (row) => percent(row.seenIn, 0),
     },
-    // Rules and classes never get a catch-up boost, so their tables leave the column out
-    ...(table.rows.some((row) => row.boost !== null)
-      ? [
-          {
-            id: "catch-up",
-            label: words.columns.catchUp,
-            numeric: true,
-            sortValue: (row: ShareRow) => row.boost ?? 0,
-            render: (row: ShareRow) => (row.boost === null ? "–" : words.items.times(multiplier(row.boost))),
-          },
-        ]
-      : []),
   ];
   return (
     <Section title={title} lede={lede === undefined ? counted : `${lede} ${counted}`}>

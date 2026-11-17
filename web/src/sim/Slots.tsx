@@ -18,7 +18,6 @@ import {
   type Sample,
   type ShareTable,
 } from "../../sim/aggregate";
-import type { ChanceSums } from "../../sim/simulate";
 import { copy } from "../copy";
 import { Cycler } from "../ui/Cycler";
 import { DataTable } from "../ui/DataTable";
@@ -37,12 +36,10 @@ const columns = copy.sim.columns;
 export function Slots({
   sample,
   search,
-  chances,
   by,
   onBy,
 }: {
   readonly sample: Sample;
-  readonly chances: ChanceSums;
   readonly search: string;
   readonly by: SlotView;
   readonly onBy: (by: SlotView) => void;
@@ -50,9 +47,9 @@ export function Slots({
   const region = by === "region";
   // Counted once per sample and view; typing in the search only filters the rows
   const tables = useMemo(() => countOnce(sample, `slots:${by}`, () => {
-    const byRegion = (table: RegionTable): ShareTable | null => regionShares(sample, table, chances);
-    const count = (table: Exclude<GearTable, "rule">) => (region ? byRegion(table) : gearShares(sample, table, chances));
-    const hand = (slot: "rh" | "lh") => (region ? byRegion(slot) : handShares(sample, slot, by === "class" ? "class" : "weapon", chances));
+    const byRegion = (table: RegionTable): ShareTable | null => regionShares(sample, table);
+    const count = (table: Exclude<GearTable, "rule">) => (region ? byRegion(table) : gearShares(sample, table));
+    const hand = (slot: "rh" | "lh") => (region ? byRegion(slot) : handShares(sample, slot, by === "class" ? "class" : "weapon"));
     return {
       rh: hand("rh"),
       lh: hand("lh"),
@@ -67,9 +64,9 @@ export function Slots({
       none: ruleNone(sample),
       empty: empties(sample),
     };
-  }), [sample, chances, by, region]);
+  }), [sample, by, region]);
   // Each picked class alone, every slot but the item slot, whatever the tables count by
-  const lines = useMemo(() => countOnce(sample, "fair-lines", () => fairLines(sample, FAIR_TABLES, chances)), [sample, chances]);
+  const lines = useMemo(() => countOnce(sample, "fair-lines", () => fairLines(sample, FAIR_TABLES)), [sample]);
   const regionLede = (table: RegionTable) => (twoSlots(table) ? `${words.regionLede} ${words.regionBothSlots}` : words.regionLede);
   const both = tables.both;
   const pairRows = both.rows.filter((row) => matches(row.name, search));

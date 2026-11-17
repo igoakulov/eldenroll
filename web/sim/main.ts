@@ -12,11 +12,11 @@ import { LOADOUT_ORDER } from "../src/engine/loadout";
 import { ALLOCATIONS, type Allocation } from "./player";
 import { NO_LOCATION, REGION_TABLES, regionShares, sampleOf, vsFair } from "./aggregate";
 import { report } from "./report";
-import { playOrder, runSeed, simulateRun, type ChanceSums, type RunResult } from "./simulate";
+import { playOrder, runSeed, simulateRun, type RunResult } from "./simulate";
 
 const USAGE = `pnpm sim [--runs 20] [--allocations ITEMS,STR,DEX,INT,FTH,ARC,ALL] [--seed 1] [--no-dlc]
          [--regions limgrave,liurnia] [--completion 50] [--classes knight,jester]
-         [--out ../data/build/sim/<timestamp>]`;
+         [--no-synergies] [--flat] [--out ../data/build/sim/<timestamp>]`;
 
 /** Each run writes its own folder, so an earlier dump stays put while the next one is read. */
 function timestamp(): string {
@@ -38,7 +38,7 @@ function csv(rows: readonly (readonly (string | number | boolean | null)[])[]): 
 
 /** Every slot's regions with Vs fair (web/sim/README.md#Reading the dump), for the classes together (`all`) and for
  * each class alone, from the page's own counting over the same runs. */
-function vsFairRows(engine: Engine, results: readonly RunResult[], classes: readonly string[], chances: ChanceSums) {
+function vsFairRows(engine: Engine, results: readonly RunResult[], classes: readonly string[]) {
   const rows: (string | number | null)[][] = [
     [
       "character_class", "slot", "region_number", "region", "per_run", "share", "fair_share", "vs_fair", "fair_per_run",
@@ -48,7 +48,7 @@ function vsFairRows(engine: Engine, results: readonly RunResult[], classes: read
   for (const scope of ["all", ...classes]) {
     const sample = sampleOf(engine.data, results, scope === "all" ? classes : [scope]);
     for (const table of REGION_TABLES) {
-      const shares = regionShares(sample, table, chances);
+      const shares = regionShares(sample, table);
       if (shares === null) continue;
       for (const row of shares.rows) {
         const fair = row.adjusted ?? 0;
@@ -63,6 +63,19 @@ function vsFairRows(engine: Engine, results: readonly RunResult[], classes: read
   return rows;
 }
 
+/** The database with every rule above or below ×1 at ×1 (removals kept), and with `flat` every item's and armor set's odds that aren't 0
+ * at 1 too: catch-up judged alone, before odds and synergies steer single items. */
+function judging(database: Database, noSynergies: boolean, flat: boolean): Database {
+  if (!noSynergies) return database;
+  const one = <T extends { readonly odds: number }>(row: T): T => (flat && row.odds !== 0 ? { ...row, odds: 1 } : row);
+  return {
+    ...database,
+    modifier: database.modifier.map((row) => (row.value === 0 ? row : { ...row, value: 1 })),
+    item: database.item.map(one),
+    armor_set: database.armor_set.map(one),
+  };
+}
+
 export function main(argv: readonly string[], repo: string): void {
   const { values } = parseArgs({
     args: [...argv],
@@ -74,6 +87,8 @@ export function main(argv: readonly string[], repo: string): void {
       regions: { type: "string" },
       completion: { type: "string", default: "50" },
       classes: { type: "string" },
+      "no-synergies": { type: "boolean", default: false },
+      flat: { type: "boolean", default: false },
       out: { type: "string", default: path.join(repo, "data/build/sim", timestamp()) },
       help: { type: "boolean", default: false },
     },
@@ -86,7 +101,11 @@ export function main(argv: readonly string[], repo: string): void {
   const unknown = allocations.filter((one) => !(ALLOCATIONS as readonly string[]).includes(one));
   if (unknown.length > 0) throw new Error(`Unknown allocation ${unknown.join(", ")}; use ${ALLOCATIONS.join(", ")}`);
 
-  const database = JSON.parse(readFileSync(path.join(repo, "data/build/db.json"), "utf8")) as Database;
+  const database = judging(
+    JSON.parse(readFileSync(path.join(repo, "data/build/db.json"), "utf8")) as Database,
+    values["no-synergies"] || values.flat,
+    values.flat,
+  );
   const engine: Engine = { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
   const regions = (values.regions?.split(",").map((one) => one.trim()) ?? playOrder(database)).filter(
     (id) => !values["no-dlc"] || !id.startsWith("dlc_"),
@@ -106,7 +125,6 @@ export function main(argv: readonly string[], repo: string): void {
   if (unknownClasses.length > 0) throw new Error(`Unknown class ${unknownClasses.join(", ")}`);
   const started = performance.now();
   const results: RunResult[] = [];
-  const chances: ChanceSums = new Map();
   for (const allocation of allocations as Allocation[]) {
     for (let run = 0; run < runs; run += 1) {
       results.push(
@@ -116,7 +134,6 @@ export function main(argv: readonly string[], repo: string): void {
           regions,
           completion,
           characterClasses: playing,
-          chances,
         }),
       );
     }
@@ -153,8 +170,8 @@ export function main(argv: readonly string[], repo: string): void {
     ]),
   );
   const classes = playing ?? database.character_class.map((row) => row.id);
-  writeFileSync(path.join(out, "metrics.md"), report(sampleOf(engine.data, results, classes), chances));
-  writeFileSync(path.join(out, "vs-fair.csv"), csv(vsFairRows(engine, results, classes, chances)));
+  writeFileSync(path.join(out, "metrics.md"), report(sampleOf(engine.data, results, classes)));
+  writeFileSync(path.join(out, "vs-fair.csv"), csv(vsFairRows(engine, results, classes)));
   const seconds = ((performance.now() - started) / 1000).toFixed(1);
   console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/metrics.md, vs-fair.csv, rolls.csv, objectives.csv`);
 }

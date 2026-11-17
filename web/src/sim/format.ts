@@ -39,7 +39,7 @@ export function decimal(value: number, digits = 2): string {
   return Number.isFinite(value) ? value.toFixed(digits) : "–";
 }
 
-/** A multiplier: two decimals below 10, whole numbers above, since the catch-up boost reaches tens of thousands. */
+/** A multiplier: two decimals below 10, whole numbers above, since a modifier's tier reaches millions. */
 export function multiplier(value: number): string {
   if (!Number.isFinite(value)) return "–";
   return value < 10 ? value.toFixed(2) : Math.round(value).toLocaleString("en-GB");

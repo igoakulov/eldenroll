@@ -9,7 +9,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 | `engineData.ts` | indexes built once from `db.json` |
 | `eligibility.ts` | which location rows count (#Eligibility); `countedItems` also counts every item with no row, everywhere |
 | `regions.ts` | selected locations, the Ashen Capital and Maliketh rules, the boss pool |
-| `slotRoll.ts` | one pool: filters, odds, modifiers, the catch-up boost, sampling |
+| `slotRoll.ts` | one pool: filters, odds, modifiers, catch-up and its tally, sampling |
 | `loadout.ts` | every slot in roll order, ash and spell rules, rerolls, the weapon shortlist |
 | `run.ts` | the run as plain data and every action |
 | `display.ts` | what each card row shows |
@@ -17,7 +17,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 
 ## Pitfalls
 
-- **The catch-up boost reads `Run.availableSince`**, refreshed before every roll: an option out of reach at a roll loses its entry, so a change made and undone between two rolls changes nothing (`data/balance.md#Hyperparameters`).
+- **Catch-up reads `Run.tally`**, the chance each option has had in the objectives done, plus what this objective's earlier slots added: a slot's roll carries what it adds (`SlotRoll.tally`), the objective keeps it per slot, and `Done` adds it to the run, so a reroll or a discarded objective changes nothing (`data/balance.md#Hyperparameters`).
 - **Showings are tallied per `repeatKey`**: `alias:x` for an alias member, else its `optionKey`. `Never roll` keys on `optionKey`, which never names an alias.
 - **A reroll** keeps the slots before its target, rolls the rest, and leaves out only the target's current result unless nothing else is left.
 - **Determinism.** The generator's state lives in `run.rngState`, and tables are iterated in file order. Every action returns a new `Run`; keep the returned one, or reproducibility breaks.

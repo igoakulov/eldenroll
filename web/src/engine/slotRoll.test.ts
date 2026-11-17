@@ -9,6 +9,8 @@ import { selectedLocations } from "./regions";
 import {
   sample,
   slotOptions,
+  tallyKey,
+  tallyScope,
   weighOptions,
   type OptionFilter,
   type Random,
@@ -371,7 +373,7 @@ describe("on a small database", () => {
     });
 
     it("gives an empty result when nothing is left", () => {
-      const roll = sample({ pool: 0, options: [] }, () => 0.5);
+      const roll = sample({ pool: 0, options: [], tally: {} }, () => 0.5);
       expect(roll.chosen).toBeNull();
       expect(roll.probability).toBe(0);
     });
@@ -391,31 +393,41 @@ describe("on a small database", () => {
   });
 });
 
-describe("the catch-up boost", () => {
-  it("weighs a straight sword by how much of the run was left when it came into reach", () => {
-    const state = { characterClass: "knight", boss: null, rolled: new Map<PoolSlot, string | null>() };
-    const weigh = (left: number) => {
-      const availableSince = { "item:crystal_sword": 1, "item:miquellan_knights_sword": left };
-      const result = weighOptions(
-        { data: real, state, counted: EVERYTHING, catchUp: { ...DEFAULT_HYPERPARAMS.catchUp, boost: (runLeft) => 1 / runLeft }, availableSince },
-        slotOptions(real, "knight", "rh"),
-      );
-      return weightOf(result, "miquellan_knights_sword")! / weightOf(result, "crystal_sword")!;
-    };
-    expect(weigh(0.25) / weigh(1)).toBeCloseTo(4);
+describe("catch-up", () => {
+  const catchUp = DEFAULT_HYPERPARAMS.catchUp;
+  /** Weighs a slot's pool for a class with each option's tally from `had`, by item or set id; unlisted ones at `rest`. */
+  const weigh = (slot: "rh" | "item" | "armor", had: Record<string, number>, rest = 1, rolled: Rolled = {}) => {
+    const state = { characterClass: "knight", boss: null, rolled: new Map(Object.entries(rolled)) as Map<PoolSlot, string | null> };
+    const scope = tallyScope(catchUp, "knight", slot);
+    const options = slotOptions(real, "knight", slot);
+    const tally = Object.fromEntries(options.map((option) => [tallyKey(scope, option), had[option.row.id] ?? rest]));
+    return weighOptions({ data: real, state, counted: EVERYTHING, catchUp, tally: { had: tally, scope } }, options);
+  };
+  const shareOf = (result: SlotPoolResult, ids: readonly string[]) =>
+    result.options.filter((row) => ids.includes(row.option.row.id)).reduce((sum, row) => sum + row.weight, 0) /
+    result.options.reduce((sum, row) => sum + row.weight, 0);
+
+  it("rolls every option at its odds when each has had as much as its peers", () => {
+    for (const row of weigh("rh", {}).options) expect(row.catchUp).toBeCloseTo(1);
   });
 
-  it("leaves consumables, found everywhere, their share of the item slot when a late tool comes into reach", () => {
-    const state = { characterClass: "knight", boss: null, rolled: new Map<PoolSlot, string | null>() };
-    const everywhere = (availableSince: Record<string, number>) => {
-      const result = weighOptions(
-        { data: real, state, counted: EVERYTHING, catchUp: DEFAULT_HYPERPARAMS.catchUp, availableSince },
-        slotOptions(real, "knight", "item"),
-      );
-      const total = result.options.reduce((sum, row) => sum + row.weight, 0);
-      const found = result.options.filter((row) => real.foundEverywhere.has(row.option.row.id));
-      return found.reduce((sum, row) => sum + row.weight, 0) / total;
-    };
-    expect(everywhere({ "item:horned_bairn": 0.05 })).toBeCloseTo(everywhere({}));
+  it("gives the roll to a sword behind its peers and none to one ahead of them", () => {
+    const result = weigh("rh", { miquellan_knights_sword: 0, crystal_sword: 3 });
+    expect(weightOf(result, "crystal_sword")).toBe(0);
+    const late = weightOf(result, "miquellan_knights_sword")!;
+    expect(result.options.every((row) => row.option.row.id === "miquellan_knights_sword" || row.weight < late)).toBe(true);
+  });
+
+  it("leaves consumables, found everywhere, their share of the item slot however far a tool is behind", () => {
+    const found = (result: SlotPoolResult) => shareOf(result, [...real.foundEverywhere]);
+    expect(found(weigh("item", { horned_bairn: 0 }, 5))).toBeCloseTo(found(weigh("item", {})));
+  });
+
+  it("keeps a guarantee on sets that have shown far more than their peers", () => {
+    const jumpSets = ["raptors_set", "gravebird_set"];
+    const ahead = { raptors_set: 10, gravebird_set: 10 };
+    expect(shareOf(weigh("armor", ahead, 0, { rule_1: "jump_attacks_only" }), jumpSets)).toBeGreaterThan(0.99);
+    expect(shareOf(weigh("armor", ahead, 0), jumpSets)).toBe(0);
   });
 });
+

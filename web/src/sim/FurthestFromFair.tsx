@@ -1,4 +1,4 @@
-import { fairDistance, gap, worstLines, type FairLine, type Sample } from "../../sim/aggregate";
+import { className, fairDistance, gap, worstLines, type FairLine, type Sample } from "../../sim/aggregate";
 import { copy } from "../copy";
 import { DataTable } from "../ui/DataTable";
 import { Section } from "../ui/Headings";
@@ -21,7 +21,8 @@ export function FurthestFromFair({
 }) {
   const runs = sample.results.length;
   const all = worstLines(lines, runs);
-  const worst = all.filter((line) => [lineClasses(sample, line), words[line.table], rowName(lineRow(line))].some((text) => matches(text, search)));
+  const names = (line: FairLine) => [lineClasses(sample, line), ...line.classes.map((id) => className(sample.data, id))];
+  const worst = all.filter((line) => [...names(line), words[line.table], rowName(lineRow(line))].some((text) => matches(text, search)));
   if (search !== "" && worst.length === 0) return null;
   return (
     <Section title={words.furthest} lede={words.furthestLede(runs, all.length)}>

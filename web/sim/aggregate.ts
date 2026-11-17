@@ -143,9 +143,6 @@ export interface ShareRow {
   readonly share: number;
   /** 0 to 1, of the runs, the share it showed in at least once. */
   readonly seenIn: number;
-  /** The mean catch-up boost while it was in a pool, won or not, each pool weighted by its chance there without the
-   * boost, as the Items charts read it; null where none applies: a rule, `none`, or with no chance sums. */
-  readonly boost: number | null;
   /** The share it would have from pool size alone, where it applies: every weapon class holding as many weapons, or
    * every item of a region's showing equally. */
   readonly adjusted?: number;
@@ -172,8 +169,6 @@ export interface ShareTable {
 interface Tally {
   /** Adds a row at 0 for each key that never showed. */
   readonly universe?: Iterable<string>;
-  /** Each row's catch-up boost (`boostsInReach`). */
-  readonly boosts?: ReadonlyMap<string, number>;
   /** `objectives`: an objective counts once under each key it shows, out of every objective. `showings`: every key
    * counts, out of every showing, where two slots of one objective can share a key. */
   readonly basis?: "objectives" | "showings";
@@ -185,7 +180,7 @@ function shareTable(
   objectives: readonly Obj[],
   keysOf: (one: Obj) => readonly string[],
   name: (key: string) => string,
-  { universe = [], boosts = new Map(), basis = "objectives" }: Tally = {},
+  { universe = [], basis = "objectives" }: Tally = {},
 ): ShareTable {
   const counted = new Map<string, number>();
   const inRuns = new Map<string, Set<number>>();
@@ -209,7 +204,6 @@ function shareTable(
       perRun: count / runs,
       share: total === 0 ? 0 : count / total,
       seenIn: (inRuns.get(key)?.size ?? 0) / runs,
-      boost: boosts.get(key) ?? null,
     }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
   return { total, runs, rows, ...(basis === "showings" ? { unit: "showings" as const } : {}) };
@@ -223,24 +217,6 @@ const chosenKeys =
       return roll !== undefined && roll.chosenKey !== null && test(roll) ? [roll.chosenKey] : [];
     });
 
-/** The mean catch-up boost on each option while it was in a pool of these slots, for the picked classes, each pool
- * weighted by the option's chance there without the boost, as the Items charts read it. `group` folds options into a
- * table's rows, undefined leaving one out; rules and `none` are left out. The sums cover the first of two slots only
- * (`CHANCE_SLOTS`). */
-function boostsInReach(
-  sample: Sample,
-  chances: ChanceSums | undefined,
-  slots: readonly LoadoutSlot[],
-  group: (key: string) => string | undefined = (key) => key,
-): ReadonlyMap<string, number> {
-  const wanted = new Set<string>(slots);
-  const sums = foldChances(sample, chances, ({ slot, key }) => {
-    const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
-    return !wanted.has(slot) || kind === "rule" || isNone(id) ? undefined : group(key);
-  });
-  return new Map([...sums].flatMap(([row, total]) => (total.plain > 0 ? [[row, total.boosted / total.plain] as const] : [])));
-}
-
 interface ChanceEntry {
   readonly slot: LoadoutSlot;
   readonly key: string;
@@ -248,7 +224,7 @@ interface ChanceEntry {
 }
 
 /** The picked classes' chance sums, added up into rows by `group`, undefined leaving an entry out. Every reading of
- * `ChanceSums` goes through here, so the table's catch-up boost and the Items charts add up alike. */
+ * `ChanceSums` goes through here, so every chart adds up alike. */
 function foldChances(
   sample: Sample,
   chances: ChanceSums | undefined,
@@ -337,22 +313,15 @@ type HandView = "class" | "weapon";
 /** A hand by weapon, or by weapon class with each share beside the one it would have if every class held the same
  * number of weapons, so a skew from pool size reads apart from one from catch-up, stat gates or a modifier. With
  * several classes picked, each class's adjusted shares count by its objectives. */
-export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView, chances?: ChanceSums): ShareTable | null {
+export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView): ShareTable | null {
   const { data } = sample;
   const classes = sample.classes.filter((id) => !alwaysNone(data, id, slot));
   if (classes.length === 0) return null;
   const inClasses = sample.objectives.filter((one) => classes.includes(one.row.characterClass));
   if (by === "weapon") {
     const universe = inReach(sample, classes, [slot]).map(repeatKey);
-    return shareTable(sample, inClasses, chosenKeys([slot]), (key) => nameOf(data, key), {
-      universe,
-      boosts: boostsInReach(sample, chances, [slot]),
-    });
+    return shareTable(sample, inClasses, chosenKeys([slot]), (key) => nameOf(data, key), { universe });
   }
-  const classOf = (key: string) => {
-    const item = membersOf(data, key)[0];
-    return item === undefined ? undefined : classOfItem(item);
-  };
   const table = shareTable(
     sample,
     inClasses,
@@ -365,7 +334,6 @@ export function handShares(sample: Sample, slot: "rh" | "lh", by: HandView, chan
       universe: inReach(sample, classes, [slot]).flatMap((option) =>
         option.kind === "item" ? [classOfItem(option.row)] : [],
       ),
-      boosts: boostsInReach(sample, chances, [slot], classOf),
     },
   );
   const adjusted = new Map<string, number>();
@@ -467,7 +435,7 @@ function reachedOptions(sample: Sample, classes: readonly string[], slots: reado
 export type GearTable = "spell" | "weaponAsh" | "shieldAsh" | "item" | "talisman" | "rule" | "armor";
 
 /** Everything but the hands: a share of objectives showing each option, in either slot where there are two. */
-export function gearShares(sample: Sample, table: GearTable, chances?: ChanceSums): ShareTable | null {
+export function gearShares(sample: Sample, table: GearTable): ShareTable | null {
   const { data } = sample;
   const name = (key: string) => nameOf(data, key);
   if (table === "spell") {
@@ -475,7 +443,7 @@ export function gearShares(sample: Sample, table: GearTable, chances?: ChanceSum
     if (classes.length === 0) return null;
     const objectives = sample.objectives.filter((one) => classes.includes(one.row.characterClass));
     const universe = inReach(sample, classes, ["spell"]).map(repeatKey);
-    return shareTable(sample, objectives, chosenKeys(["spell"]), name, { universe, boosts: boostsInReach(sample, chances, ["spell"]) });
+    return shareTable(sample, objectives, chosenKeys(["spell"]), name, { universe });
   }
   const universe = {
     weaponAsh: reachedOptions(sample, sample.classes, ASH_SLOTS, "weaponAsh"),
@@ -495,8 +463,7 @@ export function gearShares(sample: Sample, table: GearTable, chances?: ChanceSum
     rule: chosenKeys(["rule_1", "rule_2"]),
     armor: chosenKeys(["armor"]),
   }[table];
-  const boosts = table === "rule" ? new Map<string, number>() : boostsInReach(sample, chances, REGION_SLOTS[table]);
-  return shareTable(sample, sample.objectives, keysOf, name, { universe, boosts });
+  return shareTable(sample, sample.objectives, keysOf, name, { universe });
 }
 
 // Overview
@@ -728,7 +695,7 @@ function regionOfKey(data: EngineData, key: string): string {
 /** A slot's showings by the region each first comes into reach in, `none` left out, every roll counted, so two
  * talisman slots count twice. `adjusted` is the share a region would get if every option in reach showed equally,
  * so a skew from how many items a region holds reads apart from the rest. */
-export function regionShares(sample: Sample, table: RegionTable, chances?: ChanceSums): ShareTable | null {
+export function regionShares(sample: Sample, table: RegionTable): ShareTable | null {
   const { data } = sample;
   const slots = REGION_SLOTS[table];
   const single = slots.length === 1 ? slots[0]! : undefined;
@@ -755,7 +722,7 @@ export function regionShares(sample: Sample, table: RegionTable, chances?: Chanc
         return [regionOf(`${slot === "armor" ? "armor_set" : "item"}:${chosen}`)];
       }),
     (region) => (region === NO_LOCATION ? NO_LOCATION : regionName(data, region)),
-    { universe: options.keys(), boosts: boostsInReach(sample, chances, slots, regionOf), basis: "showings" },
+    { universe: options.keys(), basis: "showings" },
   );
   const groups = new Set<string>(ash === undefined ? slots : [ash]);
   const rollable = new Map<string, number>();
@@ -1003,12 +970,12 @@ function forClass(sample: Sample, characterClass: string): Sample {
 
 /** Every region of the region tables for each picked class alone; `No location` and regions with no fair share are
  * left out. */
-export function fairLines(sample: Sample, tables: readonly RegionTable[], chances?: ChanceSums): readonly FairLine[] {
+export function fairLines(sample: Sample, tables: readonly RegionTable[]): readonly FairLine[] {
   const lines: FairLine[] = [];
   for (const characterClass of sample.classes) {
     const own = forClass(sample, characterClass);
     for (const table of tables) {
-      const shares = regionShares(own, table, chances);
+      const shares = regionShares(own, table);
       if (shares === null) continue;
       for (const row of shares.rows) {
         const fair = row.adjusted ?? 0;

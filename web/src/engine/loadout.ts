@@ -3,8 +3,10 @@ import { poolKey, type EngineData } from "./engineData";
 import type { CatchUp } from "./hyperparams";
 import type { RollState } from "./modifiers";
 import {
+  addTally,
   sample,
   slotOptions,
+  tallyScope,
   weighOptions,
   type OptionFilter,
   type PoolFilters,
@@ -12,6 +14,7 @@ import {
   type RollContext,
   type RollObserver,
   type SlotRoll,
+  type TallyAdded,
 } from "./slotRoll";
 import { lhStatFilter, plainStatFilter, rhStatFilter, type StatLimits } from "./stats";
 
@@ -38,7 +41,8 @@ export interface LoadoutInput {
   readonly limits: StatLimits;
   readonly random: Random;
   readonly catchUp?: CatchUp;
-  readonly availableSince?: Readonly<Record<string, number>>;
+  /** `Run.tally`: the chance each option has had over the objectives done so far. */
+  readonly tally?: Readonly<Record<string, number>>;
   /** RH rolls from these first; `null` when the setting is off. */
   readonly shortlist?: ReadonlySet<string> | null;
   /** A reroll keeps the slots before `from` as they are. */
@@ -46,6 +50,8 @@ export interface LoadoutInput {
   readonly kept?: Readonly<Partial<Record<LoadoutSlot, string | null>>>;
   /** The reroll target's current result, left out unless it's the only option. */
   readonly exclude?: string | null;
+  /** What the kept slots added to the tally, so the slots after them read it as when they first rolled. */
+  readonly keptTally?: Readonly<Partial<Record<LoadoutSlot, TallyAdded>>>;
   readonly observe?: RollObserver;
 }
 
@@ -176,17 +182,22 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     counted,
     ...(input.neverRoll === undefined ? {} : { neverRoll: input.neverRoll }),
     ...(input.catchUp === undefined ? {} : { catchUp: input.catchUp }),
-    ...(input.availableSince === undefined ? {} : { availableSince: input.availableSince }),
   };
+  // Each slot reads the tally with every earlier slot of this objective added, a second talisman its first: one copy
+  // of the run's tally per loadout, added to in place
+  const had = addTally(input.tally ?? {}, ...LOADOUT_ORDER.slice(0, start).map((slot) => input.keptTally?.[slot] ?? {}));
 
   for (const slot of LOADOUT_ORDER.slice(start)) {
     if (slot !== "armor" && !data.pools.has(poolKey(characterClass, slot))) continue;
     const exclude = slot === from ? (input.exclude ?? null) : null;
+    const slotContext: RollContext =
+      input.catchUp === undefined ? context : { ...context, tally: { had, scope: tallyScope(input.catchUp, characterClass, slot) } };
     const shortlisted =
-      slot === "rh" && input.shortlist ? rollShortlistRh(context, input.shortlist, exclude, random) : null;
+      slot === "rh" && input.shortlist ? rollShortlistRh(slotContext, input.shortlist, exclude, random) : null;
     const roll =
-      shortlisted ?? rollExcluding(context, slot, filtersFor(slot, context, limits), exclude, random);
+      shortlisted ?? rollExcluding(slotContext, slot, filtersFor(slot, slotContext, limits), exclude, random);
     if (slot !== "armor") rolled.set(slot, roll.chosen?.option.row.id ?? null);
+    for (const [key, value] of Object.entries(roll.tally)) had[key] = (had[key] ?? 0) + value;
     loadout.set(slot, roll);
     input.observe?.(slot, roll);
   }

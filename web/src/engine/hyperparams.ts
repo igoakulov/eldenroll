@@ -1,11 +1,17 @@
-/** The catch-up boost on an item or armor set (`data/balance.md#Hyperparameters`), in two steps. */
+import type { TallyGroup } from "./slotRoll";
+
+/** Catch-up (`data/balance.md#Hyperparameters`): evens out how often items show over a run, from what each has had. */
 export interface CatchUp {
-  /** `runLeft` is the share of the run's bosses still to fell when the option last came into reach
-   * (`Run.availableSince`): 1 from the start, near 0 at the end. */
-  readonly boost: (runLeft: number) => number;
-  /** Within one pool, over its options with a location: `odds` is their base odds summed, `boostedOdds` the same
-   * with each one's `boost` applied. Options with no location keep a boost of 1. */
-  readonly inPool: (inputs: { readonly boost: number; readonly odds: number; readonly boostedOdds: number }) => number;
+  /** Slots whose tally each class keeps apart, since their pools differ by class; every other slot's tally is shared
+   * by every class. A second slot of a kind shares the first's tally. */
+  readonly perCharacterClass: readonly TallyGroup[];
+  /** Each option's chance in one roll, rules left out, from the options with a location that can roll now: `odds` its
+   * base odds, `had` its tally, the chance it has had so far. `share` is the part of the roll those options hold at
+   * base odds; the rest of the pool keeps its base share. */
+  readonly even: (options: readonly { readonly odds: number; readonly had: number }[], share: number) => readonly number[];
+  /** What catch-up multiplies an option's odds by while a rule above ×1 is active on it, from what evening alone would
+   * (`evened`): a rule must mean the same whatever the tally says, even for an option ahead of its peers. */
+  readonly boosted: (evened: number) => number;
 }
 
 /** Balance values that apply to every row, tuned here against the simulation, and the engine's only balance: no other
@@ -19,10 +25,26 @@ export interface Hyperparams {
 
 export const DEFAULT_HYPERPARAMS: Hyperparams = {
   catchUp: {
-    // The cap keeps what comes into reach at the very end of a run below the `guarantee` tier
-    boost: (runLeft) => Math.min((1 / runLeft) ** 5, 20_000),
-    // Catch-up moves chance among options with a location and takes none from the rest of the pool
-    inPool: ({ boost, odds, boostedOdds }) => (boost * odds) / boostedOdds,
+    perCharacterClass: ["lh", "talisman_1"],
+    // Raise the lowest tallies, per unit of odds, to one common level with the roll's chance: whoever is furthest
+    // behind gets the most, and whoever is above the level sits this roll out
+    even: (options, share) => {
+      const behind = (index: number) => options[index]!.had / options[index]!.odds;
+      const order = options.map((_, index) => index).sort((a, b) => behind(a) - behind(b));
+      let odds = 0;
+      let had = 0;
+      let level = 0;
+      for (const [rank, index] of order.entries()) {
+        odds += options[index]!.odds;
+        had += options[index]!.had;
+        level = (share + had) / odds;
+        const next = order[rank + 1];
+        if (next === undefined || level <= behind(next)) break;
+      }
+      return options.map((option) => Math.max(0, level * option.odds - option.had));
+    },
+    // Never below the option's base share, so a synergy or guarantee holds on an option that has shown a lot
+    boosted: (evened) => Math.max(evened, 1),
   },
   defaultMaxStatGap: 10,
 };
