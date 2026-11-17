@@ -332,8 +332,9 @@ P1. A talisman that does nothing for the loadout wastes the slot, and the talism
 - `Shard of Alexander` boosts skills, so it follows `L2 only` (#6. L2 only needs a skill): never `Sorcerer` or `Pyromancer`, nor an empty right hand.
 - `Rellana's Cameo` boosts only stance skills: it needs `Square Off`, `Unsheathe`, `Wing Stance` or `Overhead Stance` on a hand, or `Moonveil`, `Rellana's Twin Blades` or `Sword of Night and Flame`, whose own skills are stances.
 - `Beloved Stardust` speeds up casting, so only `Sorcerer`, `Pyromancer` and `Spellblade` roll it. `Old Lord's Talisman` stays for everyone, since any class can lengthen a buff with it.
+- `Blue Dancer Charm`, `Rellana's Cameo`, `Kindred of Rot's Exultation` and `Lord of Blood's Exultation` never roll for `Sorcerer` or `Pyromancer`: physical and status-effect builds aren't viable with most spells (owner, 2026-11-17). Their synergies on those classes go with them: a rot or bleed staff no longer boosts the exultations there.
 
-Rows: `melee_talismans_need_a_melee_class`, `guard_counter_talisman_not_on_casters_or_ranger`, `guard_talismans_not_on_pure_casters_or_ranger`, `shard_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`
+Rows: `melee_talismans_need_a_melee_class`, `guard_counter_talisman_not_on_casters_or_ranger`, `guard_talismans_not_on_pure_casters_or_ranger`, `talismans_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`
 
 ### 34. Attack rules a class can't use
 
