@@ -150,6 +150,8 @@ export interface ShareRow {
   readonly rollable?: number;
   /** A region's number in play order, from 1, which the page and `metrics.md` show before its name and sort by. */
   readonly order?: number;
+  /** By item, the name of the region it first comes into reach in. */
+  readonly region?: string;
 }
 
 /** A row's share against the one pool size alone would give: 1 even, above 1 more than its fair share; NaN where
@@ -550,13 +552,17 @@ const REPEAT_KEYS: Readonly<Record<RepeatKind, (one: Obj) => readonly string[]>>
   class: (one) => [`character_class:${one.row.characterClass}`],
   rh: chosenKeys(["rh"], notNone),
   lh: chosenKeys(["lh"], notNone),
-  ash: chosenKeys(["rh_ash", "lh_ash"]),
-  spell: chosenKeys(["spell"]),
-  item: chosenKeys(["item"]),
-  talisman: chosenKeys(["talisman_1", "talisman_2"]),
+  ash: chosenKeys(["rh_ash", "lh_ash"], notNone),
+  spell: chosenKeys(["spell"], notNone),
+  item: chosenKeys(["item"], notNone),
+  talisman: chosenKeys(["talisman_1", "talisman_2"], notNone),
   rule: chosenKeys(["rule_1", "rule_2"], notNone),
-  armor: chosenKeys(["armor"]),
+  armor: chosenKeys(["armor"], notNone),
 };
+
+/** Too often for the player: the same thing this many objectives in a row, or `ofLast` of the last `window`
+ * (`data/balance.md#Late-game crowding`). */
+export const REPEAT_LIMIT = { inARow: 4, ofLast: 5, window: 10 } as const;
 
 export interface RepeatRow {
   readonly kind: RepeatKind;
@@ -566,27 +572,45 @@ export interface RepeatRow {
   readonly gap: number;
   /** The share of showings repeating one from the last `SOON` objectives. */
   readonly soon: number;
+  /** The share of showings that reach `REPEAT_LIMIT`, this one counted. */
+  readonly pastLimit: number;
 }
 
 export function repeats(sample: Sample): readonly RepeatRow[] {
   return REPEAT_KINDS.map((kind) => {
     const gaps: number[] = [];
     let showings = 0;
+    let pastLimit = 0;
     const last = new Map<string, number>();
+    const recent: (ReadonlySet<string>)[] = [];
     let run = -1;
     for (const one of sample.objectives) {
       if (one.run !== run) {
         last.clear();
+        recent.length = 0;
         run = one.run;
       }
-      for (const key of new Set(REPEAT_KEYS[kind](one))) {
+      const keys = new Set(REPEAT_KEYS[kind](one));
+      recent.push(keys);
+      if (recent.length > REPEAT_LIMIT.window) recent.shift();
+      for (const key of keys) {
         showings += 1;
         const before = last.get(key);
         if (before !== undefined) gaps.push(one.row.objective - before);
         last.set(key, one.row.objective);
+        const inARow = recent.length >= REPEAT_LIMIT.inARow && recent.slice(-REPEAT_LIMIT.inARow).every((shown) => shown.has(key));
+        if (inARow || recent.filter((shown) => shown.has(key)).length >= REPEAT_LIMIT.ofLast) pastLimit += 1;
       }
     }
-    return { kind, showings, perRun: showings / sample.results.length, gap: mean(gaps), soon: showings === 0 ? 0 : gaps.filter((gap) => gap <= SOON).length / showings };
+    const share = (count: number) => (showings === 0 ? 0 : count / showings);
+    return {
+      kind,
+      showings,
+      perRun: showings / sample.results.length,
+      gap: mean(gaps),
+      soon: share(gaps.filter((gap) => gap <= SOON).length),
+      pastLimit: share(pastLimit),
+    };
   });
 }
 
@@ -692,19 +716,19 @@ function regionOfKey(data: EngineData, key: string): string {
   return found.length === 0 ? NO_LOCATION : found.reduce((a, b) => ((rank.get(b) ?? 0) < (rank.get(a) ?? 0) ? b : a));
 }
 
-/** A slot's showings by the region each first comes into reach in, `none` left out, every roll counted, so two
- * talisman slots count twice. `adjusted` is the share a region would get if every option in reach showed equally,
- * so a skew from how many items a region holds reads apart from the rest. */
-export function regionShares(sample: Sample, table: RegionTable): ShareTable | null {
+/** A slot's showings by the region each first comes into reach in, or with `byItem` by each item itself, `none` left
+ * out, every roll counted, so two talisman slots count twice. `adjusted` is the share a region or item would get if
+ * every option in reach showed equally, so a skew from how many items a region holds reads apart from the rest. */
+export function regionShares(sample: Sample, table: RegionTable, byItem = false): ShareTable | null {
   const { data } = sample;
   const slots = REGION_SLOTS[table];
   const single = slots.length === 1 ? slots[0]! : undefined;
   const classes = single === undefined ? sample.classes : sample.classes.filter((id) => !alwaysNone(data, id, single));
   if (classes.length === 0) return null;
   const ash = isAshTable(table) ? table : undefined;
-  const regionOf = (key: string) => regionOfKey(data, key);
+  const regionOf = (key: string) => (byItem ? key : regionOfKey(data, key));
   const rank = playRank(data.database);
-  const orderOf = (region: string) => (rank.get(region) ?? -1) + 1;
+  const orderOf = (key: string) => (rank.get(byItem ? regionOfKey(data, key) : key) ?? -1) + 1;
   const reach = new Map<string, string>();
   for (const option of reachedOptions(sample, classes, slots, ash)) {
     if (!isNone(option.row.id)) reach.set(optionKey(option), regionOf(optionKey(option)));
@@ -721,7 +745,7 @@ export function regionShares(sample: Sample, table: RegionTable): ShareTable | n
         if (ash !== undefined && !onTable(one, slot, ash, data)) return [];
         return [regionOf(`${slot === "armor" ? "armor_set" : "item"}:${chosen}`)];
       }),
-    (region) => (region === NO_LOCATION ? NO_LOCATION : regionName(data, region)),
+    (key) => (byItem ? nameOf(data, key) : key === NO_LOCATION ? NO_LOCATION : regionName(data, key)),
     { universe: options.keys(), basis: "showings" },
   );
   const groups = new Set<string>(ash === undefined ? slots : [ash]);
@@ -743,6 +767,7 @@ export function regionShares(sample: Sample, table: RegionTable): ShareTable | n
       adjusted: (options.get(row.key) ?? 0) / Math.max(1, reach.size),
       rollable: rollableTotal > 0 ? (rollable.get(row.key) ?? 0) / rollableTotal : 0,
       ...(row.key === NO_LOCATION ? {} : { order: orderOf(row.key) }),
+      ...(byItem && regionOfKey(data, row.key) !== NO_LOCATION ? { region: regionName(data, regionOfKey(data, row.key)) } : {}),
     })),
   };
 }

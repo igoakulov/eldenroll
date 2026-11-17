@@ -45,6 +45,13 @@ export function Overview({ sample, search }: { readonly sample: Sample; readonly
             perRunColumn((row) => row.showings),
             { id: "apart", label: words.columns.apart, numeric: true, sortValue: (row) => row.gap, render: (row) => decimal(row.gap, 1) },
             { id: "soon", label: words.columns.soon, numeric: true, sortValue: (row) => row.soon, render: (row) => percent(row.soon) },
+            {
+              id: "pastLimit",
+              label: words.columns.pastLimit,
+              numeric: true,
+              sortValue: (row) => row.pastLimit,
+              render: (row) => percent(row.pastLimit),
+            },
           ]}
           rows={repeated}
           rowKey={(row) => row.kind}

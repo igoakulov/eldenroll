@@ -315,6 +315,7 @@ export const copy = {
       gap: "Gap",
       apart: "Apart",
       soon: "Within 10",
+      pastLimit: "Too often",
       klass: "Class",
       slot: "Slot",
       region: "Region",
@@ -335,7 +336,7 @@ export const copy = {
       classesLede: "The picked classes' shares of every objective.",
       repeats: "Repeats",
       repeatsLede:
-        "Apart: objectives since the same thing last showed in that run. Within 10: the share of showings that repeat one from the last 10 objectives.",
+        "Apart: objectives since the same thing last showed in that run. Within 10: the share of showings that repeat one from the last 10 objectives. Too often: the share of showings that make it 4 objectives in a row or 5 of the last 10. None never counts.",
       repeatKinds: {
         class: "Class",
         rh: "Right hand",
@@ -344,7 +345,7 @@ export const copy = {
         spell: "Spell",
         item: "Item",
         talisman: "Talisman",
-        rule: "Combat rule other than None",
+        rule: "Combat rule",
         armor: "Armor set",
       },
     },

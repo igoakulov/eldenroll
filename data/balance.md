@@ -46,7 +46,7 @@ The engine evens each roll against what can roll now, and never predicts what th
 ### Late-game crowding
 
 - **The player sees items, not regions.** A new weapon and a new armor set from one region are two new things they'd like to roll, never a group; a slot showing several new items in a row is welcome variety. Crowding is the same item coming back soon in its slot.
-- **Catching up must not make one item repeat.** A newcomer far behind its peers gets most of a slot's rolls until it catches up, and one that arrives with little of the run left would take most of the rest of it. Past a point, parity costs more than it gives: the same item in the same slot four objectives in a row, or five of the last ten, is too much, even for an item that is still owed. Any control acts per item and is judged by those runs of repeats, slot by slot.
+- **Catching up must not make one item repeat.** A newcomer far behind its peers gets most of a slot's rolls until it catches up, and one that arrives with little of the run left would take most of the rest of it. Past a point, parity costs more than it gives: the same item in the same slot four objectives in a row, or five of the last ten, is too much, even for an item that is still owed. Any control acts per item and is judged by those runs of repeats, slot by slot, as the simulation's Too often column counts them.
 - **No roll feels scheduled.** The most-favoured options hold a minority of a roll, and items level with their peers sit out without making the next pick predictable.
 
 ## Tiers

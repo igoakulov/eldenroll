@@ -63,6 +63,28 @@ function vsFairRows(engine: Engine, results: readonly RunResult[], classes: read
   return rows;
 }
 
+/** The same Vs fair by item: each item against an even share of every item in reach in its slot. */
+function vsFairItemRows(engine: Engine, results: readonly RunResult[], classes: readonly string[]) {
+  const rows: (string | number | null)[][] = [
+    ["character_class", "slot", "region_number", "region", "item", "per_run", "fair_per_run", "vs_fair"],
+  ];
+  for (const scope of ["all", ...classes]) {
+    const sample = sampleOf(engine.data, results, scope === "all" ? classes : [scope]);
+    for (const table of REGION_TABLES) {
+      const shares = regionShares(sample, table, true);
+      if (shares === null) continue;
+      for (const row of shares.rows) {
+        const fair = row.adjusted ?? 0;
+        rows.push([
+          scope, table, row.order ?? null, row.region ?? copy.sim.slots.noLocation, row.name, row.perRun,
+          (fair * shares.total) / shares.runs, fair > 0 ? vsFair(row) : null,
+        ]);
+      }
+    }
+  }
+  return rows;
+}
+
 /** The database with every rule above or below ×1 at ×1 (removals kept), and with `flat` every item's and armor set's odds that aren't 0
  * at 1 too: catch-up judged alone, before odds and synergies steer single items. */
 function judging(database: Database, noSynergies: boolean, flat: boolean): Database {
@@ -172,6 +194,9 @@ export function main(argv: readonly string[], repo: string): void {
   const classes = playing ?? database.character_class.map((row) => row.id);
   writeFileSync(path.join(out, "metrics.md"), report(sampleOf(engine.data, results, classes)));
   writeFileSync(path.join(out, "vs-fair.csv"), csv(vsFairRows(engine, results, classes)));
+  writeFileSync(path.join(out, "vs-fair-items.csv"), csv(vsFairItemRows(engine, results, classes)));
   const seconds = ((performance.now() - started) / 1000).toFixed(1);
-  console.log(`${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/metrics.md, vs-fair.csv, rolls.csv, objectives.csv`);
+  console.log(
+    `${results.length} runs in ${seconds} s → ${path.relative(process.cwd(), out)}/metrics.md, vs-fair.csv, vs-fair-items.csv, rolls.csv, objectives.csv`,
+  );
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Database, Item } from "../src/engine/database";
 import { indexDatabase } from "../src/engine/engineData";
-import { fairLines, regionShares, sampleOf, vsFair, worstLines, type Sample } from "./aggregate";
+import { fairLines, regionShares, repeats, sampleOf, vsFair, worstLines, type Sample } from "./aggregate";
 import type { RunResult } from "./simulate";
 
 function talisman(id: string): Item {
@@ -99,5 +99,17 @@ describe("Furthest from fair", () => {
     expect(worstLines(lines.filter((line) => line.classes[0] === "x"), 1)).toEqual([]);
     const worst = worstLines(lines, 1);
     expect(worst.map((line) => [line.key, [...line.classes].sort()])).toEqual([["r3", ["x", "y"]]]);
+  });
+});
+
+describe("Repeats", () => {
+  const tooOften = (picked: Sample) => repeats(picked).find((row) => row.kind === "talisman")?.pastLimit;
+
+  it("counts a talisman too often from its fourth showing in a row", () => {
+    expect(tooOften(sample(["a"], 6))).toBeCloseTo(3 / 6);
+  });
+
+  it("counts one shown every other objective once it has 5 of the last 10", () => {
+    expect(tooOften(sample(["a", "b"], 6))).toBeCloseTo(4 / 12);
   });
 });

@@ -102,8 +102,14 @@ export function report(sample: Sample): string {
     shares(words.overview.classes, classShares(sample)),
     `### ${words.overview.repeats}`,
     table(
-      [columns.what, columns.perRun, columns.apart, columns.soon],
-      repeats(sample).map((row) => [words.overview.repeatKinds[row.kind], perRun(row.perRun), decimal(row.gap, 1), percent(row.soon)]),
+      [columns.what, columns.perRun, columns.apart, columns.soon, columns.pastLimit],
+      repeats(sample).map((row) => [
+        words.overview.repeatKinds[row.kind],
+        perRun(row.perRun),
+        decimal(row.gap, 1),
+        percent(row.soon),
+        percent(row.pastLimit),
+      ]),
     ),
     `## ${words.tabs[1]}`,
     shares(`${words.slots.rh}, ${words.slots.byClass}`, handShares(sample, "rh", "class")),
