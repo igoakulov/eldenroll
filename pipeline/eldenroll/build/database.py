@@ -16,7 +16,7 @@ from eldenroll.model.database import Database
 from eldenroll.paths import ROOT
 from eldenroll.validate.gate_data import GateData, load_gate_data
 from eldenroll.validate.quality import quality_problems
-from eldenroll.validate.structure import several_top_tiers, structure_problems
+from eldenroll.validate.structure import GUARANTEE_TIER, several_top_tiers, structure_problems
 
 DB_FILE = "db.json"
 REPORT_FILE = "import-report.json"
@@ -99,7 +99,7 @@ def _guarantee_targets_off_base_odds(database: Database) -> list[str]:
         {
             target
             for row in database.modifiers
-            if row.value >= 100_000
+            if row.value >= GUARANTEE_TIER
             for target in row.target.ids or ()
             if odds.get(target, 1) != 1
         }

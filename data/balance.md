@@ -58,8 +58,8 @@ A modifier multiplies an option's odds. Pick its value from these tiers, or `0` 
 | `prefer` | 2 | a nudge |
 | `strong` | 10 | clearly more likely |
 | `boost` | 100 | likely, but other options still show up |
-| `guarantee` | 100,000 | near-certain in a small pool |
-| `top` | 10,000,000 | near-certain in any pool |
+| `guarantee` | 10,000 | near-certain in a small pool |
+| `top` | 1,000,000 | near-certain in any pool |
 
 **Each ×10 adds about one more 9, never 100%.** One boosted option among others at odds 1 wins this often:
 
@@ -69,14 +69,13 @@ A modifier multiplies an option's odds. Pick its value from these tiers, or `0` 
 | 100 | 92% | 50% |
 | 1,000 | 99.1% | 91% |
 | 10,000 | 99.9% | 99% |
-| 100,000 | 99.99% | 99.9% |
-| 10,000,000 | 99.9999% | 99.999% |
+| 1,000,000 | 99.999% | 99.99% |
 
-So the same multiplier feels weaker in a bigger pool, which is why `guarantee` is for small pools (a few armor sets in reach) and `top` for large ones (the rule pool). Both sit higher than the feel alone needs, so they still win where catch-up hands one option most of a roll: a newcomer far behind its peers can hold nearly the whole share of the options with a location (#Hyperparameters), about the pool's size times its base share. Nothing short of removing every other option makes a roll certain, and a reroll can always show something else.
+So the same multiplier feels weaker in a bigger pool, which is why `guarantee` is for small pools and `top` for large ones. Catch-up only moves chance between the options (#Hyperparameters), so a boosted option faces about the sum of the pool's odds whatever the tallies say, and the tiers are sized to that: every `guarantee` row wins 98–99% even in the whole armor pool, where its targets are a few sets among about 180, and an exultation at odds 0.25 among the talismans. One order lower would leave the exultations and the jump sets under 90% (owner, 2026-11-17: as low as that allows). Nothing short of removing every other option makes a roll certain, and a reroll can always show something else.
 
 When two boosted options meet in one pool, compare them with each other, not with the pool:
 
-- **Keep tiers two orders of magnitude apart.** A `top` (×10,000,000) next to a `guarantee` (×100,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
+- **Keep tiers two orders of magnitude apart.** A `top` (×1,000,000) next to a `guarantee` (×10,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
 - **Avoid two `top` targets in one pool:** they split about 50/50. It is allowed where the combination is rare, such as `Claw Talisman` with `Axe Talisman`; `import-report.json` lists every pool where it can happen.
 - **Soft rows and catch-up compound on top.** A `prefer` or `strong` row on a rival raises the rival, and so does catch-up on a rival behind its peers; the simulation's Synergies tab shows how often each boosted target still wins.
 - **Off-tier values** (`×70`, `×42`, `×34`, `×6`, `×5`, `×4`, `×3.5`, `×0.5`) are aimed at a target share rather than a feel, such as Dual-Wield's share of same-class pairs, and are tuned at the simulation.
