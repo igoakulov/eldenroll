@@ -151,8 +151,9 @@ describe("modifiers across slots", () => {
     const katana = result.options.filter((row) => item(row.option.row.id).subcategory === "katana");
     const other = result.options.filter((row) => item(row.option.row.id).subcategory !== "katana");
     expect(katana.length).toBeGreaterThan(0);
-    for (const row of katana) expect(row.weight).toBe(modifierRow("warrior_dw_pairs_katana").value);
-    for (const row of other) expect(row.weight).toBe(1);
+    const odds = (row: (typeof result.options)[number]) => item(row.option.row.id).odds;
+    for (const row of katana) expect(row.weight).toBe(odds(row) * modifierRow("warrior_dw_pairs_katana").value);
+    for (const row of other) expect(row.weight).toBe(odds(row));
     expect(ids(result)).not.toContain("none");
   });
 
@@ -405,7 +406,7 @@ describe("catch-up", () => {
     const state = { characterClass: "knight", boss: null, rolled: new Map(Object.entries(rolled)) as Map<PoolSlot, string | null> };
     const scope = tallyScope(catchUp, "knight", slot);
     const options = slotOptions(real, "knight", slot);
-    const tally = Object.fromEntries(options.map((option) => [tallyKey(scope, option), had[option.row.id] ?? rest]));
+    const tally = Object.fromEntries(options.map((option) => [tallyKey(scope, option), had[option.row.id] ?? rest * option.row.odds]));
     return weighOptions({ data: real, state, counted: EVERYTHING, catchUp, tally: { had: tally, scope } }, options);
   };
   const shareOf = (result: SlotPoolResult, ids: readonly string[]) =>
