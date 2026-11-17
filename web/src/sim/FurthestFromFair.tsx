@@ -1,8 +1,8 @@
-import { gap, worstLines, type FairLine, type Sample } from "../../sim/aggregate";
+import { fairDistance, gap, worstLines, type FairLine, type Sample } from "../../sim/aggregate";
 import { copy } from "../copy";
 import { DataTable } from "../ui/DataTable";
 import { Section } from "../ui/Headings";
-import { FOLD, lineClasses, matches, rowName, showings, signedShowings } from "./format";
+import { decimal, FOLD, lineClasses, matches, perRun, rowName, signedPerRun } from "./format";
 
 const words = copy.sim.slots;
 
@@ -21,7 +21,7 @@ export function FurthestFromFair({
 }) {
   const runs = sample.results.length;
   const all = worstLines(lines, runs);
-  const worst = all.filter((line) => matches(rowName(lineRow(line)), search));
+  const worst = all.filter((line) => [lineClasses(sample, line), words[line.table], rowName(lineRow(line))].some((text) => matches(text, search)));
   if (search !== "" && worst.length === 0) return null;
   return (
     <Section title={words.furthest} lede={words.furthestLede(runs, all.length)}>
@@ -41,14 +41,21 @@ export function FurthestFromFair({
             sortValue: (line) => (line.order === undefined ? line.region : String(line.order).padStart(3, "0")),
             render: (line) => rowName(lineRow(line)),
           },
-          { id: "shown", label: columns.shown, numeric: true, sortValue: (line) => line.shown, render: (line) => showings(line.shown) },
-          { id: "fair", label: columns.fairShowings, numeric: true, sortValue: (line) => line.fair, render: (line) => showings(line.fair) },
+          { id: "shown", label: columns.perRun, numeric: true, sortValue: (line) => line.shown, render: (line) => perRun(line.shown / runs) },
+          { id: "fair", label: columns.fairPerRun, numeric: true, sortValue: (line) => line.fair, render: (line) => perRun(line.fair / runs) },
           {
             id: "gap",
             label: columns.gap,
             numeric: true,
             sortValue: (line) => Math.abs(gap(line)),
-            render: (line) => signedShowings(gap(line)),
+            render: (line) => signedPerRun(gap(line) / runs),
+          },
+          {
+            id: "vs-fair",
+            label: columns.fair,
+            numeric: true,
+            sortValue: (line) => fairDistance(line.shown / line.fair),
+            render: (line) => decimal(line.shown / line.fair),
           },
         ]}
         rows={worst}

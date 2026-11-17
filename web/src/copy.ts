@@ -313,6 +313,7 @@ export const copy = {
       share: "Share",
       what: "What",
       gap: "Gap",
+      apart: "Apart",
       soon: "Within 10",
       klass: "Class",
       slot: "Slot",
@@ -323,8 +324,7 @@ export const copy = {
       seenIn: "Runs",
       catchUp: "Catch-up",
       fair: "Vs fair",
-      shown: "Shown",
-      fairShowings: "Fair",
+      fairPerRun: "Fair per run",
     },
     overview: {
       runs: "Runs",
@@ -336,7 +336,7 @@ export const copy = {
       classesLede: "The picked classes' shares of every objective.",
       repeats: "Repeats",
       repeatsLede:
-        "Gap: objectives since the same thing last showed in that run. Within 10: the share of showings that repeat one from the last 10 objectives.",
+        "Apart: objectives since the same thing last showed in that run. Within 10: the share of showings that repeat one from the last 10 objectives.",
       repeatKinds: {
         class: "Class",
         rh: "Right hand",
@@ -361,7 +361,7 @@ export const copy = {
       regionBothSlots: "Both slots count.",
       furthest: "Furthest from fair",
       furthestLede: (runs: number, found: number) =>
-        `Gaps too large to be luck in ${runs === 1 ? "1 run" : `${runs} runs`}. ${found} found.`,
+        `Gaps too large to be luck in ${runs === 1 ? "1 run" : `${runs} runs`}. ${found} found. Vs fair: 1.00 is even.`,
       classesTogether: (count: number, others: boolean) => `${count} ${others ? "other classes" : "classes"} together`,
       noLocation: "No location",
       countBy: "Count by",

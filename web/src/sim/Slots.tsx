@@ -68,8 +68,8 @@ export function Slots({
       empty: empties(sample),
     };
   }), [sample, chances, by, region]);
-  // Each picked class alone, every slot but the item slot: counted only while the tables count by region
-  const lines = useMemo(() => (region ? countOnce(sample, "fair-lines", () => fairLines(sample, FAIR_TABLES, chances)) : []), [sample, chances, region]);
+  // Each picked class alone, every slot but the item slot, whatever the tables count by
+  const lines = useMemo(() => countOnce(sample, "fair-lines", () => fairLines(sample, FAIR_TABLES, chances)), [sample, chances]);
   const regionLede = (table: RegionTable) => (twoSlots(table) ? `${words.regionLede} ${words.regionBothSlots}` : words.regionLede);
   const both = tables.both;
   const pairRows = both.rows.filter((row) => matches(row.name, search));
@@ -152,7 +152,7 @@ export function Slots({
 
       {gear("armor", words.armor)}
 
-      {region && <FurthestFromFair sample={sample} lines={lines} search={search} />}
+      <FurthestFromFair sample={sample} lines={lines} search={search} />
 
       <Section title={words.empties} lede={words.emptiesLede}>
         <DataTable<EmptyRow>

@@ -26,7 +26,7 @@ import {
   vsFair,
 } from "./aggregate";
 import { STATS } from "../src/engine/settings";
-import { decimal, lineClasses, multiplier, percent, perRun, rowName, showings, signedShowings } from "../src/sim/format";
+import { decimal, lineClasses, multiplier, percent, perRun, rowName, signedPerRun } from "../src/sim/format";
 import type { ChanceSums } from "./simulate";
 
 const words = copy.sim;
@@ -78,14 +78,15 @@ function furthest(sample: Sample, chances: ChanceSums | undefined): string[] {
     `### ${words.slots.furthest}`,
     words.slots.furthestLede(runs, worst.length),
     table(
-      [columns.klass, columns.slot, columns.region, columns.shown, columns.fairShowings, columns.gap],
+      [columns.klass, columns.slot, columns.region, columns.perRun, columns.fairPerRun, columns.gap, columns.fair],
       worst.map((line) => [
         lineClasses(sample, line),
         words.slots[line.table],
         rowName({ key: line.key, name: line.region, ...(line.order === undefined ? {} : { order: line.order }) }),
-        showings(line.shown),
-        showings(line.fair),
-        signedShowings(gap(line)),
+        perRun(line.shown / runs),
+        perRun(line.fair / runs),
+        signedPerRun(gap(line) / runs),
+        decimal(line.shown / line.fair),
       ]),
     ),
   ];
@@ -106,7 +107,7 @@ export function report(sample: Sample, chances: ChanceSums | undefined): string 
     shares(words.overview.classes, classShares(sample)),
     `### ${words.overview.repeats}`,
     table(
-      [columns.what, columns.perRun, columns.gap, columns.soon],
+      [columns.what, columns.perRun, columns.apart, columns.soon],
       repeats(sample).map((row) => [words.overview.repeatKinds[row.kind], perRun(row.perRun), decimal(row.gap, 1), percent(row.soon)]),
     ),
     `## ${words.tabs[1]}`,

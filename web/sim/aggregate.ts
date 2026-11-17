@@ -1033,6 +1033,12 @@ export function gap(line: FairLine): number {
   return line.shown - line.fair;
 }
 
+/** How far a Vs fair is from even on a log scale, so half and double are as far: how every Vs fair column sorts, worst
+ * first. One that never showed is furthest; one with no fair share sorts last. */
+export function fairDistance(vs: number): number {
+  return vs > 0 ? Math.abs(Math.log2(vs)) : vs === 0 ? Infinity : NaN;
+}
+
 /** Off even, by at least `MIN_GAP_PER_RUN` showings a run, and by more than luck can explain over `runs`. */
 function matters(line: FairLine, runs: number): boolean {
   const vs = line.shown / line.fair;

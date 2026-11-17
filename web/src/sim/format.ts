@@ -22,14 +22,10 @@ export function perRun(value: number): string {
   return decimal(value, value < 10 ? 2 : 1);
 }
 
-/** Showings over a whole sample: one decimal below 10, since a fair share is rarely whole. */
-export function showings(value: number): string {
-  return decimal(value, Math.abs(value) < 10 ? 1 : 0);
-}
-
-/** A gap in showings, signed: above the fair share +, below it −. */
-export function signedShowings(value: number): string {
-  return `${value > 0 ? "+" : value < 0 ? "−" : ""}${showings(Math.abs(value))}`;
+/** A gap in showings per run, signed: above the fair share +, below it −. */
+export function signedPerRun(value: number): string {
+  const text = perRun(Math.abs(value));
+  return value > 0 ? `+${text}` : value < 0 ? `−${text}` : text;
 }
 
 /** The smallest round number at or above `top`, one significant digit: each chart's own scale. */

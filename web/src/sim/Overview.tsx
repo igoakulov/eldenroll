@@ -43,7 +43,7 @@ export function Overview({ sample, search }: { readonly sample: Sample; readonly
           columns={[
             { id: "kind", label: words.columns.what, render: (row) => words.overview.repeatKinds[row.kind] },
             perRunColumn((row) => row.showings),
-            { id: "gap", label: words.columns.gap, numeric: true, sortValue: (row) => row.gap, render: (row) => decimal(row.gap, 1) },
+            { id: "apart", label: words.columns.apart, numeric: true, sortValue: (row) => row.gap, render: (row) => decimal(row.gap, 1) },
             { id: "soon", label: words.columns.soon, numeric: true, sortValue: (row) => row.soon, render: (row) => percent(row.soon) },
           ]}
           rows={repeated}

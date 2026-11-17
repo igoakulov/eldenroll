@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { THIN_SAMPLE, vsFair, type ShareRow, type ShareTable } from "../../sim/aggregate";
+import { fairDistance, THIN_SAMPLE, vsFair, type ShareRow, type ShareTable } from "../../sim/aggregate";
 import { copy } from "../copy";
 import { DataTable, type DataColumn } from "../ui/DataTable";
 import { perRunColumn, shareColumn } from "./columns";
@@ -50,7 +50,7 @@ export function ShareSection({
             id: "fair",
             label: words.columns.fair,
             numeric: true,
-            sortValue: (row: ShareRow) => vsFair(row),
+            sortValue: (row: ShareRow) => fairDistance(vsFair(row)),
             render: (row: ShareRow) => decimal(vsFair(row)),
           },
         ]
