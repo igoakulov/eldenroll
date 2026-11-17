@@ -323,7 +323,8 @@ export const copy = {
       seenIn: "Runs",
       catchUp: "Catch-up",
       fair: "Vs fair",
-      fairPerRun: "Fair per run",
+      shown: "Shown",
+      fairShowings: "Fair",
     },
     overview: {
       runs: "Runs",
@@ -359,8 +360,9 @@ export const copy = {
         "By the region where each first comes into reach, empty slots left out. Vs fair: the share against what it would be if every option in reach showed equally; 1.00 is even. Catch-up: the mean boost while in a pool, won or not.",
       regionBothSlots: "Both slots count.",
       furthest: "Furthest from fair",
-      furthestLede: (share: string) =>
-        `The ${share} of lines furthest from fair, at least 10, under and over alike, half and double being as far: each one region of one slot for one picked class alone, with enough sample. Fair per run: its showings a run at its fair share. The item slot is left out, its odds differing by design.`,
+      furthestLede: (runs: number, found: number) =>
+        `Gaps too large to be luck in ${runs === 1 ? "1 run" : `${runs} runs`}. ${found} found.`,
+      classesTogether: (count: number, others: boolean) => `${count} ${others ? "other classes" : "classes"} together`,
       noLocation: "No location",
       countBy: "Count by",
       byClass: "Weapon class",

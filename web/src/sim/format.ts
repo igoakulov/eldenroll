@@ -1,4 +1,4 @@
-import { NO_LOCATION, type ModifierText, type ShareRow, type Trigger } from "../../sim/aggregate";
+import { className, NO_LOCATION, type FairLine, type ModifierText, type Sample, type ShareRow, type Trigger } from "../../sim/aggregate";
 import { copy } from "../copy";
 import type { TableFold } from "../ui/DataTable";
 
@@ -20,6 +20,16 @@ export function percent(share: number, digits = 1): string {
 /** Showings per run, the unit a run is judged by: two decimals below 10, so a rare option still reads. */
 export function perRun(value: number): string {
   return decimal(value, value < 10 ? 2 : 1);
+}
+
+/** Showings over a whole sample: one decimal below 10, since a fair share is rarely whole. */
+export function showings(value: number): string {
+  return decimal(value, Math.abs(value) < 10 ? 1 : 0);
+}
+
+/** A gap in showings, signed: above the fair share +, below it −. */
+export function signedShowings(value: number): string {
+  return `${value > 0 ? "+" : value < 0 ? "−" : ""}${showings(Math.abs(value))}`;
 }
 
 /** The smallest round number at or above `top`, one significant digit: each chart's own scale. */
@@ -59,4 +69,11 @@ export function matches(name: string, search: string): boolean {
     .toLowerCase()
     .split(/\s+/)
     .every((word) => text.includes(word));
+}
+
+/** A Furthest from fair line's class, or how many classes it sums. */
+export function lineClasses(sample: Sample, line: FairLine): string {
+  return line.classes.length === 1
+    ? className(sample.data, line.classes[0]!)
+    : copy.sim.slots.classesTogether(line.classes.length, line.others === true);
 }

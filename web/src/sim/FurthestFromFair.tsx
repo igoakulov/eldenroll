@@ -1,15 +1,15 @@
-import { className, worstLines, WORST_SHARE, type FairLine, type Sample } from "../../sim/aggregate";
+import { gap, worstLines, type FairLine, type Sample } from "../../sim/aggregate";
 import { copy } from "../copy";
 import { DataTable } from "../ui/DataTable";
 import { Section } from "../ui/Headings";
-import { decimal, FOLD, matches, percent, perRun, rowName } from "./format";
+import { FOLD, lineClasses, matches, rowName, showings, signedShowings } from "./format";
 
 const words = copy.sim.slots;
 
 const lineRow = (line: FairLine) => ({ key: line.key, name: line.region, ...(line.order === undefined ? {} : { order: line.order }) });
 const columns = copy.sim.columns;
 
-/** Every slot's lines furthest from fair, under and over alike, worst first. */
+/** Every slot's lines whose gap from fair matters for play, under and over alike, largest first. */
 export function FurthestFromFair({
   sample,
   lines,
@@ -19,18 +19,20 @@ export function FurthestFromFair({
   readonly lines: readonly FairLine[];
   readonly search: string;
 }) {
-  const worst = worstLines(lines).filter((line) => matches(rowName(lineRow(line)), search));
+  const runs = sample.results.length;
+  const all = worstLines(lines, runs);
+  const worst = all.filter((line) => matches(rowName(lineRow(line)), search));
   if (search !== "" && worst.length === 0) return null;
   return (
-    <Section title={words.furthest} lede={words.furthestLede(percent(WORST_SHARE, 0))}>
+    <Section title={words.furthest} lede={words.furthestLede(runs, all.length)}>
       <DataTable<FairLine>
         label={words.furthest}
         columns={[
           {
             id: "class",
             label: columns.klass,
-            sortValue: (line) => className(sample.data, line.characterClass),
-            render: (line) => className(sample.data, line.characterClass),
+            sortValue: (line) => lineClasses(sample, line),
+            render: (line) => lineClasses(sample, line),
           },
           { id: "slot", label: columns.slot, sortValue: (line) => words[line.table], render: (line) => words[line.table] },
           {
@@ -39,17 +41,18 @@ export function FurthestFromFair({
             sortValue: (line) => (line.order === undefined ? line.region : String(line.order).padStart(3, "0")),
             render: (line) => rowName(lineRow(line)),
           },
-          { id: "fair", label: columns.fair, numeric: true, sortValue: (line) => line.vsFair, render: (line) => decimal(line.vsFair) },
+          { id: "shown", label: columns.shown, numeric: true, sortValue: (line) => line.shown, render: (line) => showings(line.shown) },
+          { id: "fair", label: columns.fairShowings, numeric: true, sortValue: (line) => line.fair, render: (line) => showings(line.fair) },
           {
-            id: "fair-per-run",
-            label: columns.fairPerRun,
+            id: "gap",
+            label: columns.gap,
             numeric: true,
-            sortValue: (line) => line.fairPerRun,
-            render: (line) => perRun(line.fairPerRun),
+            sortValue: (line) => Math.abs(gap(line)),
+            render: (line) => signedShowings(gap(line)),
           },
         ]}
         rows={worst}
-        rowKey={(line) => `${line.characterClass}/${line.table}/${line.key}`}
+        rowKey={(line) => `${line.classes.join(",")}/${line.table}/${line.key}`}
         fold={FOLD}
         empty={copy.sim.nothing}
       />

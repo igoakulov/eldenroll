@@ -5,6 +5,7 @@ import {
   className,
   FAIR_TABLES,
   fairLines,
+  gap,
   worstLines,
   classShares,
   empties,
@@ -25,7 +26,7 @@ import {
   vsFair,
 } from "./aggregate";
 import { STATS } from "../src/engine/settings";
-import { decimal, multiplier, percent, perRun, rowName } from "../src/sim/format";
+import { decimal, lineClasses, multiplier, percent, perRun, rowName, showings, signedShowings } from "../src/sim/format";
 import type { ChanceSums } from "./simulate";
 
 const words = copy.sim;
@@ -69,19 +70,22 @@ function synergies(title: string, share: string, rows: readonly SynergyRow[]): s
   ].join("\n\n");
 }
 
-/** The lines furthest from fair. */
+/** The lines whose gap from fair matters for play. */
 function furthest(sample: Sample, chances: ChanceSums | undefined): string[] {
-  const worst = worstLines(fairLines(sample, FAIR_TABLES, chances));
+  const runs = sample.results.length;
+  const worst = worstLines(fairLines(sample, FAIR_TABLES, chances), runs);
   return [
     `### ${words.slots.furthest}`,
+    words.slots.furthestLede(runs, worst.length),
     table(
-      [columns.klass, columns.slot, columns.region, columns.fair, columns.fairPerRun],
+      [columns.klass, columns.slot, columns.region, columns.shown, columns.fairShowings, columns.gap],
       worst.map((line) => [
-        className(sample.data, line.characterClass),
+        lineClasses(sample, line),
         words.slots[line.table],
         rowName({ key: line.key, name: line.region, ...(line.order === undefined ? {} : { order: line.order }) }),
-        decimal(line.vsFair),
-        perRun(line.fairPerRun),
+        showings(line.shown),
+        showings(line.fair),
+        signedShowings(gap(line)),
       ]),
     ),
   ];

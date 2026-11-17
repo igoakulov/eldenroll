@@ -969,26 +969,31 @@ export function itemSeries(
 
 // Furthest from fair
 
-/** A line expecting fewer showings than this at its fair share, over its class's objectives in the sample, is left
- * out: however far from 1 it reads, it is noise. */
-const LINE_SAMPLE = 8;
-/** The share of lines, furthest from fair first, that Furthest from fair lists. */
-export const WORST_SHARE = 0.3;
-const WORST_AT_LEAST = 10;
+/** Vs fair inside this range reads as even. */
+export const EVEN = { low: 0.8, high: 1.25 } as const;
+/** A gap smaller than this many showings a run is no concern for play, however far from 1 its Vs fair reads. */
+export const MIN_GAP_PER_RUN = 0.5;
+/** A gap must pass this many standard deviations of its sample to count as more than luck: one build's view holds
+ * hundreds of lines, so at three about one is listed by luck alone. A line's showings vary from run to run no more
+ * than chance alone would make them, so the standard deviation of its showings over the sample is √(fair showings). */
+export const LUCK_DEVIATIONS = 3;
 /** Region tables Furthest from fair reads: the item slot's shares follow odds that differ by design, so its Vs fair
  * says little. */
 export const FAIR_TABLES: readonly RegionTable[] = REGION_TABLES.filter((table) => table !== "item");
 
-/** One region of one slot for one class alone. */
+/** One region of one slot, for one class alone or several summed. */
 export interface FairLine {
-  readonly characterClass: string;
+  readonly classes: readonly string[];
   readonly table: RegionTable;
   readonly key: string;
   readonly region: string;
   readonly order: number | undefined;
-  readonly vsFair: number;
-  /** Showings a run at its fair share. */
-  readonly fairPerRun: number;
+  /** Showings over the whole sample. */
+  readonly shown: number;
+  /** Showings over the whole sample at its fair share. */
+  readonly fair: number;
+  /** A sum of classes beside one or more classes of the same slot and region listed alone. */
+  readonly others?: boolean;
 }
 
 /** The sample as one class alone would read it, over the same runs. */
@@ -996,8 +1001,8 @@ function forClass(sample: Sample, characterClass: string): Sample {
   return { ...sample, objectives: sample.all.filter((one) => one.row.characterClass === characterClass), classes: [characterClass] };
 }
 
-/** Every region of the region tables for each picked class alone, with enough sample (`LINE_SAMPLE`); `No location`
- * is left out. */
+/** Every region of the region tables for each picked class alone; `No location` and regions with no fair share are
+ * left out. */
 export function fairLines(sample: Sample, tables: readonly RegionTable[], chances?: ChanceSums): readonly FairLine[] {
   const lines: FairLine[] = [];
   for (const characterClass of sample.classes) {
@@ -1007,15 +1012,15 @@ export function fairLines(sample: Sample, tables: readonly RegionTable[], chance
       if (shares === null) continue;
       for (const row of shares.rows) {
         const fair = row.adjusted ?? 0;
-        if (row.key === NO_LOCATION || fair === 0 || fair * shares.total < LINE_SAMPLE) continue;
+        if (row.key === NO_LOCATION || fair === 0) continue;
         lines.push({
-          characterClass,
+          classes: [characterClass],
           table,
           key: row.key,
           region: row.name,
           order: row.order,
-          vsFair: vsFair(row),
-          fairPerRun: (fair * shares.total) / shares.runs,
+          shown: row.share * shares.total,
+          fair: fair * shares.total,
         });
       }
     }
@@ -1023,14 +1028,42 @@ export function fairLines(sample: Sample, tables: readonly RegionTable[], chance
   return lines;
 }
 
-/** How far a line is from fair on a log scale, so half and double are equally far; one that never showed is
- * furthest. */
-function distance(line: FairLine): number {
-  return line.vsFair > 0 ? Math.abs(Math.log2(line.vsFair)) : Infinity;
+/** Showings over the sample above (+) or below (−) the fair share. */
+export function gap(line: FairLine): number {
+  return line.shown - line.fair;
 }
 
-/** The lines furthest from fair, worst first: `WORST_SHARE` of them, at least 10 where there are as many. */
-export function worstLines(lines: readonly FairLine[]): readonly FairLine[] {
-  const sorted = [...lines].sort((a, b) => distance(b) - distance(a));
-  return sorted.slice(0, Math.min(sorted.length, Math.max(WORST_AT_LEAST, Math.ceil(sorted.length * WORST_SHARE))));
+/** Off even, by at least `MIN_GAP_PER_RUN` showings a run, and by more than luck can explain over `runs`. */
+function matters(line: FairLine, runs: number): boolean {
+  const vs = line.shown / line.fair;
+  const off = Math.abs(gap(line));
+  return (vs < EVEN.low || vs > EVEN.high) && off >= MIN_GAP_PER_RUN * runs && off > LUCK_DEVIATIONS * Math.sqrt(line.fair);
+}
+
+/** The lines whose gap matters for play, largest first: each class line that passes alone, then for each slot and
+ * region the classes that don't, summed (each against its own fair share), if their sum passes. Nothing counts twice,
+ * and a shortfall every class shares shows though no class is short enough alone. */
+export function worstLines(lines: readonly FairLine[], runs: number): readonly FairLine[] {
+  const listed: FairLine[] = [];
+  const rest = new Map<string, FairLine[]>();
+  const alone = new Set<string>();
+  for (const line of lines) {
+    const at = `${line.table}/${line.key}`;
+    if (matters(line, runs)) {
+      listed.push(line);
+      alone.add(at);
+    } else rest.set(at, [...(rest.get(at) ?? []), line]);
+  }
+  for (const [at, group] of rest) {
+    if (group.length < 2) continue;
+    const summed: FairLine = {
+      ...group[0]!,
+      classes: group.map((line) => line.classes[0]!),
+      shown: group.reduce((sum, line) => sum + line.shown, 0),
+      fair: group.reduce((sum, line) => sum + line.fair, 0),
+      others: alone.has(at),
+    };
+    if (matters(summed, runs)) listed.push(summed);
+  }
+  return listed.sort((a, b) => Math.abs(gap(b)) - Math.abs(gap(a)));
 }
