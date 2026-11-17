@@ -232,6 +232,9 @@ export function playRank(database: Database): ReadonlyMap<string, number> {
   return ordered(database).rank;
 }
 
+/** Regions the game walks the player through end to end: the next opens only once all their bosses are felled. */
+const LINEAR_REGIONS: ReadonlySet<string> = new Set(["leyndell", "farumazula", "leyndell_ashen", "dlc_enirilim"]);
+
 export function simulateRun(base: Engine, options: SimOptions): RunResult {
   const observed: Observed[] = [];
   const engine: Engine = { ...base, observe: (slot, roll) => observed.push({ slot, roll }) };
@@ -350,15 +353,16 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
     if (options.allocation === "ITEMS") {
       meetRequirements(player, requirements(engine.data, run.current.slots));
     }
-    // Nobody clears a region before moving on: the next one opens once `completion` of it is felled,
-    // rounding up, rather than waiting for its last boss (web/sim/README.md#A run). This boss counts as
+    // Nobody clears a region before moving on: the next one opens once `completion` of it is felled, rounding up, or
+    // all of a linear one, rather than waiting for its last boss (web/sim/README.md#A run). This boss counts as
     // felled already: opened after `done`, a region's last boss would finish the run first.
     const felled = [...run.deadBosses.map((row) => row.instanceId), run.current.boss];
     while (open < order.length) {
       const region = order[open - 1]!;
       const total = bosses.get(region) ?? 0;
       const dead = felled.filter((id) => regionOfBoss.get(id) === region).length;
-      if (total === 0 || dead * 100 < total * options.completion) break;
+      const completion = LINEAR_REGIONS.has(region) ? 100 : options.completion;
+      if (total === 0 || dead * 100 < total * completion) break;
       open += 1;
       run = editRun(run, { regions: order.slice(0, open) });
     }

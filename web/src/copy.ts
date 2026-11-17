@@ -285,7 +285,8 @@ export const copy = {
     newSeed: "New seed",
     regions: "Regions",
     completion: "Region completion",
-    completionDetail: (value: number) => `${value}% of a region's bosses felled before the next region opens`,
+    completionDetail: (value: number) =>
+      `${value}% of a region's bosses felled before the next region opens; all of them in Leyndell, Farum Azula, the Ashen Capital and Enir-Ilim, which the game leads through end to end`,
     percent: (value: number) => `${value}%`,
     regionsDetail: "Numbered in the order a run opens them: the first DLC regions come after Farum Azula, before the Haligtree.",
     allRegions: "All",
