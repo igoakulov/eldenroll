@@ -3,7 +3,7 @@
 Why the data rolls the way it does: every odds value other than 1 and every conditional rule, with its reason. Read it before tuning, and change the data and this file together: `pipeline/tests/test_balance.py` fails when a modifier row or an odds value other than 1 is missing here, or listed here but gone from the data.
 
 - How modifier rows combine: `data/overrides/README.md#Selectors and modifiers`.
-- Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×67`, `×6`, `×5`, `×3.5`, `×3`, `×0.5`) are deliberate placeholders for it.
+- Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×67`, `×65`, `×35`, `×12.5`, `×8.5`, `×6`, `×5`, `×3.5`, `×0.5`) are deliberate placeholders for it.
 
 ## Levers
 
@@ -45,7 +45,7 @@ When two boosted options meet in one pool, compare them with each other, not wit
 - **Keep tiers two orders of magnitude apart.** A `top` (×10,000,000) next to a `guarantee` (×100,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
 - **Avoid two `top` targets in one pool:** they split about 50/50. It is allowed where the combination is rare, such as `Claw Talisman` with `Axe Talisman`; `import-report.json` lists every pool where it can happen.
 - **Soft rows and catch-up compound on top.** A `prefer` or `strong` row on a rival raises the rival, and so does the catch-up boost on a late one; the simulation's Synergies tab shows how often each boosted target still wins.
-- **Off-tier values** (`×67`, `×6`, `×5`, `×3.5`, `×3`, `×0.5`) are aimed at a target share rather than a feel, such as Dual-Wield's share of same-class pairs, and are tuned at the simulation.
+- **Off-tier values** (`×67`, `×65`, `×35`, `×12.5`, `×8.5`, `×6`, `×5`, `×3.5`, `×0.5`) are aimed at a target share rather than a feel, such as Dual-Wield's share of same-class pairs, and are tuned at the simulation.
 - **When two boosted targets clash, the rarer trigger wins.** The run should vary, and the more common trigger gets more chances to show its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger, since rules roll before armor.
 
 ## Hyperparameters
@@ -79,7 +79,7 @@ A row's own odds, for every option that rolls differently all the time. Files: `
 | item | `igons_drake_hunt` | 0 | easily missed in the game; `Igon's Greatbow` itself keeps normal odds |
 | item | `lamenters_mask` `rock_heart` `priestess_heart` | 0 | transforms that conflict with gear, so an objective can't use one with its loadout |
 | item | `litany_of_proper_death` | 0 | its places are hard to pin down, and it is nearly useless against anything not undead |
-| item | `finger_seal` `godslayers_seal` `giants_seal` `gravel_stone_seal` `clawmark_seal` `golden_order_seal` `erdtree_seal` `dragon_communion_seal` `frenzied_flame_seal` `dryleaf_seal` `fire_knights_seal` `spiraltree_seal` | 2 | a rolled catalyst decides the spell type and staves outnumber seals about 3 to 1 once past Liurnia, so seals roll at twice the odds to keep `Spellblade` casting each type about evenly |
+| item | `finger_seal` `godslayers_seal` `giants_seal` `gravel_stone_seal` `clawmark_seal` `golden_order_seal` `erdtree_seal` `dragon_communion_seal` `frenzied_flame_seal` `dryleaf_seal` `fire_knights_seal` `spiraltree_seal` | 2 | a rolled catalyst decides `Spellblade`'s spell type, so staves and seals should hold the ratio of sorceries to incantations, owner 2026-11-16; with fewer seals than staves, seals at twice the odds do |
 | item | `lord_of_bloods_exultation` `kindred_of_rots_exultation` `blue_dancer_charm` | 0.25 | owner decision: the full-run simulation showed each turning up without its synergy (a bleed or rot weapon, a light build) often enough to read as noise rather than a deliberate pairing |
 | item | `radagons_soreseal` `marikas_soreseal` `radagons_scarseal` `marikas_scarseal` `crucible_scale_talisman` `crucible_feather_talisman` `crucible_knot_talisman` `fine_crucible_feather_talisman` `talisman_of_all_crucibles` `shabriris_woe` | 0.5 | owner decision: `Any Scarseal / Soreseal`, `Any Crucible talisman` and `Shabriri's Woe` only raise the damage taken, for little or no utility, unlike `Any Scorpion Charm`, which also steers toward an elemental build |
 | item | `warrior_jar_shard` | 0 | owner decision: it would otherwise take the talisman slot that `Shard of Alexander`, the more useful of the two, should get |
@@ -123,7 +123,7 @@ Most classes are just their pools in `slot_pools.csv`. Four have rules on top:
 - **Dual-Wield Warrior:** same-class pairs and paired weapons (#26. Dual-Wield Warrior pairs), and `Grafted Dragon` kept out (#29. Grafted Dragon only on Jester).
 - **Jester:** its right hand's balance (#19. Jester's right hand), `Grafted Dragon` as its own, and odd pairs, such as `Spinning Weapon` on a staff, left alone on purpose: they are the point of the class. Its pool holds `none`, 6 offensive greatshields, torches, perfume bottles, one staff and `Grafted Dragon`; none of the greatshields is reachable in the Limgrave region, which is accepted because `Jester` rolls about once per run there.
 - **Knight:** the thrusting shield (#10. Knight's thrusting shield) and no paired weapons (#28. No paired weapons in unpaired classes).
-- **Sorcerer and Pyromancer:** never `L2 only` (#6. L2 only needs a skill), and a second catalyst in LH (#32. A second catalyst for casters).
+- **Sorcerer and Pyromancer:** never `L2 only` (#6. L2 only needs a skill), and their left hand's mix of catalysts and shields (#32. Caster left hand).
 - **Sorcerer, Pyromancer, Ranger and Jester** lose the talismans and rules they can't use (#33. Talismans a class can't use, #34. Attack rules a class can't use).
 
 ### 1. Parry only needs a parry ash
@@ -280,11 +280,11 @@ P1. The card then shows what the rule asks, so it needs no "rules take precedenc
 
 Rows: `no_armor_rule_makes_naked_set_top`
 
-### 32. A second catalyst for casters
+### 32. Caster left hand
 
-P2. Small and medium shields crowd a caster's LH at equal odds, so catalysts go `×3` for `Sorcerer` and `Pyromancer`. RH holds only catalysts, so only LH changes. Aim, owner 2026-11-16: a catalyst about two thirds of the time over a run, the rest split evenly between small and medium shields, since a second catalyst often boosts the spell's school or casting speed (`Azur's Glintstone Staff`), while shields are there for defence and variety.
+P2. Owner, 2026-11-16: a `Sorcerer` or `Pyromancer` left hand holds a catalyst of the class's type about 60% of a run, a small or medium shield about 30%, at their relative counts, and `Jellyfish Shield` about 10%; never `none`. A left-hand catalyst often boosts the spell's school or casting speed (`Azur's Glintstone Staff`) and `Jellyfish Shield`'s skill is an active damage buff, so the hand serves offence about 70% of the time; the other shields are there for defence and variety. `Jellyfish Shield` is a greatshield, so the pools name it alone. The values are aimed at those shares over a whole run and every stat allocation, so they differ by class: seals already roll at odds 2 (#Base odds). Catch-up shifts the mix over a run as late catalysts and shields arrive: the late seals' large share suits Pyromancer, since the best seals for each school come from the Altus Plateau on, mostly Leyndell, the Mountaintops and the DLC; and `Jellyfish Shield`, in reach from Liurnia, shows mostly early and needs 20 Str and 14 Dex, which pure Intelligence and Faith builds reach only mid-run. RH holds only catalysts, so the catalyst rows change only LH.
 
-Rows: `casters_lh_prefers_a_second_catalyst`
+Rows: `sorcerer_lh_prefers_a_catalyst`, `pyromancer_lh_prefers_a_catalyst`, `sorcerer_lh_jellyfish_shield`, `pyromancer_lh_jellyfish_shield`
 
 ### 33. Talismans a class can't use
 

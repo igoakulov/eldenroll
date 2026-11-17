@@ -40,7 +40,10 @@ function csv(rows: readonly (readonly (string | number | boolean | null)[])[]): 
  * each class alone, from the page's own counting over the same runs. */
 function vsFairRows(engine: Engine, results: readonly RunResult[], classes: readonly string[], chances: ChanceSums) {
   const rows: (string | number | null)[][] = [
-    ["character_class", "slot", "region_number", "region", "per_run", "share", "fair_share", "vs_fair", "fair_per_run"],
+    [
+      "character_class", "slot", "region_number", "region", "per_run", "share", "fair_share", "vs_fair", "fair_per_run",
+      "rollable_share", "vs_rollable",
+    ],
   ];
   for (const scope of ["all", ...classes]) {
     const sample = sampleOf(engine.data, results, scope === "all" ? classes : [scope]);
@@ -52,6 +55,7 @@ function vsFairRows(engine: Engine, results: readonly RunResult[], classes: read
         rows.push([
           scope, table, row.order ?? null, row.key === NO_LOCATION ? copy.sim.slots.noLocation : row.name, row.perRun, row.share, fair,
           fair > 0 ? vsFair(row) : null, (fair * shares.total) / shares.runs,
+          row.rollable ?? null, row.rollable ? row.share / row.rollable : null,
         ]);
       }
     }

@@ -58,6 +58,7 @@ function sample(picks: readonly string[], times: number): Sample {
     reached: new Map([
       ["only", { options: new Set(Object.keys(PLACES).map((id) => `item:${id}`)), weaponAshes: new Set(), shieldAshes: new Set() }],
     ]),
+    rollable: new Map(),
   } as unknown as RunResult;
   return sampleOf(indexDatabase(database), [run], ["only"]);
 }

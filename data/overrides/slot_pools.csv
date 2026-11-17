@@ -38,7 +38,7 @@ ranger,talisman_2,category:talisman
 ranger,rule_1,rule:
 ranger,rule_2,rule:
 sorcerer,rh,subcategory:glintstone_staff
-sorcerer,lh,category:none; subcategory:glintstone_staff small_shield medium_shield
+sorcerer,lh,subcategory:glintstone_staff small_shield medium_shield; item:jellyfish_shield
 sorcerer,spell,category:sorcery
 sorcerer,item,category:tool consumable
 sorcerer,talisman_1,category:talisman
@@ -46,7 +46,7 @@ sorcerer,talisman_2,category:talisman
 sorcerer,rule_1,rule:
 sorcerer,rule_2,rule:
 pyromancer,rh,subcategory:sacred_seal
-pyromancer,lh,category:none; subcategory:sacred_seal small_shield medium_shield
+pyromancer,lh,subcategory:sacred_seal small_shield medium_shield; item:jellyfish_shield
 pyromancer,spell,category:incantation
 pyromancer,item,category:tool consumable
 pyromancer,talisman_1,category:talisman

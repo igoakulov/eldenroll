@@ -149,6 +149,8 @@ export interface ShareRow {
   /** The share it would have from pool size alone, where it applies: every weapon class holding as many weapons, or
    * every item of a region's showing equally. */
   readonly adjusted?: number;
+  /** By region, the share it would have if every option showed equally whenever it could roll: the time baseline. */
+  readonly rollable?: number;
   /** A region's number in play order, from 1, which the page and `metrics.md` show before its name and sort by. */
   readonly order?: number;
 }
@@ -755,11 +757,24 @@ export function regionShares(sample: Sample, table: RegionTable, chances?: Chanc
     (region) => (region === NO_LOCATION ? NO_LOCATION : regionName(data, region)),
     { universe: options.keys(), boosts: boostsInReach(sample, chances, slots, regionOf), basis: "showings" },
   );
+  const groups = new Set<string>(ash === undefined ? slots : [ash]);
+  const rollable = new Map<string, number>();
+  let rollableTotal = 0;
+  for (const result of sample.results) {
+    for (const [at, value] of result.rollable) {
+      const [characterClass = "", group = "", key = ""] = at.split("|");
+      if (!classes.includes(characterClass) || !groups.has(group)) continue;
+      const region = regionOf(key);
+      rollable.set(region, (rollable.get(region) ?? 0) + value);
+      rollableTotal += value;
+    }
+  }
   return {
     ...shares,
     rows: shares.rows.map((row) => ({
       ...row,
       adjusted: (options.get(row.key) ?? 0) / Math.max(1, reach.size),
+      rollable: rollableTotal > 0 ? (rollable.get(row.key) ?? 0) / rollableTotal : 0,
       ...(row.key === NO_LOCATION ? {} : { order: orderOf(row.key) }),
     })),
   };

@@ -112,6 +112,14 @@ export interface RunResult {
   readonly offered: Map<string, Set<string>>;
   /** What the pools offered by class, by `optionKey`, so a region table counts as in reach only what could roll. */
   readonly reached: Map<string, Reached>;
+  /** For the time baseline: over every roll that showed something, each option's 1 / the options other than `none`
+   * in its pool, by `rollableKey`, so options share a showing equally among what could roll then. */
+  readonly rollable: Map<string, number>;
+}
+
+/** A slot, or for an ash slot the ash table its hand puts it in. */
+export function rollableKey(characterClass: string, group: string, key: string): string {
+  return `${characterClass}|${group}|${key}`;
 }
 
 /** Ashes apart by the hand's kind: an ash fitting both, such as `Parry`, counts where it could roll. */
@@ -129,6 +137,10 @@ export function ashOnShield(data: EngineData, slots: RolledSlots, slot: LoadoutS
 
 function boostOf(row: WeightedOption): number {
   return row.modifiers.reduce((product, modifier) => product * modifier.value, 1);
+}
+
+function isNoneOption(option: Option): boolean {
+  return option.kind !== "armor_set" && isNone(option.row.id);
 }
 
 interface Observed {
@@ -241,6 +253,7 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
     finalStats: DEFAULT_STATS,
     offered: new Map(),
     reached: new Map(),
+    rollable: new Map(),
   };
 
   let open = 1;
@@ -286,6 +299,15 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
       for (const row of one.roll.options) {
         reached.options.add(optionKey(row.option));
         ashes?.add(optionKey(row.option));
+      }
+      const chosen = one.roll.chosen?.option;
+      if (chosen !== undefined && !one.slot.startsWith("rule_") && !isNoneOption(chosen)) {
+        const group = ashes === null ? one.slot : ashes === reached.shieldAshes ? "shieldAsh" : "weaponAsh";
+        const rollable = one.roll.options.filter((row) => !isNoneOption(row.option));
+        for (const row of rollable) {
+          const at = rollableKey(objective.characterClass, group, optionKey(row.option));
+          result.rollable.set(at, (result.rollable.get(at) ?? 0) + 1 / rollable.length);
+        }
       }
       result.rolls.push({
         objective: objectiveNumber,
