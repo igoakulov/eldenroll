@@ -66,8 +66,7 @@ def test_hands_resolve_to_their_classes(
     assert _subcategories(resolved["ranger", "rh"]) == RANGED
     assert _subcategories(resolved["sorcerer", "rh"]) == {"glintstone_staff"}
     assert _subcategories(resolved["pyromancer", "rh"]) == {"sacred_seal"}
-    # A caster's left hand is never empty, and `Jellyfish Shield` is its one greatshield
-    # (data/balance.md#32. Caster left hand)
+    # data/balance.md#32. Caster left hand
     casters = (("sorcerer", "glintstone_staff"), ("pyromancer", "sacred_seal"))
     for character_class, catalyst in casters:
         hand = resolved[character_class, "lh"]

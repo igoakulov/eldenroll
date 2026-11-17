@@ -58,7 +58,7 @@ function itemShown(data: EngineData, item: Item): SlotDisplay {
   return alias === undefined ? { kind: "item", item } : { kind: "alias", label: alias.label, url: alias.url, item };
 }
 
-/** The one slot whose missing result shows `any`: the player picks the ash, unless the hand is
+/** The ash slots, the only ones whose missing result shows `any`: the player picks the ash, unless the hand is
  * empty. */
 function ash(data: EngineData, slots: RolledSlots, hand: PoolSlot, slot: PoolSlot): SlotDisplay {
   if (shown(data, slots, hand).kind === "none") return NONE;

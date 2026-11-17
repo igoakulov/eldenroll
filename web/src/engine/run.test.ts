@@ -192,7 +192,7 @@ describe("catch-up", () => {
     let run = start(knight);
     const slots = Object.keys(current(run).slots).length;
     for (let step = 0; step < 5; step += 1) run = reroll(engine, run, "rh");
-    // Each kept roll adds at most its whole chance, so five discarded loadouts counted would add far more
+    // Each kept roll adds at most its whole chance, so discarded loadouts counted would add far more
     expect(total(done(engine, run).tally)).toBeLessThanOrEqual(slots + 1e-9);
   });
 });

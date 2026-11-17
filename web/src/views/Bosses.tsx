@@ -48,7 +48,7 @@ export function Bosses({
   defaultExpanded = false,
 }: {
   readonly eyebrow: string;
-  /** Every boss instance with `odds > 0`, in database order. */
+  /** Every boss instance that can roll, in database order. */
   readonly bosses: readonly BossInstance[];
   readonly board: BossBoard;
   /** Only the bosses whose state changed. */

@@ -1,4 +1,4 @@
-"""Tests for the eight base-game JSON loaders.
+"""Tests for the base-game JSON loaders.
 
 The record counts here are the record; no doc repeats them.
 """

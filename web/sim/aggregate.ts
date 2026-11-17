@@ -940,9 +940,8 @@ export function itemSeries(
 export const EVEN = { low: 0.8, high: 1.25 } as const;
 /** A gap smaller than this many showings a run is no concern for play, however far from 1 its Vs fair reads. */
 export const MIN_GAP_PER_RUN = 0.5;
-/** A gap must pass this many standard deviations of its sample to count as more than luck: one build's view holds
- * hundreds of lines, so at three about one is listed by luck alone. A line's showings vary from run to run no more
- * than chance alone would make them, so the standard deviation of its showings over the sample is √(fair showings). */
+/** How many standard deviations of its sample, √(fair showings), a gap must pass to count as more than luck
+ * (`web/sim/README.md#The page`). */
 export const LUCK_DEVIATIONS = 3;
 /** Region tables Furthest from fair reads: the item slot's shares follow odds that differ by design, so its Vs fair
  * says little. */
@@ -1013,9 +1012,8 @@ function matters(line: FairLine, runs: number): boolean {
   return (vs < EVEN.low || vs > EVEN.high) && off >= MIN_GAP_PER_RUN * runs && off > LUCK_DEVIATIONS * Math.sqrt(line.fair);
 }
 
-/** The lines whose gap matters for play, largest first: each class line that passes alone, then for each slot and
- * region the classes that don't, summed (each against its own fair share), if their sum passes. Nothing counts twice,
- * and a shortfall every class shares shows though no class is short enough alone. */
+/** The lines whose gap matters for play, largest first: classes alone, then the rest summed per slot and region
+ * (`web/sim/README.md#The page`). */
 export function worstLines(lines: readonly FairLine[], runs: number): readonly FairLine[] {
   const listed: FairLine[] = [];
   const rest = new Map<string, FairLine[]>();

@@ -1,4 +1,4 @@
-"""Tests for the seven CSV loaders.
+"""Tests for the CSV loaders.
 
 The row counts here are the record; no doc repeats them. They double as a regression suite
 for the committed sources.

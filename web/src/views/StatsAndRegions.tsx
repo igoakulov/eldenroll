@@ -7,7 +7,7 @@ import { splitDlc } from "../engine/regions";
 
 export const STAT_NAMES: Readonly<Record<Stat, string>> = copy.statsAndRegions.stats;
 
-/** The 8 stats on Start and `Level up`. Given `before`, a stat above it shows raised. */
+/** The stats on Start and `Level up`. Given `before`, a stat above it shows raised. */
 export function StatSteppers({
   stats,
   before,

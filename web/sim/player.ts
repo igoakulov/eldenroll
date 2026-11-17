@@ -66,7 +66,7 @@ export function newPlayer(allocation: Allocation, stats: Stats): PlayerState {
   return { allocation, stats: { ...stats }, bank: 0, window: -1, windowRate: 0, windowCredit: 0, asideCount: 0 };
 }
 
-/** Which region each boss belongs to, to know when a region is half felled and to count how many
+/** Which region each boss belongs to, to know when a region reaches its completion share and to count how many
  * levels are left before one opens. */
 export function bossRegions(database: Database): ReadonlyMap<string, string> {
   const regionOf = new Map(database.location.map((row) => [row.id, row.region_id]));
@@ -79,7 +79,7 @@ export function bossRegions(database: Database): ReadonlyMap<string, string> {
   return regions;
 }
 
-/** Boss counts by region, to know how many levels are left before a region opens. */
+/** Boss counts by region. */
 export function bossesByRegion(database: Database): ReadonlyMap<string, number> {
   const counts = new Map<string, number>();
   for (const region of bossRegions(database).values()) counts.set(region, (counts.get(region) ?? 0) + 1);

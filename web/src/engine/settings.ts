@@ -40,14 +40,14 @@ export function defaultSettings(
   };
 }
 
-/** Impossible stats give an impossible level, such as -15 with every stat at 8; it isn't clamped. */
+/** Impossible stats give an impossible level; it isn't clamped. */
 export function derivedLevel(stats: Stats): number {
   return STATS.reduce((sum, stat) => sum + stats[stat], 0) - LEVEL_OFFSET;
 }
 
 const DIGITS = /^[0-9]+$/;
 
-/** Only the digits 0 to 9 are valid, so a blank or anything else keeps `previous`. */
+/** A blank or anything but digits keeps `previous`. */
 export function correctedStat(entered: string, previous: number): number {
   if (!DIGITS.test(entered)) return previous;
   return Math.min(MAX_STAT, Math.max(MIN_STAT, Number(entered)));

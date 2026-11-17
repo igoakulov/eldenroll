@@ -3,7 +3,7 @@ import { Icon, Lozenge, WordmarkO } from "./Icon";
 
 const files = Object.keys(import.meta.glob("../assets/icons/*.svg"));
 const names = new Set(files.map((path) => path.slice(path.lastIndexOf("/") + 1, -".svg".length)));
-/** Each icon by its key, with the sizes it is drawn at: the file itself, and the `-40` and `-22` an item's has. */
+/** Each icon by its key, at every size it is drawn at. */
 const ICONS = [...names]
   .filter((name) => !/-(40|22)$/.test(name))
   .sort()

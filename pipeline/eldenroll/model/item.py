@@ -1,6 +1,6 @@
-"""The five requirements are `str`, `dex`, `int`, `fth` and `arc` in `db.json`. Two of those are
-Python builtins that the other annotations here need, so the attributes carry a `req_` prefix and
-`to_row` restores the stored names.
+"""Two requirement names in `db.json`, `str` and `int`, are Python builtins that the other
+annotations here need, so the attributes carry a `req_` prefix and `to_row` restores the stored
+names.
 """
 
 from __future__ import annotations

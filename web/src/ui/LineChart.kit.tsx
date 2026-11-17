@@ -2,16 +2,14 @@ import type { KitBlock } from "../kit/kit";
 import { KitPad } from "../kit/kit";
 import { LineChart } from "./LineChart";
 
-/** A sample curve: the boost an item would get by how much of the run is played when it comes into reach, if the
- * boost were 1 / the share left. */
 const POINTS = Array.from({ length: 10 }, (_, index) => ({ x: index * 10, y: 1 / (1 - index / 10) }));
 const HALF = POINTS.map((point) => ({ x: point.x, y: Math.sqrt(point.y) }));
 
-/** With `baseline`, the square root of the curve beneath it; with `marks`, two points marked on the line. */
+/** A sample rising line; with `baseline`, its square root beneath it; with `marks`, two points marked on it. */
 function Chart({ baseline = false, marks = false }: { readonly baseline?: boolean; readonly marks?: boolean }) {
   return (
     <LineChart
-      title="Catch-up boost by how much of the run is played"
+      title="A sample line by how much of the run is played"
       points={POINTS}
       {...(baseline ? { baseline: HALF } : {})}
       {...(marks ? { marks: [50, 70] } : {})}

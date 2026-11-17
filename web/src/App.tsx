@@ -82,7 +82,7 @@ function Game({ database }: { readonly database: Database }) {
     setView("card");
   };
 
-  // Until the finished run's view (9.7) and Past runs (9.10) take it, a finished run is dropped and Start is fresh
+  // Until the finished run's view (9.7) and Past runs (9.9) take it, a finished run is dropped and Start is fresh
   const endRun = (_finished: Run) => {
     setRun(null);
     setUndoTo(null);

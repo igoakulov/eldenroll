@@ -1,8 +1,4 @@
-"""Tests for the four source loaders.
-
-The expected numbers are the ones measured in `PARSER_SURVEY.md`; they double as a
-regression suite for the committed sources.
-"""
+"""Tests for the source loaders, against the committed sources."""
 
 from __future__ import annotations
 

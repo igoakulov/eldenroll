@@ -30,7 +30,6 @@ export function keyDelay(typed: string, random: number, next = ""): number {
 const READ_MS = 60;
 const READ_BEAT_MS = 900;
 
-/** How long reading the whole line takes. */
 export function readMs(text: string): number {
   return READ_BEAT_MS + READ_MS * text.length;
 }

@@ -4,7 +4,7 @@ import type { TableFold } from "../ui/DataTable";
 
 const words = copy.sim.synergies;
 
-/** Every long table shows its first 10 rows and folds the rest behind `Show all`. */
+/** Every long table shows its first rows and folds the rest behind `Show all`. */
 export const FOLD: TableFold = { after: 10, showAll: copy.sim.showAll, showLess: copy.sim.showLess };
 
 /** A share row's name as the page and `metrics.md` show it: a region numbered in play order, `No location` named. */
@@ -17,7 +17,7 @@ export function percent(share: number, digits = 1): string {
   return Number.isFinite(share) ? `${(share * 100).toFixed(digits)}%` : "–";
 }
 
-/** Showings per run, the unit a run is judged by: two decimals below 10, so a rare option still reads. */
+/** Showings per run, the unit a run is judged by, precise enough below 10 that a rare option still reads. */
 export function perRun(value: number): string {
   return decimal(value, value < 10 ? 2 : 1);
 }

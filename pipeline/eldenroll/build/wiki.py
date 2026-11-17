@@ -16,7 +16,7 @@ from eldenroll.model.database import Database
 
 WIKI_BASE = "https://eldenring.wiki.fextralife.com/"
 _ASH_OF_WAR = "Ash of War"
-# The item `none` and the alias of the `None` armor pieces share this id (CLAUDE.md#Traps).
+# The item `none` and the alias of the `None` armor pieces share this id.
 _NONE = "none"
 _SAFE = "'(),:"
 

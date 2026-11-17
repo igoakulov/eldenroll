@@ -176,8 +176,8 @@ export function Slots({
   );
 }
 
-/** One switch for every table of items on the tab, so they always read the same way; the hands alone count by weapon
- * class. */
+/** One switch for every table of items on the tab, so they always read the same way; only the hands count by weapon
+ * class or weapon. */
 function CountBy({ hands, by, onBy }: { readonly hands: boolean; readonly by: SlotView; readonly onBy: (by: SlotView) => void }) {
   const options: { value: SlotView; label: string }[] = hands
     ? [

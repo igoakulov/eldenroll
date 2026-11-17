@@ -29,7 +29,7 @@ BOSS_ROWS: Final[int] = 229
 ROLLABLE_BOSSES: Final[int] = 218
 BASE_BOSSES: Final[int] = 166
 DLC_BOSSES: Final[int] = 52
-# A guarantee is a boost or above. Lower values such as the same-class x67 are tuned by hand at the
+# A guarantee is a boost or above. Lower values are tuned by hand at the
 # simulation, off the tier table on purpose, so spacing does not apply to them
 # (`data/balance.md#Tiers`).
 LOWEST_GUARANTEE: Final[float] = 100

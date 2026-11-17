@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class ArmorSet:
-    """One set; `pieces` holds 0 to 4 item ids, at most one per slot, in slot order."""
+    """One set; `pieces` holds at most one item id per slot, in slot order."""
 
     id: str
     name: str

@@ -1,7 +1,7 @@
 """The bonus is on by default and off for the classes in
 `web/src/engine/README.md#Two-handing`. `str_bonus_2h.csv` names the
-weapons that differ from their class: paired weapons outside those classes, and the two
-exceptions `Grafted Dragon` and `Starscourge Greatsword`. Every other category keeps its null,
+weapons that differ from their class: paired weapons outside those classes, and a few
+exceptions. Every other category keeps its null,
 and `none` keeps its `false`.
 """
 
