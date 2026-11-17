@@ -87,7 +87,7 @@ A **modifier** row is `id`, `when`, `target`, `value`:
 - A condition may list slots split by `|`, such as `rh|lh=item:x` or `talisman_1|talisman_2=item:x`: it holds when any listed slot rolled a match, and the row applies once, so a match in both hands doesn't compound. Only the slots rolled so far count, so a target that rolls between two listed slots sees only the first. One list may hold weapons and ashes for `rh|lh|rh_ash|lh_ash`, since no slot can roll the other kind. "Neither" is two negated conditions, `rh!=…; lh!=…`; a listed condition can't be negated.
 - Rows combine by multiplying: every row whose conditions hold applies once to each option it targets, so two true rows on one option compound. A `0` can't be revived by any other row, and a row whose target is already filtered out does nothing.
 - A rule exclusion is written both ways, and a target must roll after its conditions, or the build fails.
-- A value is a guarantee tier (`data/balance.md#Tiers`) or `0`. `×67`, `×6`, `×5`, `×3.5`, `×3` and `×0.5` are off-tier on purpose, until the simulation tunes them.
+- A value is a guarantee tier (`data/balance.md#Tiers`) or `0`. `×70`, `×6`, `×5`, `×3.5`, `×3` and `×0.5` are off-tier on purpose, until the simulation tunes them.
 
 ## Gaps
 

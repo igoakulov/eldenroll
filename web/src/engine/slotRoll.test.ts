@@ -115,17 +115,7 @@ describe("a condition on a slot not rolled yet", () => {
     const removed = options.filter((one) => !ids(result).includes(one.row.id));
     expect(removed.map((one) => one.row.id)).toContain("grafted_dragon");
     for (const one of removed) expect(classRemovals.some((row) => matchesOption(row.target, one))).toBe(true);
-    const classes = modifierRow("warrior_dw_boosts_paired_subcategories");
-    const weapons = modifierRow("warrior_dw_boosts_paired_weapons");
-    for (const row of result.options) {
-      const item = row.option.row as Item;
-      const boost = classes.target.ids?.includes(item.subcategory ?? "")
-        ? classes.value
-        : weapons.target.ids?.includes(item.id)
-          ? weapons.value
-          : 1;
-      expect(row.weight).toBe(item.odds * boost);
-    }
+    for (const row of result.options) expect(row.weight).toBe((row.option.row as Item).odds);
   });
 
   it("is inactive when it says does not match, so a rule survives until its slot rolls", () => {
