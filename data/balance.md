@@ -15,6 +15,37 @@ Three places decide how often anything rolls, and nothing else does:
 
 Engine code holds no balance of its own: no weight, multiplier, cap or curve that changes a roll lives anywhere else, so every effect on a roll traces to one of the three while tuning. Owner, 2026-11-15.
 
+## Late arrivals
+
+What any catch-up must do, whatever its formula; #Hyperparameters holds today's. Each requirement came out of the full-run simulation, and every rewrite or retune of the engine is judged against all of them.
+
+### Fair share
+
+- **Every item a slot can roll shows about equally often over a whole run**, whether it comes into reach in the first region or the last, early or late, among few rivals or many. Base odds and rules then steer single items for taste; catch-up never stands in for them, and an item a rule removes stays removed.
+- **In reach is decided at the roll.** An item counts from the moment it can roll: its region ticked or its boss felled, and its stats within `Max stat gap`. Stats reaching an item late are an arrival like a region opening. An item that leaves reach, by unticking or the Royal Capital after Maliketh, stops counting: the player knows what they leave behind.
+- **Even out with memory.** Each item keeps a tally of the chance it has had, and a roll favours the items furthest behind the others that can roll now. A late arrival catches up and stops once level; an item that fell behind for any reason, luck included, is pushed again. A boost fixed when an item arrives and kept for the rest of the run can do neither: it floods its region long after the item is level, and never notices one that fell behind.
+- **The tally is measured against the item's peers, never against the roll itself.** An item that earns a share only in rolls it can show in, and is then given exactly that share, is always level with what it earned: that memory plays the same as a fixed boost.
+- **A synergy is never paid back.** The tally counts the chance an item would have had without rules, so a showing a rule boosted doesn't hold the item back later.
+- **Who shares a tally follows what the player meets.** Spells and ashes are tallied across every class, since what varies for the player is which spells and ashes they meet over the whole run, whichever class shows them. The hands and talismans are tallied per class, since their pools differ by class. Within a shared tally an item is measured only against rolls that could show it: a sorcery never against what incantation rolls handed out.
+- **Never fall back to plain odds.** When every option in a roll is level with or ahead of its peers, the roll still goes to the furthest behind; plain odds would feed the items in reach longest.
+- **Variety over strict parity.** Items with high requirements in a secondary stat, one a build rarely raises beside its own (Intelligence for a melee weapon, Faith for a sorcery), may be pushed beyond even, so a run invites trying them. A high requirement in the item's primary stat earns nothing: Strength or Dexterity for weapons, Strength for shields, Intelligence for sorceries, Faith for incantations, since a build's main stat often passes 60 by a run's end and opens nearly everything tied to it alone. Players habitually spread a melee build a little, which opens many weapons, and rarely spread a caster, which opens few spells. The uplift is set by base odds, item by item, each with its reason here (#Base odds), so it stays visible in the data.
+- **Judged per stat allocation.** What a build can use decides what reaches it, so a fair share is read within one stat allocation of the simulation. A mix of builds makes an item only some builds reach look short in all of them, and averages away skews that run opposite ways in different builds.
+
+### Forecasting run-end shares
+
+- **An exact run-end share needs a forecast** of two things: every item the slot will hold by the run's end, and the chance the slot has left to hand out. Each item's target is then that chance spread over that count.
+- **Region and boss gates can be forecast:** the player is assumed to play to the end, so every ticked region opens and every rollable boss falls.
+- **Stat gates can't:** which items a build reaches depends on levels not yet spent. A forecast that counts items the build never reaches reserves shares nobody claims, so the items in reach meet their targets early and stop being steered; one that leaves out items the build will reach overfills the early ones. Ash pools follow the rolled weapon, and how often a slot rolls at all follows other rolls, such as spells needing a catalyst in hand: neither can be forecast either.
+- **So catch-up never depends on a forecast for the hands, spells or ashes.** A forecast is accurate only for slots without stat requirements whose pools don't follow other rolls: armor and talismans. If one is used there, it is chosen per slot, never per item, since a roll compares all its options on one measure.
+- **Early items get more than an even share regardless:** before later items arrive, they are all that can roll. No formula takes that back; it can only stop serving them until the rest catch up.
+- **Late arrivals catch up only in the rolls left.** Gear that comes into reach late, by region or by stats, falls short when too few objectives remain to bring it level, and the last region, opening with a handful of objectives left, can't reach its share under any formula.
+
+### Late-game crowding
+
+- **The player sees items, not regions.** A new weapon and a new armor set from one region are two new things they'd like to roll, never a group; a slot showing several new items in a row is welcome variety. Crowding is the same item coming back soon in its slot.
+- **Catching up must not make one item repeat.** A newcomer far behind its peers gets most of a slot's rolls until it catches up, and one that arrives with little of the run left would take most of the rest of it. Past a point, parity costs more than it gives: the same item in the same slot four objectives in a row, or five of the last ten, is too much, even for an item that is still owed. Any control acts per item and is judged by those runs of repeats, slot by slot.
+- **No roll feels scheduled.** The most-favoured options hold a minority of a roll, and items level with their peers sit out without making the next pick predictable.
+
 ## Tiers
 
 A modifier multiplies an option's odds. Pick its value from these tiers, or `0` to remove the option:
