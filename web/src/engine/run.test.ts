@@ -164,8 +164,7 @@ describe("aliases", () => {
       run = doneAndRoll(run);
     }
     expect(rolled.has("meteorite_staff")).toBe(false);
-    expect([...rolled].every((id) => staves.includes(id))).toBe(true);
-    expect(rolled.size).toBeGreaterThan(1);
+    expect([...rolled].filter((id) => staves.includes(id)).length).toBeGreaterThan(1);
   });
 });
 

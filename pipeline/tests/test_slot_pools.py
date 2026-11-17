@@ -64,7 +64,11 @@ def test_hands_resolve_to_their_classes(
     assert _subcategories(resolved["warrior_dw", "lh"]) == UNPAIRED | {None}
     assert _subcategories(resolved["spellblade", "rh"]) == UNPAIRED
     assert _subcategories(resolved["ranger", "rh"]) == RANGED
-    assert _subcategories(resolved["sorcerer", "rh"]) == {"glintstone_staff"}
+    # data/balance.md#35. Carian Sorcery Sword
+    sorcerer_rh = resolved["sorcerer", "rh"]
+    assert _subcategories(sorcerer_rh) == {"glintstone_staff", "thrusting_sword"}
+    swords = {row.id for row in sorcerer_rh if row.subcategory == "thrusting_sword"}
+    assert swords == {"carian_sorcery_sword"}
     assert _subcategories(resolved["pyromancer", "rh"]) == {"sacred_seal"}
     # data/balance.md#32. Caster left hand
     casters = (("sorcerer", "glintstone_staff"), ("pyromancer", "sacred_seal"))

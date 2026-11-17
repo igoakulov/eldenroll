@@ -37,10 +37,10 @@ The engine evens each roll against what can roll now, and never predicts what th
 
 - **An exact run-end share would need a forecast** of two things: every item the slot will hold by the run's end, and the chance the slot has left to hand out. Each item's target would be that chance spread over that count.
 - **Region and boss gates could be forecast:** the player is assumed to play to the end, so every ticked region opens and every rollable boss falls.
-- **Stat gates can't be:** which items a build reaches depends on levels not yet spent, and the build is the player's. A wrong list does worse than none: counting items the build never reaches reserves shares nobody claims, so the items in reach meet their targets early and stop being steered; leaving out items it will reach overfills the early ones. Ash pools follow the rolled weapon, and how often a slot rolls at all follows other rolls, such as spells needing a catalyst in hand, so neither can be forecast either. Only armor and talismans could be, and there evening reads nearly as even, so one rule serves every slot.
+- **Stat gates can't be:** which items a build reaches depends on levels not yet spent, and the build is the player's. A wrong list does worse than none: counting items the build never reaches reserves shares nobody claims, so the items in reach meet their targets early and stop being steered; leaving out items it will reach overfills the early ones. Ash pools follow the rolled weapon, and how often a slot rolls at all follows other rolls, such as spells needing a catalyst in hand, so neither can be forecast either. Only armor and talismans could be, and there catch-up reads nearly as even without one, so one rule serves every slot.
 - **What it skews:**
-  - **Early items get more than an even share.** Before later items arrive, they are all that can roll; evening stops serving them until the rest catch up, but never takes those showings back.
-  - **Late arrivals fall short when few objectives remain.** Evening raises the lowest tallies first, so an item arriving late, by region or by stats, joins every item still behind at the bottom of the tally and shares the rolls left with them. The last region, opening with a handful of objectives left, can't reach its share at all, and a class that gets few objectives a run shows this most in its own slots.
+  - **Early items get more than an even share.** Before later items arrive, they are all that can roll; catch-up stops serving them until the rest catch up, but never takes those showings back.
+  - **Late arrivals fall short when few objectives remain.** Catch-up raises the lowest tallies first, so an item arriving late, by region or by stats, joins every item still behind at the bottom of the tally and shares the rolls left with them. The last region, opening with a handful of objectives left, can't reach its share at all, and a class that gets few objectives a run shows this most in its own slots.
   - **Items a build reaches late by stats lag.** A spell or weapon whose requirements a build reaches only late has less of the run to catch up in than the rest of its region; #Fair share's variety uplift answers it by odds.
 
 ### Late-game crowding
@@ -91,7 +91,7 @@ When two boosted options meet in one pool, compare them with each other, not wit
   - **`even`** raises the lowest tallies among the options with a location that can roll now, per unit of base odds, to one common level with the roll's chance: whoever is furthest behind its peers gets the most, and whoever is above the level sits the roll out. A late arrival starts at 0 and catches up; an item behind for any reason, luck included, is pushed again. Those options hold their base share of the pool between them, so `none`, consumables and anything else found everywhere keep theirs, which would otherwise fade as late items catch up.
   - **`boosted`**: an option with a rule above ×1 active on it is weighed at least at its base odds, so a synergy or guarantee holds on an option ahead of its peers.
 
-  Owner, 2026-11-17: evening with no pace limit, chosen on the simulation per stat allocation; the right hand shared by every class.
+  Owner, 2026-11-17: this catch-up, with no pace limit, chosen on the simulation per stat allocation; the right hand shared by every class.
 
 - **`defaultMaxStatGap`** is how far above the player's stats an item may be. It is per item, never a shared budget, so a loadout of several near-reach items is fine.
 
@@ -153,12 +153,13 @@ Four questions decide a tier: what happens when the rule is missing (an impossib
 
 ### Classes with extra rules
 
-Most classes are just their pools in `slot_pools.csv`. Four have rules on top:
+Most classes are just their pools in `slot_pools.csv`. Some have rules on top:
 
 - **Dual-Wield Warrior:** same-class pairs and paired weapons (#26. Dual-Wield Warrior pairs), and `Grafted Dragon` kept out (#29. Grafted Dragon only on Jester).
 - **Jester:** its right hand's balance (#19. Jester's right hand), `Grafted Dragon` as its own, and odd pairs, such as `Spinning Weapon` on a staff, left alone on purpose: they are the point of the class. Its pool holds `none`, 6 offensive greatshields, torches, perfume bottles, one staff and `Grafted Dragon`; none of the greatshields is reachable in the Limgrave region, which is accepted because `Jester` rolls about once per run there.
 - **Knight:** the thrusting shield (#10. Knight's thrusting shield) and no paired weapons (#28. No paired weapons in unpaired classes).
 - **Sorcerer and Pyromancer:** never `L2 only` (#6. L2 only needs a skill), and their left hand's mix of catalysts and shields (#32. Caster left hand).
+- **Knight and both Warriors** never roll `Carian Sorcery Sword`, which `Sorcerer` rolls in its right hand (#35. Carian Sorcery Sword).
 - **Sorcerer, Pyromancer, Ranger and Jester** lose the talismans and rules they can't use (#33. Talismans a class can't use, #34. Attack rules a class can't use).
 
 ### 1. Parry only needs a parry ash
@@ -317,7 +318,7 @@ Rows: `no_armor_rule_makes_naked_set_top`
 
 ### 32. Caster left hand
 
-P2. Owner, 2026-11-16: a `Sorcerer` or `Pyromancer` left hand holds a catalyst of the class's type about 60% of a run, a small or medium shield about 30%, at their relative counts, and `Jellyfish Shield` about 10%; never `none`. A left-hand catalyst often boosts the spell's school or casting speed (`Azur's Glintstone Staff`) and `Jellyfish Shield`'s skill is an active damage buff, so the hand serves offence about 70% of the time; the other shields are there for defence and variety. `Jellyfish Shield` is a greatshield, so the pools name it alone. The values are aimed at those shares over a whole run and every stat allocation, so they differ by class: seals already roll at odds 2 (#Base odds). Catch-up shifts the mix over a run as late catalysts and shields arrive: the late seals' large share suits Pyromancer, since the best seals for each school come from the Altus Plateau on, mostly Leyndell, the Mountaintops and the DLC; and `Jellyfish Shield`, in reach from Liurnia, shows mostly early and needs 20 Str and 14 Dex, which pure Intelligence and Faith builds reach only mid-run. RH holds only catalysts, so the catalyst rows change only LH.
+P2. Owner, 2026-11-16: a `Sorcerer` or `Pyromancer` left hand holds a catalyst of the class's type about 60% of a run, a small or medium shield about 30%, at their relative counts, and `Jellyfish Shield` about 10%; never `none`. A left-hand catalyst often boosts the spell's school or casting speed (`Azur's Glintstone Staff`) and `Jellyfish Shield`'s skill is an active damage buff, so the hand serves offence about 70% of the time; the other shields are there for defence and variety. `Jellyfish Shield` is a greatshield, so the pools name it alone. The values are aimed at those shares over a whole run and every stat allocation, so they differ by class: seals already roll at odds 2 (#Base odds). Catch-up shifts the mix over a run as late catalysts and shields arrive: the late seals' large share suits Pyromancer, since the best seals for each school come from the Altus Plateau on, mostly Leyndell, the Mountaintops and the DLC; and `Jellyfish Shield`, in reach from Liurnia, shows mostly early and needs 20 Str and 14 Dex, which pure Intelligence and Faith builds reach only mid-run. The catalyst rows hold only once the right hand has rolled, so they act on the left hand alone: `Sorcerer`'s right hand also rolls `Carian Sorcery Sword` (#35. Carian Sorcery Sword), which they would otherwise cut against the staves.
 
 Rows: `sorcerer_lh_prefers_a_catalyst`, `pyromancer_lh_prefers_a_catalyst`, `sorcerer_lh_jellyfish_shield`, `pyromancer_lh_jellyfish_shield`
 
@@ -339,3 +340,9 @@ Rows: `melee_talismans_need_a_melee_class`, `guard_counter_talisman_not_on_caste
 P1. Owner, 2026-11-14: `Sorcerer` and `Pyromancer` don't attack physically, so `R1 only` and `R2 only` mean nothing for them; a bow can't attack from the left hand, so `Ranger` never gets `L1 only (can swap hands)`. Jumps, rolls, ripostes and charged attacks are already covered (#2. Charged attacks need a weapon in the right hand, #3. Melee rules need a melee weapon), and `L2 only` by #6. L2 only needs a skill.
 
 Rows: `r1_r2_only_not_on_pure_casters`, `l1_only_not_on_ranger`
+
+### 35. Carian Sorcery Sword
+
+P2. Owner, 2026-11-17: a rare thrusting sword that casts sorceries with L2 in place of an ash. It rolls in `Sorcerer`'s right hand beside the staves and stays in `Spellblade`'s, and never for `Knight` or either Warrior. Its share in each class is not tuned yet: it rolls at base odds.
+
+Rows: `carian_sorcery_sword_not_on_knight_or_warriors`

@@ -9,9 +9,9 @@ export interface CatchUp {
    * base odds, `had` its tally, the chance it has had so far. `share` is the part of the roll those options hold at
    * base odds; the rest of the pool keeps its base share. */
   readonly even: (options: readonly { readonly odds: number; readonly had: number }[], share: number) => readonly number[];
-  /** What catch-up multiplies an option's odds by while a rule above ×1 is active on it, from what evening alone would
-   * (`evened`): a rule must mean the same whatever the tally says, even for an option ahead of its peers. */
-  readonly boosted: (evened: number) => number;
+  /** What catch-up multiplies an option's odds by while a rule above ×1 is active on it, from what catch-up alone would
+   * (`caughtUp`): a rule must mean the same whatever the tally says, even for an option ahead of its peers. */
+  readonly boosted: (caughtUp: number) => number;
 }
 
 /** Balance values that apply to every row, tuned here against the simulation, and the engine's only balance: no other
@@ -44,7 +44,7 @@ export const DEFAULT_HYPERPARAMS: Hyperparams = {
       return options.map((option) => Math.max(0, level * option.odds - option.had));
     },
     // Never below the option's base share, so a synergy or guarantee holds on an option that has shown a lot
-    boosted: (evened) => Math.max(evened, 1),
+    boosted: (caughtUp) => Math.max(caughtUp, 1),
   },
   defaultMaxStatGap: 10,
 };

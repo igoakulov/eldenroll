@@ -6,6 +6,7 @@ import { indexDatabase, type EngineData } from "./engineData";
 import { DEFAULT_HYPERPARAMS } from "./hyperparams";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
+import { matchesOption } from "./selectors";
 import {
   sample,
   slotOptions,
@@ -103,13 +104,17 @@ function ruleOdds(id: string): number {
 }
 
 describe("a condition on a slot not rolled yet", () => {
-  it("leaves Dual-Wield Warrior RH with only Grafted Dragon losing odds", () => {
+  it("leaves Dual-Wield Warrior RH losing only what the class itself removes", () => {
     const result = pool("warrior_dw", "rh");
     const options = slotOptions(real, "warrior_dw", "rh").filter(
       (one) => one.row.odds > 0 && EVERYTHING.has(one.row.id),
     );
-    expect(options.length - result.options.length).toBe(1);
-    expect(ids(result)).not.toContain("grafted_dragon");
+    const classRemovals = realDatabase.modifier.filter(
+      (row) => row.value === 0 && row.when.every((c) => c.kind === "character_class" && c.ids.includes("warrior_dw")),
+    );
+    const removed = options.filter((one) => !ids(result).includes(one.row.id));
+    expect(removed.map((one) => one.row.id)).toContain("grafted_dragon");
+    for (const one of removed) expect(classRemovals.some((row) => matchesOption(row.target, one))).toBe(true);
     const classes = modifierRow("warrior_dw_boosts_paired_subcategories");
     const weapons = modifierRow("warrior_dw_boosts_paired_weapons");
     for (const row of result.options) {

@@ -165,21 +165,21 @@ export function weighOptions(
   const { catchUp, tally } = context;
   const multipliers = new Map<Option, number>();
   const added: Record<string, number> = {};
-  const evening = kept.filter((row) => row.located);
-  if (catchUp !== undefined && tally !== undefined && evening.length > 0) {
+  const locatedRows = kept.filter((row) => row.located);
+  if (catchUp !== undefined && tally !== undefined && locatedRows.length > 0) {
     // Catch-up moves chance only among options with a location: `none`, consumables and the rest found everywhere
     // keep their base share of the pool
     const odds = kept.reduce((sum, row) => sum + row.option.row.odds, 0);
-    const locatedOdds = evening.reduce((sum, row) => sum + row.option.row.odds, 0);
-    const keys = evening.map((row) => tallyKey(tally.scope, row.option));
+    const locatedOdds = locatedRows.reduce((sum, row) => sum + row.option.row.odds, 0);
+    const keys = locatedRows.map((row) => tallyKey(tally.scope, row.option));
     const chances = catchUp.even(
-      evening.map((row, index) => ({ odds: row.option.row.odds, had: tally.had[keys[index]!] ?? 0 })),
+      locatedRows.map((row, index) => ({ odds: row.option.row.odds, had: tally.had[keys[index]!] ?? 0 })),
       locatedOdds / odds,
     );
-    evening.forEach((row, index) => {
+    locatedRows.forEach((row, index) => {
       const chance = chances[index] ?? 0;
-      const evened = (chance * odds) / row.option.row.odds;
-      multipliers.set(row.option, row.modifiers.some((modifier) => modifier.value > 1) ? catchUp.boosted(evened) : evened);
+      const caughtUp = (chance * odds) / row.option.row.odds;
+      multipliers.set(row.option, row.modifiers.some((modifier) => modifier.value > 1) ? catchUp.boosted(caughtUp) : caughtUp);
       added[keys[index]!] = chance;
     });
   }

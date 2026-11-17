@@ -37,7 +37,7 @@ ranger,talisman_1,category:talisman
 ranger,talisman_2,category:talisman
 ranger,rule_1,rule:
 ranger,rule_2,rule:
-sorcerer,rh,subcategory:glintstone_staff
+sorcerer,rh,subcategory:glintstone_staff; item:carian_sorcery_sword
 sorcerer,lh,subcategory:glintstone_staff small_shield medium_shield; item:jellyfish_shield
 sorcerer,spell,category:sorcery
 sorcerer,item,category:tool consumable
