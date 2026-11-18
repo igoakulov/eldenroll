@@ -104,3 +104,5 @@ beloved_stardust_only_on_casters,character_class=knight warrior_2h warrior_dw ra
 r1_r2_only_not_on_pure_casters,character_class=sorcerer pyromancer,rule:r1_only r2_only,0
 l1_only_not_on_ranger,character_class=ranger,rule:l1_only_can_swap_hands,0
 carian_sorcery_sword_not_on_knight_or_warriors,character_class=knight warrior_2h warrior_dw,item:carian_sorcery_sword,0
+sorcerer_prefers_carian_sorcery_sword,character_class=sorcerer,item:carian_sorcery_sword,3
+sorcerer_sword_lh_no_catalyst,character_class=sorcerer; rh=item:carian_sorcery_sword,subcategory:catalyst,0
