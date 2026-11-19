@@ -11,6 +11,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 | `regions.ts` | selected locations, the Ashen Capital and Maliketh rules, the boss pool |
 | `slotRoll.ts` | one pool: filters, odds, modifiers, catch-up and its tally, sampling |
 | `loadout.ts` | every slot in roll order, ash and spell rules, rerolls, the weapon shortlist |
+| `pairRoll.ts` | the two talisman slots and the two combat rule slots, each pair rolled as one draw (`data/balance.md#Paired slots`) |
 | `run.ts` | the run as plain data and every action |
 | `display.ts` | what each card row shows |
 | `hyperparams.ts` | balance values passed in, so a hidden page can tune them live; game mechanics never go here |
@@ -36,7 +37,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 
 ## Run model
 
-An objective is a boss instance, a class loadout and 2 combat rules. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans always roll, even for an early character with fewer slots. Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
+An objective is a boss instance, a class loadout and 2 combat rules. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans always roll, even for an early character with fewer slots. The two talismans roll as one draw, and so do the two rules (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
 
 - **Owned** means it appeared in a completed objective this run; nothing else is known about the player's inventory.
 - **Felled** (code: `dead`) is a boss out of the run, by `Done`, `Felled?` or `Bosses`. **Skipped** keeps a boss out of the boss pool while it stays alive for its items.

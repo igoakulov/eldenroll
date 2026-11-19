@@ -52,8 +52,10 @@ function conditionHolds(data: EngineData, state: RollState, condition: Condition
   return condition.slots.some((slot) => holdsOn(data, state, condition, slot));
 }
 
+export function modifierHolds(data: EngineData, state: RollState, row: Modifier): boolean {
+  return row.when.every((condition) => conditionHolds(data, state, condition));
+}
+
 export function activeModifiers(data: EngineData, state: RollState): readonly Modifier[] {
-  return data.database.modifier.filter((row) =>
-    row.when.every((condition) => conditionHolds(data, state, condition)),
-  );
+  return data.database.modifier.filter((row) => modifierHolds(data, state, row));
 }

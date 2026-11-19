@@ -2,6 +2,7 @@ import { isNone, type Item, type LoadoutSlot, type PoolSlot } from "./database";
 import { poolKey, type EngineData } from "./engineData";
 import type { CatchUp, FixedShare } from "./hyperparams";
 import type { RollState } from "./modifiers";
+import { PAIRED, rollPair, rollSecondOfPair } from "./pairRoll";
 import {
   addTally,
   sample,
@@ -13,6 +14,7 @@ import {
   type Random,
   type RollContext,
   type RollObserver,
+  type SlotPoolResult,
   type SlotRoll,
   type TallyAdded,
 } from "./slotRoll";
@@ -119,10 +121,6 @@ function filtersFor(slot: LoadoutSlot, context: RollContext, limits: StatLimits)
       return { rules: [ashFilter(context, "lh"), differsFrom(context, "rh_ash")] };
     case "spell":
       return { rules: [spellTypeFilter(context)], stats: plainStatFilter(limits) };
-    case "talisman_2":
-      return { rules: [differsFrom(context, "talisman_1")] };
-    case "rule_2":
-      return { rules: [differsFrom(context, "rule_1")] };
     default:
       return {};
   }
@@ -130,6 +128,16 @@ function filtersFor(slot: LoadoutSlot, context: RollContext, limits: StatLimits)
 
 function excluding(filters: PoolFilters, exclude: string): PoolFilters {
   return { ...filters, rules: [...(filters.rules ?? []), (option) => option.row.id !== exclude] };
+}
+
+/** Weighs the pool without the excluded option, or with it when nothing else is left. */
+function weighExcluding(context: RollContext, slot: LoadoutSlot, filters: PoolFilters, exclude: string | null): SlotPoolResult {
+  const options = slotOptions(context.data, context.state.characterClass, slot);
+  if (exclude !== null) {
+    const result = weighOptions(context, options, excluding(filters, exclude));
+    if (result.options.some((row) => row.weight > 0)) return result;
+  }
+  return weighOptions(context, options, filters);
 }
 
 /** Rolls without the excluded option, or with it when nothing else is left. */
@@ -190,19 +198,45 @@ export function rollLoadout(input: LoadoutInput): Loadout {
   // of the run's tally per loadout, added to in place
   const had = addTally(input.tally ?? {}, ...LOADOUT_ORDER.slice(0, start).map((slot) => input.keptTally?.[slot] ?? {}));
 
-  for (const slot of LOADOUT_ORDER.slice(start)) {
-    if (slot !== "armor" && !data.pools.has(poolKey(characterClass, slot))) continue;
-    const exclude = slot === from ? (input.exclude ?? null) : null;
-    const slotContext: RollContext =
-      input.catchUp === undefined ? context : { ...context, tally: { had, scope: tallyScope(input.catchUp, characterClass, slot) } };
-    const shortlisted =
-      slot === "rh" && input.shortlist ? rollShortlistRh(slotContext, input.shortlist, exclude, random) : null;
-    const roll =
-      shortlisted ?? rollExcluding(slotContext, slot, filtersFor(slot, slotContext, limits), exclude, random);
+  const record = (slot: LoadoutSlot, roll: SlotRoll) => {
     if (slot !== "armor") rolled.set(slot, roll.chosen?.option.row.id ?? null);
     for (const [key, value] of Object.entries(roll.tally)) had[key] = (had[key] ?? 0) + value;
     loadout.set(slot, roll);
     input.observe?.(slot, roll);
+  };
+  const firstOf = new Map([...PAIRED].map(([first, second]) => [second, first]));
+  const pooled = (slot: LoadoutSlot) => slot === "armor" || data.pools.has(poolKey(characterClass, slot));
+
+  for (const slot of LOADOUT_ORDER.slice(start)) {
+    if (loadout.has(slot) || !pooled(slot)) continue;
+    const exclude = slot === from ? (input.exclude ?? null) : null;
+    const slotContext: RollContext =
+      input.catchUp === undefined ? context : { ...context, tally: { had, scope: tallyScope(input.catchUp, characterClass, slot) } };
+    const second = PAIRED.get(slot as PoolSlot);
+    if (second !== undefined && pooled(second)) {
+      // The pair rolls as one draw; neither slot has rolled, so no row reading the pair weighs either pool alone
+      const one = weighExcluding(slotContext, slot, filtersFor(slot, slotContext, limits), exclude);
+      const two = weighOptions(slotContext, slotOptions(data, characterClass, second), {});
+      const [firstRoll, secondRoll] = rollPair(data, state, [slot as PoolSlot, second], one, two, random, input.catchUp?.boosted);
+      record(slot, firstRoll);
+      record(second, secondRoll);
+      continue;
+    }
+    const first = firstOf.get(slot as PoolSlot);
+    if (first !== undefined && rolled.has(first)) {
+      // The first slot was kept: the second reads it through the same pair rows, both ways
+      const without = new Map(rolled);
+      without.delete(first);
+      const alone: RollContext = { ...slotContext, state: { ...state, rolled: without } };
+      const two = weighExcluding(alone, slot, {}, exclude);
+      const takenId = rolled.get(first) ?? null;
+      const taken = takenId === null ? null : (slotOptions(data, characterClass, first).find((option) => option.row.id === takenId) ?? null);
+      record(slot, rollSecondOfPair(data, state, [first, slot as PoolSlot], two, taken, random, input.catchUp?.boosted));
+      continue;
+    }
+    const shortlisted =
+      slot === "rh" && input.shortlist ? rollShortlistRh(slotContext, input.shortlist, exclude, random) : null;
+    record(slot, shortlisted ?? rollExcluding(slotContext, slot, filtersFor(slot, slotContext, limits), exclude, random));
   }
   return loadout;
 }

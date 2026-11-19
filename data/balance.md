@@ -3,7 +3,7 @@
 Why the data rolls the way it does: every odds value other than 1 and every conditional rule, with its reason. Read it before tuning, and change the data and this file together: `pipeline/tests/test_balance.py` fails when a modifier row or an odds value other than 1 is missing here, or listed here but gone from the data.
 
 - How modifier rows combine: `data/overrides/README.md#Selectors and modifiers`.
-- Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×70`, `×42`, `×34`, `×33`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×1.5`, `×0.67`, `×0.5`) are deliberate placeholders for it.
+- Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×70`, `×42`, `×34`, `×33`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×1.5`, `×0.5`) are deliberate placeholders for it.
 
 ## Levers
 
@@ -81,8 +81,15 @@ When two boosted options meet in one pool, compare them with each other, not wit
 - **Keep tiers two orders of magnitude apart.** A `top` (×1,000,000) next to a `guarantee` (×10,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
 - **Avoid two `top` targets in one pool:** they split about 50/50. It is allowed where the combination is rare, such as `Claw Talisman` with `Axe Talisman`; `import-report.json` lists every pool where it can happen.
 - **Soft rows and catch-up compound on top.** A `prefer` or `strong` row on a rival raises the rival, and so does catch-up on a rival behind its peers; the simulation's Synergies tab shows how often each boosted target still wins.
-- **Off-tier values** (`×70`, `×42`, `×34`, `×33`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×1.5`, `×0.67`, `×0.5`) are aimed at a target share rather than a feel, such as Dual-Wield's share of same-class pairs, and are tuned at the simulation.
+- **Off-tier values** (`×70`, `×42`, `×34`, `×33`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×1.5`, `×0.5`) are aimed at a target share rather than a feel, such as Dual-Wield's share of same-class pairs, and are tuned at the simulation.
 - **When two boosted targets clash, the rarer trigger wins.** The run should vary, and the more common trigger gets more chances to show its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger, since rules roll before armor.
+
+## Paired slots
+
+The two talisman slots roll as one draw, and so do the two combat rule slots: every pair of options weighs its two options' weights times the rows that link them, so a pairing holds whichever slot either option would land in, and the pair shows in its slots in either order. A row whose condition names a slot of the pair reads the other slot of the pair, both ways, and applies once to a pair: one row links two talismans, and one exclusion keeps two rules apart. Owner, 2026-11-19.
+
+- **Reading a pair row:** its value multiplies the pair, as a single-slot row multiplies one option. Two options at weights `a` and `b` with a ×N row between them weigh `N·a·b`, against `a·c` for any other pair holding `a`.
+- **A slot that rolls alone,** such as a reroll that keeps the first slot, reads the kept one through the same rows.
 
 ## Fixed shares
 
@@ -90,7 +97,7 @@ When two boosted options meet in one pool, compare them with each other, not wit
 
 - **Which options:** every option with no location, the same line catch-up draws (#Hyperparameters): the `none` item, consumables and the `Naked Set`, whose pieces have no location. In the combat rule slots, where no rule has a location, `None` alone.
 - **How their odds count:** against the rest of the pool counted as 100 odds, whatever its size. `None` at 100 holds half the roll; two fixed options at 80 and 20 hold 80 / 200 and 20 / 200. Among themselves, with nothing else in the pool, they share by their odds.
-- **Repeats:** an empty slot may follow another, so one `None` serves both rule slots, and the second slot's empty share is set by rows on the first slot's result.
+- **Repeats:** an empty slot may follow another, so one `None` serves both rule slots; the two slots roll as one draw (#Paired slots), and a row on the pair sets how often both are empty.
 - **Modifiers work in two steps.** A ×N row multiplies an option's odds against everything else in the roll, the fixed shares included, so first find the option's chance in the roll: its share of the rest of the pool times what the fixed shares leave. Then ×N takes a chance `p` to `N·p / (1 + (N−1)·p)`. A fixed share `s` makes the pool count as `1 / (1 − s)` times its size: with `None` at half, `Parry only` holding 4% of the rules has 2% of the roll, and ×10 takes it to about 17%. A guarantee or top tier still beats a fixed share nearly always.
 - **A row aimed at a fixed option** multiplies its odds the same way: Jester's `none` at 33 holds a quarter of its right hand, and `No armor` makes the `Naked Set` top tier.
 
@@ -117,7 +124,7 @@ A row's own odds, for every option that rolls differently all the time. Files: `
 |---|---|---:|---|
 | class | `ranger` | 0.5 | a less enjoyable playstyle, with less weapon variety than melee or magic |
 | class | `jester` | 0.25 | a mix of silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
-| rule | `none` | 100 | half the first rule slot, a fixed share (#Fixed shares); the second slot's empty share follows the first (#36. Empty rule slots). Owner, 2026-11-14: about 20% of objectives with no rule, 59% with one and 21% with two; owner, 2026-11-19: one implementation for every empty slot, giving 20%, 60% and 20% for every class before synergies |
+| rule | `none` | 100 | half of each rule slot taken alone, a fixed share (#Fixed shares); a pair of `None` and a rule weighs more (#36. Empty rule slots). Owner, 2026-11-14: about 20% of objectives with no rule, 59% with one and 21% with two; owner, 2026-11-19: one implementation for every empty slot, giving 20%, 60% and 20% for every class before synergies |
 | rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` | 0.5 | owner decision: the full-run simulation (`web/sim/README.md`) showed these five crowding out other rules and, for `no_armor`, pushing the `Naked Set` and the Blue Dancer Charm's light sets past their guarantee's reach of each other |
 | rule | `parry_only` `l2_only` | 0.5 | owner decision: both limit the moveset a lot, `L2 only` sometimes clashing with an ash it doesn't suit, so each joins the other hard rules at about 5% |
 | rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
@@ -306,9 +313,9 @@ Rows: `jump_attacks_rule_boosts_jump_sets`, `jump_attacks_rule_removes_mushroom_
 
 ### 24. Rot and poison
 
-P2. A rot or poison weapon, shield or ash in a hand makes `Kindred of Rot's Exultation` near-certain (`guarantee`), and the talisman puts the 5 `Mushroom Crown` sets in the guarantee tier, because the crown matters for rot and poison loadouts. The chain goes weapon to talisman to set, never weapon to set, so nothing double-dips, and the three come together. The triggers are the owner's list in the rows. The `Mushroom Crown` sets beat the `Blue Dancer Charm` light sets, so the talisman in the first slot removes the charm from the second; the reverse order needs the charm to beat a near-certain talisman, so it is left. `No armor` and the jump sets win over them (#Tiers, #23. Jump attacks and the jump sets).
+P2. A rot or poison weapon, shield or ash in a hand makes `Kindred of Rot's Exultation` near-certain (`guarantee`), and the talisman puts the 5 `Mushroom Crown` sets in the guarantee tier, because the crown matters for rot and poison loadouts. The chain goes weapon to talisman to set, never weapon to set, so nothing double-dips, and the three come together. The triggers are the owner's list in the rows. The `Mushroom Crown` sets beat the `Blue Dancer Charm` light sets, so the talisman and the charm never show together. `No armor` and the jump sets win over them (#Tiers, #23. Jump attacks and the jump sets).
 
-Rows: `rot_boosts_kindred_exultation`, `kindred_exultation_boosts_mushroom_sets`, `kindred_exultation_1_removes_blue_dancer_charm`
+Rows: `rot_boosts_kindred_exultation`, `kindred_exultation_boosts_mushroom_sets`, `kindred_exultation_removes_blue_dancer_charm`
 
 ### 25. Blasphemous Blade and Prayerful Strike
 
@@ -388,9 +395,9 @@ Rows: `carian_sorcery_sword_not_on_knight_or_warriors`, `sorcerer_prefers_carian
 
 ### 36. Empty rule slots
 
-Owner, 2026-11-14 and 2026-11-19: about 20% of objectives with no rule, 60% with one and 20% with two. `None` holds half the first slot (#Base odds); after `None` the second is empty 40% of the time (`×0.67`), after a rule 60% (`×1.5`). Two independent slots can't do it: one rule would peak at 50%.
+Owner, 2026-11-14 and 2026-11-19: about 20% of objectives with no rule, 60% with one and 20% with two. The two slots roll as one draw (#Paired slots), and `None` holds half of each slot taken alone (#Base odds), which alone would give 25%, 50% and 25%; a pair of `None` and a rule weighs `×1.5`, which gives 20%, 60% and 20%.
 
-Rows: `none_after_none`, `none_after_a_rule`
+Rows: `none_beside_a_rule`
 
 ### 37. Ripostes
 
@@ -399,6 +406,6 @@ Owner, 2026-11-19. `Dagger Talisman` and `Blade of Mercy` boost critical hits, w
 - **P1.** The game allows no riposte with flails, torches, shields, thrusting shields, staves, seals, ranged weapons, perfume bottles, throwing blades or whips, so with one in the right hand neither talisman rolls, for any class, and neither do `Parry only` and `Land a riposte`, which ask for one.
 - **P2.** `Sorcerer` rolls both only with a parry ash in its left hand, so it rolls a left-hand ash; with a staff in the right hand the P1 row still removes them, so they come with `Carian Sorcery Sword` and a shield, on about 2% of its objectives.
 - **P2.** `2H Warrior` with a colossal sword, colossal weapon, great hammer, great spear, greataxe, greatsword or hammer in the right hand, whose ripostes hit hardest, gets both at `prefer`: about 19% of its talisman showings with those weapons over a run, 15% before `Blade of Mercy` arrives and 25% after, the pairing adding the partner.
-- **P2.** One in the first talisman slot brings the other into the second at `strong`, so they come equipped together; a `guarantee` synergy still takes a slot first. The rows act only forward, so both show in about a third of the objectives either shows in.
+- **P2.** The two come together at `strong`, one row for the pair, whichever slot either would land in (#Paired slots); a `guarantee` synergy still takes a slot first.
 
-Rows: `sorcerer_parry_talismans_need_a_parry_ash`, `riposte_talismans_need_a_riposte_rh`, `riposte_rules_need_a_riposte_rh`, `warrior_2h_heavy_rh_boosts_parry_talismans`, `dagger_talisman_brings_blade_of_mercy`, `blade_of_mercy_brings_dagger_talisman`
+Rows: `sorcerer_parry_talismans_need_a_parry_ash`, `riposte_talismans_need_a_riposte_rh`, `riposte_rules_need_a_riposte_rh`, `warrior_2h_heavy_rh_boosts_parry_talismans`, `dagger_talisman_and_blade_of_mercy_come_together`
