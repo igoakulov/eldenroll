@@ -1,7 +1,7 @@
-import type { LoadoutSlot, Modifier } from "./database";
+import { isNone, type LoadoutSlot, type Modifier } from "./database";
 import { isSetReachable } from "./eligibility";
 import { poolKey, type EngineData } from "./engineData";
-import type { CatchUp } from "./hyperparams";
+import { DEFAULT_HYPERPARAMS, type CatchUp, type FixedShare } from "./hyperparams";
 import { activeModifiers, type RollState } from "./modifiers";
 import { pickWeighted } from "./random";
 import { matchesOption, type Option } from "./selectors";
@@ -24,6 +24,8 @@ export interface WeightedOption {
   /** What catch-up multiplies the option's odds by in `weight` (`Hyperparams.catchUp`); 1 on anything without a
    * location. */
   readonly catchUp: number;
+  /** `weight` without catch-up: odds, modifiers and the fixed share's scale (`Hyperparams.fixedShare`). */
+  readonly plain: number;
 }
 
 /** What a roll adds to the run's tally: each option with a location's chance in it, rules left out, by `tallyKey`. */
@@ -61,6 +63,8 @@ export interface RollContext {
   readonly neverRoll?: ReadonlySet<string>;
   /** Absent means no catch-up: most tests roll a pool in isolation and don't need one. */
   readonly catchUp?: CatchUp;
+  /** Absent means the default (`DEFAULT_HYPERPARAMS`). */
+  readonly fixedShare?: FixedShare;
   /** The chance each option has had so far (`Run.tally` and this objective's earlier slots), by `tallyKey`, and the
    * scope this roll's options are tallied under (`tallyScope`). */
   readonly tally?: { readonly had: Readonly<Record<string, number>>; readonly scope: string };
@@ -101,11 +105,18 @@ export function addTally(...tallies: readonly TallyAdded[]): Record<string, numb
 }
 
 /** Whether catch-up moves chance to or from an option: an item with a location row, or a set with a piece that has
- * one. `none`, consumables and the rest found everywhere keep their base share of the pool. */
+ * one. */
 function located(data: EngineData, option: Option): boolean {
   if (option.kind === "item") return !data.foundEverywhere.has(option.row.id);
   if (option.kind === "armor_set") return option.row.pieces.some((piece) => !data.foundEverywhere.has(piece));
   return false;
+}
+
+/** Whether an option holds a fixed share of its roll whatever else is in it (`data/balance.md#Fixed shares`): `none`,
+ * the consumables and the rest found everywhere, a set with no piece that has a location, and in a rule slot `None`,
+ * since no rule has a location. */
+function holdsFixedShare(data: EngineData, option: Option): boolean {
+  return option.kind === "rule" ? isNone(option.row.id) : !located(data, option);
 }
 
 export function optionKey(option: Option): string {
@@ -163,29 +174,34 @@ export function weighOptions(
     })
     .filter((row) => row.plain > 0);
   const { catchUp, tally } = context;
+  const fixedShare = context.fixedShare ?? DEFAULT_HYPERPARAMS.fixedShare;
+  const sum = (rows: readonly (typeof kept)[number][]) => rows.reduce((total, row) => total + row.option.row.odds, 0);
+  // The rest of the pool, everything but the fixed shares, weighs `rest` at base odds against the fixed shares' odds
+  const restRows = kept.filter((row) => !holdsFixedShare(context.data, row.option));
+  const restOdds = sum(restRows);
+  const rest = fixedShare.restWeight(1);
+  const restOfRoll = rest / (rest + sum(kept.filter((row) => holdsFixedShare(context.data, row.option))));
   const multipliers = new Map<Option, number>();
   const added: Record<string, number> = {};
-  const locatedRows = kept.filter((row) => row.located);
+  const locatedRows = restRows.filter((row) => row.located);
   if (catchUp !== undefined && tally !== undefined && locatedRows.length > 0) {
-    // Catch-up moves chance only among options with a location: `none`, consumables and the rest found everywhere
-    // keep their base share of the pool
-    const odds = kept.reduce((sum, row) => sum + row.option.row.odds, 0);
-    const locatedOdds = locatedRows.reduce((sum, row) => sum + row.option.row.odds, 0);
+    // Catch-up moves chance only among options with a location; chances are of the whole roll, as the tally counts
     const keys = locatedRows.map((row) => tallyKey(tally.scope, row.option));
     const chances = catchUp.even(
       locatedRows.map((row, index) => ({ odds: row.option.row.odds, had: tally.had[keys[index]!] ?? 0 })),
-      locatedOdds / odds,
+      (restOfRoll * sum(locatedRows)) / restOdds,
     );
     locatedRows.forEach((row, index) => {
       const chance = chances[index] ?? 0;
-      const caughtUp = (chance * odds) / row.option.row.odds;
+      const caughtUp = (chance / restOfRoll) * (restOdds / row.option.row.odds);
       multipliers.set(row.option, row.modifiers.some((modifier) => modifier.value > 1) ? catchUp.boosted(caughtUp) : caughtUp);
       added[keys[index]!] = chance;
     });
   }
   const weighted = kept.map(({ option, modifiers, plain }) => {
+    const scale = restRows.length === 0 || holdsFixedShare(context.data, option) ? 1 : fixedShare.restWeight(1 / restOdds);
     const multiplier = multipliers.get(option) ?? 1;
-    return { option, weight: plain * multiplier, modifiers, catchUp: multiplier };
+    return { option, weight: plain * scale * multiplier, modifiers, catchUp: multiplier, plain: plain * scale };
   });
   return { pool: weighted.length, options: weighted, tally: added };
 }

@@ -78,7 +78,7 @@ no_armor_rule_makes_naked_set_top,rule_1|rule_2=rule:no_armor,armor_set:naked_se
 blue_dancer_charm_boosts_light_sets,talisman_1|talisman_2=item:blue_dancer_charm,armor_set:naked_set fell_omen_set bloodsoaked_set hornsent_set festive_set blue_festive_set guilty_lite_set prisoner_lite_set commoners_lite_set,10000
 overloaded_rule_removes_light_sets,rule_1|rule_2=rule:overloaded,armor_set:naked_set fell_omen_set bloodsoaked_set hornsent_set festive_set blue_festive_set guilty_lite_set prisoner_lite_set commoners_lite_set,0
 heavy_rolling_rule_removes_light_sets,rule_1|rule_2=rule:heavy_rolling,armor_set:naked_set fell_omen_set bloodsoaked_set hornsent_set festive_set blue_festive_set guilty_lite_set prisoner_lite_set commoners_lite_set,0
-jester_none_x6,character_class=jester,item:none,6
+jester_none_x33,character_class=jester,item:none,33
 jester_staff_x2,character_class=jester,item:demi_human_queens_staff,2
 jester_torches_x0_5,character_class=jester,subcategory:torch,0.5
 buff_ash_weapon_removes_buff_ashes,rh|lh=item:golem_fist lizard_greatsword smithscript_axe smithscript_greathammer smithscript_spear smithscript_dagger,item:cragblade flaming_strike lightning_slash sacred_blade sacred_order shared_order chilling_mist poisonous_mist,0
@@ -106,3 +106,5 @@ l1_only_not_on_ranger,character_class=ranger,rule:l1_only_can_swap_hands,0
 carian_sorcery_sword_not_on_knight_or_warriors,character_class=knight warrior_2h warrior_dw,item:carian_sorcery_sword,0
 sorcerer_prefers_carian_sorcery_sword,character_class=sorcerer,item:carian_sorcery_sword,3
 sorcerer_sword_lh_no_catalyst,character_class=sorcerer; rh=item:carian_sorcery_sword,subcategory:catalyst,0
+none_after_none,rule_1=rule:none,rule:none,0.67
+none_after_a_rule,rule_1!=rule:none,rule:none,1.5

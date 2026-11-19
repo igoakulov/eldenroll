@@ -218,7 +218,7 @@ def test_the_tables_hold_exactly_the_documented_fields(gate_data: GateData) -> N
 
 def test_a_modifier_writes_both_kinds_of_condition(gate_data: GateData) -> None:
     rows = {str(row["id"]): row for row in database_rows(gate_data.database)["modifier"]}
-    assert rows["jester_none_x6"]["when"] == [{"kind": "character_class", "ids": ["jester"]}]
+    assert rows["jester_none_x33"]["when"] == [{"kind": "character_class", "ids": ["jester"]}]
     assert rows["l2_only_needs_a_skill_not_empty"]["when"] == [
         {
             "kind": "rolled",

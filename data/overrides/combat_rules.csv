@@ -1,6 +1,5 @@
 id,name,odds
-none,None,12
-none_2,None 2,12
+none,None,100
 do_not_get_hit,Do not get hit,0.5
 apply_status,Apply status,1
 land_a_riposte,Land a riposte,1

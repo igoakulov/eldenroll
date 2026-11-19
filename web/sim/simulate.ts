@@ -3,7 +3,7 @@ import { isNone, type Database, type LoadoutSlot } from "../src/engine/database"
 import type { RolledSlots } from "../src/engine/display";
 import { done, editRun, rollNext, startRun, type Engine, type Run } from "../src/engine/run";
 import { DEFAULT_STATS, defaultSettings, derivedLevel, type Stats } from "../src/engine/settings";
-import { optionKey, repeatKey, type SlotRoll, type WeightedOption } from "../src/engine/slotRoll";
+import { optionKey, repeatKey, type SlotRoll } from "../src/engine/slotRoll";
 import type { EngineData } from "../src/engine/engineData";
 import type { Option } from "../src/engine/selectors";
 import {
@@ -135,10 +135,6 @@ export function ashOnShield(data: EngineData, slots: RolledSlots, slot: LoadoutS
   return hand !== null && hand !== undefined && data.items.get(hand)?.category === "shield";
 }
 
-function boostOf(row: WeightedOption): number {
-  return row.modifiers.reduce((product, modifier) => product * modifier.value, 1);
-}
-
 function isNoneOption(option: Option): boolean {
   return option.kind !== "armor_set" && isNone(option.row.id);
 }
@@ -152,7 +148,7 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
   const { roll } = observed;
   const options = roll.options;
   const total = options.reduce((sum, row) => sum + row.weight, 0);
-  const plain = options.map((row) => row.option.row.odds * boostOf(row));
+  const plain = options.map((row) => row.plain);
   const plainTotal = plain.reduce((sum, value) => sum + value, 0);
   let none: number | null = null;
   const keyOf = (option: Option) => (option.kind === "rule" && isNone(option.row.id) ? "rule:none" : repeatKey(option));

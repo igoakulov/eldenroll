@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Item, LoadoutSlot, PoolSlot } from "./database";
+import { isNone, type Item, type LoadoutSlot, type PoolSlot } from "./database";
 import { countedItems, isSetReachable } from "./eligibility";
 import { indexDatabase, poolKey } from "./engineData";
 import { LOADOUT_ORDER, ashFits, rollLoadout, spellTypeFilter, type Loadout } from "./loadout";
@@ -130,13 +130,15 @@ describe.each(CASES)("every roll on $name", (testCase) => {
       }
     });
 
-    it("never repeats an item, a talisman or a rule", () => {
+    it("never repeats an item, a talisman or a rule, though an empty slot may follow another", () => {
       for (const loadout of loadouts) {
         const rh = id(loadout, "rh");
         const lh = id(loadout, "lh");
         if (rh !== "none" && rh !== null) expect(lh).not.toBe(rh);
-        expect(id(loadout, "talisman_2")).not.toBe(id(loadout, "talisman_1"));
-        expect(id(loadout, "rule_2")).not.toBe(id(loadout, "rule_1"));
+        for (const [first, second] of [["talisman_1", "talisman_2"], ["rule_1", "rule_2"]] as const) {
+          const taken = id(loadout, first);
+          if (taken !== null && taken !== undefined && !isNone(taken)) expect(id(loadout, second)).not.toBe(taken);
+        }
         const rhAsh = id(loadout, "rh_ash");
         if (rhAsh !== null && rhAsh !== undefined) expect(id(loadout, "lh_ash")).not.toBe(rhAsh);
       }

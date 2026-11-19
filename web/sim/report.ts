@@ -17,7 +17,7 @@ import {
   REGION_TABLES,
   regionShares,
   repeats,
-  ruleNone,
+  rulesActive,
   runSummary,
   synergyWins,
   type Sample,
@@ -89,7 +89,7 @@ function furthest(sample: Sample): string[] {
 
 export function report(sample: Sample): string {
   const summary = runSummary(sample);
-  const none = ruleNone(sample);
+  const active = rulesActive(sample);
   const both = pairs(sample);
   const never = neverRolled(sample);
   const sections = [
@@ -127,13 +127,13 @@ export function report(sample: Sample): string {
     shares(words.slots.item, gearShares(sample, "item")),
     shares(words.slots.talisman, gearShares(sample, "talisman")),
     shares(words.slots.rule, gearShares(sample, "rule")),
-    `### ${words.slots.ruleNone}`,
+    `### ${words.slots.rulesActive}`,
     table(
       [columns.what, columns.share],
       [
-        [words.slots.neither, percent(none.neither / none.total)],
-        [words.slots.one, percent(none.one / none.total)],
-        [words.slots.both, percent(none.both / none.total)],
+        [words.slots.noRules, percent(active.none / active.total)],
+        [words.slots.oneRule, percent(active.one / active.total)],
+        [words.slots.bothRules, percent(active.both / active.total)],
       ],
     ),
     shares(words.slots.armor, gearShares(sample, "armor")),

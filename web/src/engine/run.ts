@@ -156,6 +156,7 @@ function rollSlots(
     limits: { stats: run.stats, maxStatGap: run.settings.maxStatGap },
     random,
     catchUp: engine.hyperparams.catchUp,
+    fixedShare: engine.hyperparams.fixedShare,
     tally: run.tally,
     keptTally,
     shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,

@@ -3,7 +3,7 @@
 Why the data rolls the way it does: every odds value other than 1 and every conditional rule, with its reason. Read it before tuning, and change the data and this file together: `pipeline/tests/test_balance.py` fails when a modifier row or an odds value other than 1 is missing here, or listed here but gone from the data.
 
 - How modifier rows combine: `data/overrides/README.md#Selectors and modifiers`.
-- Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×70`, `×42`, `×34`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×0.5`) are deliberate placeholders for it.
+- Most values are provisional until tuned at the full-run simulation (`web/sim/README.md`); values off the tier table (`×70`, `×42`, `×34`, `×33`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×1.5`, `×0.67`, `×0.5`) are deliberate placeholders for it.
 
 ## Levers
 
@@ -74,15 +74,25 @@ A modifier multiplies an option's odds. Pick its value from these tiers, or `0` 
 | 10,000 | 99.9% | 99% |
 | 1,000,000 | 99.999% | 99.99% |
 
-So the same multiplier feels weaker in a bigger pool, which is why `guarantee` is for small pools and `top` for large ones. Catch-up only moves chance between the options (#Hyperparameters), so a boosted option faces about the sum of the pool's odds whatever the tallies say, and the tiers are sized to that: every `guarantee` row wins 98–99% even in the whole armor pool, where its targets are a few sets among about 180, and an exultation at odds 0.25 among the talismans. One order lower would leave the exultations and the jump sets under 90% (owner, 2026-11-17: as low as that allows). Nothing short of removing every other option makes a roll certain, and a reroll can always show something else.
+So the same multiplier feels weaker in a bigger pool, which is why `guarantee` is for small pools and `top` for large ones. A pool with fixed shares counts as larger (#Fixed shares). Catch-up only moves chance between the options (#Hyperparameters), so a boosted option faces about the sum of the pool's odds whatever the tallies say, and the tiers are sized to that: every `guarantee` row wins 98–99% even in the whole armor pool, where its targets are a few sets among about 180, and an exultation at odds 0.25 among the talismans. One order lower would leave the exultations and the jump sets under 90% (owner, 2026-11-17: as low as that allows). Nothing short of removing every other option makes a roll certain, and a reroll can always show something else.
 
 When two boosted options meet in one pool, compare them with each other, not with the pool:
 
 - **Keep tiers two orders of magnitude apart.** A `top` (×1,000,000) next to a `guarantee` (×10,000) still wins 99% of the time; two tiers only ×10 apart would split about 90/10.
 - **Avoid two `top` targets in one pool:** they split about 50/50. It is allowed where the combination is rare, such as `Claw Talisman` with `Axe Talisman`; `import-report.json` lists every pool where it can happen.
 - **Soft rows and catch-up compound on top.** A `prefer` or `strong` row on a rival raises the rival, and so does catch-up on a rival behind its peers; the simulation's Synergies tab shows how often each boosted target still wins.
-- **Off-tier values** (`×70`, `×42`, `×34`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×0.5`) are aimed at a target share rather than a feel, such as Dual-Wield's share of same-class pairs, and are tuned at the simulation.
+- **Off-tier values** (`×70`, `×42`, `×34`, `×33`, `×6`, `×5`, `×4`, `×3.5`, `×3`, `×1.5`, `×0.67`, `×0.5`) are aimed at a target share rather than a feel, such as Dual-Wield's share of same-class pairs, and are tuned at the simulation.
 - **When two boosted targets clash, the rarer trigger wins.** The run should vary, and the more common trigger gets more chances to show its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger, since rules roll before armor.
+
+## Fixed shares
+
+`None`, the consumables and the `Naked Set` hold a fixed share of their roll, whatever else is in it: they are always there, so the room they leave, an empty slot or a consumable in the item slot, shouldn't shrink as the pool grows or vary with a class's exclusions. Owner, 2026-11-19.
+
+- **Which options:** every option with no location, the same line catch-up draws (#Hyperparameters): the `none` item, consumables and the `Naked Set`, whose pieces have no location. In the combat rule slots, where no rule has a location, `None` alone.
+- **How their odds count:** against the rest of the pool counted as 100 odds, whatever its size. `None` at 100 holds half the roll; two fixed options at 80 and 20 hold 80 / 200 and 20 / 200. Among themselves, with nothing else in the pool, they share by their odds.
+- **Repeats:** an empty slot may follow another, so one `None` serves both rule slots, and the second slot's empty share is set by rows on the first slot's result.
+- **Modifiers work in two steps.** A ×N row multiplies an option's odds against everything else in the roll, the fixed shares included, so first find the option's chance in the roll: its share of the rest of the pool times what the fixed shares leave. Then ×N takes a chance `p` to `N·p / (1 + (N−1)·p)`. A fixed share `s` makes the pool count as `1 / (1 − s)` times its size: with `None` at half, `Parry only` holding 4% of the rules has 2% of the roll, and ×10 takes it to about 17%. A guarantee or top tier still beats a fixed share nearly always.
+- **A row aimed at a fixed option** multiplies its odds the same way: Jester's `none` at 33 holds a quarter of its right hand, and `No armor` makes the `Naked Set` top tier.
 
 ## Hyperparameters
 
@@ -95,6 +105,8 @@ When two boosted options meet in one pool, compare them with each other, not wit
 
   Owner, 2026-11-17: this catch-up, with no pace limit, chosen on the simulation per stat allocation; the right hand shared by every class.
 
+- **`fixedShare`** sets the weight of the rest of the pool against the fixed shares' odds (#Fixed shares): 100, so odds 100 is half the roll.
+
 - **`defaultMaxStatGap`** is how far above the player's stats an item may be. It is per item, never a shared budget, so a loadout of several near-reach items is fine.
 
 ## Base odds
@@ -105,14 +117,13 @@ A row's own odds, for every option that rolls differently all the time. Files: `
 |---|---|---:|---|
 | class | `ranger` | 0.5 | a less enjoyable playstyle, with less weapon variety than melee or magic |
 | class | `jester` | 0.25 | a mix of silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
-| rule | `none` `none_2` | 12 | two `None` rules, so both rule slots can be empty: `rule_2` leaves out what `rule_1` rolled, and the other `None` can still follow. Owner, 2026-11-14: about 20% of objectives with no rule, 59% with one and 21% with two; two slots rolling apart can't make the three equal |
+| rule | `none` | 100 | half the first rule slot, a fixed share (#Fixed shares); the second slot's empty share follows the first (#36. Empty rule slots). Owner, 2026-11-14: about 20% of objectives with no rule, 59% with one and 21% with two; owner, 2026-11-19: one implementation for every empty slot, giving 20%, 60% and 20% for every class before synergies |
 | rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` | 0.5 | owner decision: the full-run simulation (`web/sim/README.md`) showed these five crowding out other rules and, for `no_armor`, pushing the `Naked Set` and the Blue Dancer Charm's light sets past their guarantee's reach of each other |
 | rule | `parry_only` `l2_only` | 0.5 | owner decision: both limit the moveset a lot, `L2 only` sometimes clashing with an ash it doesn't suit, so each joins the other hard rules at about 5% |
 | rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
 | item | `grafted_dragon` | 3 | `Jester`'s signature right hand; it rolls nowhere else (#29. Grafted Dragon only on Jester) |
-| item | `perfumed_oil_of_ranah` `ancestral_infants_head` `omen_bairn` `regal_omen_bairn` `horned_bairn` | 28 | the item slot rolls tools and consumables together, and consumables far outnumber tools, so each tool rolls at half the odds of the whole `Any pots / perfumes` alias, whose members all sit at 1. Tools keep the region filter and consumables don't, so no tool rolls in the Limgrave region until a boss is felled |
-| item | `wraith_calling_bell` | 10 | owner decision. **Catch-up:** the full-run simulation showed it far ahead of the other tools, since it's reachable from Liurnia while they wait for a later region or boss; brought down to where theirs land |
-| item | `bone_dart` `poisonbone_dart` `crystal_dart` `throwing_dagger` `kukri` `fan_daggers` `dragon_communion_harpoon` `ruin_fragment` `roundrock` `poisoned_stone` `poisoned_stone_clump` `explosive_stone` `explosive_stone_clump` `glintstone_scrap` `large_glintstone_scrap` `cuckoo_glintstone` `glinting_nail` `gravity_stone_fan` `gravity_stone_chunk` `fire_spritestone` `spritestone` `fire_coil` `surging_frenzied_flame` `innard_meat` `call_of_tibia` | 0.335 | the throwables, together a third as often as the whole `Any pots / perfumes` alias to start, then owner decision: the full-run simulation still showed them taking the item slot too often, so they're at half that, about a sixth |
+| item | `perfumed_oil_of_ranah` `ancestral_infants_head` `omen_bairn` `regal_omen_bairn` `horned_bairn` | 3 | owner decision. **Catch-up:** `Wraith Calling Bell`, reachable from Liurnia while the other tools wait for a later region or boss, ran far ahead of them, so it rolls at a third of their odds. The tools share what the consumables leave of the item slot (#Fixed shares), and keep the region filter while consumables don't, so no tool rolls in the Limgrave region until a boss is felled |
+| item | `academy_magic_pot` `acid_spraymist` `albinauric_pot` `alluring_pot` `ancient_dragonbolt_pot` `beastlure_pot` `bloodboil_aromatic` `cursed_blood_pot` `eternal_sleep_pot` `fetid_pot` `fire_pot` `freezing_pot` `frenzied_flame_pot` `giantsflame_fire_pot` `hefty_fetid_pot` `hefty_fire_pot` `hefty_fly_pot` `hefty_freezing_pot` `hefty_frenzied_flame_pot` `hefty_furnace_pot` `hefty_lightning_pot` `hefty_magic_pot` `hefty_oil_pot` `hefty_poison_pot` `hefty_rancor_pot` `hefty_red_lightning_pot` `hefty_rock_pot` `hefty_rot_pot` `hefty_volcano_pot` `holy_water_pot` `ironjar_aromatic` `lightning_pot` `magic_pot` `oil_pot` `poison_pot` `poison_spraymist` `rancor_pot` `red_lightning_pot` `redmane_fire_pot` `roped_fetid_pot` `roped_fire_pot` `roped_fly_pot` `roped_frenzied_flame_pot` `roped_holy_water_pot` `roped_lightning_pot` `roped_magic_pot` `roped_oil_pot` `roped_poison_pot` `roped_volcano_pot` `rot_pot` `sacred_order_pot` `sleep_pot` `spark_aromatic` `swarm_pot` `uplifting_aromatic` `volcano_pot` | 3 | owner decision: consumables hold about two thirds of the item slot whenever a tool is in reach, a fixed share (#Fixed shares); today's average over a run, steady instead of all of it in Limgrave and under a third late. The other throwables stay at 1, a third of a pot's or perfume's odds and together about an eighth of the consumables, since the full-run simulation showed them taking the item slot too often |
 | item | `igons_drake_hunt` | 0 | easily missed in the game; `Igon's Greatbow` itself keeps normal odds |
 | item | `lamenters_mask` `rock_heart` `priestess_heart` | 0 | transforms that conflict with gear, so an objective can't use one with its loadout |
 | item | `litany_of_proper_death` | 0 | its places are hard to pin down, and it is nearly useless against anything not undead |
@@ -277,9 +288,9 @@ Rows: `parry_ash_boosts_parry_talismans`, `parry_ash_boosts_parry_only`
 
 ### 19. Jester's right hand
 
-P2. Shapes the class: an empty right hand is part of the joke, so `none` goes `×6`, the staff `×2` and torches `×0.5`, with `Grafted Dragon` at base odds 3. The aims are `none` about a quarter of the hand once greatshields, perfume bottles and `Grafted Dragon` are in reach, and torches about 30% in the Limgrave region. There only `none`, the one staff and a few torches can roll, so a `none` big enough for late in a run would crowd them out; torches get `×3.5` more while the boss is in the Limgrave region. Values preliminary; decay hits `none` hard, so the simulation decides them.
+P2. Shapes the class: an empty right hand is part of the joke, so `none` goes to odds `33`, a quarter of the hand at every point of a run (#Fixed shares), the staff `×2` and torches `×0.5`, with `Grafted Dragon` at base odds 3. The aims are `none` about a quarter of the hand, and torches about 30% in the Limgrave region, where they get `×3.5` more while the boss is there. Values preliminary, read at the simulation once the rest is settled.
 
-Rows: `jester_none_x6`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_torches_in_limgrave`
+Rows: `jester_none_x33`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_torches_in_limgrave`
 
 ### 22. Buff ashes on weapons that refuse them
 
@@ -374,3 +385,9 @@ Rows: `r1_r2_only_not_on_pure_casters`, `l1_only_not_on_ranger`
 P2. Owner, 2026-11-17 and 2026-11-18: a rare thrusting sword that casts sorceries with L2 in place of an ash. It rolls in `Sorcerer`'s right hand beside the staves and stays in `Spellblade`'s, and never for `Knight` or either Warrior. **Preference:** once in reach it holds about one `Sorcerer` right hand in three, most just after it arrives, by a `×3` row; its base odds stay 1, so its catch-up baseline is untouched. **Synergy:** with it in the right hand, `Sorcerer`'s left hand holds no staff, only small and medium shields and `Jellyfish Shield`: the owner's pairing of the sword with a shield, which also leaves staves more of the left hand beside a staff.
 
 Rows: `carian_sorcery_sword_not_on_knight_or_warriors`, `sorcerer_prefers_carian_sorcery_sword`, `sorcerer_sword_lh_no_catalyst`
+
+### 36. Empty rule slots
+
+Owner, 2026-11-14 and 2026-11-19: about 20% of objectives with no rule, 60% with one and 20% with two. `None` holds half the first slot (#Base odds); after `None` the second is empty 40% of the time (`×0.67`), after a rule 60% (`×1.5`). Two independent slots can't do it: one rule would peak at 50%.
+
+Rows: `none_after_none`, `none_after_a_rule`

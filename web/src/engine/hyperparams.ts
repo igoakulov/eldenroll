@@ -14,12 +14,21 @@ export interface CatchUp {
   readonly boosted: (caughtUp: number) => number;
 }
 
+/** Fixed shares (`data/balance.md#Fixed shares`): `none`, consumables and anything else found everywhere hold a share
+ * of their roll that the size of the rest of the pool can't move. */
+export interface FixedShare {
+  /** What an option in the rest of the pool weighs, from `share`, its part of the rest at base odds; together they
+   * weigh `restWeight(1)` against the fixed shares' own odds. */
+  readonly restWeight: (share: number) => number;
+}
+
 /** Balance values that apply to every row, tuned here against the simulation, and the engine's only balance: no other
  * engine file may weigh a roll (`data/balance.md#Levers`). The engine reads them as an argument
  * rather than an import, so a run can override them and a seed still reproduces its roll. Odds and modifier values
  * are per row, so they stay in the data files. */
 export interface Hyperparams {
   readonly catchUp: CatchUp;
+  readonly fixedShare: FixedShare;
   readonly defaultMaxStatGap: number;
 }
 
@@ -46,5 +55,7 @@ export const DEFAULT_HYPERPARAMS: Hyperparams = {
     // Never below the option's base share, so a synergy or guarantee holds on an option that has shown a lot
     boosted: (caughtUp) => Math.max(caughtUp, 1),
   },
+  // The rest of the pool counts as 100 odds, so a fixed share at odds 100 holds half its roll
+  fixedShare: { restWeight: (share) => share * 100 },
   defaultMaxStatGap: 10,
 };

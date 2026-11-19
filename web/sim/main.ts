@@ -3,7 +3,7 @@ import path from "node:path";
 import { parseArgs } from "node:util";
 
 import { copy } from "../src/copy";
-import type { Database, LoadoutSlot } from "../src/engine/database";
+import { isNone, type Database, type LoadoutSlot } from "../src/engine/database";
 import { indexDatabase } from "../src/engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "../src/engine/hyperparams";
 import type { Engine } from "../src/engine/run";
@@ -86,17 +86,22 @@ function vsFairItemRows(engine: Engine, results: readonly RunResult[], classes: 
 }
 
 /** The database with every rule above or below ×1 at ×1 (removals kept), and with `flat` every item's and armor set's odds that aren't 0
- * at 1 too: catch-up judged alone, before odds and synergies steer single items. */
+ * at 1 too: catch-up judged alone, before odds and synergies steer single items. Fixed shares keep their odds and the
+ * rows that set an empty slot's share, since they are no item's balance (`data/balance.md#Fixed shares`). */
 function judging(database: Database, noSynergies: boolean, flat: boolean): Database {
   if (!noSynergies) return database;
-  const one = <T extends { readonly odds: number }>(row: T): T => (flat && row.odds !== 0 ? { ...row, odds: 1 } : row);
+  const placed = new Set(database.item_location.map((row) => row.item_id));
+  const one = <T extends { readonly odds: number }>(row: T, located: boolean): T =>
+    flat && located && row.odds !== 0 ? { ...row, odds: 1 } : row;
+  const empty = (row: Database["modifier"][number]) => row.target.ids?.some(isNone) ?? false;
   return {
     ...database,
-    modifier: database.modifier.map((row) => (row.value === 0 ? row : { ...row, value: 1 })),
-    item: database.item.map(one),
-    armor_set: database.armor_set.map(one),
+    modifier: database.modifier.map((row) => (row.value === 0 || empty(row) ? row : { ...row, value: 1 })),
+    item: database.item.map((row) => one(row, placed.has(row.id))),
+    armor_set: database.armor_set.map((row) => one(row, row.pieces.some((piece) => placed.has(piece)))),
   };
 }
+
 
 export function main(argv: readonly string[], repo: string): void {
   const { values } = parseArgs({

@@ -45,6 +45,7 @@ def _excludes(rows: tuple[Modifier, ...]) -> set[tuple[str, str]]:
     return {
         (rolled, removed)
         for row in rows
+        if row.value == 0
         for one in row.when
         if isinstance(one, RolledCondition) and one.slots == ("rule_1",)
         for rolled in one.selector.ids or ()

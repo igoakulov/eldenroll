@@ -1,6 +1,6 @@
-import type { Item, LoadoutSlot, PoolSlot } from "./database";
+import { isNone, type Item, type LoadoutSlot, type PoolSlot } from "./database";
 import { poolKey, type EngineData } from "./engineData";
-import type { CatchUp } from "./hyperparams";
+import type { CatchUp, FixedShare } from "./hyperparams";
 import type { RollState } from "./modifiers";
 import {
   addTally,
@@ -41,6 +41,7 @@ export interface LoadoutInput {
   readonly limits: StatLimits;
   readonly random: Random;
   readonly catchUp?: CatchUp;
+  readonly fixedShare?: FixedShare;
   /** `Run.tally`: the chance each option has had over the objectives done so far. */
   readonly tally?: Readonly<Record<string, number>>;
   /** RH rolls from these first; `null` when the setting is off. */
@@ -78,9 +79,10 @@ function ashFilter(context: RollContext, hand: PoolSlot): OptionFilter {
   return (option) => item !== undefined && ashFits(context.data, option.row.id, item);
 }
 
+/** An empty slot may follow another; anything else may show only once. */
 function differsFrom(context: RollContext, slot: PoolSlot): OptionFilter {
   const taken = context.state.rolled.get(slot);
-  return (option) => option.row.id !== taken;
+  return (option) => isNone(option.row.id) || option.row.id !== taken;
 }
 
 /** `none` may repeat, because several slots roll it; a real weapon may exist only once. */
@@ -182,6 +184,7 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     counted,
     ...(input.neverRoll === undefined ? {} : { neverRoll: input.neverRoll }),
     ...(input.catchUp === undefined ? {} : { catchUp: input.catchUp }),
+    ...(input.fixedShare === undefined ? {} : { fixedShare: input.fixedShare }),
   };
   // Each slot reads the tally with every earlier slot of this objective added, a second talisman its first: one copy
   // of the run's tally per loadout, added to in place

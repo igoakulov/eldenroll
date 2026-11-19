@@ -9,7 +9,7 @@ import {
   handShares,
   pairs,
   regionShares,
-  ruleNone,
+  rulesActive,
   THIN_SAMPLE,
   type EmptyRow,
   type GearTable,
@@ -61,7 +61,7 @@ export function Slots({
       armor: count("armor"),
       rule: gearShares(sample, "rule"),
       both: pairs(sample),
-      none: ruleNone(sample),
+      active: rulesActive(sample),
       empty: empties(sample),
     };
   }), [sample, by, region]);
@@ -72,7 +72,7 @@ export function Slots({
   const pairRows = both.rows.filter((row) => matches(row.name, search));
   const scale = Math.max(0, ...both.rows.map((row) => row.share));
   const dualWieldOnly = sample.classes.length === 1 && sample.classes[0] === "warrior_dw";
-  const none = tables.none;
+  const active = tables.active;
   const empty = tables.empty.filter((row) => matches(className(sample.data, row.characterClass), search));
   const emptyScale = Math.max(0, ...tables.empty.map((row) => row.share));
   const runs = sample.results.length;
@@ -139,11 +139,11 @@ export function Slots({
       {gear("item", words.item)}
       {gear("talisman", words.talisman, words.talismanLede)}
       <ShareSection title={words.rule} lede={words.ruleLede} table={tables.rule} search={search} />
-      <Section title={words.ruleNone} lede={copy.sim.counted(perRun(none.total / runs))}>
+      <Section title={words.rulesActive} lede={copy.sim.counted(perRun(active.total / runs))}>
         <div>
-          <ListRow title={words.neither} value={percent(none.total === 0 ? NaN : none.neither / none.total)} />
-          <ListRow title={words.one} value={percent(none.total === 0 ? NaN : none.one / none.total)} />
-          <ListRow title={words.both} value={percent(none.total === 0 ? NaN : none.both / none.total)} />
+          <ListRow title={words.noRules} value={percent(active.total === 0 ? NaN : active.none / active.total)} />
+          <ListRow title={words.oneRule} value={percent(active.total === 0 ? NaN : active.one / active.total)} />
+          <ListRow title={words.bothRules} value={percent(active.total === 0 ? NaN : active.both / active.total)} />
         </div>
       </Section>
 

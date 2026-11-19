@@ -79,15 +79,16 @@ describe("slot pools on the real data", () => {
     expect(weightOf(pool("knight", "rule_1"), "none")).toBe(odds);
   });
 
-  it("gives Jester's empty hand its x6, and only there", () => {
-    expect(weightOf(pool("jester", "rh"), "none")).toBe(modifierRow("jester_none_x6").value);
+  it("gives Jester's empty hand its own odds, and only there", () => {
+    expect(weightOf(pool("jester", "rh"), "none")).toBe(modifierRow("jester_none_x33").value);
     expect(weightOf(pool("warrior_2h", "lh"), "none")).toBe(1);
   });
 
   it("gives a seal and a staff their own base odds", () => {
     const result = pool("spellblade", "lh");
-    expect(weightOf(result, "finger_seal")).toBe(item("finger_seal").odds);
-    expect(weightOf(result, "astrologers_staff")).toBe(item("astrologers_staff").odds);
+    expect(weightOf(result, "finger_seal")! / weightOf(result, "astrologers_staff")!).toBeCloseTo(
+      item("finger_seal").odds / item("astrologers_staff").odds,
+    );
   });
 });
 
@@ -103,6 +104,36 @@ function ruleOdds(id: string): number {
   return row.odds;
 }
 
+/** A rule's weight per unit of its odds, so two rules compare whatever scale the fixed shares put on the pool. */
+function perRuleOdds(result: SlotPoolResult, id: string): number {
+  return weightOf(result, id)! / ruleOdds(id);
+}
+
+describe("fixed shares", () => {
+  const chanceOf = (result: SlotPoolResult, keep: (row: SlotPoolResult["options"][number]) => boolean) =>
+    result.options.filter(keep).reduce((sum, row) => sum + row.weight, 0) / result.options.reduce((sum, row) => sum + row.weight, 0);
+  const rest = DEFAULT_HYPERPARAMS.fixedShare.restWeight(1);
+
+  it("keeps None's share of a rule slot whatever the class's pool", () => {
+    const odds = ruleOdds("none");
+    const isNoneRule = (row: SlotPoolResult["options"][number]) => row.option.row.id === "none";
+    const knight = pool("knight", "rule_1", KNIGHT_MELEE);
+    const sorcerer = pool("sorcerer", "rule_1", { rh: "astrologers_staff", lh: "astrologers_staff" });
+    expect(sorcerer.pool).toBeLessThan(knight.pool);
+    for (const result of [knight, sorcerer]) expect(chanceOf(result, isNoneRule)).toBeCloseTo(odds / (rest + odds));
+  });
+
+  it("keeps the consumables' share of the item slot however many tools are in reach", () => {
+    const consumable = (row: SlotPoolResult["options"][number]) => item(row.option.row.id).category === "consumable";
+    const few = pool("knight", "item", {}, countedFor(new Set(["limgrave", "liurnia"]), new Set()));
+    const all = pool("knight", "item");
+    const tools = (result: SlotPoolResult) => result.options.filter((row) => !consumable(row)).length;
+    expect(tools(few)).toBeGreaterThan(0);
+    expect(tools(few)).toBeLessThan(tools(all));
+    expect(chanceOf(few, consumable)).toBeCloseTo(chanceOf(all, consumable));
+  });
+});
+
 describe("a condition on a slot not rolled yet", () => {
   it("leaves Dual-Wield Warrior RH losing only what the class itself removes", () => {
     const result = pool("warrior_dw", "rh");
@@ -115,7 +146,8 @@ describe("a condition on a slot not rolled yet", () => {
     const removed = options.filter((one) => !ids(result).includes(one.row.id));
     expect(removed.map((one) => one.row.id)).toContain("grafted_dragon");
     for (const one of removed) expect(classRemovals.some((row) => matchesOption(row.target, one))).toBe(true);
-    for (const row of result.options) expect(row.weight).toBe((row.option.row as Item).odds);
+    const perOdds = result.options.map((row) => row.weight / (row.option.row as Item).odds);
+    for (const value of perOdds) expect(value).toBeCloseTo(perOdds[0]!);
   });
 
   it("is inactive when it says does not match, so a rule survives until its slot rolls", () => {
@@ -141,9 +173,10 @@ describe("modifiers across slots", () => {
     const katana = result.options.filter((row) => item(row.option.row.id).subcategory === "katana");
     const other = result.options.filter((row) => item(row.option.row.id).subcategory !== "katana");
     expect(katana.length).toBeGreaterThan(0);
-    const odds = (row: (typeof result.options)[number]) => item(row.option.row.id).odds;
-    for (const row of katana) expect(row.weight).toBe(odds(row) * modifierRow("warrior_dw_pairs_katana").value);
-    for (const row of other) expect(row.weight).toBe(odds(row));
+    const perOdds = (row: (typeof result.options)[number]) => row.weight / item(row.option.row.id).odds;
+    const base = perOdds(other[0]!);
+    for (const row of katana) expect(perOdds(row)).toBeCloseTo(base * modifierRow("warrior_dw_pairs_katana").value);
+    for (const row of other) expect(perOdds(row)).toBeCloseTo(base);
     expect(ids(result)).not.toContain("none");
   });
 
@@ -174,15 +207,15 @@ describe("modifiers across slots", () => {
   it("needs a parry ash for Parry only, and boosts it with one", () => {
     expect(ids(pool("knight", "rule_1", KNIGHT_MELEE))).not.toContain("parry_only");
     const withParry = pool("knight", "rule_1", { ...KNIGHT_MELEE, lh_ash: "parry" });
-    expect(weightOf(withParry, "parry_only")).toBe(
-      ruleOdds("parry_only") * modifierRow("parry_ash_boosts_parry_only").value,
+    expect(perRuleOdds(withParry, "parry_only") / perRuleOdds(withParry, "r1_only")).toBeCloseTo(
+      modifierRow("parry_ash_boosts_parry_only").value,
     );
   });
 
   it("makes a named talisman's rule top tier", () => {
     const result = pool("knight", "rule_1", { ...KNIGHT_MELEE, talisman_1: "claw_talisman" });
-    expect(weightOf(result, "jump_attacks_only")).toBe(
-      ruleOdds("jump_attacks_only") * modifierRow("claw_talisman_makes_jump_attacks_top").value,
+    expect(perRuleOdds(result, "jump_attacks_only") / perRuleOdds(result, "r1_only")).toBeCloseTo(
+      modifierRow("claw_talisman_makes_jump_attacks_top").value,
     );
   });
 

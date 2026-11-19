@@ -507,21 +507,21 @@ export function classShares(sample: Sample): ShareTable {
   return { ...table, rows: table.rows.filter((row) => sample.classes.includes(row.key.slice("character_class:".length))) };
 }
 
-interface RuleNone {
+interface RulesActive {
   readonly total: number;
-  readonly neither: number;
+  readonly none: number;
   readonly one: number;
   readonly both: number;
 }
 
-/** How many of an objective's two rule slots show `None`. */
-export function ruleNone(sample: Sample): RuleNone {
+/** How many combat rules an objective holds: its rule slots that show something other than `None`. */
+export function rulesActive(sample: Sample): RulesActive {
   const counts = [0, 0, 0];
   for (const objective of sample.objectives) {
-    const nones = (["rule_1", "rule_2"] as const).filter((slot) => isNone(objective.rolls.get(slot)?.chosen ?? "")).length;
-    counts[nones]! += 1;
+    const rules = (["rule_1", "rule_2"] as const).filter((slot) => !isNone(objective.rolls.get(slot)?.chosen ?? "none")).length;
+    counts[rules]! += 1;
   }
-  return { total: sample.objectives.length, neither: counts[0]!, one: counts[1]!, both: counts[2]! };
+  return { total: sample.objectives.length, none: counts[0]!, one: counts[1]!, both: counts[2]! };
 }
 
 interface NeverRolled {
