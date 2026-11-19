@@ -201,11 +201,11 @@ describe.each(CASES)("every roll on $name", (testCase) => {
 describe("class shapes", () => {
   const testCase = CASES[0];
 
-  it("gives the casters no ash line", () => {
+  it("gives the casters no right-hand ash, and only Sorcerer a left-hand one", () => {
     for (const characterClass of ["sorcerer", "pyromancer"]) {
       for (const loadout of rolls(characterClass, testCase, 10)) {
         expect(loadout.has("rh_ash")).toBe(false);
-        expect(loadout.has("lh_ash")).toBe(false);
+        expect(loadout.has("lh_ash")).toBe(characterClass === "sorcerer");
       }
     }
   });

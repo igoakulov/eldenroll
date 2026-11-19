@@ -196,7 +196,7 @@ Most classes are just their pools in `slot_pools.csv`. Some have rules on top:
 - **Dual-Wield Warrior:** same-class pairs and paired weapons (#26. Dual-Wield Warrior pairs), and `Grafted Dragon` kept out (#29. Grafted Dragon only on Jester).
 - **Jester:** its right hand's balance (#19. Jester's right hand), `Grafted Dragon` as its own, and odd pairs, such as `Spinning Weapon` on a staff, left alone on purpose: they are the point of the class. Its pool holds `none`, 6 offensive greatshields, torches, perfume bottles, one staff and `Grafted Dragon`; none of the greatshields is reachable in the Limgrave region, which is accepted because `Jester` rolls about once per run there.
 - **Knight:** the thrusting shield (#10. Knight's thrusting shield) and no paired weapons (#28. No paired weapons in unpaired classes).
-- **Sorcerer and Pyromancer:** never `L2 only` (#6. L2 only needs a skill), and their left hand's mix of catalysts and shields (#32. Caster left hand).
+- **Sorcerer and Pyromancer:** never `L2 only` (#6. L2 only needs a skill), and their left hand's mix of catalysts and shields (#32. Caster left hand). `Sorcerer` also rolls a left-hand ash, for the riposte talismans (#37. Ripostes).
 - **Knight and both Warriors** never roll `Carian Sorcery Sword`, which `Sorcerer` rolls in its right hand (#35. Carian Sorcery Sword).
 - **Sorcerer, Pyromancer, Ranger and Jester** lose the talismans and rules they can't use (#33. Talismans a class can't use, #34. Attack rules a class can't use).
 
@@ -282,7 +282,7 @@ Rows: `dancers_weapon_makes_dancers_set_top`, `dancers_weapon_boosts_moveset_tal
 
 ### 18. Parry ashes
 
-P2. A parry ash in a hand boosts `Dagger Talisman`, `Blade of Mercy` and `Parry only` (`strong`).
+P2. A parry ash in a hand boosts `Parry only` (`strong`), and `Dagger Talisman` and `Blade of Mercy` (`boost`), whose critical hits a parry sets up: with the two talisman slots, one of them shows about 90% of the time, the rest going mostly to the `guarantee` synergies that take a slot first (owner, 2026-11-19).
 
 Rows: `parry_ash_boosts_parry_talismans`, `parry_ash_boosts_parry_only`
 
@@ -364,7 +364,7 @@ Rows: `sorcerer_lh_prefers_a_catalyst`, `pyromancer_lh_prefers_a_catalyst`, `sor
 
 P1. A talisman that does nothing for the loadout wastes the slot, and the talisman pool is small enough that each one shifts the rest. From each talisman's Fextralife page, owner's rulings, 2026-11-14:
 
-- Critical hits, R1 chains, jump, roll and dash attacks, charged attacks and successive melee hits (`Dagger Talisman`, `Twinblade Talisman`, `Claw Talisman`, `Retaliatory Crossed-Tree`, `Lacerating Crossed-Tree`, `Blade of Mercy`, `Godskin Swaddling Cloth`, `Axe Talisman`) need melee: never `Sorcerer`, `Pyromancer` or `Ranger` (the wiki says bows don't count), and never `Jester`, taken as a whole rather than by what its right hand holds.
+- Critical hits, R1 chains, jump, roll and dash attacks, charged attacks and successive melee hits (`Dagger Talisman`, `Twinblade Talisman`, `Claw Talisman`, `Retaliatory Crossed-Tree`, `Lacerating Crossed-Tree`, `Blade of Mercy`, `Godskin Swaddling Cloth`, `Axe Talisman`) need melee: never `Sorcerer`, `Pyromancer` or `Ranger` (the wiki says bows don't count), and never `Jester`, taken as a whole rather than by what its right hand holds. `Sorcerer` rolls the two critical-hit talismans, `Dagger Talisman` and `Blade of Mercy`, with a parry ash in its left hand (#37. Ripostes).
 - `Curved Sword Talisman` boosts guard counters: never `Ranger` or a caster, `Spellblade` included.
 - `Greatshield Talisman` and `Pearl Shield Talisman` act only while guarding: never `Ranger`, `Sorcerer` or `Pyromancer`; a caster can hide behind a shield, but it isn't a way to fight.
 - `Shard of Alexander` boosts skills, so it follows `L2 only` (#6. L2 only needs a skill): never `Sorcerer` or `Pyromancer`, nor an empty right hand.
@@ -372,7 +372,7 @@ P1. A talisman that does nothing for the loadout wastes the slot, and the talism
 - `Beloved Stardust` speeds up casting, so only `Sorcerer`, `Pyromancer` and `Spellblade` roll it. `Old Lord's Talisman` stays for everyone, since any class can lengthen a buff with it.
 - `Blue Dancer Charm`, `Rellana's Cameo`, `Kindred of Rot's Exultation` and `Lord of Blood's Exultation` never roll for `Sorcerer` or `Pyromancer`: physical and status-effect builds aren't viable with most spells (owner, 2026-11-17). Their synergies on those classes go with them: a rot or bleed staff no longer boosts the exultations there.
 
-Rows: `melee_talismans_need_a_melee_class`, `guard_counter_talisman_not_on_casters_or_ranger`, `guard_talismans_not_on_pure_casters_or_ranger`, `talismans_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`
+Rows: `melee_talismans_need_a_melee_class`, `melee_talismans_not_on_sorcerer`, `guard_counter_talisman_not_on_casters_or_ranger`, `guard_talismans_not_on_pure_casters_or_ranger`, `talismans_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`
 
 ### 34. Attack rules a class can't use
 
@@ -391,3 +391,14 @@ Rows: `carian_sorcery_sword_not_on_knight_or_warriors`, `sorcerer_prefers_carian
 Owner, 2026-11-14 and 2026-11-19: about 20% of objectives with no rule, 60% with one and 20% with two. `None` holds half the first slot (#Base odds); after `None` the second is empty 40% of the time (`×0.67`), after a rule 60% (`×1.5`). Two independent slots can't do it: one rule would peak at 50%.
 
 Rows: `none_after_none`, `none_after_a_rule`
+
+### 37. Ripostes
+
+Owner, 2026-11-19. `Dagger Talisman` and `Blade of Mercy` boost critical hits, which come mostly from ripostes.
+
+- **P1.** The game allows no riposte with flails, torches, shields, thrusting shields, staves, seals, ranged weapons, perfume bottles, throwing blades or whips, so with one in the right hand neither talisman rolls, for any class, and neither do `Parry only` and `Land a riposte`, which ask for one.
+- **P2.** `Sorcerer` rolls both only with a parry ash in its left hand, so it rolls a left-hand ash; with a staff in the right hand the P1 row still removes them, so they come with `Carian Sorcery Sword` and a shield, on about 2% of its objectives.
+- **P2.** `2H Warrior` with a colossal sword, colossal weapon, great hammer, great spear, greataxe, greatsword or hammer in the right hand, whose ripostes hit hardest, gets both at `prefer`: about 19% of its talisman showings with those weapons over a run, 15% before `Blade of Mercy` arrives and 25% after, the pairing adding the partner.
+- **P2.** One in the first talisman slot brings the other into the second at `strong`, so they come equipped together; a `guarantee` synergy still takes a slot first. The rows act only forward, so both show in about a third of the objectives either shows in.
+
+Rows: `sorcerer_parry_talismans_need_a_parry_ash`, `riposte_talismans_need_a_riposte_rh`, `riposte_rules_need_a_riposte_rh`, `warrior_2h_heavy_rh_boosts_parry_talismans`, `dagger_talisman_brings_blade_of_mercy`, `blade_of_mercy_brings_dagger_talisman`

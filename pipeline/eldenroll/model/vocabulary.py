@@ -37,7 +37,7 @@ CHARACTER_CLASS_ASH_SLOTS: Final[Mapping[str, frozenset[str]]] = {
     "warrior_2h": frozenset({"rh_ash"}),
     "warrior_dw": ASH_SLOTS,
     "ranger": frozenset({"rh_ash"}),
-    "sorcerer": frozenset(),
+    "sorcerer": frozenset({"lh_ash"}),
     "pyromancer": frozenset(),
     "spellblade": frozenset({"rh_ash"}),
     "jester": frozenset({"rh_ash"}),
