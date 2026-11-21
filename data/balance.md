@@ -89,6 +89,7 @@ When two boosted options meet in one pool, compare them with each other, not wit
 The two talisman slots roll as one draw, and so do the two combat rule slots: every pair of options weighs its two options' weights times the rows that link them, so a pairing holds whichever slot either option would land in, and the pair shows in its slots in either order. A row whose condition names a slot of the pair reads the other slot of the pair, both ways, and applies once to a pair: one row links two talismans, and one exclusion keeps two rules apart. Owner, 2026-11-19.
 
 - **Reading a pair row:** its value multiplies the pair, as a single-slot row multiplies one option. Two options at weights `a` and `b` with a ×N row between them weigh `N·a·b`, against `a·c` for any other pair holding `a`.
+- **Boost one partner of a pair.** Two options boosted by the same condition weigh the boost squared as a pair, enough to beat a `guarantee` synergy beside them. So the condition boosts one, and a pair row brings the other.
 - **A slot that rolls alone,** such as a reroll that keeps the first slot, reads the kept one through the same rows.
 
 ## Fixed shares
@@ -109,6 +110,7 @@ The two talisman slots roll as one draw, and so do the two combat rule slots: ev
   - **The tally:** the run keeps, for every item and set with a location, the chance it has had in the objectives done, rules left out, so a synergy's extra showings are never paid back. Only rolls the player keeps count: a reroll or a discarded objective adds nothing. So a rule above ×1 never moves a tally: `Dual-Wield Warrior`'s same-class rows change which left-hand weapon shows, not what any tally holds, and never touch the right hand's that every class shares. `perCharacterClass` names the slots whose tally each class keeps apart, the left hand and talismans; every other slot's is shared by every class. A second talisman or ash counts with the first. The weapon shortlist's rolls are evened among the listed weapons in the same right-hand tally, so they rotate evenly, and turning the shortlist off leaves them ahead of their peers for a while (owner, 2026-11-17: kept simple).
   - **`even`** raises the lowest tallies among the options with a location that can roll now, per unit of base odds, to one common level with the roll's chance: whoever is furthest behind its peers gets the most, and whoever is above the level sits the roll out. A late arrival starts at 0 and catches up; an item behind for any reason, luck included, is pushed again. Those options hold their base share of the pool between them, so `none`, consumables and anything else found everywhere keep theirs, which would otherwise fade as late items catch up.
   - **`boosted`**: an option with a rule above ×1 active on it is weighed at least at its base odds, so a synergy or guarantee holds on an option ahead of its peers.
+  - **`ceiling`**, the runway ceiling, off (`null`) unless switched on with `runwayCeiling(k)`: an option may get at most `k` times its plain share (its odds over the roll's), divided by the share of the game's rollable bosses still alive when it first could roll, so an early arrival can't spike and a late one may catch up harder. It smooths the spike after an arrival and the valley after it, at a cost to late arrivals' share of the run that falls on talismans and ashes, where newcomers arrive few at a time; weapons and spells barely move. Every rollable boss counts toward the run's length, since a player may tick regions as they reach them. `pnpm sim --runway-ceiling k` runs it without changing this file.
 
   Owner, 2026-11-17: this catch-up, with no pace limit, chosen on the simulation per stat allocation; the right hand shared by every class.
 
@@ -160,8 +162,19 @@ A row's own odds, for every option that rolls differently all the time. Files: `
 | item | `ghostflame_breath` | 4 | owner decision. **Catch-up:** its region's odds of 3. **Preference:** the rest, for a spell worth seeing that still showed too rarely |
 | item | `midras_flame_of_frenzy` `triple_rings_of_light` `scarlet_aeonia` | 5 | owner decision. **Catch-up:** its region's odds of 3. **Preference:** the rest, for a spell worth seeing that still showed too rarely |
 | item | `roar_of_rugalea` | 3 | owner decision. **Catch-up:** its region's odds of 2. **Preference:** the rest, for a spell worth seeing that still showed too rarely |
-| item | `lord_of_bloods_exultation` `kindred_of_rots_exultation` `blue_dancer_charm` | 0.25 | owner decision: the full-run simulation showed each turning up without its synergy (a bleed or rot weapon, a light build) often enough to read as noise rather than a deliberate pairing |
-| item | `radagons_soreseal` `marikas_soreseal` `radagons_scarseal` `marikas_scarseal` `crucible_scale_talisman` `crucible_feather_talisman` `crucible_knot_talisman` `fine_crucible_feather_talisman` `talisman_of_all_crucibles` `shabriris_woe` | 0.5 | owner decision: `Any Scarseal / Soreseal`, `Any Crucible talisman` and `Shabriri's Woe` only raise the damage taken, for little or no utility, unlike `Any Scorpion Charm`, which also steers toward an elemental build |
+| item | `marikas_soreseal` | 0 | owner decision: **Preference:** it arrives in Miquella's Haligtree, too late in the game, where bosses are very difficult, for such a disadvantage; `Any Scarseal / Soreseal` keeps the other three |
+| item | `radagons_soreseal` `radagons_scarseal` `marikas_scarseal` `shabriris_woe` | 0.5 | owner decision: **Preference:** `Any Scarseal / Soreseal` and `Shabriri's Woe` only raise the damage taken, for little or no utility, unlike `Any Scorpion Charm`, which also steers toward an elemental build |
+| item | `crucible_feather_talisman` `crucible_knot_talisman` `fine_crucible_feather_talisman` `talisman_of_all_crucibles` | 0.25 | owner decision: **Preference:** negative effects that add challenge roll less often; `Any Crucible talisman` only raises the damage taken, for little or no utility |
+| item | `crucible_scale_talisman` | 0.1 | owner decision: **Preference:** crucibles roll less overall, and it arrives in Leyndell, where a spike of a pure downside suits least |
+| item | `daedicars_woe` `verdigris_discus` | 0.5 | owner decision: **Preference:** negative effects that add challenge roll less often |
+| item | `dagger_talisman` | 0.25 | owner decision: **Preference:** rarely useful without a parry or a heavy weapon's stance break, where rules raise it (#18. Parry ashes, #37. Ripostes) |
+| item | `curved_sword_talisman` | 0.1 | owner decision: **Synergy:** it shows almost only beside `Greatshield Talisman`, which brings it (#38. Guarding talismans) |
+| item | `talisman_of_lords_bestowal` | 0.5 | owner decision: **Preference:** too niche |
+| item | `claw_talisman` | 1.5 | owner decision: **Preference:** usable by every melee build and often good, and it lifts its synergies (#13. Claw Talisman and jump attacks) |
+| item | `companion_jar` `perfumers_talisman` | 0.5 | owner decision: **Preference:** too frequent among objectives with pots or perfumes; no row boosts them, so none needs offsetting (#39. Pots and perfumes) |
+| item | `blade_of_mercy` | 0.5 | owner decision: **Preference:** more situational than the moveset talismans; rules raise it where it fits (#37. Ripostes) |
+| item | `twinblade_talisman` | 0.5 | owner decision: reason not recorded |
+| item | `retaliatory_crossed_tree` | 2 | owner decision: reason not recorded |
 | item | `warrior_jar_shard` | 0 | owner decision: it would otherwise take the talisman slot that `Shard of Alexander`, the more useful of the two, should get |
 | boss | `guardian_golem_highroad_cave` `ancient_hero_of_zamor_weeping_peninsula_tombsward_weeping_evergaol_tombsward_cave_entrance` | 10 | each takes about 20% of its region's boss roll, counting the region's other bosses, so what it drops comes early: `Blue Dancer Charm`, `Kindred of Rot's Exultation`, the `Dancer's Set` and `Godskin Swaddling Cloth` for their synergies, `Radagon's Scarseal` and `Crucible Knot Talisman` for talisman variety. `Esgar, Priest of Blood` and the Lake of Rot's `Dragonkin Soldier`, by the `Mushroom Crown`, are in regions of 5 bosses and get 20% at odds 1 |
 | boss | `kindred_of_rot_seethewater_cave` | 9 | about 20% of its region's boss roll, as above |
@@ -259,6 +272,8 @@ Rows: `heavy_rh_removes_blue_dancer_charm`, `two_hands_need_a_lightest_rh_for_bl
 
 ### 12. Blue Dancer Charm and the light sets
 
+The charm keeps base odds (**Preference**, owner, 2026-11-20): a great double-edged sword, and #11 already keeps it to light builds.
+
 P2. A named class idea: the charm wants a light load, so the 9 light sets (`guarantee`) and `No armor` (`strong`) follow it. Owner, 2026-11-13: final, since the simulation shows the sets winning every roll the charm is in.
 
 Rows: `blue_dancer_charm_boosts_light_sets`, `blue_dancer_charm_boosts_no_armor`
@@ -289,7 +304,7 @@ Rows: `dancers_weapon_makes_dancers_set_top`, `dancers_weapon_boosts_moveset_tal
 
 ### 18. Parry ashes
 
-P2. A parry ash in a hand boosts `Parry only` (`strong`), and `Dagger Talisman` and `Blade of Mercy` (`boost`), whose critical hits a parry sets up: with the two talisman slots, one of them shows about 90% of the time, the rest going mostly to the `guarantee` synergies that take a slot first (owner, 2026-11-19).
+P2. A parry ash in a hand boosts `Parry only` (`strong`), and `Dagger Talisman` (`boost` on its odds of 0.25, so `×400`), whose critical hits a parry sets up; `Blade of Mercy` joins it by the pair row (#37. Ripostes), not by a boost of its own (#Paired slots). `Dagger Talisman` shows about 90% of the time, the rest going mostly to the `guarantee` synergies (owner, 2026-11-19).
 
 Rows: `parry_ash_boosts_parry_talismans`, `parry_ash_boosts_parry_only`
 
@@ -314,6 +329,8 @@ Rows: `jump_attacks_rule_boosts_jump_sets`, `jump_attacks_rule_removes_mushroom_
 ### 24. Rot and poison
 
 P2. A rot or poison weapon, shield or ash in a hand makes `Kindred of Rot's Exultation` near-certain (`guarantee`), and the talisman puts the 5 `Mushroom Crown` sets in the guarantee tier, because the crown matters for rot and poison loadouts. The chain goes weapon to talisman to set, never weapon to set, so nothing double-dips, and the three come together. The triggers are the owner's list in the rows. The `Mushroom Crown` sets beat the `Blue Dancer Charm` light sets, so the talisman and the charm never show together. `No armor` and the jump sets win over them (#Tiers, #23. Jump attacks and the jump sets).
+
+Both exultations keep base odds (**Preference**, owner, 2026-11-19): in a pair draw a talisman faces its partners' weights multiplied by its own, so at lower odds a pair of boosted talismans could beat it (#Paired slots); and they now show without their synergy too, `Kindred of Rot's Exultation` the more often, since catch-up lifts the rarer synergy's talisman.
 
 Rows: `rot_boosts_kindred_exultation`, `kindred_exultation_boosts_mushroom_sets`, `kindred_exultation_removes_blue_dancer_charm`
 
@@ -372,14 +389,13 @@ Rows: `sorcerer_lh_prefers_a_catalyst`, `pyromancer_lh_prefers_a_catalyst`, `sor
 P1. A talisman that does nothing for the loadout wastes the slot, and the talisman pool is small enough that each one shifts the rest. From each talisman's Fextralife page, owner's rulings, 2026-11-14:
 
 - Critical hits, R1 chains, jump, roll and dash attacks, charged attacks and successive melee hits (`Dagger Talisman`, `Twinblade Talisman`, `Claw Talisman`, `Retaliatory Crossed-Tree`, `Lacerating Crossed-Tree`, `Blade of Mercy`, `Godskin Swaddling Cloth`, `Axe Talisman`) need melee: never `Sorcerer`, `Pyromancer` or `Ranger` (the wiki says bows don't count), and never `Jester`, taken as a whole rather than by what its right hand holds. `Sorcerer` rolls the two critical-hit talismans, `Dagger Talisman` and `Blade of Mercy`, with a parry ash in its left hand (#37. Ripostes).
-- `Curved Sword Talisman` boosts guard counters: never `Ranger` or a caster, `Spellblade` included.
-- `Greatshield Talisman` and `Pearl Shield Talisman` act only while guarding: never `Ranger`, `Sorcerer` or `Pyromancer`; a caster can hide behind a shield, but it isn't a way to fight.
+- `Greatshield Talisman`, `Pearl Shield Talisman` and `Curved Sword Talisman` act while guarding, so only the classes that guard roll them (#38. Guarding talismans).
 - `Shard of Alexander` boosts skills, so it follows `L2 only` (#6. L2 only needs a skill): never `Sorcerer` or `Pyromancer`, nor an empty right hand.
 - `Rellana's Cameo` boosts only stance skills: it needs `Square Off`, `Unsheathe`, `Wing Stance` or `Overhead Stance` on a hand, or `Moonveil`, `Rellana's Twin Blades` or `Sword of Night and Flame`, whose own skills are stances.
 - `Beloved Stardust` speeds up casting, so only `Sorcerer`, `Pyromancer` and `Spellblade` roll it. `Old Lord's Talisman` stays for everyone, since any class can lengthen a buff with it.
 - `Blue Dancer Charm`, `Rellana's Cameo`, `Kindred of Rot's Exultation` and `Lord of Blood's Exultation` never roll for `Sorcerer` or `Pyromancer`: physical and status-effect builds aren't viable with most spells (owner, 2026-11-17). Their synergies on those classes go with them: a rot or bleed staff no longer boosts the exultations there.
 
-Rows: `melee_talismans_need_a_melee_class`, `melee_talismans_not_on_sorcerer`, `guard_counter_talisman_not_on_casters_or_ranger`, `guard_talismans_not_on_pure_casters_or_ranger`, `talismans_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`
+Rows: `melee_talismans_need_a_melee_class`, `melee_talismans_not_on_sorcerer`, `talismans_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`
 
 ### 34. Attack rules a class can't use
 
@@ -405,7 +421,42 @@ Owner, 2026-11-19. `Dagger Talisman` and `Blade of Mercy` boost critical hits, w
 
 - **P1.** The game allows no riposte with flails, torches, shields, thrusting shields, staves, seals, ranged weapons, perfume bottles, throwing blades or whips, so with one in the right hand neither talisman rolls, for any class, and neither do `Parry only` and `Land a riposte`, which ask for one.
 - **P2.** `Sorcerer` rolls both only with a parry ash in its left hand, so it rolls a left-hand ash; with a staff in the right hand the P1 row still removes them, so they come with `Carian Sorcery Sword` and a shield, on about 2% of its objectives.
-- **P2.** `2H Warrior` with a colossal sword, colossal weapon, great hammer, great spear, greataxe, greatsword or hammer in the right hand, whose ripostes hit hardest, gets both at `prefer`: about 19% of its talisman showings with those weapons over a run, 15% before `Blade of Mercy` arrives and 25% after, the pairing adding the partner.
-- **P2.** The two come together at `strong`, one row for the pair, whichever slot either would land in (#Paired slots); a `guarantee` synergy still takes a slot first.
+- **P2.** Everywhere but `2H Warrior`, `Blade of Mercy` joins `Dagger Talisman`, one row for the pair whichever slot either lands in (#Paired slots): nearly always, unless a `guarantee` synergy takes the other slot. The row is `×160` on `Blade of Mercy`'s odds of 0.5, the pair weight it had at `boost` on odds 0.8.
+- **P2.** `Dagger Talisman` keeps its parry boost at its odds of 0.25: the boost is `×400`, so it reads as it did at odds 1.
+- **P2.** `2H Warrior` with a colossal sword, colossal weapon, great hammer, great spear, greataxe, greatsword or hammer in the right hand, whose ripostes hit hardest, gets `Blade of Mercy`, the talisman that matters for a heavy hit, on about 30% of those objectives once it can roll, by a `×1.6` row on its odds of 0.5, so other classes and weapons see it less while these keep its weight; before `Blade of Mercy` arrives, `Dagger Talisman` has no boost (owner, 2026-11-19).
+- **P2. Synergy.** A partner joins that `Blade of Mercy` about half the time, `Axe Talisman` about three times in five and `Dagger Talisman` two: `Axe Talisman` boosts charged attacks, the same heavy-weapon playstyle, so on those seven weapon classes it rolls `×2` and joins `Blade of Mercy` by a `×10` pair row, against `×50` for `Dagger Talisman` (owner, 2026-11-21). On those weapons the pairs weigh 0.8 × 2 × 10 = 16 and 0.8 × 0.25 × 50 = 10. The `×2` also brings `Axe Talisman` back late in a run, where it is still strong, and with it its charged rules (#15. Axe Talisman and charged attacks).
 
-Rows: `sorcerer_parry_talismans_need_a_parry_ash`, `riposte_talismans_need_a_riposte_rh`, `riposte_rules_need_a_riposte_rh`, `warrior_2h_heavy_rh_boosts_parry_talismans`, `dagger_talisman_and_blade_of_mercy_come_together`
+Rows: `sorcerer_parry_talismans_need_a_parry_ash`, `riposte_talismans_need_a_riposte_rh`, `riposte_rules_need_a_riposte_rh`, `warrior_2h_heavy_rh_boosts_blade_of_mercy`, `mercy_joins_dagger`, `dagger_joins_mercy`, `axe_joins_mercy`, `warrior_2h_heavy_rh_boosts_axe_talisman`
+
+### 38. Guarding talismans
+
+Owner, 2026-11-19. `Greatshield Talisman` raises guard boost, `Pearl Shield Talisman` the elemental damage a guard blocks, and `Curved Sword Talisman` guard counters.
+
+- **P1.** Only `Knight`, `2H Warrior` and `Jester` guard as a way to fight: no other class rolls the three. `Pearl Shield Talisman` isn't `2H Warrior`'s either: it guards with its weapon, and the talisman helps only against elemental attacks. `Jester` rolls them only with a greatshield in its right hand, and `2H Warrior` `Curved Sword Talisman` only with a heavy weapon or a thrusting shield there.
+- **P2.** `Knight` with a shield in its left hand and no parry ash on it gets `Greatshield Talisman` at `boost`, nearly always, and `Pearl Shield Talisman` `×5`, sometimes: it helps only against elemental attacks. A parry ash keeps the parry synergy's slots (#18. Parry ashes).
+- **P2.** A thrusting shield in the right hand, which guards and attacks at once, gets `Greatshield Talisman` at `×1000`.
+- **P2.** `Curved Sword Talisman` comes almost only beside `Greatshield Talisman`, by pair rows (#Paired slots): about 30% of `Knight`'s and `Jester`'s greatshield showings, about 15% with a thrusting shield, whose counter is weaker.
+- **P2.** `2H Warrior` with a colossal sword, colossal weapon, curved greatsword, great hammer, greataxe or greatsword, whose guard is good, gets `Greatshield Talisman` on about 20% of those objectives, mostly with `Curved Sword Talisman` beside it: the weapon lowers `Greatshield Talisman` to `×0.5` on its own, and the pair row `×1000` makes the pair the way it shows (owner, 2026-11-20). A stronger pair row would sit within one order of the exultations' `guarantee`, which the build's gate refuses (#Tiers).
+
+Rows: `guard_talismans_need_a_guarding_class`, `pearl_shield_talisman_not_on_warrior_2h`, `jester_guard_talismans_need_a_greatshield`, `warrior_2h_curved_sword_talisman_needs_a_guarding_rh`, `knight_shield_boosts_greatshield_talisman`, `knight_shield_boosts_pearl_shield_talisman`, `thrusting_shield_boosts_greatshield_talisman`, `warrior_2h_heavy_rh_lowers_greatshield_talisman`, `greatshield_talisman_brings_curved_sword_talisman`, `thrusting_shield_greatshield_talisman_brings_curved_sword_talisman`, `warrior_2h_heavy_greatshield_talisman_brings_curved_sword_talisman`
+
+### 39. Pots and perfumes
+
+Owner, 2026-11-20. `Companion Jar` boosts throwing pots and `Perfumer's Talisman` perfume items; both follow `Any pots / perfumes` in the item slot, the alias that gives the player the choice, since the perfume consumables are rare and of little use.
+
+- **P1.** `Companion Jar` rolls only with `Any pots / perfumes` in the item slot; `Perfumer's Talisman` with it, or with a perfume bottle in a hand.
+- **P2.** `Jester` with `Any pots / perfumes` gets `Perfume Jar` and `Depraved Perfume Jar` at `guarantee`, equally: the `Jar / Greatjar` helm with the rest of the `Perfumer's Set` or `Depraved Perfumer Set`, a set themed on both. The pots fill the item slot on most objectives, so other classes keep the sets at base odds.
+
+Rows: `perfumers_talisman_needs_pots_perfumes`, `companion_jar_needs_pots_perfumes`, `jester_pots_perfumes_guarantee_jar_sets`
+
+### 40. Summons
+
+Owner, 2026-11-20. `Dried Bouquet` makes `Use a summon` top tier, as the attack talismans make their rules (#13. Claw Talisman and jump attacks).
+
+Rows: `dried_bouquet_makes_summon_rule_top`
+
+### 41. Retaliatory Crossed-Tree and Leda's sets
+
+Owner, 2026-11-20. `Retaliatory Crossed-Tree` makes `Leda's Knight Set` and its `White Mask` variant `Leda's Surgeon Set` top tier: **Synergy**, reason not recorded. Rows multiply, so with `Lord of Blood's Exultation` beside it the `White Mask` variant also takes that row's `×10` and wins about ten times in eleven. The sets come into reach only in Enir-Ilim, so the row acts there alone.
+
+Rows: `retaliatory_crossed_tree_makes_leda_sets_top`

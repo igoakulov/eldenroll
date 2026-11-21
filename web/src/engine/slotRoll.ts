@@ -68,6 +68,8 @@ export interface RollContext {
   /** The chance each option has had so far (`Run.tally` and this objective's earlier slots), by `tallyKey`, and the
    * scope this roll's options are tallied under (`tallyScope`). */
   readonly tally?: { readonly had: Readonly<Record<string, number>>; readonly scope: string };
+  /** The share of the run's bosses still alive, given only with the runway ceiling on (`CatchUp.ceiling`). */
+  readonly left?: number;
 }
 
 /** Slots that share one tally: a second slot of a kind counts with the first. */
@@ -142,9 +144,9 @@ export function slotOptions(data: EngineData, characterClass: string, slot: Load
   );
 }
 
-function reachable(option: Option, counted: ReadonlySet<string>): boolean {
+function reachable(data: EngineData, option: Option, counted: ReadonlySet<string>): boolean {
   if (option.kind === "item") return counted.has(option.row.id);
-  if (option.kind === "armor_set") return isSetReachable(option.row, counted);
+  if (option.kind === "armor_set") return isSetReachable(data, option.row, counted);
   return true;
 }
 
@@ -153,7 +155,7 @@ function allowed(option: Option, context: RollContext, filters: PoolFilters): bo
     option.row.odds > 0 &&
     (filters.rules ?? []).every((filter) => filter(option)) &&
     !(context.neverRoll?.has(optionKey(option)) ?? false) &&
-    reachable(option, context.counted) &&
+    reachable(context.data, option, context.counted) &&
     (filters.stats === undefined || filters.stats(option))
   );
 }
@@ -188,7 +190,15 @@ export function weighOptions(
     // Catch-up moves chance only among options with a location; chances are of the whole roll, as the tally counts
     const keys = locatedRows.map((row) => tallyKey(tally.scope, row.option));
     const chances = catchUp.even(
-      locatedRows.map((row, index) => ({ odds: row.option.row.odds, had: tally.had[keys[index]!] ?? 0 })),
+      locatedRows.map((row, index) => {
+        const odds = row.option.row.odds;
+        const had = tally.had[keys[index]!] ?? 0;
+        if (catchUp.ceiling === null || context.left === undefined) return { odds, had };
+        // With the runway ceiling on, the tally also keeps the share of the run left when the option first could roll
+        const arrival = `${keys[index]!}#left`;
+        if (tally.had[arrival] === undefined) added[arrival] = context.left;
+        return { odds, had, ceiling: catchUp.ceiling(tally.had[arrival] ?? context.left) };
+      }),
       (restOfRoll * sum(locatedRows)) / restOdds,
     );
     locatedRows.forEach((row, index) => {

@@ -696,7 +696,13 @@ function regionsOf(data: EngineData): ReadonlyMap<string, string> {
   }
   const found = new Map<string, string>([...items].map(([id, region]) => [`item:${id}`, region]));
   for (const set of database.armor_set) {
-    const regions = set.pieces.flatMap((piece) => (items.has(piece) ? [items.get(piece)!] : []));
+    // A piece in an alias arrives with its earliest member
+    const pieceRegion = (piece: string) => {
+      const alias = data.items.get(piece)?.alias;
+      const found = (alias == null ? [piece] : (data.aliasMembers.get(alias) ?? [])).flatMap((id) => (items.has(id) ? [items.get(id)!] : []));
+      return found.length === 0 ? [] : [found.reduce((a, b) => ((rank.get(b) ?? 0) < (rank.get(a) ?? 0) ? b : a))];
+    };
+    const regions = set.pieces.flatMap(pieceRegion);
     if (regions.length > 0) found.set(`armor_set:${set.id}`, regions.reduce((a, b) => ((rank.get(a) ?? 0) >= (rank.get(b) ?? 0) ? a : b)));
   }
   firstRegions.set(data, found);

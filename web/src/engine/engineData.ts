@@ -16,6 +16,8 @@ export interface EngineData {
   readonly rules: ReadonlyMap<string, CombatRule>;
   readonly armorSets: ReadonlyMap<string, ArmorSet>;
   readonly aliases: ReadonlyMap<string, Alias>;
+  /** Each alias's member item ids. */
+  readonly aliasMembers: ReadonlyMap<string, readonly string[]>;
   readonly bosses: ReadonlyMap<string, BossInstance>;
   readonly pools: ReadonlyMap<string, SlotPool>;
   readonly ashFits: ReadonlyMap<string, readonly AshCompatibility[]>;
@@ -33,6 +35,10 @@ export function indexDatabase(database: Database): EngineData {
     ashFits.set(row.ash_id, [...(ashFits.get(row.ash_id) ?? []), row]);
   }
   const placed = new Set(database.item_location.map((row) => row.item_id));
+  const aliasMembers = new Map<string, string[]>();
+  for (const row of database.item) {
+    if (row.alias !== null) aliasMembers.set(row.alias, [...(aliasMembers.get(row.alias) ?? []), row.id]);
+  }
   return {
     ashFits,
     foundEverywhere: new Set(database.item.filter((row) => !placed.has(row.id)).map((row) => row.id)),
@@ -41,6 +47,7 @@ export function indexDatabase(database: Database): EngineData {
     rules: new Map(database.combat_rule.map((row) => [row.id, row])),
     armorSets: new Map(database.armor_set.map((row) => [row.id, row])),
     aliases: new Map(database.alias.map((row) => [row.id, row])),
+    aliasMembers,
     bosses: new Map(database.boss_instance.map((row) => [row.id, row])),
     pools: new Map(database.slot_pool.map((row) => [poolKey(row.character_class_id, row.slot), row])),
   };

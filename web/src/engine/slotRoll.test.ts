@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Database, Item, Modifier, PoolSlot } from "./database";
 import { countedItems } from "./eligibility";
 import { indexDatabase, type EngineData } from "./engineData";
-import { DEFAULT_HYPERPARAMS } from "./hyperparams";
+import { DEFAULT_HYPERPARAMS, runwayCeiling } from "./hyperparams";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
 import { matchesOption } from "./selectors";
@@ -450,6 +450,18 @@ describe("catch-up", () => {
   it("leaves consumables, found everywhere, their share of the item slot however far a tool is behind", () => {
     const found = (result: SlotPoolResult) => shareOf(result, [...real.foundEverywhere]);
     expect(found(weigh("item", { horned_bairn: 0 }, 5))).toBeCloseTo(found(weigh("item", {})));
+  });
+
+  it("holds a newcomer to its runway ceiling, from the share of the run left when it arrived", () => {
+    const state = { characterClass: "knight", boss: null, rolled: new Map() as Map<PoolSlot, string | null> };
+    const scope = tallyScope(catchUp, "knight", "rh");
+    const options = slotOptions(real, "knight", "rh");
+    const had = Object.fromEntries(options.map((option) => [tallyKey(scope, option), option.row.id === "miquellan_knights_sword" ? 0 : option.row.odds]));
+    const context = { data: real, state, counted: EVERYTHING, catchUp: { ...catchUp, ceiling: runwayCeiling(1.5) }, tally: { had, scope }, left: 0.5 };
+    const result = weighOptions(context, options);
+    const late = result.options.find((row) => row.option.row.id === "miquellan_knights_sword")!;
+    expect(late.catchUp).toBeCloseTo(3);
+    expect(result.tally[`${tallyKey(scope, late.option)}#left`]).toBe(0.5);
   });
 
   it("keeps a guarantee on sets that have shown far more than their peers", () => {

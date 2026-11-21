@@ -7,11 +7,27 @@ export interface CatchUp {
   readonly perCharacterClass: readonly TallyGroup[];
   /** Each option's chance in one roll, rules left out, from the options with a location that can roll now: `odds` its
    * base odds, `had` its tally, the chance it has had so far. `share` is the part of the roll those options hold at
-   * base odds; the rest of the pool keeps its base share. */
-  readonly even: (options: readonly { readonly odds: number; readonly had: number }[], share: number) => readonly number[];
+   * base odds; the rest of the pool keeps its base share. `ceiling`, given only with the runway ceiling on, is the most
+   * the option may get in multiples of its plain share. */
+  readonly even: (options: readonly CatchUpOption[], share: number) => readonly number[];
   /** What catch-up multiplies an option's odds by while a rule above ×1 is active on it, from what catch-up alone would
    * (`caughtUp`): a rule must mean the same whatever the tally says, even for an option ahead of its peers. */
   readonly boosted: (caughtUp: number) => number;
+  /** The runway ceiling (`data/balance.md#Hyperparameters`), or `null` for none: from the share of the run's bosses
+   * still alive when an option first could roll, the most catch-up may give it, in multiples of its plain share. */
+  readonly ceiling: ((left: number) => number) | null;
+}
+
+export interface CatchUpOption {
+  readonly odds: number;
+  readonly had: number;
+  readonly ceiling?: number;
+}
+
+/** The runway ceiling: `k` over the share of the run left when the option arrived, so a late arrival may catch up
+ * harder than an early one. The last few objectives count as a twentieth of the run, so the ceiling stays finite. */
+export function runwayCeiling(k: number): (left: number) => number {
+  return (left) => k / Math.max(left, 0.05);
 }
 
 /** Fixed shares (`data/balance.md#Fixed shares`): `none`, consumables and anything else found everywhere hold a share
@@ -32,28 +48,48 @@ export interface Hyperparams {
   readonly defaultMaxStatGap: number;
 }
 
+// Raise the lowest tallies, per unit of odds, to one common level with the roll's chance: whoever is furthest behind
+// gets the most, and whoever is above the level sits this roll out
+function fill(options: readonly CatchUpOption[], share: number): readonly number[] {
+  const behind = (index: number) => options[index]!.had / options[index]!.odds;
+  const order = options.map((_, index) => index).sort((a, b) => behind(a) - behind(b));
+  let odds = 0;
+  let had = 0;
+  let level = 0;
+  for (const [rank, index] of order.entries()) {
+    odds += options[index]!.odds;
+    had += options[index]!.had;
+    level = (share + had) / odds;
+    const next = order[rank + 1];
+    if (next === undefined || level <= behind(next)) break;
+  }
+  return options.map((option) => Math.max(0, level * option.odds - option.had));
+}
+
+// The same filling, each option held to its ceiling times its plain share; the level is found by halving, since the
+// held options no longer rise with it
+function ceiled(options: readonly CatchUpOption[], share: number): readonly number[] {
+  const total = options.reduce((sum, option) => sum + option.odds, 0);
+  const most = options.map((option) => ((option.ceiling ?? Infinity) * share * option.odds) / total);
+  const at = (level: number) => options.map((option, index) => Math.min(Math.max(level * option.odds - option.had, 0), most[index]!));
+  let low = -1e9;
+  let high = 1e9;
+  for (let step = 0; step < 100; step++) {
+    const middle = (low + high) / 2;
+    if (at(middle).reduce((sum, chance) => sum + chance, 0) < share) low = middle;
+    else high = middle;
+  }
+  return at(high);
+}
+
 export const DEFAULT_HYPERPARAMS: Hyperparams = {
   catchUp: {
     perCharacterClass: ["lh", "talisman_1"],
-    // Raise the lowest tallies, per unit of odds, to one common level with the roll's chance: whoever is furthest
-    // behind gets the most, and whoever is above the level sits this roll out
-    even: (options, share) => {
-      const behind = (index: number) => options[index]!.had / options[index]!.odds;
-      const order = options.map((_, index) => index).sort((a, b) => behind(a) - behind(b));
-      let odds = 0;
-      let had = 0;
-      let level = 0;
-      for (const [rank, index] of order.entries()) {
-        odds += options[index]!.odds;
-        had += options[index]!.had;
-        level = (share + had) / odds;
-        const next = order[rank + 1];
-        if (next === undefined || level <= behind(next)) break;
-      }
-      return options.map((option) => Math.max(0, level * option.odds - option.had));
-    },
+    even: (options, share) => (options.some((option) => option.ceiling !== undefined) ? ceiled(options, share) : fill(options, share)),
     // Never below the option's base share, so a synergy or guarantee holds on an option that has shown a lot
     boosted: (caughtUp) => Math.max(caughtUp, 1),
+    // Off; `runwayCeiling(1.5)` switches it on
+    ceiling: null,
   },
   // The rest of the pool counts as 100 odds, so a fixed share at odds 100 holds half its roll
   fixedShare: { restWeight: (share) => share * 100 },

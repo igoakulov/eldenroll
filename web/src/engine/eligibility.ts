@@ -31,7 +31,11 @@ export function countedItems(data: EngineData, reachability: Reachability): Read
   ]);
 }
 
-/** A set the data leaves short of a piece is not filtered; the missing slot shows `any`. */
-export function isSetReachable(set: ArmorSet, counted: ReadonlySet<string>): boolean {
-  return set.pieces.every((piece) => counted.has(piece));
+/** A set the data leaves short of a piece is not filtered; the missing slot shows `any`. A piece in an alias stands
+ * for every member, so it counts once any member does (`Jar / Greatjar`). */
+export function isSetReachable(data: EngineData, set: ArmorSet, counted: ReadonlySet<string>): boolean {
+  return set.pieces.every((piece) => {
+    const alias = data.items.get(piece)?.alias;
+    return counted.has(piece) || (alias != null && (data.aliasMembers.get(alias) ?? []).some((id) => counted.has(id)));
+  });
 }

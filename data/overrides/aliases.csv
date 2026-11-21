@@ -10,3 +10,4 @@ any_scarseal_soreseal,Any Scarseal / Soreseal,item:radagons_soreseal marikas_sor
 any_pots_perfumes,Any pots / perfumes,subcategory:pots perfumes
 other_throwables_not_pots_perfumes,Other throwables (not pots / perfumes),subcategory:throwables
 none,None,item:none_head none_body none_arms none_legs
+jar_greatjar,Jar / Greatjar,item:jar greatjar

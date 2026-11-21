@@ -56,6 +56,8 @@ export interface LoadoutInput {
   /** What the kept slots added to the tally, so the slots after them read it as when they first rolled. */
   readonly keptTally?: Readonly<Partial<Record<LoadoutSlot, TallyAdded>>>;
   readonly observe?: RollObserver;
+  /** The share of the run's bosses still alive, given only with the runway ceiling on (`CatchUp.ceiling`). */
+  readonly left?: number;
 }
 
 /** Holds a roll for each slot rolled, in rolling order. */
@@ -193,6 +195,7 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     ...(input.neverRoll === undefined ? {} : { neverRoll: input.neverRoll }),
     ...(input.catchUp === undefined ? {} : { catchUp: input.catchUp }),
     ...(input.fixedShare === undefined ? {} : { fixedShare: input.fixedShare }),
+    ...(input.left === undefined ? {} : { left: input.left }),
   };
   // Each slot reads the tally with every earlier slot of this objective added, a second talisman its first: one copy
   // of the run's tally per loadout, added to in place

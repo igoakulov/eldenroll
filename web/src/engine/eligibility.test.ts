@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { BossInstance, ItemLocation } from "./database";
-import { countedItems, rowCounts } from "./eligibility";
+import { countedItems, isSetReachable, rowCounts } from "./eligibility";
 import { indexDatabase } from "./engineData";
 import { realDatabase } from "./realDatabase.testing";
 
@@ -44,5 +44,17 @@ describe("countedItems", () => {
     const consumable = realDatabase.item.find((row) => row.category === "consumable")?.id;
     for (const id of [consumable, "none", "none_head"]) expect(counted.has(id ?? "")).toBe(true);
     expect(counted.has("uchigatana")).toBe(false);
+  });
+});
+
+describe("isSetReachable", () => {
+  it("counts a piece in an alias once any member is in reach", () => {
+    const data = indexDatabase(realDatabase);
+    const set = data.armorSets.get("perfume_jar")!;
+    const rest = set.pieces.filter((piece) => data.items.get(piece)?.alias == null);
+    const helm = set.pieces.find((piece) => data.items.get(piece)?.alias != null)!;
+    const other = data.aliasMembers.get(data.items.get(helm)!.alias!)!.find((id) => id !== helm)!;
+    expect(isSetReachable(data, set, new Set([...rest, other]))).toBe(true);
+    expect(isSetReachable(data, set, new Set(rest))).toBe(false);
   });
 });

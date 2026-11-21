@@ -114,7 +114,7 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 
 - **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it. Any id starting `none_` is empty too (`isNone`). An empty slot may follow another, so `rule_2` can repeat `rule_1`'s `None`. `none`, like everything found everywhere and the rule `None`, holds a fixed share of its roll (`data/balance.md#Fixed shares`).
 - **`any`** is a slot state, never sampled, owned or counted.
-- **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label.
+- **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label. A set piece in an alias stands for every member, as `Jar / Greatjar` does: the set is in reach once any member is, and arrives with the earliest.
 - **Ash line.** A rolled ash shows its name or label; no ash row or an empty pool shows `any`; a hand that rolled `none` shows `none`.
 
 ## Combat rules

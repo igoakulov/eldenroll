@@ -45,11 +45,11 @@ describe("paired slots", () => {
     const roll = rollSecondOfPair(real, state, ["talisman_1", "talisman_2"], sidelined, dagger, () => 0, DEFAULT_HYPERPARAMS.catchUp.boosted);
     const mercy = roll.options.find((row) => row.option.row.id === "blade_of_mercy")!;
     const plain = alone.options.find((row) => row.option.row.id === "blade_of_mercy")!.plain;
-    expect(mercy.weight).toBeCloseTo(plain * modifierRow("dagger_talisman_and_blade_of_mercy_come_together").value);
+    expect(mercy.weight).toBeCloseTo(plain * modifierRow("mercy_joins_dagger").value);
   });
 
   it("links two talismans with one row, whichever comes first", () => {
-    const value = modifierRow("dagger_talisman_and_blade_of_mercy_come_together").value;
+    const value = modifierRow("mercy_joins_dagger").value;
     const pair = ["talisman_1", "talisman_2"] as const;
     expect(second("knight", pair, KNIGHT_PARRY, "dagger_talisman")("blade_of_mercy")).toBeCloseTo(value);
     expect(second("knight", pair, KNIGHT_PARRY, "blade_of_mercy")("dagger_talisman")).toBeCloseTo(value);

@@ -97,7 +97,7 @@ describe.each(CASES)("every roll on $name", (testCase) => {
           if (slot === "armor") {
             expect(option.kind).toBe("armor_set");
             if (option.kind === "armor_set") {
-              expect(isSetReachable(option.row, testCase.counted)).toBe(true);
+              expect(isSetReachable(data, option.row, testCase.counted)).toBe(true);
             }
             continue;
           }

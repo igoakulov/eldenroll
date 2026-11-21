@@ -72,7 +72,8 @@ export interface Run {
   readonly waiting: Waiting | null;
   readonly completed: readonly CompletedObjective[];
   /** The chance each option with a location has had in the objectives done, rules left out, by `tallyKey`: what
-   * catch-up evens out (`data/balance.md#Hyperparameters`). A rerolled or discarded roll adds nothing. */
+   * catch-up evens out (`data/balance.md#Hyperparameters`). A rerolled or discarded roll adds nothing. With the runway
+   * ceiling on, `<tallyKey>#left` also holds the share of the run left when the option first could roll. */
   readonly tally: Readonly<Record<string, number>>;
 }
 
@@ -138,6 +139,13 @@ interface RolledSlotsResult {
   readonly tally: Partial<Record<LoadoutSlot, TallyAdded>>;
 }
 
+/** The share of the game's rollable bosses still alive, for the runway ceiling: a player may tick regions as they
+ * reach them, so the run's own regions don't tell its length. */
+function runLeft(engine: Engine, run: Run): number {
+  const total = engine.data.database.boss_instance.filter((row) => row.odds > 0).length;
+  return total === 0 ? 1 : Math.max(0, 1 - run.deadBosses.length / total);
+}
+
 function rollSlots(
   engine: Engine,
   run: Run,
@@ -158,6 +166,7 @@ function rollSlots(
     catchUp: engine.hyperparams.catchUp,
     fixedShare: engine.hyperparams.fixedShare,
     tally: run.tally,
+    ...(engine.hyperparams.catchUp.ceiling === null ? {} : { left: runLeft(engine, run) }),
     keptTally,
     shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,
     neverRoll: new Set(run.neverRoll),
