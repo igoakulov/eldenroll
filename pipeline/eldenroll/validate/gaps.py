@@ -18,7 +18,7 @@ from eldenroll.build.armor import added_armor, build_armor
 from eldenroll.build.ash_compatibility import build_ash_compatibility
 from eldenroll.build.ashes import build_ashes
 from eldenroll.build.consumables import build_consumables
-from eldenroll.build.items import build_item_table, none_item
+from eldenroll.build.items import build_item_table, empty_talisman_item, none_item
 from eldenroll.build.placement import ENIA, REMEMBRANCE
 from eldenroll.build.spells import build_incantations, build_sorceries
 from eldenroll.build.talismans import build_talismans
@@ -359,6 +359,7 @@ def load_sources(root: Path) -> GapSources:
             *build_tools(catalog, sheet),
             *build_consumables(sheet),
             none_item(),
+            empty_talisman_item(),
         )
     )
     ash_sheet = load_ash_compatibility(ASH_WEAPON_MATRIX)

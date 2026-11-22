@@ -68,7 +68,7 @@ export interface RollContext {
   /** The chance each option has had so far (`Run.tally` and this objective's earlier slots), by `tallyKey`, and the
    * scope this roll's options are tallied under (`tallyScope`). */
   readonly tally?: { readonly had: Readonly<Record<string, number>>; readonly scope: string };
-  /** The share of the run's bosses still alive, given only with the runway ceiling on (`CatchUp.ceiling`). */
+  /** The share of the run's bosses still alive, for the runway ceiling (`CatchUp.ceiling`); absent, no ceiling. */
   readonly left?: number;
 }
 
@@ -193,8 +193,8 @@ export function weighOptions(
       locatedRows.map((row, index) => {
         const odds = row.option.row.odds;
         const had = tally.had[keys[index]!] ?? 0;
-        if (catchUp.ceiling === null || context.left === undefined) return { odds, had };
-        // With the runway ceiling on, the tally also keeps the share of the run left when the option first could roll
+        if (context.left === undefined) return { odds, had };
+        // The tally also keeps the share of the run left when the option first could roll, for its ceiling
         const arrival = `${keys[index]!}#left`;
         if (tally.had[arrival] === undefined) added[arrival] = context.left;
         return { odds, had, ceiling: catchUp.ceiling(tally.had[arrival] ?? context.left) };

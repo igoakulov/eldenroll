@@ -56,7 +56,7 @@ export interface LoadoutInput {
   /** What the kept slots added to the tally, so the slots after them read it as when they first rolled. */
   readonly keptTally?: Readonly<Partial<Record<LoadoutSlot, TallyAdded>>>;
   readonly observe?: RollObserver;
-  /** The share of the run's bosses still alive, given only with the runway ceiling on (`CatchUp.ceiling`). */
+  /** The share of the run's bosses still alive, for the runway ceiling (`CatchUp.ceiling`); absent, no ceiling. */
   readonly left?: number;
 }
 

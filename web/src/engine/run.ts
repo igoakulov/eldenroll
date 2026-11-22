@@ -72,8 +72,8 @@ export interface Run {
   readonly waiting: Waiting | null;
   readonly completed: readonly CompletedObjective[];
   /** The chance each option with a location has had in the objectives done, rules left out, by `tallyKey`: what
-   * catch-up evens out (`data/balance.md#Hyperparameters`). A rerolled or discarded roll adds nothing. With the runway
-   * ceiling on, `<tallyKey>#left` also holds the share of the run left when the option first could roll. */
+   * catch-up evens out (`data/balance.md#Hyperparameters`). A rerolled or discarded roll adds nothing.
+   * `<tallyKey>#left` also holds the share of the run left when the option first could roll, for its ceiling. */
   readonly tally: Readonly<Record<string, number>>;
 }
 
@@ -166,7 +166,7 @@ function rollSlots(
     catchUp: engine.hyperparams.catchUp,
     fixedShare: engine.hyperparams.fixedShare,
     tally: run.tally,
-    ...(engine.hyperparams.catchUp.ceiling === null ? {} : { left: runLeft(engine, run) }),
+    left: runLeft(engine, run),
     keptTally,
     shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,
     neverRoll: new Set(run.neverRoll),

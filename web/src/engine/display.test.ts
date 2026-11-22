@@ -77,6 +77,12 @@ describe("displaySlots", () => {
     });
   });
 
+  it("shows the early regions' empty talisman slot as any, for the player to choose", () => {
+    const shown = displaySlots(data, { talisman_1: "none_talisman", talisman_2: "axe_talisman" });
+    expect(shown.talisman_1).toEqual({ kind: "any" });
+    expect(shown.talisman_2.kind).toBe("item");
+  });
+
   it("always shows talismans 3 and 4 as any", () => {
     const shown = displaySlots(data, {});
     expect(shown.talisman_3).toEqual({ kind: "any" });

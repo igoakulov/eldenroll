@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Database, Item, Modifier, PoolSlot } from "./database";
 import { countedItems } from "./eligibility";
 import { indexDatabase, type EngineData } from "./engineData";
-import { DEFAULT_HYPERPARAMS, runwayCeiling } from "./hyperparams";
+import { DEFAULT_HYPERPARAMS } from "./hyperparams";
 import { realDatabase } from "./realDatabase.testing";
 import { selectedLocations } from "./regions";
 import { matchesOption } from "./selectors";
@@ -457,7 +457,7 @@ describe("catch-up", () => {
     const scope = tallyScope(catchUp, "knight", "rh");
     const options = slotOptions(real, "knight", "rh");
     const had = Object.fromEntries(options.map((option) => [tallyKey(scope, option), option.row.id === "miquellan_knights_sword" ? 0 : option.row.odds]));
-    const context = { data: real, state, counted: EVERYTHING, catchUp: { ...catchUp, ceiling: runwayCeiling(1.5) }, tally: { had, scope }, left: 0.5 };
+    const context = { data: real, state, counted: EVERYTHING, catchUp, tally: { had, scope }, left: 0.5 };
     const result = weighOptions(context, options);
     const late = result.options.find((row) => row.option.row.id === "miquellan_knights_sword")!;
     expect(late.catchUp).toBeCloseTo(3);

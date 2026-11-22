@@ -19,6 +19,7 @@ from eldenroll.model.vocabulary import ARMOR_SLOTS, NO_STR_BONUS, SUBCATEGORIES
 from eldenroll.validate.ash_compatibility import infusable_without_ashes
 from eldenroll.validate.gate_data import GateData
 from eldenroll.validate.modifiers import validate_modifiers, validate_rolling_order
+from eldenroll.validate.placement import needs_location
 from eldenroll.validate.regions import validate_region_dlc_prefix, validate_region_membership
 from eldenroll.validate.selectors import known_ids, resolve_items
 from eldenroll.validate.slot_pools import validate_slot_pools
@@ -294,18 +295,17 @@ def _placement(database: Database, found_nowhere: frozenset[str]) -> Iterator[st
             yield f"{row.item_id} has a row at no location: {row.location_id}"
         if row.boss_instance_id is not None and row.boss_instance_id not in bosses:
             yield f"{row.item_id} has a row at no boss: {row.boss_instance_id}"
-    exempt = {"consumable", "none"}
     missing = sorted(
         row.id
         for row in database.items
-        if row.category not in exempt and row.id not in found_nowhere and row.id not in placed
+        if needs_location(row, found_nowhere) and row.id not in placed
     )
     if missing:
         yield f"no location row: {', '.join(missing)}"
     extra = sorted(
         row.id
         for row in database.items
-        if (row.category in exempt or row.id in found_nowhere) and row.id in placed
+        if not needs_location(row, found_nowhere) and row.id in placed
     )
     if extra:
         yield f"location rows on what has none by design: {', '.join(extra)}"

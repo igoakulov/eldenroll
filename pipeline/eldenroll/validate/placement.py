@@ -52,10 +52,14 @@ class PlacementData:
 
 
 def needs_location(item: Item, found_nowhere: Collection[str]) -> bool:
-    """Return whether an item must have a row: every one but consumables, `none` and the pieces
-    `added_armor.csv` places nowhere.
+    """Return whether an item must have a row: every one but consumables, the empty rows (`none`
+    and any id starting `none_`) and the pieces `added_armor.csv` places nowhere.
     """
-    return item.category not in ("consumable", "none") and item.id not in found_nowhere
+    return (
+        item.category not in ("consumable", "none")
+        and not item.id.startswith("none_")
+        and item.id not in found_nowhere
+    )
 
 
 def selected_locations(

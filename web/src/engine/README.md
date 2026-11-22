@@ -37,7 +37,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 
 ## Run model
 
-An objective is a boss instance, a class loadout and 2 combat rules. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans always roll, even for an early character with fewer slots. The two talismans roll as one draw, and so do the two rules (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
+An objective is a boss instance, a class loadout and 2 combat rules. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans always roll, even for an early character with fewer slots; in Limgrave, Liurnia and Caelid either may come up `any` (`data/balance.md#43. Early talisman slots`). The two talismans roll as one draw, and so do the two rules (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
 
 - **Owned** means it appeared in a completed objective this run; nothing else is known about the player's inventory.
 - **Felled** (code: `dead`) is a boss out of the run, by `Done`, `Felled?` or `Bosses`. **Skipped** keeps a boss out of the boss pool while it stays alive for its items.
@@ -109,6 +109,7 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 | Situation | Example | Mechanism | Shows |
 |---|---|---|---|
 | slot not randomized | talismans 3 and 4, a set's missing piece, a caster's ash | no slot row | `any` |
+| randomized, the player picks | an early talisman slot | the pool holds `none_talisman`, an empty row | `any` |
 | randomized, empty on purpose | `2H Warrior` LH, `Jester` RH | the pool holds the `none` row | `none` |
 | randomized, nothing survives the filters | a narrow pool | empty result | `none` |
 

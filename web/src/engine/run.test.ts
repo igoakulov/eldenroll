@@ -187,7 +187,9 @@ describe("catch-up", () => {
   });
 
   it("counts an objective once however often its slots were rerolled", () => {
-    const total = (tally: Readonly<Record<string, number>>) => Object.values(tally).reduce((sum, value) => sum + value, 0);
+    // The `#left` entries hold when each option arrived, not chance
+    const total = (tally: Readonly<Record<string, number>>) =>
+      Object.entries(tally).reduce((sum, [key, value]) => (key.endsWith("#left") ? sum : sum + value), 0);
     let run = start(knight);
     const slots = Object.keys(current(run).slots).length;
     for (let step = 0; step < 5; step += 1) run = reroll(engine, run, "rh");

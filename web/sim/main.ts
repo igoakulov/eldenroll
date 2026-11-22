@@ -5,7 +5,7 @@ import { parseArgs } from "node:util";
 import { copy } from "../src/copy";
 import { isNone, type Database, type LoadoutSlot } from "../src/engine/database";
 import { indexDatabase } from "../src/engine/engineData";
-import { DEFAULT_HYPERPARAMS, runwayCeiling } from "../src/engine/hyperparams";
+import { DEFAULT_HYPERPARAMS } from "../src/engine/hyperparams";
 import type { Engine } from "../src/engine/run";
 import { STATS } from "../src/engine/settings";
 import { LOADOUT_ORDER } from "../src/engine/loadout";
@@ -16,7 +16,7 @@ import { playOrder, runSeed, simulateRun, type RunResult } from "./simulate";
 
 const USAGE = `pnpm sim [--runs 20] [--allocations ITEMS,STR,DEX,INT,FTH,ARC,ALL] [--seed 1] [--no-dlc]
          [--regions limgrave,liurnia] [--completion 50] [--classes knight,jester]
-         [--no-synergies] [--flat] [--runway-ceiling K] [--out ../data/build/sim/<timestamp>]`;
+         [--no-synergies] [--flat] [--out ../data/build/sim/<timestamp>]`;
 
 /** Each run writes its own folder, so an earlier dump stays put while the next one is read. */
 function timestamp(): string {
@@ -116,7 +116,6 @@ export function main(argv: readonly string[], repo: string): void {
       classes: { type: "string" },
       "no-synergies": { type: "boolean", default: false },
       flat: { type: "boolean", default: false },
-      "runway-ceiling": { type: "string" },
       out: { type: "string", default: path.join(repo, "data/build/sim", timestamp()) },
       help: { type: "boolean", default: false },
     },
@@ -134,12 +133,7 @@ export function main(argv: readonly string[], repo: string): void {
     values["no-synergies"] || values.flat,
     values.flat,
   );
-  const ceiling = values["runway-ceiling"];
-  const hyperparams =
-    ceiling === undefined
-      ? DEFAULT_HYPERPARAMS
-      : { ...DEFAULT_HYPERPARAMS, catchUp: { ...DEFAULT_HYPERPARAMS.catchUp, ceiling: runwayCeiling(Number(ceiling)) } };
-  const engine: Engine = { data: indexDatabase(database), hyperparams };
+  const engine: Engine = { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
   const regions = (values.regions?.split(",").map((one) => one.trim()) ?? playOrder(database)).filter(
     (id) => !values["no-dlc"] || !id.startsWith("dlc_"),
   );

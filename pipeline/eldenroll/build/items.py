@@ -66,6 +66,12 @@ def none_item() -> Item:
     return new_item("none", "none", str_bonus_2h=False)
 
 
+def empty_talisman_item() -> Item:
+    """Return the empty talisman slot the early regions roll; the card shows it as `any`, so the
+    player picks freely (`data/balance.md#Fixed shares`)."""
+    return replace(new_item("Free choice", "talisman"), id="none_talisman")
+
+
 def canonical_names(
     catalog: ItemCatalog, group: str, kind: str, variants: Mapping[str, NameVariant]
 ) -> tuple[str, ...]:

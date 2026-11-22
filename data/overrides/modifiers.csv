@@ -73,7 +73,7 @@ dancers_weapon_makes_dancers_set_top,rh|lh=item:curseblades_cirque dancing_blade
 dancers_weapon_boosts_moveset_talismans,rh|lh=item:curseblades_cirque dancing_blade_of_ranah eleonoras_poleblade flowing_curved_sword giants_red_braid hand_of_malenia marais_executioners_sword regalia_of_eochaid,item:shard_of_alexander warrior_jar_shard axe_talisman,10000
 heavy_rh_removes_blue_dancer_charm,rh=subcategory:greatsword colossal_sword heavy_thrusting_sword curved_greatsword greataxe great_hammer colossal_weapon great_spear halberd reaper twinblade greatbow ballista glintstone_staff sacred_seal thrusting_shield light_greatsword great_katana greatshield,item:blue_dancer_charm,0
 two_hands_need_a_lightest_rh_for_blue_dancer_charm,rh!=subcategory:dagger straight_sword curved_sword thrusting_sword whip; lh!=category:none,item:blue_dancer_charm,0
-two_hands_need_a_light_lh_for_blue_dancer_charm,lh!=subcategory:dagger straight_sword curved_sword thrusting_sword whip small_shield medium_shield glintstone_staff sacred_seal; lh!=category:none,item:blue_dancer_charm,0
+blue_dancer_charm_needs_an_empty_or_seal_lh,lh!=subcategory:sacred_seal; lh!=category:none,item:blue_dancer_charm,0
 no_armor_rule_makes_naked_set_top,rule_1|rule_2=rule:no_armor,armor_set:naked_set,1000000
 blue_dancer_charm_boosts_light_sets,talisman_1|talisman_2=item:blue_dancer_charm,armor_set:naked_set fell_omen_set bloodsoaked_set hornsent_set festive_set blue_festive_set guilty_lite_set prisoner_lite_set commoners_lite_set,10000
 overloaded_rule_removes_light_sets,rule_1|rule_2=rule:overloaded,armor_set:naked_set fell_omen_set bloodsoaked_set hornsent_set festive_set blue_festive_set guilty_lite_set prisoner_lite_set commoners_lite_set,0
@@ -97,7 +97,7 @@ jester_torches_in_limgrave,character_class=jester; boss=boss:limgrave,subcategor
 melee_talismans_need_a_melee_class,character_class=pyromancer ranger jester,item:dagger_talisman twinblade_talisman claw_talisman retaliatory_crossed_tree lacerating_crossed_tree blade_of_mercy godskin_swaddling_cloth axe_talisman,0
 talismans_not_on_pure_casters,character_class=sorcerer pyromancer,item:shard_of_alexander blue_dancer_charm rellanas_cameo kindred_of_rots_exultation lord_of_bloods_exultation,0
 shard_needs_a_skill_not_empty,rh=category:none,item:shard_of_alexander,0
-rellanas_cameo_needs_a_stance_skill,rh!=item:moonveil rellanas_twin_blades sword_of_night_and_flame; lh!=item:moonveil rellanas_twin_blades sword_of_night_and_flame; rh_ash!=item:square_off unsheathe wing_stance overhead_stance; lh_ash!=item:square_off unsheathe wing_stance overhead_stance,item:rellanas_cameo,0
+rellanas_cameo_needs_a_stance_skill,rh!=item:leontiels_greatsword moonveil rellanas_twin_blades sword_of_night_and_flame; lh!=item:leontiels_greatsword moonveil rellanas_twin_blades sword_of_night_and_flame; rh_ash!=item:square_off unsheathe wing_stance overhead_stance; lh_ash!=item:square_off unsheathe wing_stance overhead_stance,item:rellanas_cameo,0
 beloved_stardust_only_on_casters,character_class=knight warrior_2h warrior_dw ranger jester,item:beloved_stardust,0
 r1_r2_only_not_on_pure_casters,character_class=sorcerer pyromancer,rule:r1_only r2_only,0
 l1_only_not_on_ranger,character_class=ranger,rule:l1_only_can_swap_hands,0
@@ -108,7 +108,7 @@ none_beside_a_rule,rule_1!=rule:none,rule:none,1.5
 melee_talismans_not_on_sorcerer,character_class=sorcerer,item:twinblade_talisman claw_talisman retaliatory_crossed_tree lacerating_crossed_tree godskin_swaddling_cloth axe_talisman,0
 sorcerer_parry_talismans_need_a_parry_ash,character_class=sorcerer; lh_ash!=item:parry carian_retaliation golden_parry storm_wall thopss_barrier,item:dagger_talisman blade_of_mercy,0
 riposte_talismans_need_a_riposte_rh,rh=subcategory:flail torch small_shield medium_shield greatshield thrusting_shield glintstone_staff sacred_seal ranged perfume_bottle throwing_blade whip,item:dagger_talisman blade_of_mercy,0
-warrior_2h_heavy_rh_boosts_blade_of_mercy,character_class=warrior_2h; rh=subcategory:colossal_sword colossal_weapon great_hammer great_spear greataxe greatsword hammer,item:blade_of_mercy,1.6
+warrior_2h_heavy_rh_boosts_blade_of_mercy,character_class=warrior_2h; rh=subcategory:colossal_sword colossal_weapon great_hammer great_spear greataxe greatsword hammer,item:blade_of_mercy,2
 mercy_joins_dagger,character_class=knight warrior_dw spellblade sorcerer; talisman_1=item:dagger_talisman,item:blade_of_mercy,160
 dagger_joins_mercy,character_class=warrior_2h; talisman_1=item:blade_of_mercy,item:dagger_talisman,50
 axe_joins_mercy,character_class=warrior_2h; talisman_1=item:blade_of_mercy,item:axe_talisman,10
@@ -130,3 +130,65 @@ companion_jar_needs_pots_perfumes,item!=subcategory:pots perfumes,item:companion
 jester_pots_perfumes_guarantee_jar_sets,character_class=jester; item=subcategory:pots perfumes,armor_set:perfume_jar depraved_perfume_jar,10000
 dried_bouquet_makes_summon_rule_top,talisman_1|talisman_2=item:dried_bouquet,rule:use_a_summon,1000000
 retaliatory_crossed_tree_makes_leda_sets_top,talisman_1|talisman_2=item:retaliatory_crossed_tree,armor_set:ledas_knight_set ledas_surgeon_set,1000000
+branchswords_not_on_melee_warriors,character_class=knight warrior_2h warrior_dw,item:blue_feathered_branchsword red_feathered_branchsword,0
+godskin_swaddling_cloth_not_on_knight_or_spellblade,character_class=knight spellblade,item:godskin_swaddling_cloth,0
+warrior_dw_heavy_pair_boosts_claw_talisman,character_class=warrior_dw; rh=subcategory:colossal_sword colossal_weapon curved_greatsword great_hammer great_spear greataxe greatsword hammer; lh=subcategory:colossal_sword colossal_weapon curved_greatsword great_hammer great_spear greataxe greatsword hammer,item:claw_talisman,2
+claw_talisman_lower_on_knight_and_spellblade,character_class=knight spellblade,item:claw_talisman,0.7
+axe_talisman_lower_on_dw_and_spellblade,character_class=warrior_dw spellblade,item:axe_talisman,0.7
+knight_axe_talisman_lower_early,character_class=knight; boss=boss:limgrave liurnia caelid,item:axe_talisman,0.7
+knight_curved_sword_talisman_early,character_class=knight; boss=boss:limgrave liurnia caelid,item:curved_sword_talisman,3
+branchswords_come_in_pairs,talisman_1=item:red_feathered_branchsword,item:blue_feathered_branchsword,115
+none_talisman_only_early,boss!=boss:limgrave liurnia caelid,item:none_talisman,0
+none_talisman_knight_limgrave,character_class=knight; boss=boss:limgrave,item:none_talisman,8
+none_talisman_knight_liurnia,character_class=knight; boss=boss:liurnia,item:none_talisman,6
+none_talisman_knight_caelid,character_class=knight; boss=boss:caelid,item:none_talisman,12
+none_talisman_warrior_2h_limgrave,character_class=warrior_2h; boss=boss:limgrave,item:none_talisman,6
+none_talisman_warrior_2h_liurnia,character_class=warrior_2h; boss=boss:liurnia,item:none_talisman,6
+none_talisman_warrior_2h_caelid,character_class=warrior_2h; boss=boss:caelid,item:none_talisman,8
+none_talisman_warrior_dw_limgrave,character_class=warrior_dw; boss=boss:limgrave,item:none_talisman,9
+none_talisman_warrior_dw_liurnia,character_class=warrior_dw; boss=boss:liurnia,item:none_talisman,8
+none_talisman_warrior_dw_caelid,character_class=warrior_dw; boss=boss:caelid,item:none_talisman,11
+none_talisman_spellblade_limgrave,character_class=spellblade; boss=boss:limgrave,item:none_talisman,10
+none_talisman_spellblade_liurnia,character_class=spellblade; boss=boss:liurnia,item:none_talisman,7
+none_talisman_spellblade_caelid,character_class=spellblade; boss=boss:caelid,item:none_talisman,40
+none_talisman_ranger_limgrave,character_class=ranger; boss=boss:limgrave,item:none_talisman,13
+none_talisman_ranger_liurnia,character_class=ranger; boss=boss:liurnia,item:none_talisman,14
+none_talisman_ranger_caelid,character_class=ranger; boss=boss:caelid,item:none_talisman,43
+none_talisman_jester_limgrave,character_class=jester; boss=boss:limgrave,item:none_talisman,3
+none_talisman_jester_liurnia,character_class=jester; boss=boss:liurnia,item:none_talisman,16
+none_talisman_jester_caelid,character_class=jester; boss=boss:caelid,item:none_talisman,49
+none_talisman_sorcerer_limgrave,character_class=sorcerer; boss=boss:limgrave,item:none_talisman,40
+none_talisman_sorcerer_liurnia,character_class=sorcerer; boss=boss:liurnia,item:none_talisman,35
+none_talisman_sorcerer_caelid,character_class=sorcerer; boss=boss:caelid,item:none_talisman,82
+none_talisman_pyromancer_limgrave,character_class=pyromancer; boss=boss:limgrave,item:none_talisman,40
+none_talisman_pyromancer_liurnia,character_class=pyromancer; boss=boss:liurnia,item:none_talisman,34
+none_talisman_pyromancer_caelid,character_class=pyromancer; boss=boss:caelid,item:none_talisman,63
+scarseals_knight_limgrave,character_class=knight; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.5
+scarseals_knight_liurnia,character_class=knight; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.65
+scarseals_knight_caelid,character_class=knight; boss=boss:caelid,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.5
+scarseals_warrior_2h_limgrave,character_class=warrior_2h; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.65
+scarseals_warrior_2h_liurnia,character_class=warrior_2h; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.85
+scarseals_warrior_2h_caelid,character_class=warrior_2h; boss=boss:caelid,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.6
+scarseals_warrior_dw_limgrave,character_class=warrior_dw; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.5
+scarseals_warrior_dw_liurnia,character_class=warrior_dw; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.65
+scarseals_warrior_dw_caelid,character_class=warrior_dw; boss=boss:caelid,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.5
+scarseals_spellblade_limgrave,character_class=spellblade; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.65
+scarseals_spellblade_liurnia,character_class=spellblade; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.9
+scarseals_ranger_limgrave,character_class=ranger; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.15
+scarseals_ranger_liurnia,character_class=ranger; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.75
+scarseals_jester_limgrave,character_class=jester; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.03
+scarseals_jester_liurnia,character_class=jester; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.85
+scarseals_sorcerer_limgrave,character_class=sorcerer; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.15
+scarseals_sorcerer_liurnia,character_class=sorcerer; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.6
+scarseals_pyromancer_limgrave,character_class=pyromancer; boss=boss:limgrave,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.15
+scarseals_pyromancer_liurnia,character_class=pyromancer; boss=boss:liurnia,item:marikas_scarseal radagons_scarseal radagons_soreseal,0.55
+branchswords_spellblade_liurnia,character_class=spellblade; boss=boss:liurnia,item:blue_feathered_branchsword red_feathered_branchsword,0.55
+branchswords_spellblade_caelid,character_class=spellblade; boss=boss:caelid,item:blue_feathered_branchsword red_feathered_branchsword,0.6
+branchswords_ranger_liurnia,character_class=ranger; boss=boss:liurnia,item:blue_feathered_branchsword red_feathered_branchsword,0.4
+branchswords_ranger_caelid,character_class=ranger; boss=boss:caelid,item:blue_feathered_branchsword red_feathered_branchsword,0.45
+branchswords_jester_liurnia,character_class=jester; boss=boss:liurnia,item:blue_feathered_branchsword red_feathered_branchsword,0.3
+branchswords_jester_caelid,character_class=jester; boss=boss:caelid,item:blue_feathered_branchsword red_feathered_branchsword,0.5
+branchswords_sorcerer_liurnia,character_class=sorcerer; boss=boss:liurnia,item:blue_feathered_branchsword red_feathered_branchsword,0.3
+branchswords_sorcerer_caelid,character_class=sorcerer; boss=boss:caelid,item:blue_feathered_branchsword red_feathered_branchsword,0.45
+branchswords_pyromancer_liurnia,character_class=pyromancer; boss=boss:liurnia,item:blue_feathered_branchsword red_feathered_branchsword,0.35
+branchswords_pyromancer_caelid,character_class=pyromancer; boss=boss:caelid,item:blue_feathered_branchsword red_feathered_branchsword,0.35

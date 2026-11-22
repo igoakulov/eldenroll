@@ -1,3 +1,4 @@
+import { isNone } from "./database";
 import type { ArmorSet, CombatRule, Item, LoadoutSlot, PoolSlot } from "./database";
 import type { EngineData } from "./engineData";
 
@@ -50,6 +51,8 @@ function shown(data: EngineData, slots: RolledSlots, slot: PoolSlot): SlotDispla
   }
   const item = data.items.get(id);
   if (item === undefined || item.category === "none") return NONE;
+  // The early regions' empty talisman slot: the player picks freely
+  if (isNone(item.id)) return ANY;
   return itemShown(data, item);
 }
 

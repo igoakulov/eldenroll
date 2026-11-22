@@ -21,7 +21,7 @@ POOL_COUNTS: Final[Mapping[str, int]] = {
     "weapon": 409,
     "shield": 78,
     "armor": 639,
-    "talisman": 41,
+    "talisman": 42,
     "ash": 111,
     "sorcery": 67,
     "incantation": 86,
