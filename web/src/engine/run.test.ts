@@ -381,6 +381,24 @@ describe("the Bosses list", () => {
     expect(rhPool(setBossState(engine, before, morgott, "dead"))).toBeGreaterThan(rhPool(before));
   });
 
+  it("keeps gear shown on a done objective in reach after the Royal Capital falls away with Maliketh", () => {
+    const settings = { ...defaultSettings(realDatabase), characterClasses: ["spellblade"] };
+    const maliketh = "maliketh_the_black_blade_crumbling_farum_azula";
+    const royal = realDatabase.item_location.find(
+      (row) => row.item_id === "coded_sword" && row.location_id === "leyndell",
+    );
+    expect(royal).toBeDefined();
+    const run = doneAndRoll(start({ settings }));
+    const done1 = run.completed[0] as Run["completed"][number];
+    const withSword: Run = { ...run, completed: [{ ...done1, slots: { ...done1.slots, rh: "coded_sword" } }] };
+    const rhIds = (one: Run) =>
+      observed((observing) => reroll(observing, setBossState(engine, one, maliketh, "dead"), "rh"))
+        .find(([slot]) => slot === "rh")?.[1]
+        .options.map((row) => row.option.row.id) ?? [];
+    expect(rhIds(run)).not.toContain("coded_sword");
+    expect(rhIds(withSword)).toContain("coded_sword");
+  });
+
   it("locks bosses killed by Done and the current boss, and lets the rest change", () => {
     let run = doneAndRoll(start());
     const killed = run.completed[0]?.boss as string;

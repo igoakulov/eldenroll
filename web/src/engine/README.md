@@ -142,6 +142,7 @@ The player lists favourite or upgraded weapons and greatshields; with the checkb
 An item rolls if at least one of its location rows counts (`eligibility.ts`). A place row counts when its region is selected. A boss row counts once the boss is felled, whatever the region, and never before: Radahn's weapons stay out while he lives, even with Caelid ticked, and keep rolling after he falls with Caelid unticked. There is no setting to turn this off. A boss at `odds = 0` always counts by region, like a regular enemy, and is absent from `Bosses`.
 
 - A boss is known felled only through `Done`, `Felled?` or `Bosses`; skipped bosses are presumed alive.
+- Gear shown on a done objective stays in reach whatever drops out afterwards, since the player has it: an item, or every piece of a set. This matters where a place drops out, as the Royal Capital does with the Ashen Capital or a felled Maliketh (owner, 2026-11-23). Gear only shown on a rerolled or discarded objective doesn't count.
 - An item with no location row counts everywhere: consumables, whose result names a family the player fills with any variant, and the `None` pieces. A set rolls only if every piece is reachable.
 
 ## Design constraints

@@ -96,10 +96,25 @@ function deadSet(run: Run): ReadonlySet<string> {
 }
 
 function counted(engine: Engine, run: Run): ReadonlySet<string> {
-  return countedItems(engine.data, {
+  const reach = countedItems(engine.data, {
     locations: selectedLocations(engine.data.database, new Set(run.regions), deadSet(run)),
     deadBosses: deadSet(run),
   });
+  return new Set([...reach, ...acquired(engine, run)]);
+}
+
+/** Gear shown on a done objective is the player's, so it stays in reach after its place drops out, such as the Royal
+ * Capital once Maliketh falls (`web/src/engine/README.md#Eligibility`). */
+function acquired(engine: Engine, run: Run): ReadonlySet<string> {
+  const items = new Set<string>();
+  for (const objective of run.completed) {
+    for (const [slot, id] of Object.entries(objective.slots)) {
+      if (id === null || id === undefined) continue;
+      if (slot === "armor") for (const piece of engine.data.armorSets.get(id)?.pieces ?? []) items.add(piece);
+      else if (engine.data.items.has(id)) items.add(id);
+    }
+  }
+  return items;
 }
 
 function rollBoss(
