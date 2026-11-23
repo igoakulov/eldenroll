@@ -1,5 +1,6 @@
 """`selectors` holds `kind:id id` parts split by `;`, because the ids are slugs and a cell stays
-free of quoting. A part with no ids, such as `rule:`, means every option of that kind.
+free of quoting. A part with no ids, such as `rule:`, means every option of that kind. `opened_by`,
+an optional column, names the boss instance whose felling opens the slot; empty means always open.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ class SlotPoolRow:
     character_class_id: str
     slot: str
     selectors: tuple[tuple[str, tuple[str, ...]], ...]
+    opened_by: str | None = None
 
 
 def load_character_classes(path: Path) -> tuple[CharacterClass, ...]:
@@ -43,6 +45,7 @@ def load_character_classes(path: Path) -> tuple[CharacterClass, ...]:
 
 def load_slot_pools(path: Path) -> tuple[SlotPoolRow, ...]:
     table = read_table(path, required_columns=("character_class_id", "slot", "selectors"))
+    opened_by = table.column("opened_by") if "opened_by" in table.header else None
     rows: list[SlotPoolRow] = []
     for index, row in enumerate(table.rows, start=1):
         where = f"{path}: data row {index}"
@@ -54,7 +57,10 @@ def load_slot_pools(path: Path) -> tuple[SlotPoolRow, ...]:
             raise LoaderError(f"{where}: unknown slot {slot!r}")
         rows.append(
             SlotPoolRow(
-                character_class_id, slot, parse_selectors(row[table.column("selectors")], where)
+                character_class_id,
+                slot,
+                parse_selectors(row[table.column("selectors")], where),
+                (row[opened_by] or None) if opened_by is not None else None,
             )
         )
     return tuple(rows)

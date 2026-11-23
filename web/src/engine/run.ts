@@ -146,6 +146,12 @@ function runLeft(engine: Engine, run: Run): number {
   return total === 0 ? 1 : Math.max(0, 1 - run.deadBosses.length / total);
 }
 
+/** The bosses that may still be an objective in this run; the current one counts until it is felled. */
+function aliveBosses(engine: Engine, run: Run): ReadonlySet<string> {
+  const pool = bossPool(engine.data.database, new Set(run.regions), deadSet(run), new Set(run.skippedBosses));
+  return new Set(pool.status === "ready" ? pool.bosses.map((row) => row.id) : []);
+}
+
 function rollSlots(
   engine: Engine,
   run: Run,
@@ -167,6 +173,7 @@ function rollSlots(
     fixedShare: engine.hyperparams.fixedShare,
     tally: run.tally,
     left: runLeft(engine, run),
+    alive: aliveBosses(engine, run),
     keptTally,
     shortlist: run.settings.weaponShortlistEnabled ? new Set(run.weaponShortlist) : null,
     neverRoll: new Set(run.neverRoll),

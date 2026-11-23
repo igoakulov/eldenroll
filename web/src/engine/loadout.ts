@@ -58,6 +58,8 @@ export interface LoadoutInput {
   readonly observe?: RollObserver;
   /** The share of the run's bosses still alive, for the runway ceiling (`CatchUp.ceiling`); absent, no ceiling. */
   readonly left?: number;
+  /** Bosses that may still be an objective: a slot they open stays closed, never rolled. */
+  readonly alive?: ReadonlySet<string>;
 }
 
 /** Holds a roll for each slot rolled, in rolling order. */
@@ -208,7 +210,12 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     input.observe?.(slot, roll);
   };
   const firstOf = new Map([...PAIRED].map(([first, second]) => [second, first]));
-  const pooled = (slot: LoadoutSlot) => slot === "armor" || data.pools.has(poolKey(characterClass, slot));
+  const pooled = (slot: LoadoutSlot) => {
+    if (slot === "armor") return true;
+    const pool = data.pools.get(poolKey(characterClass, slot));
+    const opener = pool?.opened_by ?? null;
+    return pool !== undefined && (opener === null || input.alive?.has(opener) !== true);
+  };
 
   for (const slot of LOADOUT_ORDER.slice(start)) {
     if (loadout.has(slot) || !pooled(slot)) continue;

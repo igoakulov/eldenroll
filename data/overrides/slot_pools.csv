@@ -1,74 +1,74 @@
-character_class_id,slot,selectors
-knight,rh,subcategory:unpaired thrusting_shield
-knight,rh_ash,category:ash
-knight,lh,subcategory:shield; category:none
-knight,lh_ash,category:ash
-knight,spell,category:none
-knight,item,category:tool consumable
-knight,talisman_1,category:talisman
-knight,talisman_2,category:talisman
-knight,rule_1,rule:
-knight,rule_2,rule:
-warrior_2h,rh,subcategory:melee thrusting_shield
-warrior_2h,rh_ash,category:ash
-warrior_2h,lh,category:none
-warrior_2h,spell,category:none
-warrior_2h,item,category:tool consumable
-warrior_2h,talisman_1,category:talisman
-warrior_2h,talisman_2,category:talisman
-warrior_2h,rule_1,rule:
-warrior_2h,rule_2,rule:
-warrior_dw,rh,subcategory:melee
-warrior_dw,rh_ash,category:ash
-warrior_dw,lh,subcategory:unpaired; category:none
-warrior_dw,lh_ash,category:ash
-warrior_dw,spell,category:none
-warrior_dw,item,category:tool consumable
-warrior_dw,talisman_1,category:talisman
-warrior_dw,talisman_2,category:talisman
-warrior_dw,rule_1,rule:
-warrior_dw,rule_2,rule:
-ranger,rh,subcategory:ranged
-ranger,rh_ash,category:ash
-ranger,lh,category:none
-ranger,spell,category:none
-ranger,item,category:tool consumable
-ranger,talisman_1,category:talisman
-ranger,talisman_2,category:talisman
-ranger,rule_1,rule:
-ranger,rule_2,rule:
-sorcerer,rh,subcategory:glintstone_staff; item:carian_sorcery_sword
-sorcerer,lh,subcategory:glintstone_staff small_shield medium_shield; item:jellyfish_shield
-sorcerer,lh_ash,category:ash
-sorcerer,spell,category:sorcery
-sorcerer,item,category:tool consumable
-sorcerer,talisman_1,category:talisman
-sorcerer,talisman_2,category:talisman
-sorcerer,rule_1,rule:
-sorcerer,rule_2,rule:
-pyromancer,rh,subcategory:sacred_seal
-pyromancer,lh,subcategory:sacred_seal small_shield medium_shield; item:jellyfish_shield
-pyromancer,spell,category:incantation
-pyromancer,item,category:tool consumable
-pyromancer,talisman_1,category:talisman
-pyromancer,talisman_2,category:talisman
-pyromancer,rule_1,rule:
-pyromancer,rule_2,rule:
-spellblade,rh,subcategory:unpaired
-spellblade,rh_ash,category:ash
-spellblade,lh,subcategory:catalyst
-spellblade,spell,category:sorcery incantation
-spellblade,item,category:tool consumable
-spellblade,talisman_1,category:talisman
-spellblade,talisman_2,category:talisman
-spellblade,rule_1,rule:
-spellblade,rule_2,rule:
-jester,rh,category:none; subcategory:torch perfume_bottle; item:demi_human_queens_staff grafted_dragon briar_greatshield spiked_palisade_shield fingerprint_stone_shield jellyfish_shield visage_shield one_eyed_shield
-jester,rh_ash,category:ash
-jester,lh,category:none
-jester,spell,category:none
-jester,item,category:tool consumable
-jester,talisman_1,category:talisman
-jester,talisman_2,category:talisman
-jester,rule_1,rule:
-jester,rule_2,rule:
+character_class_id,slot,selectors,opened_by
+knight,rh,subcategory:unpaired thrusting_shield,
+knight,rh_ash,category:ash,
+knight,lh,subcategory:shield; category:none,
+knight,lh_ash,category:ash,
+knight,spell,category:none,
+knight,item,category:tool consumable,
+knight,talisman_1,category:talisman,
+knight,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+knight,rule_1,rule:,
+knight,rule_2,rule:,
+warrior_2h,rh,subcategory:melee thrusting_shield,
+warrior_2h,rh_ash,category:ash,
+warrior_2h,lh,category:none,
+warrior_2h,spell,category:none,
+warrior_2h,item,category:tool consumable,
+warrior_2h,talisman_1,category:talisman,
+warrior_2h,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+warrior_2h,rule_1,rule:,
+warrior_2h,rule_2,rule:,
+warrior_dw,rh,subcategory:melee,
+warrior_dw,rh_ash,category:ash,
+warrior_dw,lh,subcategory:unpaired; category:none,
+warrior_dw,lh_ash,category:ash,
+warrior_dw,spell,category:none,
+warrior_dw,item,category:tool consumable,
+warrior_dw,talisman_1,category:talisman,
+warrior_dw,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+warrior_dw,rule_1,rule:,
+warrior_dw,rule_2,rule:,
+ranger,rh,subcategory:ranged,
+ranger,rh_ash,category:ash,
+ranger,lh,category:none,
+ranger,spell,category:none,
+ranger,item,category:tool consumable,
+ranger,talisman_1,category:talisman,
+ranger,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+ranger,rule_1,rule:,
+ranger,rule_2,rule:,
+sorcerer,rh,subcategory:glintstone_staff; item:carian_sorcery_sword,
+sorcerer,lh,subcategory:glintstone_staff small_shield medium_shield; item:jellyfish_shield,
+sorcerer,lh_ash,category:ash,
+sorcerer,spell,category:sorcery,
+sorcerer,item,category:tool consumable,
+sorcerer,talisman_1,category:talisman,
+sorcerer,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+sorcerer,rule_1,rule:,
+sorcerer,rule_2,rule:,
+pyromancer,rh,subcategory:sacred_seal,
+pyromancer,lh,subcategory:sacred_seal small_shield medium_shield; item:jellyfish_shield,
+pyromancer,spell,category:incantation,
+pyromancer,item,category:tool consumable,
+pyromancer,talisman_1,category:talisman,
+pyromancer,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+pyromancer,rule_1,rule:,
+pyromancer,rule_2,rule:,
+spellblade,rh,subcategory:unpaired,
+spellblade,rh_ash,category:ash,
+spellblade,lh,subcategory:catalyst,
+spellblade,spell,category:sorcery incantation,
+spellblade,item,category:tool consumable,
+spellblade,talisman_1,category:talisman,
+spellblade,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+spellblade,rule_1,rule:,
+spellblade,rule_2,rule:,
+jester,rh,category:none; subcategory:torch perfume_bottle; item:demi_human_queens_staff grafted_dragon briar_greatshield spiked_palisade_shield fingerprint_stone_shield jellyfish_shield visage_shield one_eyed_shield,
+jester,rh_ash,category:ash,
+jester,lh,category:none,
+jester,spell,category:none,
+jester,item,category:tool consumable,
+jester,talisman_1,category:talisman,
+jester,talisman_2,category:talisman,margit_the_fell_omen_stormveil_castle
+jester,rule_1,rule:,
+jester,rule_2,rule:,

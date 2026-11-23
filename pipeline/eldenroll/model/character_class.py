@@ -19,3 +19,5 @@ class SlotPool:
     character_class_id: str
     slot: str
     selectors: tuple[Selector, ...]
+    # The boss whose felling opens the slot (`web/src/engine/README.md#Closed slots`)
+    opened_by: str | None = None

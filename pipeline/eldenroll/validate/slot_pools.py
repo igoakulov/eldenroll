@@ -32,7 +32,17 @@ def validate_slot_pools(
 ) -> None:
     rows = tuple(pools)
     table = tuple(items)
-    problems = [*_shape(rows), *_kinds(rows), *_scope(rows, table)]
+    bosses = known.get("boss", frozenset[str]())
+    problems = [
+        *_shape(rows),
+        *_kinds(rows),
+        *_scope(rows, table),
+        *(
+            f"{row.character_class_id} {row.slot} is opened by an unknown boss {row.opened_by}"
+            for row in rows
+            if row.opened_by is not None and row.opened_by not in bosses
+        ),
+    ]
     if problems:
         raise BuildError(f"bad slot pools: {'; '.join(problems)}")
     validate_selectors((one for row in rows for one in row.selectors), known)

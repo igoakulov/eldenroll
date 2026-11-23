@@ -40,7 +40,7 @@ TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
     "ash_compatibility": ("ash_id", "category", "subcategory"),
     "combat_rule": ("id", "name", "odds"),
     "character_class": ("id", "name", "odds"),
-    "slot_pool": ("character_class_id", "slot", "selectors"),
+    "slot_pool": ("character_class_id", "slot", "selectors", "opened_by"),
     "alias": ("id", "label", "url"),
     "item_location": ("item_id", "location_id", "boss_instance_id"),
     "modifier": ("id", "when", "target", "value"),
@@ -107,6 +107,7 @@ def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
                 "character_class_id": row.character_class_id,
                 "slot": row.slot,
                 "selectors": [_selector(one) for one in row.selectors],
+                "opened_by": row.opened_by,
             }
             for row in database.slot_pools
         ],

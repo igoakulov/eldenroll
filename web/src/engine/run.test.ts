@@ -257,6 +257,26 @@ describe("rerolls", () => {
   });
 });
 
+describe("the second talisman slot", () => {
+  const MARGIT = "margit_the_fell_omen_stormveil_castle";
+  const talismans = (run: Run) => [current(run).slots.talisman_1, current(run).slots.talisman_2];
+
+  it("stays closed while Margit may still be an objective, and opens once she is felled or out of the run", () => {
+    expect(talismans(start({ regions: ["limgrave"] }))[1]).toBeUndefined();
+    for (const opened of [{ deadBosses: [MARGIT] }, { skippedBosses: [MARGIT] }, { regions: ["liurnia"] }]) {
+      const [first, second] = talismans(start({ regions: ["limgrave"], ...opened }));
+      expect(first).toBeDefined();
+      expect(second).toBeDefined();
+    }
+  });
+
+  it("keeps one talisman through a reroll of the talismans while Margit lives", () => {
+    const run = reroll(engine, start({ regions: ["limgrave"] }), "talisman_1");
+    expect(talismans(run)[0]).toBeDefined();
+    expect(talismans(run)[1]).toBeUndefined();
+  });
+});
+
 describe("Already dead and Finish run", () => {
   it("marks the boss dead and rerolls the full objective without counting a reroll", () => {
     const run = reroll(engine, start(), "armor");

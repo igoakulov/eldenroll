@@ -261,9 +261,12 @@ export function Card({
           <Changed key={keys.talisman_1} {...change("talisman_1")}>
             <Small display={slots.talisman_1} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
           </Changed>
-          <Changed key={keys.talisman_2} {...change("talisman_2")}>
-            <Small display={slots.talisman_2} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
-          </Changed>
+          {objective.slots.talisman_2 === undefined ? null : (
+            // A closed slot has no roll and no line (`web/src/engine/README.md#Closed slots`)
+            <Changed key={keys.talisman_2} {...change("talisman_2")}>
+              <Small display={slots.talisman_2} emptyIcon={EMPTY_SLOT_ICONS.talisman} />
+            </Changed>
+          )}
         </div>
       </div>
 

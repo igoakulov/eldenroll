@@ -13,6 +13,7 @@ def build_slot_pools(rows: Iterable[SlotPoolRow]) -> tuple[SlotPool, ...]:
             character_class_id=row.character_class_id,
             slot=row.slot,
             selectors=tuple(new_selector(kind, ids) for kind, ids in row.selectors),
+            opened_by=row.opened_by,
         )
         for row in rows
     )

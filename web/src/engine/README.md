@@ -37,7 +37,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 
 ## Run model
 
-An objective is a boss instance, a class loadout and 2 combat rules. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans always roll, even for an early character with fewer slots; in Limgrave, Liurnia and Caelid either may come up `any` (`data/balance.md#43. Early talisman slots`). The two talismans roll as one draw, and so do the two rules (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
+An objective is a boss instance, a class loadout and 2 combat rules. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans roll once `Margit, the Fell Omen` is felled, as in the game, and one before (#Closed slots); talismans 3 and 4 never roll. In Limgrave, Liurnia and Caelid a rolled talisman may come up `any` (`data/balance.md#43. Early talisman slots`). The two talismans roll as one draw, and so do the two rules (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
 
 - **Owned** means it appeared in a completed objective this run; nothing else is known about the player's inventory.
 - **Felled** (code: `dead`) is a boss out of the run, by `Done`, `Felled?` or `Bosses`. **Skipped** keeps a boss out of the boss pool while it stays alive for its items.
@@ -109,6 +109,7 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 | Situation | Example | Mechanism | Shows |
 |---|---|---|---|
 | slot not randomized | talismans 3 and 4, a set's missing piece, a caster's ash | no slot row | `any` |
+| closed until a boss is felled | the second talisman before Margit | the pool's `opened_by` (#Closed slots) | no line |
 | randomized, the player picks | an early talisman slot | the pool holds `none_talisman`, an empty row | `any` |
 | randomized, empty on purpose | `2H Warrior` LH, `Jester` RH | the pool holds the `none` row | `none` |
 | randomized, nothing survives the filters | a narrow pool | empty result | `none` |
@@ -117,6 +118,10 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 - **`any`** is a slot state, never sampled, owned or counted.
 - **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label. A set piece in an alias stands for every member, as `Jar / Greatjar` does: the set is in reach once any member is, and arrives with the earliest.
 - **Ash line.** A rolled ash shows its name or label; no ash row or an empty pool shows `any`; a hand that rolled `none` shows `none`.
+
+## Closed slots
+
+A slot pool's `opened_by` names a boss. While that boss may still be an objective of the run (alive, not skipped, in the regions ticked so far), the slot is closed: it doesn't roll, adds nothing to the tally, and the card leaves its line out. The objective that fights the boss has it closed too. A slot of a pair then rolls its partner alone, as a reroll that keeps one slot does, so rows reading the pair find nothing in the closed slot. Felling, skipping or leaving out the boss opens it, so a slot never stays closed for good; a reroll decides it afresh for the slots it rolls.
 
 ## Combat rules
 

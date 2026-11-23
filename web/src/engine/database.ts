@@ -121,6 +121,9 @@ export interface SlotPool {
   readonly character_class_id: string;
   readonly slot: PoolSlot;
   readonly selectors: readonly Selector[];
+  /** The boss instance whose felling opens the slot (#Closed slots in `web/src/engine/README.md`); absent or
+   * `null`, always open. */
+  readonly opened_by?: string | null;
 }
 
 export interface Alias {
