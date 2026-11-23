@@ -135,6 +135,7 @@ The largest raise: variety over strict parity (#Fair share, O140).
 |---|---|---:|---|
 | item | `alabaster_lords_sword` `bestial_sling` `black_blade` `blades_of_stone` `blasphemous_blade` `carian_knights_sword` `carian_thrusting_shield` `celebrants_cleaver` `dark_moon_greatsword` `death_lightning` `dragonscale_blade` `dueling_shield` `eclipse_shotel` `envoys_greathorn` `envoys_horn` `envoys_long_horn` `euporia` `flame_of_the_fell_god` `fleeting_microcosm` `fortissaxs_lightning_spear` `frozen_needle` `gavel_of_haima` `ghostflame_breath` `giantsflame_take_thee` `godslayers_greatsword` `golden_order_greatsword` `golem_fist` `halo_scythe` `hoarah_louxs_earthshaker` `horned_warriors_greatsword` `icerind_hatchet` `idus_sword` `inseparable_sword` `iron_cleaver` `lansseaxs_glaive` `lorettas_mastery` `magma_blade` `midras_flame_of_frenzy` `milady` `mohgwyns_sacred_spear` `noble_presence` `rakshasas_great_katana` `reed_great_katana` `retaliatory_crossed_tree` `ringed_finger` `rings_of_spectral_light` `ritual_thrusting_shield` `roar_of_rugalea` `rock_blaster` `rosus_axe` `royal_greatsword` `scarlet_aeonia` `serpent_hunter` `shadow_sunflower_blossom` `smithscript_axe` `smithscript_cirque` `smithscript_dagger` `smithscript_greathammer` `smithscript_shield` `smithscript_spear` `spear_of_the_impaler` `spirit_sword` `star_fist` `stone_of_gurranq` `sword_of_night_and_flame` `treespear` `triple_rings_of_light` `urumi` `wing_of_astel` `zamor_curved_sword` | 1.5–10 | owner decision: **Preference:** rare, unique or striking weapons, ashes, spells and talismans, at least a fair share in the builds that reach them and most at two to three times; throwable weapons three times. Late arrivals' odds also make up for their region (#No forecast). Each value and its reason in `item_odds.csv` |
 | item | `coded_sword` | 0.5 | owner decision, 2026-11-23: **Preference:** with a ×3 row for the casters (#46. Pyromancer's weapons) |
+| armor_set | `banished_knight_set_caped` `spellblades_set` | 2–3 | owner decision, 2026-11-23: **Preference:** `Banished Knight Set (Caped)` well above a fair share: a striking look from a strong foe, arriving late, in the Mountaintops of the Giants with about 40% of the run left. **Synergy:** `Spellblade's Set` boosts magic ashes of war. Each value in `armor_set_odds.csv` |
 
 ### Synergy enablers
 
@@ -152,7 +153,23 @@ Catch-up can't make up a late arrival with few objectives left, so odds go by th
 |---|---|---:|---|
 | item | `agheels_flame` `ancient_dragons_lightning_spear` `ancient_dragons_lightning_strike` `aspects_of_the_crucible_bloom` `aspects_of_the_crucible_horns` `aspects_of_the_crucible_tail` `aspects_of_the_crucible_thorns` `bayles_flame_lightning` `bayles_tyranny` `black_flame` `black_flame_ritual` `bloodboon` `borealiss_mist` `burn_o_flame` `catch_flame` `divine_beast_tornado` `divine_bird_feathers` `dragonclaw` `dragonfire` `dragonmaw` `electrocharge` `fire_serpent` `fires_deadly_sin` `flame_fall_upon_them` `flame_sling` `frenzied_burst` `frozen_lightning_spear` `furious_blade_of_ansbach` `giant_golden_arc` `golden_arcs` `honed_bolt` `howl_of_shabriri` `inescapable_frenzy` `knights_lightning_spear` `land_of_shadow` `light_of_miquella` `lightning_spear` `lightning_strike` `messmers_orb` `multilayered_ring_of_light` `o_flame` `pest_thread_spears` `placidusaxs_ruin` `poison_mist` `radagons_rings_of_light` `rain_of_fire` `rotten_butterflies` `smarags_glintstone_breath` `spira` `surge_o_flame` `swarm_of_flies` `the_flame_of_frenzy` `theodorixs_magma` `unendurable_frenzy` `watchful_spirit` `wrath_from_afar` | 0.8–6 | owner decision. **Catch-up:** incantations by the region of arrival, from 0.9 in Limgrave to 6 in Enir-Ilim, where higher odds no longer help; sorceries need none |
 | item | `backhand_blade` `bloodhound_claws` `caestus` `claws_of_night` `clinging_bone` `danes_footwork` `death_knights_twin_axes` `dryleaf_arts` `falx` `greatsword_of_radahn_light` `greatsword_of_radahn_lord` `hookclaws` `horned_warriors_sword` `iron_ball` `katar` `madding_hand` `ornamental_straight_sword` `pata` `raptor_talons` `rellanas_twin_blades` `reverse_bladed_sword` `spiked_caestus` `starscourge_greatsword` `thiolliers_hidden_needle` `veterans_prosthesis` | 0.2–2 | owner decision. **Catch-up:** paired weapons by the region of arrival. **Preference:** they leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs); the hand-to-hand ashes at four times their region's odds, since hand-to-hand weapons were underrepresented |
-| armor_set | `ledas_knight_set` `ledas_surgeon_set` | 3 | owner decision: **Catch-up:** they arrive in Enir-Ilim with about three objectives left |
+
+### Armor within a synergy
+
+A synergy's sets share its wins by their odds and catch-up. A set arriving late already wins more than an even share of the objectives where it is in reach, so its share of a whole run's wins stays low whatever its odds (#No forecast).
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| armor_set | `gravebird_set` `naked_set` `mutated_mushroom_set` `infected_fell_omen_set` `infected_guardian_set` | 0.5–5 | owner decision, 2026-11-23: **Synergy:** shares within a synergy's sets: `Gravebird Set` raised beside `Raptor's Set` under `Jump attacks only`; the `Naked Set` lowered from the largest share of `Blue Dancer Charm`'s light sets; `Mutated Mushroom Set` and `Infected Fell Omen Set` half of `Kindred of Rot's Exultation`'s sets, the rest even. Each value and its reason in `armor_set_odds.csv` |
+
+### Armor arriving late
+
+Sets arriving from Nokron on read about two thirds of a fair share over a run, and Enir-Ilim's about a sixth. By then the earlier sets have had their share and mostly sit out, so the late rolls already go mostly to the late sets: raising every late set together only moves rolls among them, and a set gains only when raised above its neighbours (owner, 2026-11-23). So only Leyndell's sets are raised, and Leda's as a pair.
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| armor_set | `alberichs_set` `bloodsoaked_set` `fell_omen_set` `golden_order_set` `lionels_set` `nomadic_merchants_set` `omen_set` `omenkiller_set` `raging_wolf_set` | 2 | owner decision, 2026-11-23: **Catch-up:** Leyndell, Royal Capital: they also leave reach once Maliketh falls, unless already shown, and read about half a fair share at odds 1 |
+| armor_set | `ledas_knight_set` `ledas_surgeon_set` | 3–3.5 | owner decision: **Catch-up:** they arrive in Enir-Ilim with about three objectives left. **Synergy:** `Leda's Knight Set` half a step higher, since `Lord of Blood's Exultation` also raises `Leda's Surgeon Set` when both talismans roll, so the two split `Retaliatory Crossed-Tree`'s wins evenly (#41. Retaliatory Crossed-Tree and Leda's sets) |
 
 ### Lowered talismans
 
@@ -417,7 +434,7 @@ Rows: `dried_bouquet_makes_summon_rule_top`
 
 ### 41. Retaliatory Crossed-Tree and Leda's sets
 
-Owner, 2026-11-20. `Retaliatory Crossed-Tree` makes `Leda's Knight Set` and `Leda's Surgeon Set` top tier: **Synergy**, reason not recorded. The sets arrive only in Enir-Ilim, with about three objectives left, so they also roll at odds 3.
+Owner, 2026-11-20. `Retaliatory Crossed-Tree` makes `Leda's Knight Set` and `Leda's Surgeon Set` top tier: **Synergy**, reason not recorded. The sets arrive only in Enir-Ilim, with about three objectives left, so they also roll at raised odds (#Armor arriving late).
 
 Rows: `retaliatory_crossed_tree_makes_leda_sets_top`
 
