@@ -33,7 +33,7 @@ What catch-up must do, whatever its formula; #Hyperparameters holds today's.
 - **Every item a slot can roll shows about equally often over a whole run**, however late it arrives and among however many rivals. Odds and rules then steer single items for taste; an item a rule removes stays removed.
 - **In reach is decided at the roll:** its region ticked or its boss felled, and its stats within `Max stat gap`. Stats reaching an item late are an arrival too; an item that leaves reach stops counting.
 - **Even out with memory.** Each item keeps a tally of the chance it has had, and a roll favours the items furthest behind those that can roll now, so a late arrival catches up and stops once level, and an item behind for any reason is pushed again. The tally is measured against the item's peers, never the roll itself, and counts the chance an item would have had without rules, so a synergy is never paid back.
-- **Who shares a tally follows what the player meets:** spells, ashes and the right hand across every class; the left hand and talismans per class, since their pools differ by class. Within a shared tally an item is measured only against rolls that could show it.
+- **Who shares a tally follows what the player meets:** spells, ashes and the right hand across every class; the left hand and talismans per class, since their pools differ by class. A shared tally counts every class's rolls, so an item only some classes roll falls behind its peers and catch-up pushes it in those classes: the paired weapons, which only the Warriors roll, lead their right hand. It stays shared until that proves a problem (owner, 2026-11-23).
 - **Never fall back to plain odds:** they would feed the items in reach longest.
 - **Variety over strict parity.** Items with high requirements in a secondary stat (Intelligence for a melee weapon, Faith for a sorcery) may be pushed beyond even by base odds, so a run invites trying them. A high primary-stat requirement earns nothing, since a build's main stat often passes 60.
 
@@ -158,8 +158,8 @@ A row's own odds, for every option that rolls differently all the time. Files: `
 | item | `talisman_of_lords_bestowal` | 0.5 | owner decision: **Preference:** too niche |
 | item | `companion_jar` `perfumers_talisman` | 0.5 | owner decision: **Preference:** too frequent among objectives with pots or perfumes; no row boosts them, so none needs offsetting (#39. Pots and perfumes) |
 | item | `blade_of_mercy` | 0.5 | owner decision: **Preference:** more situational than the moveset talismans; rules raise it where it fits (#37. Ripostes) |
-| item | `twinblade_talisman` | 0.5 | owner decision: reason not recorded |
-| item | `retaliatory_crossed_tree` | 1.5 | owner decision: reason not recorded |
+| item | `twinblade_talisman` | 0.5 | owner decision: **Preference:** less useful than the other moveset talismans |
+| item | `retaliatory_crossed_tree` | 1.5 | owner decision: **Preference:** it promotes an underused moveset. **Catch-up:** it arrives late in the game |
 | item | `warrior_jar_shard` | 0 | owner decision: it would otherwise take the talisman slot that `Shard of Alexander`, the more useful of the two, should get |
 | item | `venomous_fang` | 4 | owner decision: **Synergy:** its innate poison brings `Kindred of Rot's Exultation` (#24. Rot and poison); about twice a fair share |
 | item | `star_fist` | 10 | owner decision: **Preference:** an outstanding weapon, raised above a fair share in every build; a paired weapon (#26. Dual-Wield Warrior pairs) |
@@ -189,6 +189,7 @@ A row's own odds, for every option that rolls differently all the time. Files: `
 | boss | `putrid_avatar_miquellas_haligtree_elphael` | 0 | kept for `Rotten Staff` |
 | boss | `shadow_tree_spirit_gravesite_plain_ellac_river_cave` | 0 | kept for `Horned Bairn` |
 | armor_set | `ledas_knight_set` `ledas_surgeon_set` | 3 | owner decision: **Catch-up:** they arrive in Enir-Ilim with about three objectives left |
+
 ## Conditional rules
 
 Every row of `data/overrides/modifiers.csv` belongs to one rule below. A rule always has a condition; what holds all the time is base odds. A new exception between items is added here by priority, then as rows. Rule numbers are stable.
