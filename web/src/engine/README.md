@@ -102,7 +102,7 @@ Pools are `data/overrides/slot_pools.csv`. Odds and the class rules (Dual-Wield 
 
 ## Two-handing
 
-RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus applies to the Strength requirement only (`stats.ts`). LH is empty when it rolled `none` or its pool was empty; `any` is undecided, never empty. RH rolls first, so it looks ahead: LH counts as empty when `none` is all it could roll after that RH.
+RH is two-handed when the item has `str_bonus_2h` and LH is empty, or whatever LH holds for a class marked `two_handed` in `character_classes.csv`: `2H Warrior` keeps a `Poisoned Hand` tucked away for its damage boost (`data/balance.md#45. Poisoned Hand`); the bonus applies to the Strength requirement only (`stats.ts`). LH is empty when it rolled `none` or its pool was empty; `any` is undecided, never empty. RH rolls first, so it looks ahead: LH counts as empty when `none` is all it could roll after that RH.
 
 ## Empty slots and aliases
 
@@ -111,7 +111,7 @@ RH is two-handed when LH is empty and the item has `str_bonus_2h`; the bonus app
 | slot not randomized | talismans 3 and 4, a set's missing piece, a caster's ash | no slot row | `any` |
 | closed until a boss is felled | the second talisman before Margit | the pool's `opened_by` (#Closed slots) | no line |
 | randomized, the player picks | an early talisman slot | the pool holds `none_talisman`, an empty row | `any` |
-| randomized, empty on purpose | `2H Warrior` LH, `Jester` RH | the pool holds the `none` row | `none` |
+| randomized, empty on purpose | `2H Warrior` LH but beside poison (`data/balance.md#45. Poisoned Hand`), `Jester` RH | the pool holds the `none` row | `none` |
 | randomized, nothing survives the filters | a narrow pool | empty result | `none` |
 
 - **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it. Any id starting `none_` is empty too (`isNone`). An empty slot may follow another, so `rule_2` can repeat `rule_1`'s `None`. `none`, like everything found everywhere and the rule `None`, holds a fixed share of its roll (`data/balance.md#Fixed shares`).

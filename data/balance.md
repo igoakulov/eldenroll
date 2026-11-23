@@ -204,7 +204,7 @@ Every row of `data/overrides/modifiers.csv` belongs to one rule below. A rule al
 
 ### Classes with extra rules
 
-Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32) and never `L2 only` (#6); `Sorcerer` a left-hand ash for ripostes (#37); the classes that can't use a talisman or rule lose it (#33, #34).
+Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32) and never `L2 only` (#6); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); the classes that can't use a talisman or rule lose it (#33, #34).
 
 ### 1. Parry only needs a parry ash
 
@@ -244,7 +244,7 @@ Rows: `knight_thrusting_shield_empties_lh`, `knight_other_rh_keeps_a_shield_in_l
 
 ### 11. Blue Dancer Charm needs light hands
 
-P1. The charm boosts physical damage at a low equip load, and the hands roll first. A heavy weapon class, staff, seal, thrusting shield or greatshield in RH removes it; with both hands full, RH must be a dagger, straight sword, curved sword, thrusting sword or whip. The left hand must be empty or a seal (owner, 2026-11-22): anything else there makes the player too heavy to benefit. So `Knight`, always holding a shield, never rolls it.
+P1. The charm boosts physical damage at a low equip load, and the hands roll first. A heavy weapon class, staff, seal, thrusting shield or greatshield in RH removes it; with both hands full, RH must be a dagger, straight sword, curved sword, thrusting sword or whip. The left hand must be empty, a seal or `Poisoned Hand` (owner, 2026-11-22 and 2026-11-23): anything else there makes the player too heavy to benefit, and `Poisoned Hand` keeps its own synergy (#45). So `Knight`, always holding a shield, never rolls it.
 
 Rows: `heavy_rh_removes_blue_dancer_charm`, `two_hands_need_a_lightest_rh_for_blue_dancer_charm`, `blue_dancer_charm_needs_an_empty_or_seal_lh`
 
@@ -316,7 +316,7 @@ Rows: `blasphemous_blade_boosts_healing_rules`, `prayerful_strike_boosts_healing
 
 ### 26. Dual-Wield Warrior pairs
 
-P2. The class's identity, as odds rather than a filter (owner, 2026-11-17): about 65% same-class pairs, 20% a paired weapon with LH `none`, 15% two classes. Once RH has rolled, LH weapons of RH's class get `×70`; a paired weapon in RH, by class or by name (every weapon without the two-handed strength bonus but `Grafted Dragon` and `Starscourge Greatsword`), leaves LH `none`; any other RH keeps an unpaired LH. A light RH removes every heavy class from LH. The paired share is set by the paired weapons' own odds, by the region where each arrives.
+P2. The class's identity, as odds rather than a filter (owner, 2026-11-17): about 65% same-class pairs, 20% a paired weapon with LH `none`, 15% two classes. Once RH has rolled, LH weapons of RH's class get `×70`; a paired weapon in RH, by class or by name (every weapon without the two-handed strength bonus but `Grafted Dragon` and `Starscourge Greatsword`), leaves LH `none`, except `Venomous Fang`, which brings `Poisoned Hand` (#45); any other RH keeps an unpaired LH. A light RH removes every heavy class from LH. The paired share is set by the paired weapons' own odds, by the region where each arrives.
 
 Rows: `warrior_dw_pairs_greatsword`, `warrior_dw_pairs_straight_sword`, `warrior_dw_pairs_colossal_weapon`, `warrior_dw_pairs_spear`, `warrior_dw_pairs_dagger`, `warrior_dw_pairs_halberd`, `warrior_dw_pairs_curved_sword`, `warrior_dw_pairs_axe`, `warrior_dw_pairs_hammer`, `warrior_dw_pairs_great_hammer`, `warrior_dw_pairs_greataxe`, `warrior_dw_pairs_colossal_sword`, `warrior_dw_pairs_curved_greatsword`, `warrior_dw_pairs_katana`, `warrior_dw_pairs_great_spear`, `warrior_dw_pairs_thrusting_sword`, `warrior_dw_pairs_twinblade`, `warrior_dw_pairs_flail`, `warrior_dw_pairs_whip`, `warrior_dw_pairs_heavy_thrusting_sword`, `warrior_dw_pairs_reaper`, `warrior_dw_pairs_great_katana`, `warrior_dw_pairs_light_greatsword`, `warrior_dw_paired_class_empties_lh`, `warrior_dw_paired_weapon_empties_lh`, `warrior_dw_unpaired_rh_keeps_lh_unpaired`, `warrior_dw_light_rh_removes_heavy_lh`
 
@@ -447,3 +447,12 @@ Rows: `none_talisman_only_early`, `none_talisman_knight_limgrave`, `none_talisma
 Owner, 2026-11-22. **Preference:** each melee class features its own: `2H Warrior` `Axe Talisman` and `Blade of Mercy` (#37), `Dual-Wield Warrior` `Claw Talisman`, which both hands heavy raise `×2` for jump attacks with two heavy weapons, all game. `Dual-Wield Warrior` and `Spellblade` don't charge heavy attacks with the right hand, so `Axe Talisman` rolls `×0.7` for them; `Claw Talisman` rolls `×0.7` for `Knight` and `Spellblade`. In Limgrave to Caelid, `Knight`'s `Axe Talisman` rolls `×0.7` and `Curved Sword Talisman` `×3`, for about 20–30% `Curved Sword Talisman` there, against `Axe Talisman`'s early lead.
 
 Rows: `warrior_dw_heavy_pair_boosts_claw_talisman`, `axe_talisman_lower_on_dw_and_spellblade`, `claw_talisman_lower_on_knight_and_spellblade`, `knight_axe_talisman_lower_early`, `knight_curved_sword_talisman_early`
+
+### 45. Poisoned Hand
+
+Owner, 2026-11-23. **Synergy:** `Poisoned Hand` joins a poison weapon in the left hand. `none` holds a fixed 1 in 101 of these hands (#Fixed shares), so rows that remove it everywhere else leave it near-certain where it joins.
+
+- `2H Warrior` gets it beside the triggers of #24. Rot and poison in its right hand or right-hand ash: it also boosts damage, as `Kindred of Rot's Exultation` does.
+- `Dual-Wield Warrior` gets it beside `Venomous Fang`: reason not recorded.
+
+Rows: `warrior_2h_lh_poisoned_hand_only_beside_rot`, `warrior_dw_lh_poisoned_hand_only_beside_venomous_fang`

@@ -213,7 +213,7 @@ describe("class shapes", () => {
   it("leaves LH empty after a paired RH", () => {
     const paired = new Set(
       realDatabase.item
-        .filter((row) => row.subcategory === "fist" || row.subcategory === "claw")
+        .filter((row) => (row.subcategory === "fist" || row.subcategory === "claw") && row.id !== "venomous_fang")
         .map((row) => row.id),
     );
     let seen = 0;
@@ -225,6 +225,33 @@ describe("class shapes", () => {
       }
     }
     expect(seen).toBeGreaterThan(0);
+  });
+
+  it("holds Poisoned Hand in a Warrior's LH only beside its poison partner", () => {
+    const rot = realDatabase.modifier.find((row) => row.id === "rot_boosts_kindred_exultation")?.when[0];
+    const rotIds = rot?.kind === "rolled" ? (rot.selector.ids ?? []) : [];
+    const rotWeapon = realDatabase.item.find((row) => rotIds.includes(row.id) && row.category === "weapon" && row.str_bonus_2h);
+    const lhAfter = (characterClass: string, rh: string, seed: number) =>
+      id(
+        rollLoadout({
+          data,
+          characterClass,
+          boss: null,
+          counted: testCase.counted,
+          limits: { stats: testCase.stats, maxStatGap: testCase.maxStatGap },
+          random: seeded(seed),
+          from: "lh",
+          kept: { rh, rh_ash: null },
+        }),
+        "lh",
+      );
+    expect(rotWeapon).toBeDefined();
+    for (let seed = 0; seed < 20; seed += 1) {
+      expect(lhAfter("warrior_2h", rotWeapon?.id ?? "", seed)).toBe("poisoned_hand");
+      expect(lhAfter("warrior_2h", "zweihander", seed)).toBe("none");
+      expect(lhAfter("warrior_dw", "venomous_fang", seed)).toBe("poisoned_hand");
+      expect(lhAfter("warrior_dw", "longsword", seed)).not.toBe("poisoned_hand");
+    }
   });
 
   it("gives Sorcerer sorceries and Pyromancer incantations", () => {

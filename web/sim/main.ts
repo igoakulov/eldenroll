@@ -63,10 +63,11 @@ function vsFairRows(engine: Engine, results: readonly RunResult[], classes: read
   return rows;
 }
 
-/** The same Vs fair by item: each item against an even share of every item in reach in its slot. */
+/** The same Vs fair by item: each item against an even share of every item in reach in its slot, and against the time
+ * baseline, its share if every option showed equally whenever it could roll, so from when it comes into reach. */
 function vsFairItemRows(engine: Engine, results: readonly RunResult[], classes: readonly string[]) {
   const rows: (string | number | null)[][] = [
-    ["character_class", "slot", "region_number", "region", "item", "per_run", "fair_per_run", "vs_fair"],
+    ["character_class", "slot", "region_number", "region", "item", "per_run", "fair_per_run", "vs_fair", "rollable_share", "vs_rollable"],
   ];
   for (const scope of ["all", ...classes]) {
     const sample = sampleOf(engine.data, results, scope === "all" ? classes : [scope]);
@@ -78,6 +79,7 @@ function vsFairItemRows(engine: Engine, results: readonly RunResult[], classes: 
         rows.push([
           scope, table, row.order ?? null, row.region ?? copy.sim.slots.noLocation, row.name, row.perRun,
           (fair * shares.total) / shares.runs, fair > 0 ? vsFair(row) : null,
+          row.rollable ?? null, row.rollable ? row.share / row.rollable : null,
         ]);
       }
     }

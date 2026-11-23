@@ -104,7 +104,7 @@ describe("rhStatFilter looks ahead at LH", () => {
   const zweihander = item("zweihander");
   const needsBonus = { stats: strengthOnlyTwoHandingReaches(zweihander.str), maxStatGap: 0 };
 
-  it("gives 2H Warrior the bonus, because LH can only be none", () => {
+  it("gives 2H Warrior the bonus, because it always two-hands", () => {
     expect(rhStatFilter(context("warrior_2h"), needsBonus)(option("zweihander"))).toBe(true);
   });
 

@@ -39,7 +39,7 @@ TABLE_FIELDS: Final[Mapping[str, tuple[str, ...]]] = {
     "armor_set": ("id", "name", "pieces", "odds", "url"),
     "ash_compatibility": ("ash_id", "category", "subcategory"),
     "combat_rule": ("id", "name", "odds"),
-    "character_class": ("id", "name", "odds"),
+    "character_class": ("id", "name", "odds", "two_handed"),
     "slot_pool": ("character_class_id", "slot", "selectors", "opened_by"),
     "alias": ("id", "label", "url"),
     "item_location": ("item_id", "location_id", "boss_instance_id"),
@@ -99,7 +99,12 @@ def database_rows(database: Database) -> Mapping[str, Sequence[Row]]:
             for row in database.rules
         ],
         "character_class": [
-            {"id": row.id, "name": row.name, "odds": _number(row.odds)}
+            {
+                "id": row.id,
+                "name": row.name,
+                "odds": _number(row.odds),
+                "two_handed": row.two_handed,
+            }
             for row in database.character_classes
         ],
         "slot_pool": [

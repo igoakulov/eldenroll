@@ -115,6 +115,8 @@ export interface CharacterClass {
   readonly id: string;
   readonly name: string;
   readonly odds: number;
+  /** Two-hands its right hand whatever the left holds (`web/src/engine/README.md#Two-handing`). */
+  readonly two_handed?: boolean;
 }
 
 export interface SlotPool {

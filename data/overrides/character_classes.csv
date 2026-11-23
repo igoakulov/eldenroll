@@ -1,9 +1,9 @@
-id,name,odds
-knight,Knight,1
-warrior_2h,2H Warrior,1
-warrior_dw,Dual-Wield Warrior,1
-ranger,Ranger,0.5
-sorcerer,Sorcerer,1
-pyromancer,Pyromancer,1
-spellblade,Spellblade,1
-jester,Jester,0.25
+id,name,odds,two_handed
+knight,Knight,1,
+warrior_2h,2H Warrior,1,yes
+warrior_dw,Dual-Wield Warrior,1,
+ranger,Ranger,0.5,
+sorcerer,Sorcerer,1,
+pyromancer,Pyromancer,1,
+spellblade,Spellblade,1,
+jester,Jester,0.25,

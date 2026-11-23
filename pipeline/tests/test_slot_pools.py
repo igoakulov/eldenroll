@@ -61,7 +61,8 @@ def test_hands_resolve_to_their_classes(
     assert _subcategories(resolved["knight", "rh"]) == UNPAIRED | {"thrusting_shield"}
     assert _subcategories(resolved["warrior_2h", "rh"]) == MELEE | {"thrusting_shield"}
     assert _subcategories(resolved["warrior_dw", "rh"]) == MELEE
-    assert _subcategories(resolved["warrior_dw", "lh"]) == UNPAIRED | {None}
+    # data/balance.md#45. Poisoned Hand
+    assert _subcategories(resolved["warrior_dw", "lh"]) == UNPAIRED | {None, "fist"}
     assert _subcategories(resolved["spellblade", "rh"]) == UNPAIRED
     assert _subcategories(resolved["ranger", "rh"]) == RANGED
     # data/balance.md#35. Carian Sorcery Sword
@@ -84,8 +85,8 @@ def test_empty_hands_and_spells_hold_only_none(
     pools: tuple[SlotPool, ...], placement_data: PlacementData
 ) -> None:
     resolved = _resolved(pools, placement_data.table)
+    assert {row.id for row in resolved["warrior_2h", "lh"]} == {"none", "poisoned_hand"}
     empty = [
-        ("warrior_2h", "lh"),
         ("ranger", "lh"),
         ("jester", "lh"),
         *((character_class, "spell") for character_class in ("knight", "warrior_2h", "warrior_dw")),
@@ -106,6 +107,7 @@ def test_jester_right_hand(pools: tuple[SlotPool, ...], placement_data: Placemen
         "perfume_bottle",
         "glintstone_staff",
         "fist",
+        "small_shield",
     }
     assert [row.name for row in found if row.subcategory == "fist"] == ["Grafted Dragon"]
     staves = [row for row in found if row.subcategory == "glintstone_staff"]

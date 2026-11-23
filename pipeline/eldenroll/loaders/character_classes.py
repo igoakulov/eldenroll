@@ -1,5 +1,6 @@
 """`selectors` holds `kind:id id` parts split by `;`, because the ids are slugs and a cell stays
-free of quoting. A part with no ids, such as `rule:`, means every option of that kind. `opened_by`,
+free of quoting. A part with no ids, such as `rule:`, means every option of that kind. A class's
+optional `two_handed` is `yes` or empty. `opened_by`,
 an optional column, names the boss instance whose felling opens the slot; empty means always open.
 """
 
@@ -25,13 +26,19 @@ class SlotPoolRow:
 
 def load_character_classes(path: Path) -> tuple[CharacterClass, ...]:
     table = read_table(path, required_columns=("id", "name", "odds"))
+    two_handed = table.column("two_handed") if "two_handed" in table.header else None
+    flags = [row[two_handed] if two_handed is not None else "" for row in table.rows]
+    bad = sorted({flag for flag in flags if flag not in ("", "yes")})
+    if bad:
+        raise LoaderError(f"{path}: two_handed must be yes or empty, not {', '.join(bad)}")
     character_classes = tuple(
         CharacterClass(
             id=row[table.column("id")],
             name=row[table.column("name")],
             odds=parse_odds(path, row[table.column("id")], row[table.column("odds")]),
+            two_handed=flag == "yes",
         )
-        for row in table.rows
+        for row, flag in zip(table.rows, flags, strict=True)
     )
     if tuple(character_class.id for character_class in character_classes) != CHARACTER_CLASSES:
         raise LoaderError(f"{path}: expected the character classes {', '.join(CHARACTER_CLASSES)}")

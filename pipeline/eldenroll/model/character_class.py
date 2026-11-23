@@ -10,6 +10,8 @@ class CharacterClass:
     id: str
     name: str
     odds: float = 1
+    # Two-hands its right hand whatever the left holds, so the Strength bonus always counts
+    two_handed: bool = False
 
 
 @dataclass(frozen=True, slots=True)

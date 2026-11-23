@@ -50,14 +50,16 @@ export function lhStatFilter(context: RollContext, limits: StatLimits): OptionFi
 }
 
 /** LH hasn't rolled when RH does, so an RH option gets the bonus only if `none` is all LH could
- * roll beside it. The look-ahead is skipped unless the bonus decides the option. */
+ * roll beside it, or the class always two-hands. The look-ahead is skipped unless the bonus decides the option. */
 export function rhStatFilter(context: RollContext, limits: StatLimits): OptionFilter {
+  const twoHanded =
+    context.data.database.character_class.find((row) => row.id === context.state.characterClass)?.two_handed === true;
   return (option) => {
     if (option.kind !== "item") return true;
     const item = option.row;
     if (withinGap(item, limits, false)) return true;
     if (item.str_bonus_2h !== true || !withinGap(item, limits, true)) return false;
-    return leavesLhEmpty(context, limits, item);
+    return twoHanded || leavesLhEmpty(context, limits, item);
   };
 }
 

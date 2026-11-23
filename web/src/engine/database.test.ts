@@ -36,7 +36,7 @@ const FIELDS: { readonly [T in keyof Database]: Record<keyof Database[T][number]
   armor_set: { id: true, name: true, pieces: true, odds: true, url: true },
   ash_compatibility: { ash_id: true, category: true, subcategory: true },
   combat_rule: { id: true, name: true, odds: true },
-  character_class: { id: true, name: true, odds: true },
+  character_class: { id: true, name: true, odds: true, two_handed: true },
   slot_pool: { character_class_id: true, slot: true, selectors: true, opened_by: true },
   alias: { id: true, label: true, url: true },
   item_location: { item_id: true, location_id: true, boss_instance_id: true },
