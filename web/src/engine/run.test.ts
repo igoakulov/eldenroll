@@ -183,7 +183,8 @@ describe("catch-up", () => {
     const rh = rolls.find(([slot]) => slot === "rh")?.[1];
     const late = rh?.options.find((row) => row.option.row.id === "miquellan_knights_sword");
     expect(late?.catchUp).toBeGreaterThan(1);
-    expect(rh?.options.every((row) => row.catchUp <= (late?.catchUp ?? 0))).toBe(true);
+    // Arrivals as late tie with it; the margin absorbs rounding
+    expect(rh?.options.every((row) => row.catchUp <= (late?.catchUp ?? 0) + 1e-9)).toBe(true);
   });
 
   it("counts an objective once however often its slots were rerolled", () => {

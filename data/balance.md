@@ -108,87 +108,77 @@ Options found everywhere hold a fixed share of their roll, whatever else is in i
 
 A row's own odds, for every option that rolls differently all the time. Files: `character_classes.csv`, `combat_rules.csv`, `item_odds.csv`, `boss_odds.csv`, `armor_set_odds.csv` in `data/overrides/`. A boss at 0 is never an objective, and its items roll by region as a regular enemy's would.
 
+### Classes and combat rules
+
+Playstyles and rules that grow tiresome or crowd the rest roll less.
+
 | Kind | Id | Odds | Why |
 |---|---|---:|---|
-| class | `ranger` | 0.5 | a less enjoyable playstyle, with less weapon variety than melee or magic |
-| class | `jester` | 0.25 | a mix of silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
+| class | `ranger` `jester` | 0.25–0.5 | owner decision: `Ranger` plays less enjoyably, with less weapon variety than melee or magic; `Jester` mixes silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
 | rule | `none` | 100 | half of each rule slot taken alone, a fixed share (#Fixed shares); with #36. Empty rule slots, 20% / 60% / 20% of objectives with no rule, one or two (owner, 2026-11-19) |
-| rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` | 0.5 | owner decision: they crowded out other rules and, for `No armor`, pushed the `Naked Set` and the light sets past their guarantees' reach of each other |
-| rule | `parry_only` `l2_only` | 0.5 | owner decision: both limit the moveset a lot, `L2 only` sometimes clashing with an ash it doesn't suit, so each joins the other hard rules at about 5% |
+| rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` `parry_only` `l2_only` | 0.5 | owner decision: hard rules, each at about 5%: they crowded out the others, limit the moveset a lot (`L2 only` sometimes clashes with an ash), and `No armor` pushed the `Naked Set` and the light sets past their guarantees' reach of each other |
 | rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
-| item | `grafted_dragon` | 3 | `Jester`'s signature right hand; it rolls nowhere else (#29. Grafted Dragon only on Jester) |
+
+### Never rolled
+
+Items left out: unplayable with a loadout, pointless where they arrive, or crowding out a better one.
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| item | `igons_drake_hunt` `lamenters_mask` `rock_heart` `priestess_heart` `litany_of_proper_death` `marikas_soreseal` `warrior_jar_shard` `sacred_scorpion_charm` | 0 | owner decision: easily missed in the game, a transform that conflicts with gear, places hard to pin down, a downside arriving too late, a talisman crowding out a better one, or too few matching ashes and spells where it arrives; each reason in `item_odds.csv` |
+
+### Rare, unique and worth seeing
+
+The largest raise: variety over strict parity (#Fair share, O140).
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| item | `alabaster_lords_sword` `bestial_sling` `black_blade` `blades_of_stone` `blasphemous_blade` `carian_knights_sword` `carian_thrusting_shield` `celebrants_cleaver` `coded_sword` `dark_moon_greatsword` `death_lightning` `dragonscale_blade` `dueling_shield` `eclipse_shotel` `envoys_greathorn` `envoys_horn` `envoys_long_horn` `euporia` `flame_of_the_fell_god` `fleeting_microcosm` `fortissaxs_lightning_spear` `frozen_needle` `gavel_of_haima` `ghostflame_breath` `giantsflame_take_thee` `godslayers_greatsword` `golden_order_greatsword` `golem_fist` `halo_scythe` `hoarah_louxs_earthshaker` `horned_warriors_greatsword` `icerind_hatchet` `idus_sword` `inseparable_sword` `iron_cleaver` `lansseaxs_glaive` `lorettas_mastery` `magma_blade` `midras_flame_of_frenzy` `milady` `mohgwyns_sacred_spear` `noble_presence` `rakshasas_great_katana` `reed_great_katana` `retaliatory_crossed_tree` `ringed_finger` `rings_of_spectral_light` `ritual_thrusting_shield` `roar_of_rugalea` `rock_blaster` `rosus_axe` `royal_greatsword` `scarlet_aeonia` `serpent_hunter` `shadow_sunflower_blossom` `smithscript_axe` `smithscript_cirque` `smithscript_dagger` `smithscript_greathammer` `smithscript_shield` `smithscript_spear` `spear_of_the_impaler` `spirit_sword` `star_fist` `stone_of_gurranq` `sword_of_night_and_flame` `treespear` `triple_rings_of_light` `urumi` `wing_of_astel` `zamor_curved_sword` | 1.5–10 | owner decision: **Preference:** rare, unique or striking weapons, ashes, spells and talismans, at least a fair share in the builds that reach them and most at two to three times; throwable weapons three times. Late arrivals' odds also make up for their region (#No forecast). Each value and its reason in `item_odds.csv` |
+
+### Synergy enablers
+
+Weapons and ashes that bring a synergy hold at least a fair share, most about twice, so the synergy shows (O141, O133).
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| item | `ants_skull_plate` `antspur_rapier` `coil_shield` `curseblades_cirque` `dancing_blade_of_ranah` `deadly_poison_perfume_bottle` `eleonoras_poleblade` `flowing_curved_sword` `giants_red_braid` `hand_of_malenia` `leontiels_greatsword` `marais_executioners_sword` `nagakiba` `overhead_stance` `poisoned_hand` `poleblade_of_the_bud` `regalia_of_eochaid` `rotten_battle_hammer` `rotten_crystal_spear` `rotten_crystal_staff` `rotten_crystal_sword` `rotten_greataxe` `rotten_staff` `scorpions_stinger` `serpent_bow` `serpentbone_blade` `square_off` `tooth_whip` `uchigatana` `unsheathe` `venomous_fang` `wing_stance` | 1.5–14 | owner decision: **Synergy:** rot and poison weapons bring `Kindred of Rot's Exultation` (#24. Rot and poison), Dancer's weapons the `Dancer's Set` (#17. Dancer's weapons), stance skills and their carriers `Rellana's Cameo` (#33. Talismans a class can't use), raised to about a fair share since few weapons take a stance; `Leontiel's Greatsword` also as a recent addition, at about three times |
+
+### Late arrivals by region
+
+Catch-up can't make up a late arrival with few objectives left, so odds go by the region where an item first comes into reach (#No forecast).
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| item | `agheels_flame` `ancient_dragons_lightning_spear` `ancient_dragons_lightning_strike` `aspects_of_the_crucible_bloom` `aspects_of_the_crucible_horns` `aspects_of_the_crucible_tail` `aspects_of_the_crucible_thorns` `bayles_flame_lightning` `bayles_tyranny` `black_flame` `black_flame_ritual` `bloodboon` `borealiss_mist` `burn_o_flame` `catch_flame` `divine_beast_tornado` `divine_bird_feathers` `dragonclaw` `dragonfire` `dragonmaw` `electrocharge` `fire_serpent` `fires_deadly_sin` `flame_fall_upon_them` `flame_sling` `frenzied_burst` `frozen_lightning_spear` `furious_blade_of_ansbach` `giant_golden_arc` `golden_arcs` `honed_bolt` `howl_of_shabriri` `inescapable_frenzy` `knights_lightning_spear` `land_of_shadow` `light_of_miquella` `lightning_spear` `lightning_strike` `messmers_orb` `multilayered_ring_of_light` `o_flame` `pest_thread_spears` `placidusaxs_ruin` `poison_mist` `radagons_rings_of_light` `rain_of_fire` `rotten_butterflies` `smarags_glintstone_breath` `spira` `surge_o_flame` `swarm_of_flies` `the_flame_of_frenzy` `theodorixs_magma` `unendurable_frenzy` `watchful_spirit` `wrath_from_afar` | 0.8–6 | owner decision. **Catch-up:** incantations by the region of arrival, from 0.9 in Limgrave to 6 in Enir-Ilim, where higher odds no longer help; sorceries need none |
+| item | `backhand_blade` `bloodhound_claws` `caestus` `cipher_pata` `claws_of_night` `clinging_bone` `danes_footwork` `death_knights_twin_axes` `dryleaf_arts` `falx` `greatsword_of_radahn_light` `greatsword_of_radahn_lord` `hookclaws` `horned_warriors_sword` `iron_ball` `katar` `madding_hand` `ornamental_straight_sword` `pata` `raptor_talons` `rellanas_twin_blades` `reverse_bladed_sword` `spiked_caestus` `starscourge_greatsword` `thiolliers_hidden_needle` `veterans_prosthesis` | 0.2–2 | owner decision. **Catch-up:** paired weapons by the region of arrival. **Preference:** they leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs); the hand-to-hand ashes at four times their region's odds, since hand-to-hand weapons were underrepresented |
 | item | `perfumed_oil_of_ranah` `ancestral_infants_head` `omen_bairn` `regal_omen_bairn` `horned_bairn` | 3 | owner decision. **Catch-up:** `Wraith Calling Bell`, in reach from Liurnia while the other tools wait, ran far ahead of them, so it rolls at a third of their odds |
-| item | `academy_magic_pot` `acid_spraymist` `albinauric_pot` `alluring_pot` `ancient_dragonbolt_pot` `beastlure_pot` `bloodboil_aromatic` `cursed_blood_pot` `eternal_sleep_pot` `fetid_pot` `fire_pot` `freezing_pot` `frenzied_flame_pot` `giantsflame_fire_pot` `hefty_fetid_pot` `hefty_fire_pot` `hefty_fly_pot` `hefty_freezing_pot` `hefty_frenzied_flame_pot` `hefty_furnace_pot` `hefty_lightning_pot` `hefty_magic_pot` `hefty_oil_pot` `hefty_poison_pot` `hefty_rancor_pot` `hefty_red_lightning_pot` `hefty_rock_pot` `hefty_rot_pot` `hefty_volcano_pot` `holy_water_pot` `ironjar_aromatic` `lightning_pot` `magic_pot` `oil_pot` `poison_pot` `poison_spraymist` `rancor_pot` `red_lightning_pot` `redmane_fire_pot` `roped_fetid_pot` `roped_fire_pot` `roped_fly_pot` `roped_frenzied_flame_pot` `roped_holy_water_pot` `roped_lightning_pot` `roped_magic_pot` `roped_oil_pot` `roped_poison_pot` `roped_volcano_pot` `rot_pot` `sacred_order_pot` `sleep_pot` `spark_aromatic` `swarm_pot` `uplifting_aromatic` `volcano_pot` | 3 | owner decision: pots and aromatics hold about two thirds of the item slot as a fixed share (#Fixed shares); other throwables stay at 1, since they took the slot too often |
-| item | `igons_drake_hunt` | 0 | easily missed in the game; `Igon's Greatbow` itself keeps normal odds |
-| item | `lamenters_mask` `rock_heart` `priestess_heart` | 0 | transforms that conflict with gear, so an objective can't use one with its loadout |
-| item | `litany_of_proper_death` | 0 | its places are hard to pin down, and it is nearly useless against anything not undead |
-| item | `finger_seal` `godslayers_seal` `giants_seal` `gravel_stone_seal` `clawmark_seal` `golden_order_seal` `erdtree_seal` `dragon_communion_seal` `frenzied_flame_seal` `dryleaf_seal` `fire_knights_seal` `spiraltree_seal` | 2 | a rolled catalyst decides `Spellblade`'s spell type, so staves and seals should hold the ratio of sorceries to incantations, owner 2026-11-16; with fewer seals than staves, seals at twice the odds do |
-| item | `ants_skull_plate` `antspur_rapier` `coil_shield` `deadly_poison_perfume_bottle` `poisoned_hand` `poleblade_of_the_bud` `rotten_battle_hammer` `rotten_crystal_spear` `rotten_crystal_staff` `rotten_crystal_sword` `rotten_greataxe` `rotten_staff` `scorpions_stinger` `serpent_bow` `serpentbone_blade` `tooth_whip` | 2 | owner decision: rot and poison weapons, shields and staves (the weapons that boost `Kindred of Rot's Exultation`, #24. Rot and poison) are underrepresented, at about 3% of what a hand can roll, and a status synergy with the talisman |
-| item | `carian_thrusting_shield` `dueling_shield` `ritual_thrusting_shield` | 3 | owner decision: thrusting shields play distinctly, and are underrepresented at about 1–2% of the right hand's showings for `Knight` and `2H Warrior`, the only classes that roll them |
-| item | `caestus` `cipher_pata` `clinging_bone` `hookclaws` `reverse_bladed_sword` `veterans_prosthesis` | 2 | owner decision. **Catch-up:** by the region where each first comes into reach. **Preference:** paired weapons leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs) |
-| item | `iron_ball` `ornamental_straight_sword` | 1.7 | owner decision. **Catch-up:** by the region where each first comes into reach. **Preference:** paired weapons leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs) |
-| item | `bloodhound_claws` `raptor_talons` | 1.4 | owner decision. **Catch-up:** by the region where each first comes into reach. **Preference:** paired weapons leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs) |
-| item | `falx` `greatsword_of_radahn_light` `greatsword_of_radahn_lord` `thiolliers_hidden_needle` | 0.35 | owner decision. **Catch-up:** by the region where each first comes into reach. **Preference:** paired weapons leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs) |
-| item | `madding_hand` | 0.3 | owner decision. **Catch-up:** by the region where each first comes into reach. **Preference:** paired weapons leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs) |
-| item | `backhand_blade` `beast_claw` `claws_of_night` `death_knights_twin_axes` `golem_fist` `horned_warriors_sword` `katar` `pata` `red_bears_claw` `rellanas_twin_blades` `smithscript_cirque` `smithscript_dagger` `spiked_caestus` `starscourge_greatsword` | 0.2 | owner decision. **Catch-up:** by the region where each first comes into reach. **Preference:** paired weapons leave `Dual-Wield Warrior`'s left hand empty, and the class holds about 20% paired through a run (#26. Dual-Wield Warrior pairs) |
-| item | `reed_great_katana` | 7 | owner decision: **Preference:** the only great katana before the DLC, so it stands for its weapon class: about 3 showings a run over the melee classes and, on `2H Warrior` before the DLC, near an average weapon class's share |
-| item | `milady` | 5 | owner decision: **Preference:** light greatswords are a rare weapon class, mostly found in the DLC; about 2 showings a run over the melee classes |
-| item | `danes_footwork` | 1.4 | owner decision. **Catch-up:** its region's odds for paired weapons (#26. Dual-Wield Warrior pairs). **Preference:** four times those, since hand-to-hand weapons were underrepresented |
-| item | `dryleaf_arts` | 0.8 | owner decision. **Catch-up:** its region's odds for paired weapons (#26. Dual-Wield Warrior pairs). **Preference:** four times those, since hand-to-hand weapons were underrepresented |
-| item | `hoarah_louxs_earthshaker` | 4 | owner decision: **Preference:** a rare, late boss ash, raised above a fair share in every build |
-| item | `agheels_flame` `aspects_of_the_crucible_horns` `aspects_of_the_crucible_tail` `black_flame` `catch_flame` `dragonclaw` `dragonfire` `dragonmaw` `flame_sling` `lightning_strike` `poison_mist` `the_flame_of_frenzy` | 0.9 | owner decision. **Catch-up:** incantations by the region where they first come into reach, here Limgrave: Limgrave through Altus take every `Pyromancer` roll while little else is in reach, and odds even them out among themselves. Sorceries need no region odds |
-| item | `bloodboon` `frenzied_burst` `frozen_lightning_spear` `honed_bolt` `howl_of_shabriri` `lightning_spear` `o_flame` `smarags_glintstone_breath` `surge_o_flame` `swarm_of_flies` | 0.8 | owner decision. **Catch-up:** incantations by region, here Liurnia |
-| item | `fires_deadly_sin` `inescapable_frenzy` `radagons_rings_of_light` | 1.5 | owner decision. **Catch-up:** incantations by region, here Leyndell; below the regions after it, since at 2 its spells ran over even |
-| item | `ancient_dragons_lightning_spear` `ancient_dragons_lightning_strike` `black_flame_ritual` `borealiss_mist` `burn_o_flame` `electrocharge` `flame_fall_upon_them` `giantsflame_take_thee` `golden_arcs` `knights_lightning_spear` `multilayered_ring_of_light` `placidusaxs_ruin` `theodorixs_magma` `unendurable_frenzy` `watchful_spirit` | 2 | owner decision. **Catch-up:** incantations by region, the Mountaintops through Gravesite Plain |
-| item | `aspects_of_the_crucible_bloom` `aspects_of_the_crucible_thorns` `bayles_flame_lightning` `bayles_tyranny` `divine_beast_tornado` `divine_bird_feathers` `fire_serpent` `giant_golden_arc` `land_of_shadow` `messmers_orb` `pest_thread_spears` `rain_of_fire` `rotten_butterflies` `wrath_from_afar` | 3 | owner decision. **Catch-up:** incantations by region, Shadow Keep through Jagged Peak: few objectives left and many rivals |
-| item | `furious_blade_of_ansbach` `light_of_miquella` `spira` | 6 | owner decision. **Catch-up:** incantations by region, Enir-Ilim, the last region; higher odds no longer help |
-| item | `blades_of_stone` `flame_of_the_fell_god` `lansseaxs_glaive` `rings_of_spectral_light` `lorettas_mastery` | 2 | owner decision. **Catch-up:** the Even build reaches this spell late for its stat requirement, so it is raised until it shows about evenly there (#No forecast). **Preference:** worth seeing, so it is left running over even in the build that raises that stat |
-| item | `death_lightning` `fortissaxs_lightning_spear` | 2 | owner decision. **Catch-up:** the Even build reaches this spell late for its Faith requirement, so it is raised part of the way there (#No forecast); enough to read even under Even would run it about three times over even under Faith. **Preference:** worth seeing |
-| item | `black_blade` | 4 | owner decision. **Catch-up:** the Even build reaches this spell late for its stat requirement, so it is raised until it shows about evenly there (#No forecast). **Preference:** worth seeing, so it is left running over even in the build that raises that stat |
-| item | `ghostflame_breath` | 4 | owner decision. **Catch-up:** its region's odds of 3. **Preference:** the rest, for a spell worth seeing that still showed too rarely |
-| item | `midras_flame_of_frenzy` `triple_rings_of_light` `scarlet_aeonia` | 5 | owner decision. **Catch-up:** its region's odds of 3. **Preference:** the rest, for a spell worth seeing that still showed too rarely |
-| item | `roar_of_rugalea` | 3 | owner decision. **Catch-up:** its region's odds of 2. **Preference:** the rest, for a spell worth seeing that still showed too rarely |
-| item | `marikas_soreseal` | 0 | owner decision: **Preference:** it arrives in Miquella's Haligtree, too late in the game, where bosses are very difficult, for such a disadvantage; `Any Scarseal / Soreseal` keeps the other three |
-| item | `radagons_soreseal` `radagons_scarseal` `marikas_scarseal` `shabriris_woe` | 0.5 | owner decision: **Preference:** `Any Scarseal / Soreseal` and `Shabriri's Woe` only raise the damage taken, for little or no utility, unlike `Any Scorpion Charm`, which also steers toward an elemental build |
-| item | `crucible_feather_talisman` `crucible_knot_talisman` `fine_crucible_feather_talisman` `talisman_of_all_crucibles` | 0.25 | owner decision: **Preference:** negative effects that add challenge roll less often; `Any Crucible talisman` only raises the damage taken, for little or no utility |
-| item | `crucible_scale_talisman` | 0.1 | owner decision: **Preference:** crucibles roll less overall, and it arrives in Leyndell, where a spike of a pure downside suits least |
-| item | `daedicars_woe` `verdigris_discus` | 0.5 | owner decision: **Preference:** negative effects that add challenge roll less often |
-| item | `dagger_talisman` | 0.25 | owner decision: **Preference:** rarely useful without a parry or a heavy weapon's stance break, where rules raise it (#18. Parry ashes, #37. Ripostes) |
-| item | `curved_sword_talisman` | 0.1 | owner decision: **Synergy:** it shows almost only beside `Greatshield Talisman`, which brings it (#38. Guarding talismans) |
-| item | `talisman_of_lords_bestowal` | 0.5 | owner decision: **Preference:** too niche |
-| item | `companion_jar` `perfumers_talisman` | 0.5 | owner decision: **Preference:** too frequent among objectives with pots or perfumes; no row boosts them, so none needs offsetting (#39. Pots and perfumes) |
-| item | `blade_of_mercy` | 0.5 | owner decision: **Preference:** more situational than the moveset talismans; rules raise it where it fits (#37. Ripostes) |
-| item | `twinblade_talisman` | 0.5 | owner decision: **Preference:** less useful than the other moveset talismans |
-| item | `retaliatory_crossed_tree` | 1.5 | owner decision: **Preference:** it promotes an underused moveset. **Catch-up:** it arrives late in the game |
-| item | `warrior_jar_shard` | 0 | owner decision: it would otherwise take the talisman slot that `Shard of Alexander`, the more useful of the two, should get |
-| item | `venomous_fang` | 4 | owner decision: **Synergy:** its innate poison brings `Kindred of Rot's Exultation` (#24. Rot and poison); about twice a fair share |
-| item | `star_fist` | 10 | owner decision: **Preference:** an outstanding weapon, raised above a fair share in every build; a paired weapon (#26. Dual-Wield Warrior pairs) |
-| item | `curseblades_cirque` `dancing_blade_of_ranah` `flowing_curved_sword` `hand_of_malenia` | 4 | owner decision: **Synergy:** Dancer's weapons (#17. Dancer's weapons) at about twice a fair share |
-| item | `eleonoras_poleblade` `giants_red_braid` `marais_executioners_sword` `regalia_of_eochaid` | 3 | owner decision: **Synergy:** Dancer's weapons (#17. Dancer's weapons) at about twice a fair share |
-| item | `leontiels_greatsword` | 4 | owner decision: **Synergy:** its stance skill brings `Rellana's Cameo` (#33. Talismans a class can't use). **Preference:** a recent addition to the game, at about three times a fair share |
-| item | `uchigatana` `nagakiba` | 1.5 | owner decision: **Catch-up:** the only infusable katanas, which carry `Unsheathe` for `Rellana's Cameo`, raised to about a fair share |
-| item | `overhead_stance` | 10 | owner decision: **Catch-up:** a stance skill for `Rellana's Cameo`, raised to about a fair share; few weapons take it |
-| item | `square_off` | 5 | owner decision: **Catch-up:** a stance skill for `Rellana's Cameo`, raised to about a fair share |
-| item | `wing_stance` | 6 | owner decision: **Catch-up:** a stance skill for `Rellana's Cameo`, raised to about a fair share |
-| item | `unsheathe` | 14 | owner decision: **Catch-up:** a stance skill for `Rellana's Cameo`, raised to about a fair share; few weapons take it |
-| item | `red_feathered_branchsword` `blue_feathered_branchsword` | 0.4 | owner decision: **Preference:** they come as a pair (#42. Branchswords), and low odds keep their peaks down |
-| item | `sacred_scorpion_charm` | 0 | owner decision: **Preference:** Limgrave holds too few holy ashes and spells for it, so `Any Scorpion Charm` opens with the other three from the Altus Plateau |
-| boss | `guardian_golem_highroad_cave` `ancient_hero_of_zamor_weeping_peninsula_tombsward_weeping_evergaol_tombsward_cave_entrance` | 10 | each takes about 20% of its region's boss roll, so what it drops comes early: `Blue Dancer Charm`, `Kindred of Rot's Exultation`, the `Dancer's Set`, `Godskin Swaddling Cloth`, `Radagon's Scarseal` and `Crucible Knot Talisman` |
-| boss | `kindred_of_rot_seethewater_cave` | 9 | about 20% of its region's boss roll, as above |
-| boss | `dancer_of_ranah_cerulean_coast_southern_nameless_mausoleum_far_southwest_coast` `omenkiller_liurnia_of_the_lakes_west_albinauric_village` | 7 | about 20% of its region's boss roll, as above |
-| boss | `spiritcaller_snail_spiritcaller_cave` | 2.5 | about 20% of its region's boss roll, as above |
-| boss | `blaidd_the_half_wolf_liurnia_of_the_lakes_rannis_rise_seluviss_rise` | 0 | an invader, not a boss fight; kept for `Royal Greatsword` and his armor |
-| boss | `fire_knight_kood_specimen_storehouse_shadow_tower` | 0 | kept for `Flame Spear` and `Winged Serpent Helm` |
-| boss | `fire_knight_salza_shadow_keep_west_rampart` | 0 | kept for `Rain of Fire` and `Salza's Hood` |
-| boss | `fire_knight_wego_shadow_keep_drained_church_district` | 0 | kept for `Death Mask Helm` |
-| boss | `divine_bird_warrior_belurat_tower_settlement_swamp` | 0 | kept for `Horned Warrior's Sword` |
-| boss | `divine_bird_warrior_enir_ilim` | 0 | kept for `Horned Warrior's Greatsword` |
-| boss | `ensha_of_the_royal_remains_roundtable_hold` | 0 | kept for `Clinging Bone` |
-| boss | `erdtree_avatar_deeproot_depths` | 0 | kept for `Staff of the Avatar` |
-| boss | `fire_prelate_mt_gelmir_fort_laiedd` | 0 | kept for `Prelate's Inferno Crozier` |
-| boss | `putrid_avatar_miquellas_haligtree_elphael` | 0 | kept for `Rotten Staff` |
-| boss | `shadow_tree_spirit_gravesite_plain_ellac_river_cave` | 0 | kept for `Horned Bairn` |
 | armor_set | `ledas_knight_set` `ledas_surgeon_set` | 3 | owner decision: **Catch-up:** they arrive in Enir-Ilim with about three objectives left |
+
+### Lowered talismans
+
+Talismans that only add challenge, or matter only where a rule brings them.
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| item | `crucible_feather_talisman` `crucible_knot_talisman` `crucible_scale_talisman` `daedicars_woe` `fine_crucible_feather_talisman` `marikas_scarseal` `radagons_scarseal` `radagons_soreseal` `shabriris_woe` `talisman_of_all_crucibles` `verdigris_discus` | 0.1–0.5 | owner decision: **Preference:** scarseals, soreseals, woes, crucibles and `Verdigris Discus` only raise the damage taken, for little or no utility, so they roll less; `Crucible Scale Talisman` least, arriving in Leyndell, where a spike of a pure downside suits least |
+| item | `talisman_of_lords_bestowal` `companion_jar` `perfumers_talisman` `twinblade_talisman` `dagger_talisman` `blade_of_mercy` `curved_sword_talisman` `red_feathered_branchsword` `blue_feathered_branchsword` | 0.1–0.5 | owner decision: **Preference:** niche or situational talismans; rules raise them where they fit: the critical-hit pair beside a parry or a heavy weapon (#18. Parry ashes, #37. Ripostes), `Curved Sword Talisman` beside `Greatshield Talisman` (#38. Guarding talismans), the branchswords as a pair (#42. Branchswords), the jar and perfume talismans beside pots and perfumes (#39. Pots and perfumes) |
+
+### Item slot, catalysts and Jester
+
+Shares within a slot that the player meets on every objective.
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| item | `academy_magic_pot` `acid_spraymist` `albinauric_pot` `alluring_pot` `ancient_dragonbolt_pot` `beastlure_pot` `bloodboil_aromatic` `cursed_blood_pot` `eternal_sleep_pot` `fetid_pot` `fire_pot` `freezing_pot` `frenzied_flame_pot` `giantsflame_fire_pot` `hefty_fetid_pot` `hefty_fire_pot` `hefty_fly_pot` `hefty_freezing_pot` `hefty_frenzied_flame_pot` `hefty_furnace_pot` `hefty_lightning_pot` `hefty_magic_pot` `hefty_oil_pot` `hefty_poison_pot` `hefty_rancor_pot` `hefty_red_lightning_pot` `hefty_rock_pot` `hefty_rot_pot` `hefty_volcano_pot` `holy_water_pot` `ironjar_aromatic` `lightning_pot` `magic_pot` `oil_pot` `poison_pot` `poison_spraymist` `rancor_pot` `red_lightning_pot` `redmane_fire_pot` `roped_fetid_pot` `roped_fire_pot` `roped_fly_pot` `roped_frenzied_flame_pot` `roped_holy_water_pot` `roped_lightning_pot` `roped_magic_pot` `roped_oil_pot` `roped_poison_pot` `roped_volcano_pot` `rot_pot` `sacred_order_pot` `sleep_pot` `spark_aromatic` `swarm_pot` `uplifting_aromatic` `volcano_pot` | 3 | owner decision: pots and aromatics hold about two thirds of the item slot as a fixed share (#Fixed shares); other throwables stay at 1, since they took the slot too often |
+| item | `finger_seal` `godslayers_seal` `giants_seal` `gravel_stone_seal` `clawmark_seal` `golden_order_seal` `erdtree_seal` `dragon_communion_seal` `frenzied_flame_seal` `dryleaf_seal` `fire_knights_seal` `spiraltree_seal` | 2 | a rolled catalyst decides `Spellblade`'s spell type, so staves and seals should hold the ratio of sorceries to incantations, owner 2026-11-16; with fewer seals than staves, seals at twice the odds do |
+| item | `grafted_dragon` | 3 | `Jester`'s signature right hand; it rolls nowhere else (#29. Grafted Dragon only on Jester) |
+
+### Bosses
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| boss | `guardian_golem_highroad_cave` `ancient_hero_of_zamor_weeping_peninsula_tombsward_weeping_evergaol_tombsward_cave_entrance` `kindred_of_rot_seethewater_cave` `dancer_of_ranah_cerulean_coast_southern_nameless_mausoleum_far_southwest_coast` `omenkiller_liurnia_of_the_lakes_west_albinauric_village` `spiritcaller_snail_spiritcaller_cave` | 2.5–10 | each takes about 20% of its region's boss roll, so what it drops comes early: `Blue Dancer Charm`, `Kindred of Rot's Exultation`, the `Dancer's Set`, `Godskin Swaddling Cloth`, `Radagon's Scarseal` and `Crucible Knot Talisman` |
+| boss | `blaidd_the_half_wolf_liurnia_of_the_lakes_rannis_rise_seluviss_rise` `fire_knight_kood_specimen_storehouse_shadow_tower` `fire_knight_salza_shadow_keep_west_rampart` `fire_knight_wego_shadow_keep_drained_church_district` `divine_bird_warrior_belurat_tower_settlement_swamp` `divine_bird_warrior_enir_ilim` `ensha_of_the_royal_remains_roundtable_hold` `erdtree_avatar_deeproot_depths` `fire_prelate_mt_gelmir_fort_laiedd` `putrid_avatar_miquellas_haligtree_elphael` `shadow_tree_spirit_gravesite_plain_ellac_river_cave` | 0 | not an objective (`Blaidd the Half-Wolf` is an invader, not a boss fight), but kept so its drops roll by region like a regular enemy's |
 
 ## Conditional rules
 
@@ -316,7 +306,7 @@ Rows: `blasphemous_blade_boosts_healing_rules`, `prayerful_strike_boosts_healing
 
 ### 26. Dual-Wield Warrior pairs
 
-P2. The class's identity, as odds rather than a filter (owner, 2026-11-17): about 65% same-class pairs, 20% a paired weapon with LH `none`, 15% two classes. Once RH has rolled, LH weapons of RH's class get `×70`; a paired weapon in RH, by class or by name (every weapon without the two-handed strength bonus but `Grafted Dragon` and `Starscourge Greatsword`), leaves LH `none`, except `Venomous Fang`, which brings `Poisoned Hand` (#45); any other RH keeps an unpaired LH. A light RH removes every heavy class from LH. The paired share is set by the paired weapons' own odds, by the region where each arrives.
+P2. The class's identity, as odds rather than a filter (owner, 2026-11-17): about 65% same-class pairs, 20% a paired weapon with LH `none`, 15% two classes. Once RH has rolled, LH weapons of RH's class get `×70`; a paired weapon in RH, by class or by name (every weapon without the two-handed strength bonus but `Grafted Dragon` and `Starscourge Greatsword`), leaves LH `none`, except `Venomous Fang`, which brings `Poisoned Hand` (#45); any other RH keeps an unpaired LH. A light RH removes every heavy class from LH. The paired share is set by the paired weapons' own odds, by the region where each arrives, except the paired weapons raised for their own sake: the throwables (#Base odds), and `Red Bear's Claw` and `Beast Claw` at plain odds as unique weapons (owner, 2026-11-23), which lift it to about a third in the DLC.
 
 Rows: `warrior_dw_pairs_greatsword`, `warrior_dw_pairs_straight_sword`, `warrior_dw_pairs_colossal_weapon`, `warrior_dw_pairs_spear`, `warrior_dw_pairs_dagger`, `warrior_dw_pairs_halberd`, `warrior_dw_pairs_curved_sword`, `warrior_dw_pairs_axe`, `warrior_dw_pairs_hammer`, `warrior_dw_pairs_great_hammer`, `warrior_dw_pairs_greataxe`, `warrior_dw_pairs_colossal_sword`, `warrior_dw_pairs_curved_greatsword`, `warrior_dw_pairs_katana`, `warrior_dw_pairs_great_spear`, `warrior_dw_pairs_thrusting_sword`, `warrior_dw_pairs_twinblade`, `warrior_dw_pairs_flail`, `warrior_dw_pairs_whip`, `warrior_dw_pairs_heavy_thrusting_sword`, `warrior_dw_pairs_reaper`, `warrior_dw_pairs_great_katana`, `warrior_dw_pairs_light_greatsword`, `warrior_dw_paired_class_empties_lh`, `warrior_dw_paired_weapon_empties_lh`, `warrior_dw_unpaired_rh_keeps_lh_unpaired`, `warrior_dw_light_rh_removes_heavy_lh`
 

@@ -36,15 +36,20 @@ def test_every_modifier_row_has_its_rule() -> None:
 def test_every_odds_value_other_than_1_has_its_reason() -> None:
     table = re.search(r"^## Base odds\n(.*?)^## ", BALANCE, flags=re.M | re.S)
     assert table is not None
-    listed: set[tuple[str, str, float]] = set()
+    # A row's odds are one value, or a range, low and high joined by an en dash, for a group whose
+    # values live in the data file
+    listed: dict[tuple[str, str], tuple[float, float]] = {}
     for line in table[1].splitlines():
         cells = [cell.strip() for cell in line.strip("|").split("|")]
         if len(cells) == 4 and cells[0] in ODDS_FILES:
-            listed |= {(cells[0], key, float(cells[2])) for key in _ids(cells[1])}
+            low, _, high = cells[2].partition("\N{EN DASH}")
+            bounds = (float(low), float(high or low))
+            listed |= {(cells[0], key): bounds for key in _ids(cells[1])}
     data = {
-        (kind, row[key], float(row["odds"]))
+        (kind, row[key]): float(row["odds"])
         for kind, (name, key) in ODDS_FILES.items()
         for row in _rows(name)
         if float(row["odds"]) != 1
     }
-    assert listed == data
+    assert set(listed) == set(data)
+    assert [key for key, odds in data.items() if not listed[key][0] <= odds <= listed[key][1]] == []
