@@ -194,7 +194,7 @@ Every row of `data/overrides/modifiers.csv` belongs to one rule below. A rule al
 
 ### Classes with extra rules
 
-Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32) and never `L2 only` (#6); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); the classes that can't use a talisman or rule lose it (#33, #34).
+Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32) and never `L2 only` (#6); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); the classes that can't use a talisman or rule lose it (#33, #34).
 
 ### 1. Parry only needs a parry ash
 
@@ -446,3 +446,9 @@ Owner, 2026-11-23. **Synergy:** `Poisoned Hand` joins a poison weapon in the lef
 - `Dual-Wield Warrior` gets it beside `Venomous Fang`: reason not recorded.
 
 Rows: `warrior_2h_lh_poisoned_hand_only_beside_rot`, `warrior_dw_lh_poisoned_hand_only_beside_venomous_fang`
+
+### 46. Pyromancer's weapons
+
+Owner, 2026-11-22. **Preference:** `Pyromancer`'s right hand rolls `Coded Sword` and `Cipher Pata` beside the seals, faith weapons a caster can fight with at their own odds and catch-up, with no raise of their own for the class. Beside either the left hand rolls only a seal (P1), so the incantation can be cast.
+
+Rows: `pyromancer_weapon_keeps_a_seal_in_lh`

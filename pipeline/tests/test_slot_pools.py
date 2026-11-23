@@ -70,7 +70,10 @@ def test_hands_resolve_to_their_classes(
     assert _subcategories(sorcerer_rh) == {"glintstone_staff", "thrusting_sword"}
     swords = {row.id for row in sorcerer_rh if row.subcategory == "thrusting_sword"}
     assert swords == {"carian_sorcery_sword"}
-    assert _subcategories(resolved["pyromancer", "rh"]) == {"sacred_seal"}
+    # data/balance.md#46. Pyromancer's weapons
+    pyromancer_rh = resolved["pyromancer", "rh"]
+    weapons = {row.id for row in pyromancer_rh if row.subcategory != "sacred_seal"}
+    assert weapons == {"coded_sword", "cipher_pata"}
     # data/balance.md#32. Caster left hand
     casters = (("sorcerer", "glintstone_staff"), ("pyromancer", "sacred_seal"))
     for character_class, catalyst in casters:
