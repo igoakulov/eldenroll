@@ -212,7 +212,7 @@ Every row of `data/overrides/modifiers.csv` belongs to one rule below. A rule al
 
 ### Classes with extra rules
 
-Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32) and never `L2 only` (#6); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); the classes that can't use a talisman or rule lose it (#33, #34).
+Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32) and never `L2 only` (#6); the casters, `Ranger` and `Jester` never `L1 only` (#34); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); the classes that can't use a talisman or rule lose it (#33, #34).
 
 ### 1. Parry only needs a parry ash
 
@@ -379,9 +379,9 @@ Rows: `melee_talismans_need_a_melee_class`, `melee_talismans_not_on_sorcerer`, `
 
 ### 34. Attack rules a class can't use
 
-P1. `Sorcerer` and `Pyromancer` don't attack physically, so no `R1 only` or `R2 only`; a bow can't attack from the left hand, so `Ranger` never gets `L1 only`.
+P1. `Sorcerer` and `Pyromancer` don't attack physically, so no `R1 only` or `R2 only`; a bow can't attack from the left hand, so `Ranger` never gets `L1 only`. `Sorcerer`, `Pyromancer`, `Spellblade` and `Jester` never get `L1 only` either (owner, 2026-11-24): reason not recorded.
 
-Rows: `r1_r2_only_not_on_pure_casters`, `l1_only_not_on_ranger`
+Rows: `r1_r2_only_not_on_pure_casters`, `l1_only_not_on_ranger_casters_jester`
 
 ### 35. Carian Sorcery Sword
 
