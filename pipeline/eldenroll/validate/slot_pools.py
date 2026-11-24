@@ -18,8 +18,8 @@ from eldenroll.model.vocabulary import (
 from eldenroll.validate.selectors import resolve_items, validate_selectors
 
 RULE_SLOTS = frozenset({"rule"})
-# The card shows `Any staff`, so one staff is enough, and this one shares its region with
-# `Spinning Weapon`, so the card always names the ash (`web/src/engine/README.md#Classes`).
+# The card shows `Any staff`, so one staff is enough; it and `Spinning Weapon` are both tied to
+# Margit, so the card always names the ash (`data/balance.md#19. Jester's right hand`).
 JESTER_STAFF = "demi_human_queens_staff"
 SCOPED_ODD_WEAPONS = frozenset({"torch", "perfume_bottle"})
 ITEM_KINDS: frozenset[SelectorKind] = frozenset({"item", "subcategory", "category"})

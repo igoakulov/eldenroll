@@ -117,6 +117,7 @@ Playstyles and rules that grow tiresome or crowd the rest roll less.
 | class | `ranger` `jester` | 0.25–0.5 | owner decision: `Ranger` plays less enjoyably, with less weapon variety than melee or magic; `Jester` mixes silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
 | rule | `none` | 100 | half the rule slot, a fixed share (#Fixed shares): half of objectives roll no rule (owner, 2026-11-24) |
 | rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` `parry_only` `l2_only` | 0.5 | owner decision: hard rules, each at about 5%: they crowded out the others, limit the moveset a lot (`L2 only` sometimes clashes with an ash), and `No armor` pushed the `Naked Set` and the light sets past their guarantees' reach of each other |
+| rule | `use_a_summon` | 0.5 | below an unboosted rule outside `Dried Bouquet`, so the talisman's boost evens out over a run (#40. Summons) (owner, 2026-11-24) |
 | rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
 
 ### Never rolled
@@ -212,7 +213,7 @@ Every row of `data/overrides/modifiers.csv` belongs to one rule below. A rule al
 
 ### Classes with extra rules
 
-Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32) and never `L2 only` (#6); the casters, `Ranger` and `Jester` never `L1 only` (#34); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); the classes that can't use a talisman or rule lose it (#33, #34).
+Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); `Pyromancer` more `No healing flasks` (#47); the classes that can't use a talisman or rule lose it (#33, #34).
 
 ### 1. Parry only needs a parry ash
 
@@ -222,21 +223,21 @@ Rows: `parry_only_needs_a_parry_ash`
 
 ### 2. Charged attacks need a weapon in the right hand
 
-P1. `Charged R2 only` needs a melee weapon, thrusting shield, torch or perfume bottle in RH; `Drink Stonebarb Cracked Tear` one of those or a bow.
+P1. `Charged R2/ash/spell only` needs a melee weapon, thrusting shield, torch or perfume bottle in RH; `2x break stance with Stonebarb Cracked Tear` one of those or a bow.
 
 Rows: `charged_r2_needs_a_melee_weapon_in_rh`, `stonebarb_needs_a_weapon_in_rh`
 
 ### 3. Melee rules need a melee weapon
 
-P1. `Jump attacks only`, `Rolling / crouch attacks only`, `Land a riposte` and `No ripostes` need a melee weapon, thrusting shield, torch or perfume bottle in a hand.
+P1. `Jump attacks only`, `Crouch/rolling attacks only`, `Land a riposte` and `No ripostes` need a melee weapon, thrusting shield, torch or perfume bottle in a hand.
 
 Rows: `melee_rules_need_a_melee_weapon_in_a_hand`
 
 ### 6. L2 only needs a skill
 
-P1. An empty hand has no skill, and `Sorcerer` and `Pyromancer` kill bosses with spells.
+P1. An empty hand has no skill.
 
-Rows: `l2_only_not_on_pure_casters`, `l2_only_needs_a_skill_not_empty`
+Rows: `l2_only_needs_a_skill_not_empty`
 
 ### 10. Knight's thrusting shield
 
@@ -270,7 +271,7 @@ Rows: `shards_make_l2_only_top`
 
 ### 15. Axe Talisman and charged attacks
 
-P2. The talisman boosts charged attacks, so `Charged R2 only` and `Drink Stonebarb Cracked Tear` go top tier and split its objectives about evenly.
+P2. The talisman boosts charged attacks, so `Charged R2/ash/spell only` and `2x break stance with Stonebarb Cracked Tear` go top tier and split its objectives about evenly.
 
 Rows: `axe_talisman_makes_charged_rules_top`
 
@@ -289,6 +290,8 @@ Rows: `parry_ash_boosts_parry_talismans`, `parry_ash_boosts_parry_only`
 ### 19. Jester's right hand
 
 P2. An empty right hand is part of the joke: `none` at `×33` holds a quarter of the hand (#Fixed shares), the staff `×2`, torches `×0.5`, and `×3.5` more in the Limgrave region for about 30% torches there. Preliminary: tuned with `Jester`, last.
+
+The staff is there to hold `Spinning Weapon`, the only ash a staff takes, which Rogier sells only past `Margit, the Fell Omen`; so the staff, like the ash, counts as found at Margit (`data/overrides/boss_slot_links.csv`, owner 2026-11-24).
 
 Rows: `jester_none_x33`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_torches_in_limgrave`
 
@@ -371,11 +374,18 @@ P1. A talisman that does nothing for the loadout wastes the slot (owner, 2026-11
 
 Rows: `melee_talismans_need_a_melee_class`, `melee_talismans_not_on_sorcerer`, `talismans_not_on_pure_casters`, `shard_needs_a_skill_not_empty`, `rellanas_cameo_needs_a_stance_skill`, `beloved_stardust_only_on_casters`, `godskin_swaddling_cloth_not_on_knight_or_spellblade`
 
-### 34. Attack rules a class can't use
+### 34. Rules a class can't use
 
-P1. `Sorcerer` and `Pyromancer` don't attack physically, so no `R1 only` or `R2 only`; a bow can't attack from the left hand, so `Ranger` never gets `L1 only`. `Sorcerer`, `Pyromancer`, `Spellblade` and `Jester` never get `L1 only` either (owner, 2026-11-24): reason not recorded.
+P1. One row per class, owner 2026-11-24 unless said:
 
-Rows: `r1_r2_only_not_on_pure_casters`, `l1_only_not_on_ranger_casters_jester`
+- **`2H Warrior`:** no `L1 only`: reason not recorded.
+- **`Dual-Wield Warrior`:** no `Charged R2/ash/spell only` or `2x break stance with Stonebarb Cracked Tear`: reason not recorded.
+- **`Ranger`:** no `L1 only`, since a bow can't attack from the left hand; no `L2 only`, `R2 only` or the Stonebarb rule: reason not recorded.
+- **`Sorcerer` and `Pyromancer`:** they kill bosses with spells and don't attack physically, so no `R1 only`, `R2 only`, `L2 only`, `Jump attacks only`, `Crouch/rolling attacks only` or the Stonebarb rule; no `L1 only`: reason not recorded.
+- **`Spellblade`:** no `L1 only`: reason not recorded.
+- **`Jester`:** its weapons are a mix that rarely allows a moveset rule, and even with one that does, its fights are hard enough: no `R1 only`, `R2 only`, `L1 only`, `L2 only`, `Charged R2/ash/spell only`, `Jump attacks only`, `Crouch/rolling attacks only`, `Parry only`, `Land a riposte`, `No ripostes`, `No buffs`, `No talismans` or the Stonebarb rule.
+
+Rows: `warrior_2h_rules_excluded`, `warrior_dw_rules_excluded`, `ranger_rules_excluded`, `casters_rules_excluded`, `spellblade_rules_excluded`, `jester_rules_excluded`
 
 ### 35. Carian Sorcery Sword
 
@@ -416,9 +426,9 @@ Rows: `perfumers_talisman_needs_pots_perfumes`, `companion_jar_needs_pots_perfum
 
 ### 40. Summons
 
-Owner, 2026-11-20. `Dried Bouquet` makes `Use a summon` top tier.
+Owner, 2026-11-24. **Synergy:** `Dried Bouquet` makes `Use a summon` `strong`. The talisman shows on a share of objectives that varies by class, about 1% for `Knight` and 10% for the casters, so a top-tier row made the rule several times as common as the others there. The rule's own odds sit at 0.5 (#Base odds), so it shows less than the others without the talisman and more with it, and about as often as an unboosted rule over a run.
 
-Rows: `dried_bouquet_makes_summon_rule_top`
+Rows: `dried_bouquet_boosts_summon_rule`
 
 ### 41. Retaliatory Crossed-Tree and Leda's sets
 
@@ -458,3 +468,9 @@ Rows: `warrior_2h_lh_poisoned_hand_only_beside_rot`, `warrior_dw_lh_poisoned_han
 Owner, 2026-11-23. **Preference:** `Coded Sword` and `Cipher Pata` are faith weapons for casters. `Pyromancer`'s right hand rolls them beside the seals, and beside either the left hand rolls only a seal (P1), so the incantation can be cast. `Knight` and the Warriors never roll them: the right hand's tally is shared by every class, so a caster's small right hand showing them often left them rare in the melee classes. Aims in `Pyromancer`'s right hand: each about 5% of the run, the seals about 90%, and no region above about 20%. `Cipher Pata` meets them at odds 1; the runway ceiling caps the spike right after each comes into reach. `Coded Sword` arrives in Leyndell with about a third of `Pyromancer`'s objectives left, so a ×3 row for the casters gives it a share through the rest of the run, at odds 0.5. Only odds times the row matters: catch-up's raise of a late arrival is a multiple of its plain share, and the row multiplies it again, since the tally counts it without rules. So its share of the run and its spike in Leyndell rise together, and about 2.5–3% of the run, peaking near a quarter of the hand, is the compromise.
 
 Rows: `pyromancer_weapon_keeps_a_seal_in_lh`, `faith_weapons_not_on_melee_classes`, `coded_sword_raised_for_casters`
+
+### 47. No healing flasks on Pyromancer
+
+Owner, 2026-11-24. **Preference:** `Pyromancer` has many powerful healing incantations, so `No healing flasks` rolls `×3` for it.
+
+Rows: `pyromancer_prefers_no_healing_flasks`

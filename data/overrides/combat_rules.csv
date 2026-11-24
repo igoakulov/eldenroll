@@ -3,16 +3,16 @@ none,None,100
 do_not_get_hit,Do not get hit,0.5
 apply_status,Apply status,1
 land_a_riposte,Land a riposte,1
-dodge_1x_with_crouch_or_jump,Dodge 1x with crouch or jump,1
-gesture_3x_without_getting_hit,Gesture 3x without getting hit,1
+1x_dodge_with_crouch_or_jump,1x dodge with crouch or jump,1
+3x_gesture_without_getting_hit,3x gesture without getting hit,1
 gesture_after_every_flask,Gesture after every flask,1
 r1_only,R1 only,1
 r2_only,R2 only,1
-charged_r2_only,Charged R2 only,1
+charged_r2_ash_spell_only,Charged R2/ash/spell only,1
 l1_only_can_swap_hands,L1 only (can swap hands),1
 l2_only,L2 only,0.5
 jump_attacks_only,Jump attacks only,1
-rolling_crouch_attacks_only,Rolling / crouch attacks only,1
+crouch_rolling_attacks_only,Crouch/rolling attacks only,1
 parry_only,Parry only,0.5
 no_ripostes,No ripostes,1
 no_lock_on,No lock-on,1
@@ -26,6 +26,7 @@ overloaded,Overloaded,0.5
 drink_deflecting_hardtear,Drink Deflecting Hardtear,0
 drink_crimson_sapping_cracked_tear,Drink Crimson-Sapping Cracked Tear,0
 drink_bloodsucking_cracked_tear,Drink Bloodsucking Cracked Tear,0
-drink_stonebarb_cracked_tear,Drink Stonebarb Cracked Tear,1
-drink_ruptured_crystal_tear,Drink Ruptured Crystal Tear,1
-use_a_summon,Use a summon,1
+2x_break_stance_with_stonebarb_cracked_tear,2x break stance with Stonebarb Cracked Tear,1
+explode_with_ruptured_crystal_tear,Explode with Ruptured Crystal Tear,1
+use_a_summon,Use a summon,0.5
+roll_only_in_one_direction,Roll only in one direction,1

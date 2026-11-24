@@ -68,6 +68,14 @@ function item(id: string): Item {
 const KNIGHT_MELEE: Rolled = { rh: "uchigatana", rh_ash: "no_skill", lh: "brass_shield", lh_ash: "no_skill" };
 
 describe("slot pools on the real data", () => {
+  it("rolls Jester's staff only once Margit is felled, since Rogier sells its ash past him", () => {
+    const limgrave = new Set(["limgrave"]);
+    const margit = "margit_the_fell_omen_stormveil_castle";
+    expect(ids(pool("jester", "rh", {}, countedFor(limgrave, new Set())))).not.toContain("demi_human_queens_staff");
+    const felled = countedFor(limgrave, new Set([margit]));
+    expect(ids(pool("jester", "rh", {}, felled))).toContain("demi_human_queens_staff");
+  });
+
   it("drops options at odds 0, and counts them nowhere", () => {
     const result = pool("jester", "item");
     expect(result.pool).toBe(result.options.length);

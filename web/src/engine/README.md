@@ -94,7 +94,7 @@ Each fight is its own instance: felling one says nothing about another fight of 
 
 Pools are `data/overrides/slot_pools.csv`. Odds and the class rules (Dual-Wield Warrior pairs, paired weapons, Knight's thrusting shield, Jester's right hand) are explained in `data/balance.md#Classes with extra rules`. What the engine itself does:
 
-- **Catalysts** are scoped by selectors, not odds, and the build checks it: staves in `Sorcerer`, seals in `Pyromancer`, both in `Spellblade` LH, and one staff in `Jester` RH, `Demi-Human Queen's Staff`, there for `Spinning Weapon`, from the same region as that ash. The card shows only `Any staff`, so one is enough.
+- **Catalysts** are scoped by selectors, not odds, and the build checks it: staves in `Sorcerer`, seals in `Pyromancer`, both in `Spellblade` LH, and one staff in `Jester` RH, `Demi-Human Queen's Staff`, there for `Spinning Weapon`; both are tied to Margit, so they arrive together (`data/balance.md#19. Jester's right hand`). The card shows only `Any staff`, so one is enough.
 - **A rolled catalyst decides the spell type,** for every class and hand, RH winning, so `Any seal` never pairs with a sorcery.
 - `Sorcerer` and `Pyromancer` are separate so a player levelling only INT or only FTH can drop the other.
 - A Knight's thrusting shield always leaves LH empty, so it gets the two-handing bonus.

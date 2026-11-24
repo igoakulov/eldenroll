@@ -118,15 +118,6 @@ def test_jester_right_hand(pools: tuple[SlotPool, ...], placement_data: Placemen
     assert staves[0].infusable
 
 
-def test_jester_staff_is_reachable_exactly_with_its_ash(placement_data: PlacementData) -> None:
-    def regions(item: str) -> set[str]:
-        rows = [one.row for one in placement_data.placements if one.row.item_id == item]
-        assert all(row.location_id for row in rows), f"{item} has a boss-tied row"
-        return {placement_data.region_of_location[row.location_id or ""] for row in rows}
-
-    assert regions("demi_human_queens_staff") == regions("spinning_weapon") == {"limgrave"}
-
-
 def _swap(
     pools: tuple[SlotPool, ...], character_class: str, slot: str, cell: str
 ) -> tuple[SlotPool, ...]:
