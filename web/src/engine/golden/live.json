@@ -1,0 +1,768 @@
+{
+  "knight, every region, nothing felled": [
+    {
+      "boss": "fell_twin_divine_tower_of_east_altus",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "omen_set",
+        "item": "giantsflame_fire_pot",
+        "lh": "beast_crest_heater_shield",
+        "lh_ash": "thopss_barrier",
+        "rh": "cranial_vessel_candlestand",
+        "rh_ash": null,
+        "rule": "parry_only",
+        "spell": null,
+        "talisman_1": "dagger_talisman"
+      }
+    },
+    {
+      "boss": "crucible_knight_siluria_deeproot_depths",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "messmer_soldier_set",
+        "item": "wraith_calling_bell",
+        "lh": "wooden_greatshield",
+        "lh_ash": "shield_bash",
+        "rh": "cleanrot_knights_sword",
+        "rh_ash": "poisonous_mist",
+        "rule": "l2_only",
+        "spell": null,
+        "talisman_1": "greatshield_talisman"
+      }
+    },
+    {
+      "boss": "red_bear_gravesite_plain_northern_nameless_mausoleum",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "royal_remains_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "coil_shield",
+        "lh_ash": null,
+        "rh": "smithscript_axe",
+        "rh_ash": "barbaric_roar",
+        "rule": "roll_only_in_one_direction",
+        "spell": null,
+        "talisman_1": "fire_scorpion_charm"
+      }
+    },
+    {
+      "boss": "death_rite_bird_liurnia_of_the_lakes_gate_town_northwest",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "alberichs_set",
+        "item": "horned_bairn",
+        "lh": "candletree_wooden_shield",
+        "lh_ash": "storm_wall",
+        "rh": "messmer_soldiers_axe",
+        "rh_ash": "stormcaller",
+        "rule": "parry_only",
+        "spell": null,
+        "talisman_1": "twinblade_talisman"
+      }
+    }
+  ],
+  "warrior_2h, every region, nothing felled": [
+    {
+      "boss": "cemetery_shade_caelid_catacombs",
+      "characterClass": "warrior_2h",
+      "slots": {
+        "armor": "battlemage_set",
+        "item": "ancient_dragonbolt_pot",
+        "lh": "none",
+        "rh": "ripple_blade",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": "none",
+        "talisman_1": "none_talisman"
+      }
+    },
+    {
+      "boss": "nights_cavalry_liurnia_of_the_lakes_liurnia_highway_far_north",
+      "characterClass": "warrior_2h",
+      "slots": {
+        "armor": "consorts_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "none",
+        "rh": "curved_club",
+        "rh_ash": "blinkbolt",
+        "rule": "none",
+        "spell": "none",
+        "talisman_1": "blade_of_mercy"
+      }
+    },
+    {
+      "boss": "erdtree_burial_watchdog_wyndham_catacombs",
+      "characterClass": "warrior_2h",
+      "slots": {
+        "armor": "horned_warrior_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "none",
+        "rh": "lordsworns_straight_sword",
+        "rh_ash": "royal_knights_resolve",
+        "rule": "no_talismans",
+        "spell": "none",
+        "talisman_1": "greatshield_talisman"
+      }
+    },
+    {
+      "boss": "ancient_hero_of_zamor_weeping_peninsula_tombsward_weeping_evergaol_tombsward_cave_entrance",
+      "characterClass": "warrior_2h",
+      "slots": {
+        "armor": "bloodsoaked_set",
+        "item": "redmane_fire_pot",
+        "lh": "none",
+        "rh": "partisan",
+        "rh_ash": "charge_forth",
+        "rule": "r1_only",
+        "spell": "none",
+        "talisman_1": "dagger_talisman"
+      }
+    }
+  ],
+  "warrior_dw, every region, nothing felled": [
+    {
+      "boss": "demi_human_queen_margot_volcano_cave",
+      "characterClass": "warrior_dw",
+      "slots": {
+        "armor": "lusats_set",
+        "item": "roped_magic_pot",
+        "lh": "obsidian_lamina",
+        "lh_ash": null,
+        "rh": "winged_scythe",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "old_lords_talisman"
+      }
+    },
+    {
+      "boss": "scadutree_avatar_scaduview_south_scadutree_base_lower_shadow_keep_exit",
+      "characterClass": "warrior_dw",
+      "slots": {
+        "armor": "golden_order_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "none",
+        "lh_ash": null,
+        "rh": "star_fist",
+        "rh_ash": "endure",
+        "rule": "r1_only",
+        "spell": "none",
+        "talisman_1": "old_lords_talisman"
+      }
+    },
+    {
+      "boss": "deathbird_liurnia_of_the_lakes_scenic_isle_laskyar_ruins",
+      "characterClass": "warrior_dw",
+      "slots": {
+        "armor": "lazuli_sorcerer_set",
+        "item": "volcano_pot",
+        "lh": "urumi",
+        "lh_ash": "raptor_of_the_mists",
+        "rh": "shadow_sunflower_blossom",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "shard_of_alexander"
+      }
+    },
+    {
+      "boss": "battlemage_hugues_caelid_west_sellia_sellia_crystal_tunnel_entrance",
+      "characterClass": "warrior_dw",
+      "slots": {
+        "armor": "redmane_knight_set",
+        "item": "horned_bairn",
+        "lh": "rotten_crystal_spear",
+        "lh_ash": null,
+        "rh": "rotten_crystal_sword",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "talisman_of_lords_bestowal"
+      }
+    }
+  ],
+  "ranger, every region, nothing felled": [
+    {
+      "boss": "guardian_golem_highroad_cave",
+      "characterClass": "ranger",
+      "slots": {
+        "armor": "bull_goat_set",
+        "item": "horned_bairn",
+        "lh": "none",
+        "rh": "harp_bow",
+        "rh_ash": null,
+        "rule": "no_buffs",
+        "spell": "none",
+        "talisman_1": "shard_of_alexander"
+      }
+    },
+    {
+      "boss": "godefroy_the_grafted_altus_plateau_golden_lineage_evergaol",
+      "characterClass": "ranger",
+      "slots": {
+        "armor": "nomadic_merchants_set",
+        "item": "omen_bairn",
+        "lh": "none",
+        "rh": "longbow",
+        "rh_ash": "sky_shot",
+        "rule": "no_healing_flasks",
+        "spell": "none",
+        "talisman_1": "marikas_scarseal"
+      }
+    },
+    {
+      "boss": "rellana_twin_moon_knight_gravesite_plain_east_castle_ensis",
+      "characterClass": "ranger",
+      "slots": {
+        "armor": "traveling_maiden_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "none",
+        "rh": "erdtree_greatbow",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": "none",
+        "talisman_1": "crucible_feather_talisman"
+      }
+    },
+    {
+      "boss": "full_grown_fallingstar_beast_mt_gelmir_ninth_mt_gelmir_campsite_road_of_iniquity_volcano_manor_entrance",
+      "characterClass": "ranger",
+      "slots": {
+        "armor": "preceptors_set",
+        "item": "ancestral_infants_head",
+        "lh": "none",
+        "rh": "composite_bow",
+        "rh_ash": "sky_shot",
+        "rule": "no_talismans",
+        "spell": "none",
+        "talisman_1": "shard_of_alexander"
+      }
+    }
+  ],
+  "sorcerer, every region, nothing felled": [
+    {
+      "boss": "furnace_golem_charos_hidden_grave_southwest_furnace_golem_area",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "banished_knight_set",
+        "item": "spark_aromatic",
+        "lh": "beast_crest_heater_shield",
+        "lh_ash": "golden_parry",
+        "rh": "lusats_glintstone_staff",
+        "rule": "none",
+        "spell": "swift_glintstone_shard",
+        "talisman_1": "beloved_stardust"
+      }
+    },
+    {
+      "boss": "tibia_mariner_charos_hidden_grave_southeast_mariner_area",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "night_set",
+        "item": "omen_bairn",
+        "lh": "glintstone_staff",
+        "lh_ash": null,
+        "rh": "meteorite_staff",
+        "rule": "none",
+        "spell": "rings_of_spectral_light",
+        "talisman_1": "crucible_feather_talisman"
+      }
+    },
+    {
+      "boss": "ulcerated_tree_spirit_stranded_graveyard",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "commoners_lite_set",
+        "item": "call_of_tibia",
+        "lh": "shield_of_the_guilty",
+        "lh_ash": "no_skill",
+        "rh": "azurs_glintstone_staff",
+        "rule": "use_a_summon",
+        "spell": "roiling_magma",
+        "talisman_1": "dried_bouquet"
+      }
+    },
+    {
+      "boss": "malenia_blade_of_miquella_miquellas_haligtree_elphael",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "highwayman_set",
+        "item": "cursed_blood_pot",
+        "lh": "diggers_staff",
+        "lh_ash": null,
+        "rh": "staff_of_the_guilty",
+        "rule": "none",
+        "spell": "impenetrable_thorns",
+        "talisman_1": "perfumers_talisman"
+      }
+    }
+  ],
+  "pyromancer, every region, nothing felled": [
+    {
+      "boss": "nox_swordstress_nox_monk_caelid_west_sellia_sellia_crystal_tunnel_entrance",
+      "characterClass": "pyromancer",
+      "slots": {
+        "armor": "night_set",
+        "item": "ancestral_infants_head",
+        "lh": "golden_order_seal",
+        "rh": "spiraltree_seal",
+        "rule": "overloaded",
+        "spell": "aspects_of_the_crucible_bloom",
+        "talisman_1": "none_talisman"
+      }
+    },
+    {
+      "boss": "guardian_golem_highroad_cave",
+      "characterClass": "pyromancer",
+      "slots": {
+        "armor": "infected_guardian_set",
+        "item": "bloodboil_aromatic",
+        "lh": "jellyfish_shield",
+        "rh": "clawmark_seal",
+        "rule": "heavy_rolling",
+        "spell": "honed_bolt",
+        "talisman_1": "none_talisman"
+      }
+    },
+    {
+      "boss": "scadutree_avatar_scaduview_south_scadutree_base_lower_shadow_keep_exit",
+      "characterClass": "pyromancer",
+      "slots": {
+        "armor": "crucible_tree_set",
+        "item": "red_lightning_pot",
+        "lh": "erdtree_seal",
+        "rh": "clawmark_seal",
+        "rule": "no_healing_flasks",
+        "spell": "flame_fall_upon_them",
+        "talisman_1": "perfumers_talisman"
+      }
+    },
+    {
+      "boss": "putrid_crystalian_sellia_hideaway",
+      "characterClass": "pyromancer",
+      "slots": {
+        "armor": "cuckoo_knight_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "jellyfish_shield",
+        "rh": "dryleaf_seal",
+        "rule": "gesture_after_every_flask",
+        "spell": "dragonmaw",
+        "talisman_1": "old_lords_talisman"
+      }
+    }
+  ],
+  "spellblade, every region, nothing felled": [
+    {
+      "boss": "onyx_lord_divine_tower_of_west_altus",
+      "characterClass": "spellblade",
+      "slots": {
+        "armor": "bloodhound_knight_set",
+        "item": "roped_oil_pot",
+        "lh": "carian_glintstone_staff",
+        "rh": "regalia_of_eochaid",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": "shattering_crystal",
+        "talisman_1": "shard_of_alexander"
+      }
+    },
+    {
+      "boss": "fallingstar_beast_sellia_crystal_tunnel",
+      "characterClass": "spellblade",
+      "slots": {
+        "armor": "nox_monk_set",
+        "item": "horned_bairn",
+        "lh": "prince_of_deaths_staff",
+        "rh": "lordsworns_greatsword",
+        "rh_ash": "storm_stomp",
+        "rule": "explode_with_ruptured_crystal_tear",
+        "spell": "rock_sling",
+        "talisman_1": "talisman_of_all_crucibles"
+      }
+    },
+    {
+      "boss": "death_rite_bird_caelid_southern_aeonia_swamp_bank",
+      "characterClass": "spellblade",
+      "slots": {
+        "armor": "divine_bird_warrior_set",
+        "item": "ancestral_infants_head",
+        "lh": "prince_of_deaths_staff",
+        "rh": "queeligns_greatsword",
+        "rh_ash": "bloody_slash",
+        "rule": "1x_dodge_with_crouch_or_jump",
+        "spell": "gavel_of_haima",
+        "talisman_1": "none_talisman"
+      }
+    },
+    {
+      "boss": "tibia_mariner_limgrave_summonwater_village",
+      "characterClass": "spellblade",
+      "slots": {
+        "armor": "fire_monk_set",
+        "item": "hefty_furnace_pot",
+        "lh": "staff_of_loss",
+        "rh": "urumi",
+        "rh_ash": "golden_vow",
+        "rule": "none",
+        "spell": "rock_blaster",
+        "talisman_1": "shard_of_alexander"
+      }
+    }
+  ],
+  "jester, every region, nothing felled": [
+    {
+      "boss": "dryleaf_dane_scadu_altus_moorth_ruins_bonny_village_west_entrance",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "godrick_knight_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "jellyfish_shield",
+        "rh": "deadly_poison_perfume_bottle",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "dried_bouquet"
+      }
+    },
+    {
+      "boss": "godefroy_the_grafted_altus_plateau_golden_lineage_evergaol",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "fur_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "jellyfish_shield",
+        "rh": "none",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "lightning_scorpion_charm"
+      }
+    },
+    {
+      "boss": "stonedigger_troll_limgrave_tunnels",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "spellblades_set",
+        "item": "wraith_calling_bell",
+        "lh": "none",
+        "rh": "smithscript_shield",
+        "rh_ash": null,
+        "rule": "explode_with_ruptured_crystal_tear",
+        "spell": "none",
+        "talisman_1": "verdigris_discus"
+      }
+    },
+    {
+      "boss": "spiritcaller_snail_roads_end_catacombs",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "depraved_perfume_jar",
+        "item": "albinauric_pot",
+        "lh": "jellyfish_shield",
+        "rh": "none",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "perfumers_talisman"
+      }
+    }
+  ],
+  "knight, Margit felled": [
+    {
+      "boss": "guardian_golem_highroad_cave",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "war_surgeon_set",
+        "item": "ancestral_infants_head",
+        "lh": "one_eyed_shield",
+        "lh_ash": null,
+        "rh": "stone_club",
+        "rh_ash": "sacred_order",
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "old_lords_talisman",
+        "talisman_2": "greatshield_talisman"
+      }
+    },
+    {
+      "boss": "metyr_mother_of_fingers_finger_birthing_grounds",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "gravebird_set",
+        "item": "poisoned_stone",
+        "lh": "wooden_greatshield",
+        "lh_ash": "holy_ground",
+        "rh": "nobles_estoc",
+        "rh_ash": "glintblade_phalanx_ash",
+        "rule": "r1_only",
+        "spell": null,
+        "talisman_1": "curved_sword_talisman",
+        "talisman_2": "greatshield_talisman"
+      }
+    },
+    {
+      "boss": "baleful_shadow_ainsel_river_main",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "blue_surgeon_set",
+        "item": "glintstone_scrap",
+        "lh": "black_leather_shield",
+        "lh_ash": "golden_parry",
+        "rh": "rosus_axe",
+        "rh_ash": null,
+        "rule": "parry_only",
+        "spell": null,
+        "talisman_1": "blade_of_mercy",
+        "talisman_2": "dagger_talisman"
+      }
+    },
+    {
+      "boss": "bayle_the_dread_jagged_peak_jagged_peak_summit_bayle_arena",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "bull_goat_set",
+        "item": "rancor_pot",
+        "lh": "redmane_greatshield",
+        "lh_ash": "shield_strike",
+        "rh": "trolls_hammer",
+        "rh_ash": null,
+        "rule": "no_lock_on",
+        "spell": null,
+        "talisman_1": "greatshield_talisman",
+        "talisman_2": "pearl_shield_talisman"
+      }
+    }
+  ],
+  "jester, Margit felled": [
+    {
+      "boss": "guardian_golem_highroad_cave",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "gelmir_knight_set",
+        "item": "poisoned_stone",
+        "lh": "none",
+        "rh": "demi_human_queens_staff",
+        "rh_ash": "spinning_weapon",
+        "rule": "explode_with_ruptured_crystal_tear",
+        "spell": "none",
+        "talisman_1": "shard_of_alexander",
+        "talisman_2": "magic_scorpion_charm"
+      }
+    },
+    {
+      "boss": "knight_of_the_solitary_gaol_gravesite_plain_western_nameless_mausoleum_east_of_prospect_town_west_of_scorched_ruins",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "perfume_jar",
+        "item": "frenzied_flame_pot",
+        "lh": "jellyfish_shield",
+        "rh": "none",
+        "rh_ash": null,
+        "rule": "use_a_summon",
+        "spell": null,
+        "talisman_1": "perfumers_talisman",
+        "talisman_2": "dried_bouquet"
+      }
+    },
+    {
+      "boss": "bell_bearing_hunter_stormhill_warmasters_shack_stormgate",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "depraved_perfume_jar",
+        "item": "hefty_poison_pot",
+        "lh": "jellyfish_shield",
+        "rh": "none",
+        "rh_ash": null,
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "old_lords_talisman",
+        "talisman_2": "perfumers_talisman"
+      }
+    },
+    {
+      "boss": "nights_cavalry_duo_southwest_mountaintops",
+      "characterClass": "jester",
+      "slots": {
+        "armor": "depraved_perfume_jar",
+        "item": "academy_magic_pot",
+        "lh": "jellyfish_shield",
+        "rh": "none",
+        "rh_ash": null,
+        "rule": "roll_only_in_one_direction",
+        "spell": null,
+        "talisman_1": "fire_scorpion_charm",
+        "talisman_2": "companion_jar"
+      }
+    }
+  ],
+  "sorcerer, Limgrave only, starting stats": [
+    {
+      "boss": "ancient_hero_of_zamor_weeping_peninsula_tombsward_weeping_evergaol_tombsward_cave_entrance",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "banished_knight_set",
+        "item": "freezing_pot",
+        "lh": "brass_shield",
+        "lh_ash": "parry",
+        "rh": "glintstone_staff",
+        "rule": "roll_only_in_one_direction",
+        "spell": "rancorcall",
+        "talisman_1": "none_talisman"
+      }
+    },
+    {
+      "boss": "patches_murkwater_cave",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "commoners_set",
+        "item": "hefty_freezing_pot",
+        "lh": "round_shield",
+        "lh_ash": "storm_wall",
+        "rh": "glintstone_staff",
+        "rule": "no_rolling",
+        "spell": "glintstone_arc",
+        "talisman_1": "none_talisman"
+      }
+    },
+    {
+      "boss": "nights_cavalry_limgrave_agheel_lake_north_murkwater_cave_entrance",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "guardian_set",
+        "item": "fire_pot",
+        "lh": "sun_realm_shield",
+        "lh_ash": "storm_wall",
+        "rh": "glintstone_staff",
+        "rule": "none",
+        "spell": "glintstone_stars",
+        "talisman_1": "none_talisman"
+      }
+    },
+    {
+      "boss": "guardian_golem_highroad_cave",
+      "characterClass": "sorcerer",
+      "slots": {
+        "armor": "guilty_lite_set",
+        "item": "hefty_poison_pot",
+        "lh": "gilded_iron_shield",
+        "lh_ash": "parry",
+        "rh": "glintstone_staff",
+        "rule": "none",
+        "spell": "carian_slicer",
+        "talisman_1": "radagons_scarseal"
+      }
+    }
+  ],
+  "knight, weapon shortlist": [
+    {
+      "boss": "fire_giant_southeast_mountaintops",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "white_reed_set",
+        "item": "frenzied_flame_pot",
+        "lh": "inverted_hawk_towershield",
+        "lh_ash": "holy_ground",
+        "rh": "longsword",
+        "rh_ash": "flame_of_the_redmanes",
+        "rule": "apply_status",
+        "spell": null,
+        "talisman_1": "talisman_of_lords_bestowal"
+      }
+    },
+    {
+      "boss": "demi_human_chief_coastal_cave",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "carian_knight_set",
+        "item": "horned_bairn",
+        "lh": "smithscript_shield",
+        "lh_ash": null,
+        "rh": "uchigatana",
+        "rh_ash": "determination",
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "greatshield_talisman"
+      }
+    },
+    {
+      "boss": "rugalea_the_great_red_bear_rauh_base_west_scorpion_river",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "cleanrot_set",
+        "item": "fire_coil",
+        "lh": "messmer_soldier_shield",
+        "lh_ash": "storm_wall",
+        "rh": "uchigatana",
+        "rh_ash": "beasts_roar",
+        "rule": "parry_only",
+        "spell": null,
+        "talisman_1": "dagger_talisman"
+      }
+    },
+    {
+      "boss": "omenkiller_liurnia_of_the_lakes_west_albinauric_village",
+      "characterClass": "knight",
+      "slots": {
+        "armor": "godrick_foot_soldier_set",
+        "item": "perfumed_oil_of_ranah",
+        "lh": "shield_of_night",
+        "lh_ash": null,
+        "rh": "longsword",
+        "rh_ash": "square_off",
+        "rule": "none",
+        "spell": null,
+        "talisman_1": "pearl_shield_talisman"
+      }
+    }
+  ],
+  "warrior_2h, rerolls": {
+    "hands": [
+      {
+        "boss": "stray_mimic_tear_hidden_path_to_the_haligtree",
+        "characterClass": "warrior_2h",
+        "slots": {
+          "armor": "steel_set",
+          "item": "sleep_pot",
+          "lh": "none",
+          "rh": "carian_thrusting_shield",
+          "rh_ash": "storm_assault",
+          "rule": "none",
+          "spell": "none",
+          "talisman_1": "greatshield_talisman"
+        }
+      }
+    ],
+    "items": [
+      {
+        "boss": "stray_mimic_tear_hidden_path_to_the_haligtree",
+        "characterClass": "warrior_2h",
+        "slots": {
+          "armor": "blue_cloth_set",
+          "item": "hefty_red_lightning_pot",
+          "lh": "none",
+          "rh": "regalia_of_eochaid",
+          "rh_ash": null,
+          "rule": "2x_break_stance_with_stonebarb_cracked_tear",
+          "spell": "none",
+          "talisman_1": "axe_talisman"
+        }
+      }
+    ],
+    "objective": [
+      {
+        "boss": "ghostflame_dragon_scadu_altus_moorth_highway_south_fort_of_reprimand",
+        "characterClass": "warrior_2h",
+        "slots": {
+          "armor": "leyndell_soldier_set",
+          "item": "perfumed_oil_of_ranah",
+          "lh": "none",
+          "rh": "spear",
+          "rh_ash": "raptor_of_the_mists",
+          "rule": "none",
+          "spell": "none",
+          "talisman_1": "magic_scorpion_charm"
+        }
+      }
+    ]
+  }
+}

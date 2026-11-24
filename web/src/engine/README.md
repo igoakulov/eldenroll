@@ -145,6 +145,18 @@ An item rolls if at least one of its location rows counts (`eligibility.ts`). A 
 - Gear shown on a done objective stays in reach whatever drops out afterwards, since the player has it: an item, or every piece of a set. This matters where a place drops out, as the Royal Capital does with the Ashen Capital or a felled Maliketh (owner, 2026-11-23). Gear only shown on a rerolled or discarded objective doesn't count.
 - An item with no location row counts everywhere: consumables, whose result names a family the player fills with any variant, and the `None` pieces. A set rolls only if every piece is reachable.
 
+## Golden fixtures
+
+`golden.test.ts` plays a few fixed runs, one per class plus Margit felled, Limgrave at starting stats, the weapon shortlist and rerolls, and compares every roll with a saved file. It runs them twice: on `golden/db.json`, a frozen copy of the database, and on the real one.
+
+| Frozen | Real | Meaning |
+|---|---|---|
+| passes | passes | nothing rolls differently |
+| fails | fails | the engine rolls differently |
+| passes | fails | the data changed |
+
+After an intended change, `pnpm test -u` saves the new rolls and the diff of `golden/frozen.json` or `golden/live.json` shows which moved. Refresh the frozen copy only when the database's format changes: copy `data/build/db.json` over it and save again.
+
 ## Design constraints
 
 Each exists because the alternative was tried and failed.
