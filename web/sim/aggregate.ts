@@ -452,7 +452,7 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
     shieldAsh: reachedOptions(sample, sample.classes, ASH_SLOTS, "shieldAsh"),
     item: inReach(sample, sample.classes, ["item"]),
     talisman: inReach(sample, sample.classes, ["talisman_1", "talisman_2"]),
-    rule: inReach(sample, sample.classes, ["rule_1", "rule_2"]),
+    rule: inReach(sample, sample.classes, ["rule"]),
     armor: inReach(sample, sample.classes, ["armor"]),
   }[table].map(repeatKey);
   const ashKeys = (ash: AshTable) => (one: Obj) =>
@@ -462,7 +462,7 @@ export function gearShares(sample: Sample, table: GearTable): ShareTable | null 
     shieldAsh: ashKeys("shieldAsh"),
     item: chosenKeys(["item"]),
     talisman: chosenKeys(["talisman_1", "talisman_2"]),
-    rule: chosenKeys(["rule_1", "rule_2"]),
+    rule: chosenKeys(["rule"]),
     armor: chosenKeys(["armor"]),
   }[table];
   return shareTable(sample, sample.objectives, keysOf, name, { universe });
@@ -507,23 +507,6 @@ export function classShares(sample: Sample): ShareTable {
   return { ...table, rows: table.rows.filter((row) => sample.classes.includes(row.key.slice("character_class:".length))) };
 }
 
-interface RulesActive {
-  readonly total: number;
-  readonly none: number;
-  readonly one: number;
-  readonly both: number;
-}
-
-/** How many combat rules an objective holds: its rule slots that show something other than `None`. */
-export function rulesActive(sample: Sample): RulesActive {
-  const counts = [0, 0, 0];
-  for (const objective of sample.objectives) {
-    const rules = (["rule_1", "rule_2"] as const).filter((slot) => !isNone(objective.rolls.get(slot)?.chosen ?? "none")).length;
-    counts[rules]! += 1;
-  }
-  return { total: sample.objectives.length, none: counts[0]!, one: counts[1]!, both: counts[2]! };
-}
-
 interface NeverRolled {
   /** In a pool of a picked class at some point, never shown. */
   readonly inReach: readonly string[];
@@ -556,7 +539,7 @@ const REPEAT_KEYS: Readonly<Record<RepeatKind, (one: Obj) => readonly string[]>>
   spell: chosenKeys(["spell"], notNone),
   item: chosenKeys(["item"], notNone),
   talisman: chosenKeys(["talisman_1", "talisman_2"], notNone),
-  rule: chosenKeys(["rule_1", "rule_2"], notNone),
+  rule: chosenKeys(["rule"], notNone),
   armor: chosenKeys(["armor"], notNone),
 };
 
@@ -810,7 +793,7 @@ function pairsHands(modifier: Modifier): boolean {
 const isSynergy = (modifier: Modifier) => modifier.value > 1 && !pairsHands(modifier);
 
 /** Every boosting modifier in play for the picked classes: how often it was active, and how often what it boosted
- * won. Counted per objective, since a talisman or rule boost is active in both of its slots. */
+ * won. Counted per objective, since a talisman boost is active in both of its slots. */
 export function synergyWins(sample: Sample): readonly SynergyRow[] {
   const { data } = sample;
   const runs = sample.results.length;
@@ -922,10 +905,9 @@ interface ItemPoint {
   readonly shown: number;
 }
 
-/** Slots whose showings mark a slot's chart: the second talisman and combat rule slots show on the first's. */
+/** Slots whose showings mark a slot's chart: the second talisman slot shows on the first's. */
 const MARKED: Partial<Record<LoadoutSlot, readonly LoadoutSlot[]>> = {
   talisman_1: ["talisman_1", "talisman_2"],
-  rule_1: ["rule_1", "rule_2"],
 };
 
 /** One option's chance over the run, per slot it rolls in, for the picked classes, with the objectives it showed

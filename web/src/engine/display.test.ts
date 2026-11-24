@@ -8,10 +8,10 @@ const data = indexDatabase(realDatabase);
 
 describe("displaySlots", () => {
   it("shows a rolled item and rule as themselves", () => {
-    const shown = displaySlots(data, { rh: "uchigatana", rh_ash: "barbaric_roar", rule_1: "parry_only" });
+    const shown = displaySlots(data, { rh: "uchigatana", rh_ash: "barbaric_roar", rule: "parry_only" });
     expect(shown.rh).toEqual({ kind: "item", item: data.items.get("uchigatana") });
     expect(shown.rh_ash).toEqual({ kind: "item", item: data.items.get("barbaric_roar") });
-    expect(shown.rule_1).toEqual({ kind: "rule", rule: data.rules.get("parry_only") });
+    expect(shown.rule).toEqual({ kind: "rule", rule: data.rules.get("parry_only") });
   });
 
   it("shows an alias member as its label, and keeps the member it rolled", () => {
@@ -33,7 +33,7 @@ describe("displaySlots", () => {
   });
 
   it("shows the rule None as a rule, not as an empty slot", () => {
-    expect(displaySlots(data, { rule_1: "none" }).rule_1.kind).toBe("rule");
+    expect(displaySlots(data, { rule: "none" }).rule.kind).toBe("rule");
   });
 
   it("leaves the ash to the player on a hand that holds something", () => {

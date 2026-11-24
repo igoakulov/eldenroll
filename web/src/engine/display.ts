@@ -31,8 +31,7 @@ export const DISPLAY_SLOTS = [
   "talisman_4",
   "armor",
   "item",
-  "rule_1",
-  "rule_2",
+  "rule",
 ] as const;
 export type DisplaySlot = (typeof DISPLAY_SLOTS)[number];
 
@@ -45,7 +44,7 @@ const ANY: SlotDisplay = { kind: "any" };
 function shown(data: EngineData, slots: RolledSlots, slot: PoolSlot): SlotDisplay {
   const id = slots[slot];
   if (id === null || id === undefined) return NONE;
-  if (slot === "rule_1" || slot === "rule_2") {
+  if (slot === "rule") {
     const rule = data.rules.get(id);
     return rule === undefined ? NONE : { kind: "rule", rule };
   }
@@ -99,7 +98,6 @@ export function displaySlots(
     talisman_4: ANY,
     armor: armor(data, slots),
     item: shown(data, slots, "item"),
-    rule_1: shown(data, slots, "rule_1"),
-    rule_2: shown(data, slots, "rule_2"),
+    rule: shown(data, slots, "rule"),
   };
 }

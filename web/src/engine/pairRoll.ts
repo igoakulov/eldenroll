@@ -9,7 +9,6 @@ import type { Random, SlotPoolResult, SlotRoll, WeightedOption } from "./slotRol
  * slot. */
 export const PAIRED: ReadonlyMap<PoolSlot, PoolSlot> = new Map<PoolSlot, PoolSlot>([
   ["talisman_1", "talisman_2"],
-  ["rule_1", "rule_2"],
 ]);
 
 /** Weighs pairs of options: a row whose condition names a slot of the pair reads the other slot of the pair, both

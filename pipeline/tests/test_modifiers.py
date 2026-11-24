@@ -41,22 +41,10 @@ def _validate(rows: tuple[Modifier, ...], placement_data: PlacementData) -> None
     )
 
 
-def _excludes(rows: tuple[Modifier, ...]) -> set[tuple[str, str]]:
-    return {
-        (rolled, removed)
-        for row in rows
-        if row.value == 0
-        for one in row.when
-        if isinstance(one, RolledCondition) and one.slots == ("rule_1",)
-        for rolled in one.selector.ids or ()
-        for removed in row.target.ids or ()
-    }
-
-
 def _rule_row(rolled: str, removed: str) -> Modifier:
     return Modifier(
-        id=f"{rolled}_excludes",
-        when=(RolledCondition(("rule_1",), Selector("rule", (rolled,))),),
+        id=f"{rolled}_removes",
+        when=(RolledCondition(("rh",), Selector("subcategory", (rolled,))),),
         target=Selector("rule", (removed,)),
         value=0,
     )
@@ -66,12 +54,7 @@ def test_no_row_names_a_rule_that_never_rolls(modifiers: tuple[Modifier, ...]) -
     rules = load_combat_rules(OVERRIDES / "combat_rules.csv")
     parked = {rule.id for rule in rules if rule.odds == 0}
     named = {one for row in modifiers if row.target.kind == "rule" for one in row.target.ids or ()}
-    named |= {one for pair in _excludes(modifiers) for one in pair}
     assert not named & parked
-
-
-def test_none_excludes_nothing(modifiers: tuple[Modifier, ...]) -> None:
-    assert not [pair for pair in _excludes(modifiers) if "none" in pair]
 
 
 def test_a_target_rolled_before_its_condition_fails(placement_data: PlacementData) -> None:
@@ -89,22 +72,13 @@ def test_a_target_rolled_before_its_condition_fails(placement_data: PlacementDat
 @pytest.mark.parametrize(
     ("rows", "message"),
     [
-        ((_rule_row("r1_only", "r2_only"),), "r1_only excludes r2_only but not the reverse"),
-        ((_rule_row("r1_only", "r1_only"),), "r1_only excludes itself"),
-        (
-            (
-                _rule_row("r1_only", "r2_only"),
-                _rule_row("r2_only", "r1_only"),
-                _rule_row("r1_only", "r2_only"),
-            ),
-            "r1_only_excludes repeats",
-        ),
-        ((replace(_rule_row("r1_only", "r2_only"), when=()),), "r1_only_excludes has no condition"),
+        ((_rule_row("torch", "r2_only"), _rule_row("torch", "r1_only")), "torch_removes repeats"),
+        ((replace(_rule_row("torch", "r2_only"), when=()),), "torch_removes has no condition"),
         (
             (
                 Modifier(
                     "late",
-                    (RolledCondition(("rule_2",), Selector("rule", ("r1_only",))),),
+                    (RolledCondition(("rule",), Selector("rule", ("r1_only",))),),
                     Selector("rule", ("r2_only",)),
                     0,
                 ),

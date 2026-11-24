@@ -9,7 +9,6 @@ import {
   handShares,
   pairs,
   regionShares,
-  rulesActive,
   THIN_SAMPLE,
   type EmptyRow,
   type GearTable,
@@ -23,7 +22,6 @@ import { Cycler } from "../ui/Cycler";
 import { DataTable } from "../ui/DataTable";
 import { perRunColumn, shareColumn } from "./columns";
 import { Section } from "../ui/Headings";
-import { ListRow } from "../ui/Rows";
 import { FOLD, matches, percent, perRun } from "./format";
 import type { SlotView } from "./inputs";
 import { FurthestFromFair } from "./FurthestFromFair";
@@ -61,7 +59,6 @@ export function Slots({
       armor: count("armor"),
       rule: gearShares(sample, "rule"),
       both: pairs(sample),
-      active: rulesActive(sample),
       empty: empties(sample),
     };
   }), [sample, by, region]);
@@ -72,7 +69,6 @@ export function Slots({
   const pairRows = both.rows.filter((row) => matches(row.name, search));
   const scale = Math.max(0, ...both.rows.map((row) => row.share));
   const dualWieldOnly = sample.classes.length === 1 && sample.classes[0] === "warrior_dw";
-  const active = tables.active;
   const empty = tables.empty.filter((row) => matches(className(sample.data, row.characterClass), search));
   const emptyScale = Math.max(0, ...tables.empty.map((row) => row.share));
   const runs = sample.results.length;
@@ -138,14 +134,7 @@ export function Slots({
       {gear("shieldAsh", words.shieldAsh)}
       {gear("item", words.item)}
       {gear("talisman", words.talisman, words.talismanLede)}
-      <ShareSection title={words.rule} lede={words.ruleLede} table={tables.rule} search={search} />
-      <Section title={words.rulesActive} lede={copy.sim.counted(perRun(active.total / runs))}>
-        <div>
-          <ListRow title={words.noRules} value={percent(active.total === 0 ? NaN : active.none / active.total)} />
-          <ListRow title={words.oneRule} value={percent(active.total === 0 ? NaN : active.one / active.total)} />
-          <ListRow title={words.bothRules} value={percent(active.total === 0 ? NaN : active.both / active.total)} />
-        </div>
-      </Section>
+      <ShareSection title={words.rule} table={tables.rule} search={search} />
 
       {gear("armor", words.armor)}
 

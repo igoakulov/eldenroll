@@ -52,7 +52,7 @@ export const kit: readonly KitBlock[] = [
     title: "Slot heading",
     section: "controls",
     size: "phone",
-    states: [{ label: "plain", render: () => <SlotHeading>{copy.card.combatRules}</SlotHeading> }],
+    states: [{ label: "plain", render: () => <SlotHeading>{copy.card.combatRule}</SlotHeading> }],
   },
   {
     id: "section-note",

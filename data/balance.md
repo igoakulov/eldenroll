@@ -19,7 +19,7 @@ Every odds reason names what it serves, so a preference can be retuned while the
 - **Read the full-run simulation per stat allocation** (`web/sim/README.md`), never a mix of builds: what a build can use decides what reaches it. Weapons and ashes read in Even, STR and DEX; spells in the builds whose stats they need; talismans and armor in Even, STR and ARC. Completion 80 at 200 runs per allocation tells real gaps from luck down to a tenth of a showing a run.
 - **Vs fair is the yardstick for catch-up.** It compares an item's showings with an even share of its slot over the run and doesn't depend on odds, so raising an item's odds raises its Vs fair. Items with rows are read by their share where the condition holds instead, against the aim their rule states.
 - **A row above ×1 lifts its target past catch-up.** The target is weighed at least at its base share while the row holds, even where catch-up or the ceiling would give it less (#Hyperparameters). A class-wide or always-true boost row therefore acts far beyond its multiplier; lower a class with a row below ×1, which leaves catch-up alone.
-- **A pair row is always in play.** In the paired talisman and rule slots, a row linking two options boosts the pair in every objective where both can roll, and catch-up never pays a rule back, so a strong pair row floods both. Aim it at a share and check the peaks by region.
+- **A pair row is always in play.** In the paired talisman slots, a row linking two options boosts the pair in every objective where both can roll, and catch-up never pays a rule back, so a strong pair row floods both. Aim it at a share and check the peaks by region.
 - **Small pools fill.** Two talisman slots always fill unless the empty slot is in the pool, so where few talismans are in reach, lowering one hands its share to the rest; odds only matter against the pool. The early regions' empty slot exists for this (#43. Early talisman slots).
 - **Regions:** `boss=boss:<region>` makes a row hold for every boss fought in a region; read its result by the objective's boss region, since the simulation's region tables group by the latest region open.
 - **Check after every change:** each synergy's win rate (Synergies tab), the shares of rows' triggers and targets by class and region, and Vs fair by class for the items a change could move.
@@ -78,7 +78,7 @@ When two boosted options meet in one pool, compare them with each other:
 
 ## Paired slots
 
-The two talisman slots roll as one draw, and so do the two combat rule slots (owner, 2026-11-19): each pair of options weighs its two weights times the rows that link them, so a pairing holds whichever slot either lands in. A row naming a slot of the pair reads the other slot, both ways, and applies once to the pair: two options at weights `a` and `b` with a ×N row between them weigh `N·a·b`, against `a·c` for any other pair holding `a`.
+The two talisman slots roll as one draw (owner, 2026-11-19): each pair of options weighs its two weights times the rows that link them, so a pairing holds whichever slot either lands in. A row naming a slot of the pair reads the other slot, both ways, and applies once to the pair: two options at weights `a` and `b` with a ×N row between them weigh `N·a·b`, against `a·c` for any other pair holding `a`.
 
 - **Boost one partner, link the other.** Two options boosted by one condition weigh the boost squared as a pair, enough to beat a `guarantee` beside them; so the condition boosts one and a pair row brings the other.
 - **A slot rolled alone,** such as a reroll that keeps the first slot, reads the kept one through the same rows.
@@ -87,9 +87,9 @@ The two talisman slots roll as one draw, and so do the two combat rule slots (ow
 
 Options found everywhere hold a fixed share of their roll, whatever else is in it, so the room they leave doesn't shrink as the pool grows or vary with a class's exclusions (owner, 2026-11-19):
 
-- **Which:** every option with no location: the `none` item, consumables, the `Naked Set`, the early regions' empty talisman slot `none_talisman` (#43. Early talisman slots), and in the rule slots `None`.
+- **Which:** every option with no location: the `none` item, consumables, the `Naked Set`, the early regions' empty talisman slot `none_talisman` (#43. Early talisman slots), and in the rule slot `None`.
 - **How their odds count:** against the rest of the pool counted as 100 odds, whatever its size: `None` at 100 holds half the roll. Among themselves they share by their odds.
-- **An empty slot may follow another**, so one `None` serves both rule slots, and a row on the pair sets how often both are empty.
+- **An empty slot may follow another**, so both talisman slots may roll `none_talisman`.
 - **Modifiers work in two steps:** an option's chance in the roll is its share of the rest of the pool times what the fixed shares leave; ×N then takes a chance `p` to `N·p / (1 + (N−1)·p)`. A row aimed at a fixed option multiplies its odds the same way.
 
 ## Hyperparameters
@@ -115,7 +115,7 @@ Playstyles and rules that grow tiresome or crowd the rest roll less.
 | Kind | Id | Odds | Why |
 |---|---|---:|---|
 | class | `ranger` `jester` | 0.25–0.5 | owner decision: `Ranger` plays less enjoyably, with less weapon variety than melee or magic; `Jester` mixes silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
-| rule | `none` | 100 | half of each rule slot taken alone, a fixed share (#Fixed shares); with #36. Empty rule slots, 20% / 60% / 20% of objectives with no rule, one or two (owner, 2026-11-19) |
+| rule | `none` | 100 | half the rule slot, a fixed share (#Fixed shares): half of objectives roll no rule (owner, 2026-11-24) |
 | rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` `parry_only` `l2_only` | 0.5 | owner decision: hard rules, each at about 5%: they crowded out the others, limit the moveset a lot (`L2 only` sometimes clashes with an ash), and `No armor` pushed the `Naked Set` and the light sets past their guarantees' reach of each other |
 | rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
 
@@ -232,12 +232,6 @@ P1. `Jump attacks only`, `Rolling / crouch attacks only`, `Land a riposte` and `
 
 Rows: `melee_rules_need_a_melee_weapon_in_a_hand`
 
-### 5. Rule exclusions
-
-P1. Two rules never roll together when they contradict, when one is a harder version of the other, or when one makes the other meaningless; a pair that is only hard stays (`No healing flasks` with `Overloaded`), a practically impossible one goes (`Do not get hit` with `Overloaded`). Each pair is written both ways. `Jump attacks only` stays free with `R1 only`, `R2 only` and `L1 only`; every attack rule but `R1 only` already rules out a riposte; `Apply status` excludes `Parry only`; tears exclude each other.
-
-Rows: `do_not_get_hit_excludes`, `apply_status_excludes`, `land_a_riposte_excludes`, `dodge_excludes`, `gesture_after_every_flask_excludes`, `r1_only_excludes`, `r2_only_excludes`, `charged_r2_only_excludes`, `l1_only_excludes`, `l2_only_excludes`, `jump_attacks_only_excludes`, `rolling_crouch_attacks_only_excludes`, `parry_only_excludes`, `no_ripostes_excludes`, `no_healing_flasks_excludes`, `no_armor_excludes`, `no_talismans_excludes`, `no_rolling_excludes`, `heavy_rolling_excludes`, `overloaded_excludes`, `drink_stonebarb_cracked_tear_excludes`, `drink_ruptured_crystal_tear_excludes`
-
 ### 6. L2 only needs a skill
 
 P1. An empty hand has no skill, and `Sorcerer` and `Pyromancer` kill bosses with spells.
@@ -276,7 +270,7 @@ Rows: `shards_make_l2_only_top`
 
 ### 15. Axe Talisman and charged attacks
 
-P2. The talisman boosts charged attacks, so `Charged R2 only` and `Drink Stonebarb Cracked Tear` go top tier.
+P2. The talisman boosts charged attacks, so `Charged R2 only` and `Drink Stonebarb Cracked Tear` go top tier and split its objectives about evenly.
 
 Rows: `axe_talisman_makes_charged_rules_top`
 
@@ -388,12 +382,6 @@ Rows: `r1_r2_only_not_on_pure_casters`, `l1_only_not_on_ranger_casters_jester`
 P2. Owner, 2026-11-17: a thrusting sword that casts sorceries with L2. It rolls in `Sorcerer`'s and `Spellblade`'s right hand, never for `Knight` or the Warriors. **Preference:** about one `Sorcerer` right hand in three once in reach, by `×3`; builds low in Intelligence see it more, which suits them. **Synergy:** with it, `Sorcerer`'s left hand holds a shield, never a staff.
 
 Rows: `carian_sorcery_sword_not_on_knight_or_warriors`, `sorcerer_prefers_carian_sorcery_sword`, `sorcerer_sword_lh_no_catalyst`
-
-### 36. Empty rule slots
-
-Owner, 2026-11-19: about 20% of objectives with no rule, 60% with one and 20% with two. `None` alone would give 25/50/25; a pair of `None` and a rule weighs `×1.5`.
-
-Rows: `none_beside_a_rule`
 
 ### 37. Ripostes
 

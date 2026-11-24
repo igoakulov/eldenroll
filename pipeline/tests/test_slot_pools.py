@@ -151,7 +151,7 @@ def _swap(
         ("jester", "rh", "subcategory:glintstone_staff", "jester rh has the wrong catalysts"),
         ("knight", "rh", "subcategory:torch", "knight rh has the wrong torches"),
         ("jester", "rh", "subcategory:torch", "jester rh has the wrong torches"),
-        ("knight", "rule_1", "item:none", "knight rule_1 selects by item"),
+        ("knight", "rule", "item:none", "knight rule selects by item"),
         ("knight", "item", "rule:parry_only", "knight item selects by rule"),
     ],
 )
@@ -193,7 +193,7 @@ def test_selector_cells_parse(tmp_path: Path) -> None:
     path.write_text(
         "character_class_id,slot,selectors\n"
         "jester,rh,category:none; subcategory:torch perfume_bottle\n"
-        "jester,rule_1,rule:\n",
+        "jester,rule,rule:\n",
         encoding="utf-8",
     )
     assert load_slot_pools(path) == (
@@ -202,7 +202,7 @@ def test_selector_cells_parse(tmp_path: Path) -> None:
             "rh",
             (("category", ("none",)), ("subcategory", ("torch", "perfume_bottle"))),
         ),
-        SlotPoolRow("jester", "rule_1", (("rule", ()),)),
+        SlotPoolRow("jester", "rule", (("rule", ()),)),
     )
     assert build_slot_pools(load_slot_pools(path))[1].selectors == (Selector("rule", None),)
 

@@ -29,8 +29,7 @@ export const LOADOUT_ORDER: readonly LoadoutSlot[] = [
   "item",
   "talisman_1",
   "talisman_2",
-  "rule_1",
-  "rule_2",
+  "rule",
   "armor",
 ];
 

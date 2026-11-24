@@ -33,9 +33,9 @@ interface SimOptions {
 /** Objectives per stretch in `ChanceSums` and the page's charts. */
 export const BUCKET = 20;
 
-/** Slots whose options' chances are summed: the second talisman and combat rule slots leave out what the first
- * rolled, so they run close to the first and are left out. */
-export const CHANCE_SLOTS: readonly LoadoutSlot[] = ["rh", "rh_ash", "lh", "lh_ash", "spell", "item", "talisman_1", "rule_1", "armor"];
+/** Slots whose options' chances are summed: the second talisman slot leaves out what the first rolled, so it runs
+ * close to the first and is left out. */
+export const CHANCE_SLOTS: readonly LoadoutSlot[] = ["rh", "rh_ash", "lh", "lh_ash", "spell", "item", "talisman_1", "rule", "armor"];
 
 /** Every option's chance at roll time, with the catch-up boost and with it removed from every option, summed over
  * the rolls of one class and slot in one stretch of `BUCKET` objectives, across runs: `chanceKey` to sums.
@@ -300,7 +300,7 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
         ashes?.add(optionKey(row.option));
       }
       const chosen = one.roll.chosen?.option;
-      if (chosen !== undefined && !one.slot.startsWith("rule_") && !isNoneOption(chosen)) {
+      if (chosen !== undefined && one.slot !== "rule" && !isNoneOption(chosen)) {
         const group = ashes === null ? one.slot : ashes === reached.shieldAshes ? "shieldAsh" : "weaponAsh";
         const rollable = one.roll.options.filter((row) => !isNoneOption(row.option));
         for (const row of rollable) {

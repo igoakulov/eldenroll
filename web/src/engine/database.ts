@@ -12,8 +12,8 @@ export const CATEGORIES = [
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-/** An empty slot: `none`, or any id starting `none_`, so one pool can hold more than one, such as the rule `None`
- * that may follow another (`data/balance.md#Base odds`). */
+/** An empty slot: `none`, or any id starting `none_`, so one pool can hold more than one, such as the early regions'
+ * empty talisman slot `none_talisman` (`data/balance.md#43. Early talisman slots`). */
 export function isNone(id: string): boolean {
   return id === "none" || id.startsWith("none_");
 }
@@ -38,8 +38,7 @@ export const POOL_SLOTS = [
   "item",
   "talisman_1",
   "talisman_2",
-  "rule_1",
-  "rule_2",
+  "rule",
 ] as const;
 export type PoolSlot = (typeof POOL_SLOTS)[number];
 

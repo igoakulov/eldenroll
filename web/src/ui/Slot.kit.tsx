@@ -79,13 +79,14 @@ export const kit: readonly KitBlock[] = [
         },
       },
       {
-        label: "rules: red, and none",
+        label: "a rule, red, and none",
         render: (kit) => {
-          const slots = shown(kit, { rule_1: kit.samples.rule.id, rule_2: "none" });
+          const red = shown(kit, { rule: kit.samples.rule.id });
+          const none = shown(kit, { rule: "none" });
           return (
             <>
-              <RuleSlot name={nameOf(slots.rule_1)} />
-              <RuleSlot name={nameOf(slots.rule_2)} />
+              <RuleSlot name={nameOf(red.rule)} />
+              <RuleSlot name={nameOf(none.rule)} />
             </>
           );
         },

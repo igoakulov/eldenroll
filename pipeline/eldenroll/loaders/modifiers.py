@@ -1,4 +1,4 @@
-"""`when` holds conditions split by `;`: `rule_1=rule:parry_only` when a slot rolled a match,
+"""`when` holds conditions split by `;`: `rule=rule:parry_only` when a slot rolled a match,
 `rh|lh=item:x` when either did, `rh!=subcategory:melee` when it did not, and
 `character_class=sorcerer jester` for the rolled character class. `target` is one selector in the
 `slot_pools.csv` form.

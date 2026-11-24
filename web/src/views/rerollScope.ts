@@ -7,7 +7,7 @@ import type { RerollTarget } from "../engine/run";
  * (`web/src/engine/README.md#Rerolls`). A stop lights its own chip and every chip to its left. */
 export const REROLL_STOPS: readonly { readonly target: RerollTarget; readonly chip: string }[] = [
   { target: "armor", chip: copy.reroll.chips.armor },
-  { target: "rule_1", chip: copy.reroll.chips.rules },
+  { target: "rule", chip: copy.reroll.chips.rule },
   { target: "talisman_1", chip: copy.reroll.chips.talismans },
   { target: "item", chip: copy.reroll.chips.item },
   { target: "spell", chip: copy.reroll.chips.spell },

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { copy } from "../copy";
-import { isNone } from "../engine/database";
 import { displaySlots } from "../engine/display";
 import type { EngineData } from "../engine/engineData";
 import { objectiveNumber, type Objective, type RerollTarget, type Run } from "../engine/run";
@@ -72,8 +71,7 @@ function changeKeys(objective: Objective) {
     talisman_2: key(slots.talisman_2),
     armor: key(slots.armor),
     item: key(slots.item),
-    rule_1: key(slots.rule_1),
-    rule_2: key(slots.rule_2),
+    rule: key(slots.rule),
   };
 }
 
@@ -84,12 +82,6 @@ function changedParts(from: Objective, to: Objective): ReadonlySet<Part> {
   const before = changeKeys(from);
   const after = changeKeys(to);
   return new Set((Object.keys(before) as Part[]).filter((part) => before[part] !== after[part]));
-}
-
-/** A rule shows before `None`, whichever slot rolled it. */
-function ruleOrder(objective: Objective): readonly ("rule_1" | "rule_2")[] {
-  const filled = (id: string | null | undefined) => id !== null && id !== undefined && !isNone(id);
-  return !filled(objective.slots.rule_1) && filled(objective.slots.rule_2) ? ["rule_2", "rule_1"] : ["rule_1", "rule_2"];
 }
 
 /** The boss bar, broken in the middle by `Felled?`. As the boss arrives a whole bar fills over it, then gives
@@ -285,13 +277,11 @@ export function Card({
       </div>
 
       <div className="r" style={at(1300)}>
-        <SlotHeading>{copy.card.combatRules}</SlotHeading>
+        <SlotHeading>{copy.card.combatRule}</SlotHeading>
         <div className="rules">
-          {ruleOrder(objective).map((slot) => (
-            <Changed key={`${slot}:${keys[slot]}`} {...change(slot)}>
-              <RuleSlot name={nameOf(slots[slot])} />
-            </Changed>
-          ))}
+          <Changed key={keys.rule} {...change("rule")}>
+            <RuleSlot name={nameOf(slots.rule)} />
+          </Changed>
         </div>
       </div>
     </Screen>

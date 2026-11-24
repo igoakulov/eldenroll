@@ -228,8 +228,8 @@ describe("rerolls", () => {
 
   it("rerolls the armor with any slot before it", () => {
     const run = start(knight);
-    const slots = observed((observing) => reroll(observing, run, "rule_2")).map(([slot]) => slot);
-    expect(slots).toEqual(["rule_2", "armor"]);
+    const slots = observed((observing) => reroll(observing, run, "rule")).map(([slot]) => slot);
+    expect(slots).toEqual(["rule", "armor"]);
   });
 
   it("gives the same result back when it's the only option", () => {
@@ -250,8 +250,8 @@ describe("rerolls", () => {
     let run = start();
     run = reroll(engine, run, "boss");
     run = reroll(engine, run, "character_class");
-    run = reroll(engine, run, "rule_2");
-    expect(current(run).rerolls).toEqual(["boss", "character_class", "rule_2"]);
+    run = reroll(engine, run, "rule");
+    expect(current(run).rerolls).toEqual(["boss", "character_class", "rule"]);
     run = doneAndRoll(run);
     expect(run.completed[0]?.rerolls).toHaveLength(3);
     expect(current(run).rerolls).toEqual([]);
@@ -445,8 +445,7 @@ describe("Never roll", () => {
     });
     for (let step = 0; step < 25; step += 1) {
       expect(current(run).slots.rh).not.toBe("uchigatana");
-      expect(current(run).slots.rule_1).not.toBe("none");
-      expect(current(run).slots.rule_2).not.toBe("none");
+      expect(current(run).slots.rule).not.toBe("none");
       run = doneAndRoll(run);
     }
   });

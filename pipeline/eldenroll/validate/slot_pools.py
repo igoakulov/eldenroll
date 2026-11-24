@@ -17,7 +17,7 @@ from eldenroll.model.vocabulary import (
 )
 from eldenroll.validate.selectors import resolve_items, validate_selectors
 
-RULE_SLOTS = frozenset({"rule_1", "rule_2"})
+RULE_SLOTS = frozenset({"rule"})
 # The card shows `Any staff`, so one staff is enough, and this one shares its region with
 # `Spinning Weapon`, so the card always names the ash (`web/src/engine/README.md#Classes`).
 JESTER_STAFF = "demi_human_queens_staff"

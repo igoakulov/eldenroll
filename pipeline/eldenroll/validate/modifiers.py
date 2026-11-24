@@ -1,7 +1,3 @@
-"""Rule exclusions must also run both ways, because either rule of a pair can land in `rule_1`. A
-pair written one way would still roll in the other order.
-"""
-
 from __future__ import annotations
 
 from collections import Counter
@@ -20,8 +16,7 @@ from eldenroll.validate.selectors import (
     validate_selectors,
 )
 
-FIRST_RULE_SLOT = "rule_1"
-LAST_RULE_SLOT = "rule_2"
+RULE_SLOT = "rule"
 ITEM_KINDS: frozenset[SelectorKind] = frozenset({"item", "subcategory", "category"})
 
 
@@ -33,7 +28,6 @@ def validate_modifiers(
     problems = [f"{name} repeats" for name, count in counts.items() if count > 1]
     problems += [f"{row.id} has no condition" for row in rows if not row.when]
     problems += [f"{row.id} targets a rule before its condition" for row in rows if _late(row)]
-    problems += sorted(_one_way_exclusions(rows))
     if problems:
         raise BuildError(f"bad modifiers: {'; '.join(problems)}")
     for row in rows:
@@ -81,42 +75,14 @@ def _earliest(condition: RolledCondition) -> int:
 
 
 def _late(row: Modifier) -> bool:
-    """Return whether a rule target's last pool rolls no later than one of its conditions."""
+    """Return whether a rule target rolls no later than one of its conditions."""
     if row.target.kind != "rule":
         return False
     return any(
-        _earliest(one) >= SLOTS.index(LAST_RULE_SLOT)
+        _earliest(one) >= SLOTS.index(RULE_SLOT)
         for one in row.when
         if isinstance(one, RolledCondition)
     )
-
-
-def _one_way_exclusions(rows: tuple[Modifier, ...]) -> set[str]:
-    """Return each rule pair excluded in one direction only, or a rule excluding itself."""
-    excluded = {pair for row in rows for pair in _exclusions(row)}
-    problems = {f"{first} excludes itself" for first, second in excluded if first == second}
-    problems |= {
-        f"{first} excludes {second} but not the reverse"
-        for first, second in excluded
-        if (second, first) not in excluded
-    }
-    return problems
-
-
-def _exclusions(row: Modifier) -> Iterator[tuple[str, str]]:
-    """Yield the `(rolled, removed)` rule pairs of a row that removes rules after `rule_1`."""
-    if row.value != 0 or row.target.kind != "rule" or row.target.ids is None:
-        return
-    for one in row.when:
-        if (
-            isinstance(one, RolledCondition)
-            and one.slots == (FIRST_RULE_SLOT,)
-            and not one.negated
-            and one.selector.kind == "rule"
-        ):
-            for rolled in one.selector.ids or ():
-                for removed in row.target.ids:
-                    yield rolled, removed
 
 
 def _selectors(rows: tuple[Modifier, ...]) -> Iterator[Selector]:

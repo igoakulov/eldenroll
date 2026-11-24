@@ -73,7 +73,7 @@ export interface RollContext {
 }
 
 /** Slots that share one tally: a second slot of a kind counts with the first. */
-export type TallyGroup = "rh" | "rh_ash" | "lh" | "spell" | "item" | "talisman_1" | "rule_1" | "armor";
+export type TallyGroup = "rh" | "rh_ash" | "lh" | "spell" | "item" | "talisman_1" | "rule" | "armor";
 
 const TALLY_GROUP: Readonly<Record<LoadoutSlot, TallyGroup>> = {
   rh: "rh",
@@ -84,8 +84,7 @@ const TALLY_GROUP: Readonly<Record<LoadoutSlot, TallyGroup>> = {
   item: "item",
   talisman_1: "talisman_1",
   talisman_2: "talisman_1",
-  rule_1: "rule_1",
-  rule_2: "rule_1",
+  rule: "rule",
   armor: "armor",
 };
 
@@ -115,7 +114,7 @@ function located(data: EngineData, option: Option): boolean {
 }
 
 /** Whether an option holds a fixed share of its roll whatever else is in it (`data/balance.md#Fixed shares`): `none`,
- * the consumables and the rest found everywhere, a set with no piece that has a location, and in a rule slot `None`,
+ * the consumables and the rest found everywhere, a set with no piece that has a location, and in the rule slot `None`,
  * since no rule has a location. */
 function holdsFixedShare(data: EngineData, option: Option): boolean {
   return option.kind === "rule" ? isNone(option.row.id) : !located(data, option);

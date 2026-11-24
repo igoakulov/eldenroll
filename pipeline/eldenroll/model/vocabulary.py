@@ -29,8 +29,7 @@ SLOTS: Final[tuple[str, ...]] = (
     "item",
     "talisman_1",
     "talisman_2",
-    "rule_1",
-    "rule_2",
+    "rule",
 )
 CHARACTER_CLASS_ASH_SLOTS: Final[Mapping[str, frozenset[str]]] = {
     "knight": ASH_SLOTS,

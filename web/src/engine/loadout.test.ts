@@ -130,15 +130,13 @@ describe.each(CASES)("every roll on $name", (testCase) => {
       }
     });
 
-    it("never repeats an item, a talisman or a rule, though an empty slot may follow another", () => {
+    it("never repeats an item or a talisman, though an empty slot may follow another", () => {
       for (const loadout of loadouts) {
         const rh = id(loadout, "rh");
         const lh = id(loadout, "lh");
         if (rh !== "none" && rh !== null) expect(lh).not.toBe(rh);
-        for (const [first, second] of [["talisman_1", "talisman_2"], ["rule_1", "rule_2"]] as const) {
-          const taken = id(loadout, first);
-          if (taken !== null && taken !== undefined && !isNone(taken)) expect(id(loadout, second)).not.toBe(taken);
-        }
+        const taken = id(loadout, "talisman_1");
+        if (taken !== null && taken !== undefined && !isNone(taken)) expect(id(loadout, "talisman_2")).not.toBe(taken);
         const rhAsh = id(loadout, "rh_ash");
         if (rhAsh !== null && rhAsh !== undefined) expect(id(loadout, "lh_ash")).not.toBe(rhAsh);
       }
@@ -173,24 +171,15 @@ describe.each(CASES)("every roll on $name", (testCase) => {
 
     it("keeps Parry only to a hand with a parry ash", () => {
       for (const loadout of loadouts) {
-        const rules = [id(loadout, "rule_1"), id(loadout, "rule_2")];
-        if (!rules.includes("parry_only")) continue;
+        if (id(loadout, "rule") !== "parry_only") continue;
         const ashes = [id(loadout, "rh_ash"), id(loadout, "lh_ash")];
         expect(ashes.some((ash) => typeof ash === "string" && PARRY_ASHES.includes(ash))).toBe(true);
       }
     });
 
-    it("never rolls two rules that exclude each other", () => {
+    it("always fills the item, both talismans, the rule and the armor", () => {
       for (const loadout of loadouts) {
-        const rules = [id(loadout, "rule_1"), id(loadout, "rule_2")];
-        expect(rules.includes("do_not_get_hit") && rules.includes("overloaded")).toBe(false);
-        expect(rules.includes("no_rolling") && rules.includes("heavy_rolling")).toBe(false);
-      }
-    });
-
-    it("always fills the item, both talismans, both rules and the armor", () => {
-      for (const loadout of loadouts) {
-        for (const slot of ["item", "talisman_1", "talisman_2", "rule_1", "rule_2", "armor"] as const) {
+        for (const slot of ["item", "talisman_1", "talisman_2", "rule", "armor"] as const) {
           expect(id(loadout, slot)).not.toBeNull();
         }
       }
@@ -303,7 +292,7 @@ describe("armor", () => {
         limits: { stats: MAXED, maxStatGap: 0 },
         random,
         from: "armor",
-        kept: { rule_1: "jump_attacks_only" },
+        kept: { rule: "jump_attacks_only" },
       });
       if (jumpSets.includes(id(loadout, "armor") ?? "")) hits += 1;
     }
@@ -322,7 +311,7 @@ describe("armor", () => {
         limits: { stats: MAXED, maxStatGap: 0 },
         random,
         from: "armor",
-        kept: { rule_1: "no_armor" },
+        kept: { rule: "no_armor" },
       });
       if (id(loadout, "armor") === "naked_set") hits += 1;
     }
@@ -345,7 +334,7 @@ describe("armor", () => {
           limits: { stats: MAXED, maxStatGap: 0 },
           random,
           from: "armor",
-          kept: { talisman_1: "blue_dancer_charm", rule_1: rule },
+          kept: { talisman_1: "blue_dancer_charm", rule: rule },
         }),
         "armor",
       ) ?? "";

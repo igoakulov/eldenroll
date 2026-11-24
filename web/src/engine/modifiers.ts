@@ -9,15 +9,13 @@ export interface RollState {
   readonly rolled: ReadonlyMap<PoolSlot, string | null>;
 }
 
-const RULE_SLOTS: ReadonlySet<PoolSlot> = new Set(["rule_1", "rule_2"]);
-
 /** An empty result and a slot the class has no row for both read as `none`. */
 function rolledOption(data: EngineData, state: RollState, slot: PoolSlot): Option | "not_rolled" {
   const value = state.rolled.get(slot);
   if (value === undefined && data.pools.has(poolKey(state.characterClass, slot))) return "not_rolled";
 
   const id = value ?? "none";
-  if (RULE_SLOTS.has(slot)) {
+  if (slot === "rule") {
     const row = data.rules.get(id);
     if (row === undefined) throw new Error(`Unknown rule rolled: ${id}`);
     return { kind: "rule", row };

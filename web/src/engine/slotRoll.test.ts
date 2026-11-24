@@ -76,7 +76,7 @@ describe("slot pools on the real data", () => {
 
   it("gives None its base odds as a rule", () => {
     const odds = realDatabase.combat_rule.find((row) => row.id === "none")!.odds;
-    expect(weightOf(pool("knight", "rule_1"), "none")).toBe(odds);
+    expect(weightOf(pool("knight", "rule"), "none")).toBe(odds);
   });
 
   it("gives Jester's empty hand its own odds, and only there", () => {
@@ -114,11 +114,11 @@ describe("fixed shares", () => {
     result.options.filter(keep).reduce((sum, row) => sum + row.weight, 0) / result.options.reduce((sum, row) => sum + row.weight, 0);
   const rest = DEFAULT_HYPERPARAMS.fixedShare.restWeight(1);
 
-  it("keeps None's share of a rule slot whatever the class's pool", () => {
+  it("keeps None's share of the rule slot whatever the class's pool", () => {
     const odds = ruleOdds("none");
     const isNoneRule = (row: SlotPoolResult["options"][number]) => row.option.row.id === "none";
-    const knight = pool("knight", "rule_1", KNIGHT_MELEE);
-    const sorcerer = pool("sorcerer", "rule_1", { rh: "astrologers_staff", lh: "astrologers_staff" });
+    const knight = pool("knight", "rule", KNIGHT_MELEE);
+    const sorcerer = pool("sorcerer", "rule", { rh: "astrologers_staff", lh: "astrologers_staff" });
     expect(sorcerer.pool).toBeLessThan(knight.pool);
     for (const result of [knight, sorcerer]) expect(chanceOf(result, isNoneRule)).toBeCloseTo(odds / (rest + odds));
   });
@@ -151,17 +151,14 @@ describe("a condition on a slot not rolled yet", () => {
   });
 
   it("is inactive when it says does not match, so a rule survives until its slot rolls", () => {
-    expect(ids(pool("knight", "rule_1"))).toContain("parry_only");
+    expect(ids(pool("knight", "rule"))).toContain("parry_only");
   });
 
-  it("leaves the rule exclusions off rule_1's own pool", () => {
-    expect(ids(pool("knight", "rule_1", KNIGHT_MELEE))).toContain("overloaded");
-  });
 });
 
 describe("a slot the class has no row for", () => {
   it("counts as rolled with nothing, so Parry only leaves Pyromancer", () => {
-    const result = pool("pyromancer", "rule_1", { rh: "finger_seal", lh: "none" });
+    const result = pool("pyromancer", "rule", { rh: "finger_seal", lh: "none" });
     expect(ids(result)).not.toContain("parry_only");
     expect(ids(result)).not.toContain("l2_only");
   });
@@ -194,26 +191,19 @@ describe("modifiers across slots", () => {
   it("removes the item none without touching the rule None", () => {
     const rolled = { ...KNIGHT_MELEE };
     expect(ids(pool("knight", "spell", rolled))).toEqual([]);
-    expect(ids(pool("knight", "rule_1", rolled))).toContain("none");
-  });
-
-  it("reads rule_1 for rule_2's exclusions, both ways", () => {
-    const first = ids(pool("knight", "rule_2", { ...KNIGHT_MELEE, rule_1: "do_not_get_hit" }));
-    expect(first).not.toContain("overloaded");
-    const second = ids(pool("knight", "rule_2", { ...KNIGHT_MELEE, rule_1: "overloaded" }));
-    expect(second).not.toContain("do_not_get_hit");
+    expect(ids(pool("knight", "rule", rolled))).toContain("none");
   });
 
   it("needs a parry ash for Parry only, and boosts it with one", () => {
-    expect(ids(pool("knight", "rule_1", KNIGHT_MELEE))).not.toContain("parry_only");
-    const withParry = pool("knight", "rule_1", { ...KNIGHT_MELEE, lh_ash: "parry" });
+    expect(ids(pool("knight", "rule", KNIGHT_MELEE))).not.toContain("parry_only");
+    const withParry = pool("knight", "rule", { ...KNIGHT_MELEE, lh_ash: "parry" });
     expect(perRuleOdds(withParry, "parry_only") / perRuleOdds(withParry, "r1_only")).toBeCloseTo(
       modifierRow("parry_ash_boosts_parry_only").value,
     );
   });
 
   it("makes a named talisman's rule top tier", () => {
-    const result = pool("knight", "rule_1", { ...KNIGHT_MELEE, talisman_1: "claw_talisman" });
+    const result = pool("knight", "rule", { ...KNIGHT_MELEE, talisman_1: "claw_talisman" });
     expect(perRuleOdds(result, "jump_attacks_only") / perRuleOdds(result, "r1_only")).toBeCloseTo(
       modifierRow("claw_talisman_makes_jump_attacks_top").value,
     );
@@ -467,7 +457,7 @@ describe("catch-up", () => {
   it("keeps a guarantee on sets that have shown far more than their peers", () => {
     const jumpSets = ["raptors_set", "gravebird_set"];
     const ahead = { raptors_set: 10, gravebird_set: 10 };
-    expect(shareOf(weigh("armor", ahead, 0, { rule_1: "jump_attacks_only" }), jumpSets)).toBeGreaterThan(0.99);
+    expect(shareOf(weigh("armor", ahead, 0, { rule: "jump_attacks_only" }), jumpSets)).toBeGreaterThan(0.99);
     expect(shareOf(weigh("armor", ahead, 0), jumpSets)).toBe(0);
   });
 });

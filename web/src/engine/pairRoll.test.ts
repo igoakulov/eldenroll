@@ -56,11 +56,4 @@ describe("paired slots", () => {
     expect(second("knight", pair, KNIGHT_PARRY, "dagger_talisman")("dagger_talisman")).toBe(0);
   });
 
-  it("lets None fill both rule slots, and weighs None beside a rule more", () => {
-    const pair = ["rule_1", "rule_2"] as const;
-    const value = modifierRow("none_beside_a_rule").value;
-    expect(second("knight", pair, KNIGHT_PARRY, "none")("none")).toBeCloseTo(1);
-    expect(second("knight", pair, KNIGHT_PARRY, "r1_only")("none")).toBeCloseTo(value);
-    expect(second("knight", pair, KNIGHT_PARRY, "none")("r1_only")).toBeCloseTo(value);
-  });
 });

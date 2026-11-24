@@ -11,7 +11,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 | `regions.ts` | selected locations, the Ashen Capital and Maliketh rules, the boss pool |
 | `slotRoll.ts` | one pool: filters, odds, modifiers, catch-up and its tally, sampling |
 | `loadout.ts` | every slot in roll order, ash and spell rules, rerolls, the weapon shortlist |
-| `pairRoll.ts` | the two talisman slots and the two combat rule slots, each pair rolled as one draw (`data/balance.md#Paired slots`) |
+| `pairRoll.ts` | the two talisman slots, rolled as one draw (`data/balance.md#Paired slots`) |
 | `run.ts` | the run as plain data and every action |
 | `display.ts` | what each card row shows |
 | `hyperparams.ts` | balance values passed in, so a hidden page can tune them live; game mechanics never go here |
@@ -37,7 +37,7 @@ The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with
 
 ## Run model
 
-An objective is a boss instance, a class loadout and 2 combat rules. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans roll once `Margit, the Fell Omen` is felled, as in the game, and one before (#Closed slots); talismans 3 and 4 never roll. In Limgrave, Liurnia and Caelid a rolled talisman may come up `any` (`data/balance.md#43. Early talisman slots`). The two talismans roll as one draw, and so do the two rules (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
+An objective is a boss instance, a class loadout and a combat rule. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans roll once `Margit, the Fell Omen` is felled, as in the game, and one before (#Closed slots); talismans 3 and 4 never roll. In Limgrave, Liurnia and Caelid a rolled talisman may come up `any` (`data/balance.md#43. Early talisman slots`). The two talismans roll as one draw (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
 
 - **Owned** means it appeared in a completed objective this run; nothing else is known about the player's inventory.
 - **Felled** (code: `dead`) is a boss out of the run, by `Done`, `Felled?` or `Bosses`. **Skipped** keeps a boss out of the boss pool while it stays alive for its items.
@@ -56,13 +56,13 @@ An objective is a boss instance, a class loadout and 2 combat rules. The player 
 Unlimited; they never change the objective number or any probability, and a discarded roll adds no ownership. A slider with 9 stops picks the scope; its target and every slot after it in the roll order re-roll:
 
 ```
-boss → character_class → rh → rh_ash → lh → lh_ash → spell → item → talisman_1 → talisman_2 → rule_1 → rule_2 → armor
+boss → character_class → rh → rh_ash → lh → lh_ash → spell → item → talisman_1 → talisman_2 → rule → armor
 ```
 
 | Stop | Target |
 |---|---|
 | `Armor only` | `armor` |
-| `Rules` | `rule_1` |
+| `Rule` | `rule` |
 | `Talismans` | `talisman_1` |
 | `Item` | `item` |
 | `Spell` | `spell` |
@@ -114,7 +114,7 @@ RH is two-handed when the item has `str_bonus_2h` and LH is empty, or whatever L
 | randomized, empty on purpose | `2H Warrior` LH but beside poison (`data/balance.md#45. Poisoned Hand`), `Jester` RH | the pool holds the `none` row | `none` |
 | randomized, nothing survives the filters | a narrow pool | empty result | `none` |
 
-- **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it. Any id starting `none_` is empty too (`isNone`). An empty slot may follow another, so `rule_2` can repeat `rule_1`'s `None`. `none`, like everything found everywhere and the rule `None`, holds a fixed share of its roll (`data/balance.md#Fixed shares`).
+- **`none`** is an ordinary item row. Selectors skip it unless they name it, so "all greatshields" can never remove it. Any id starting `none_` is empty too (`isNone`). An empty slot may follow another, so both talisman slots may roll `none_talisman`. `none`, like everything found everywhere and the rule `None`, holds a fixed share of its roll (`data/balance.md#Fixed shares`).
 - **`any`** is a slot state, never sampled, owned or counted.
 - **An alias** is a label over real items. The engine rolls a concrete member with its own odds and filters and shows the label, so the alias's chance is the sum of its members' and it vanishes when no member survives. Ownership and the summary use the label. A synthetic "any staff" item would need its own odds, eligibility and distinctness rules, so it stays a label. A set piece in an alias stands for every member, as `Jar / Greatjar` does: the set is in reach once any member is, and arrives with the earliest.
 - **Ash line.** A rolled ash shows its name or label; no ash row or an empty pool shows `any`; a hand that rolled `none` shows `none`.
@@ -125,12 +125,12 @@ A slot pool's `opened_by` names a boss. While that boss may still be an objectiv
 
 ## Combat rules
 
-A rule is its name and nothing else, so the name says the whole rule: `Land a riposte` means landing one on the boss; `L2 only` means attacking only with the skill, whatever the FP. Each requirement, exclusion and synergy is a row in `data/overrides/modifiers.csv`, explained rule by rule in `data/balance.md#Conditional rules`.
+A rule is its name and nothing else, so the name says the whole rule: `Land a riposte` means landing one on the boss; `L2 only` means attacking only with the skill, whatever the FP. Each requirement and synergy is a row in `data/overrides/modifiers.csv`, explained rule by rule in `data/balance.md#Conditional rules`.
 
 - `No talismans` is advisory: talismans roll first, so they show and the player ignores them. `No armor` makes the `Naked Set` top tier instead, because armor rolls after the rules.
 - `No healing flasks` allows healing items, spells and blocking, and doesn't forbid the Flask of Wondrous Physick.
 - Rules have no location filter, so the tears that come only from DLC bosses sit at `odds = 0` (`data/balance.md#Base odds`).
-- Requirements remove a rule the loadout can't obey, and exclusions keep two contradicting rules apart.
+- Requirements remove a rule the loadout can't obey.
 - A trigger or target from a boss waits until it is felled; a modifier whose target is filtered out is simply inactive.
 
 ## Weapon shortlist
