@@ -487,3 +487,17 @@ Rows: `pyromancer_prefers_no_healing_flasks`
 Owner, 2026-11-24. **Preference:** `Dual-Wield Warrior` features `Claw Talisman` (#44), so `Jump attacks only` came about six times as often as an unboosted rule for it; `×0.5` on the rule, with or without the talisman, brings it to about twice.
 
 Rows: `warrior_dw_lowers_jump_attacks`
+
+### 49. Jester's talismans
+
+Owner, 2026-11-24. **Synergy:** `Jester`'s gear brings the talismans that suit it, near-certain unless the branchswords pair up:
+
+- `Shard of Alexander` with `Visage Shield`, `One-Eyed Shield` or the staff in the right hand, whose skills it boosts (`×100`).
+- A scorpion charm on about half of the objectives with `Visage Shield` or `One-Eyed Shield` (`×6` on each; catch-up favours the charm furthest behind).
+- With pots or perfumes, `Companion Jar` or `Perfumer's Talisman`, never both, about three to one (`×100` and `×20`).
+- A perfume bottle in a hand brings `Perfumer's Talisman` for every class (`×100`); only `Jester` rolls bottles.
+
+Under the right-hand triggers the branchsword pair row gets `×100` more, so the pair keeps a share against the boosted talismans; with pots it gets none, since pots show on about half of `Jester`'s objectives, mostly before `Companion Jar` and `Perfumer's Talisman` are in reach, and a row there doubled the pair over the run.
+
+Rows: `jester_skill_rh_boosts_shard`, `jester_shields_boost_scorpion_charms`, `jester_pots_perfumes_boost_companion_jar`, `jester_pots_perfumes_boost_perfumers_talisman`, `jester_companion_jar_excludes_perfumers_talisman`, `perfume_bottle_boosts_perfumers_talisman`, `jester_branchswords_beside_boosted_talismans`
+
