@@ -354,8 +354,8 @@ describe("Weapon shortlist", () => {
   it("lets none join Jester's first pool without counting as a listed weapon", () => {
     const jester = { ...settings, characterClasses: ["jester"] };
     for (let seed = 1; seed <= 20; seed += 1) {
-      const run = start({ settings: jester, weaponShortlist: ["briar_greatshield"] }, seed);
-      expect(["briar_greatshield", "none"]).toContain(current(run).slots.rh);
+      const run = start({ settings: jester, weaponShortlist: ["spiked_palisade_shield"] }, seed);
+      expect(["spiked_palisade_shield", "none"]).toContain(current(run).slots.rh);
     }
   });
 });

@@ -171,6 +171,12 @@ Sets arriving from Nokron on read about two thirds of a fair share over a run, a
 | armor_set | `alberichs_set` `bloodsoaked_set` `fell_omen_set` `golden_order_set` `lionels_set` `nomadic_merchants_set` `omen_set` `omenkiller_set` `raging_wolf_set` | 2 | owner decision, 2026-11-23: **Catch-up:** Leyndell, Royal Capital: they also leave reach once Maliketh falls, unless already shown, and read about half a fair share at odds 1 |
 | armor_set | `ledas_knight_set` `ledas_surgeon_set` | 3–3.5 | owner decision: **Catch-up:** they arrive in Enir-Ilim with about three objectives left. **Synergy:** `Leda's Knight Set` half a step higher, since `Lord of Blood's Exultation` also raises `Leda's Surgeon Set` when both talismans roll, so the two split `Retaliatory Crossed-Tree`'s wins evenly (#41. Retaliatory Crossed-Tree and Leda's sets) |
 
+### Greatshields
+
+| Kind | Id | Odds | Why |
+|---|---|---:|---|
+| item | `visage_shield` `one_eyed_shield` `fingerprint_stone_shield` | 2 | owner decision, 2026-11-24: `Visage Shield` **Preference**, too rare in `Jester`'s right hand; `One-Eyed Shield` **Catch-up**, arriving late in the Mountaintops of the Giants; `Fingerprint Stone Shield` reason not recorded |
+
 ### Lowered talismans
 
 Talismans that only add challenge, or matter only where a rule brings them.
@@ -212,7 +218,7 @@ Every row of `data/overrides/modifiers.csv` belongs to one rule below. A rule al
 
 ### Classes with extra rules
 
-Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); `Pyromancer` more `No healing flasks` (#47); the classes that can't use a talisman or rule lose it (#33, #34).
+Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand and `Jellyfish Shield` in the left beside a free right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); `Pyromancer` more `No healing flasks` (#47); the classes that can't use a talisman or rule lose it (#33, #34).
 
 ### 1. Parry only needs a parry ash
 
@@ -222,9 +228,9 @@ Rows: `parry_only_needs_a_parry_ash`
 
 ### 2. Charged attacks need a weapon in the right hand
 
-P1. `Charged R2/ash/spell only` needs a melee weapon, thrusting shield, torch or perfume bottle in RH; `2x break stance with Stonebarb Cracked Tear` one of those or a bow.
+P1. `Charged R2/ash/spell only` needs a melee weapon, thrusting shield, torch or perfume bottle in RH, or a staff or seal in either hand, since a charged spell counts (owner, 2026-11-24); `2x break stance with Stonebarb Cracked Tear` a weapon of those or a bow in RH.
 
-Rows: `charged_r2_needs_a_melee_weapon_in_rh`, `stonebarb_needs_a_weapon_in_rh`
+Rows: `charged_rule_needs_a_weapon_or_catalyst`, `stonebarb_needs_a_weapon_in_rh`
 
 ### 3. Melee rules need a melee weapon
 
@@ -292,7 +298,9 @@ P2. An empty right hand is part of the joke: `none` at `×33` holds a quarter of
 
 The staff is there to hold `Spinning Weapon`, the only ash a staff takes, which Rogier sells only past `Margit, the Fell Omen`; so the staff, like the ash, counts as found at Margit (`data/overrides/boss_slot_links.csv`, owner 2026-11-24).
 
-Rows: `jester_none_x33`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_torches_in_limgrave`
+P1. `Jellyfish Shield` is `Jester`'s left hand, for its damage buff, beside a right hand that leaves the left free: `none`, a torch or a perfume bottle; any other right hand leaves the left empty (owner, 2026-11-24). The left hand's tally is per class (#Fair share), and with the rows the shield is the only option where it rolls, so its odds don't matter.
+
+Rows: `jester_none_x33`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_torches_in_limgrave`, `jester_jellyfish_needs_a_free_rh`, `jester_free_rh_keeps_jellyfish_in_lh`
 
 ### 22. Buff ashes on weapons that refuse them
 
@@ -419,7 +427,7 @@ Rows: `guard_talismans_need_a_guarding_class`, `pearl_shield_talisman_not_on_war
 Owner, 2026-11-20. `Companion Jar` and `Perfumer's Talisman` follow `Any pots / perfumes` in the item slot.
 
 - **P1.** `Companion Jar` rolls only with `Any pots / perfumes`; `Perfumer's Talisman` with it or a perfume bottle in a hand.
-- **P2.** `Jester` with `Any pots / perfumes` gets `Perfume Jar` and `Depraved Perfume Jar` at `guarantee`, equally.
+- **P2.** `Jester` with `Any pots / perfumes` gets `Perfume Jar` and `Depraved Perfume Jar` top tier, equally, so the jars win over the Mushroom Crown sets when both hold, though the pots are the commoner trigger, and split with the `Naked Set` under `No armor` (owner, 2026-11-24).
 
 Rows: `perfumers_talisman_needs_pots_perfumes`, `companion_jar_needs_pots_perfumes`, `jester_pots_perfumes_guarantee_jar_sets`
 
@@ -473,3 +481,9 @@ Rows: `pyromancer_weapon_keeps_a_seal_in_lh`, `faith_weapons_not_on_melee_classe
 Owner, 2026-11-24. **Preference:** `Pyromancer` has many powerful healing incantations, so `No healing flasks` rolls `×4` for it, making up what `Dried Bouquet` objectives take from it (#40. Summons).
 
 Rows: `pyromancer_prefers_no_healing_flasks`
+
+### 48. Jump attacks on Dual-Wield Warrior
+
+Owner, 2026-11-24. **Preference:** `Dual-Wield Warrior` features `Claw Talisman` (#44), so `Jump attacks only` came about six times as often as an unboosted rule for it; `×0.5` on the rule, with or without the talisman, brings it to about twice.
+
+Rows: `warrior_dw_lowers_jump_attacks`

@@ -89,9 +89,9 @@ def test_empty_hands_and_spells_hold_only_none(
 ) -> None:
     resolved = _resolved(pools, placement_data.table)
     assert {row.id for row in resolved["warrior_2h", "lh"]} == {"none", "poisoned_hand"}
+    assert {row.id for row in resolved["jester", "lh"]} == {"none", "jellyfish_shield"}
     empty = [
         ("ranger", "lh"),
-        ("jester", "lh"),
         *((character_class, "spell") for character_class in ("knight", "warrior_2h", "warrior_dw")),
         ("ranger", "spell"),
         ("jester", "spell"),
