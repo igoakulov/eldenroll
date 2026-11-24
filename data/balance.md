@@ -72,7 +72,7 @@ A pool with fixed shares counts as larger (#Fixed shares). `guarantee` is sized 
 When two boosted options meet in one pool, compare them with each other:
 
 - **Keep guarantees two orders of magnitude apart**, so the higher wins about 99%; ×10 apart splits about 90/10. The build refuses two values of `boost` or above within one order in the same pool.
-- **Avoid two `top` targets in one pool:** they split about 50/50. Allowed where the pair is rare, such as `Claw Talisman` with `Axe Talisman`; `import-report.json` lists every such pool.
+- **Avoid two `top` targets in one pool:** they split about 50/50. Allowed where the pair is rare; `import-report.json` lists every such pool.
 - **When two boosted targets clash, the rarer trigger wins:** the more common one shows its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger.
 - **Off-tier values** are aimed at a target share rather than a feel, and tuned at the simulation.
 
@@ -117,7 +117,6 @@ Playstyles and rules that grow tiresome or crowd the rest roll less.
 | class | `ranger` `jester` | 0.25–0.5 | owner decision: `Ranger` plays less enjoyably, with less weapon variety than melee or magic; `Jester` mixes silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
 | rule | `none` | 100 | half the rule slot, a fixed share (#Fixed shares): half of objectives roll no rule (owner, 2026-11-24) |
 | rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` `parry_only` `l2_only` | 0.5 | owner decision: hard rules, each at about 5%: they crowded out the others, limit the moveset a lot (`L2 only` sometimes clashes with an ash), and `No armor` pushed the `Naked Set` and the light sets past their guarantees' reach of each other |
-| rule | `use_a_summon` | 0.5 | below an unboosted rule outside `Dried Bouquet`, so the talisman's boost evens out over a run (#40. Summons) (owner, 2026-11-24) |
 | rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
 
 ### Never rolled
@@ -259,21 +258,21 @@ Rows: `blue_dancer_charm_boosts_light_sets`, `blue_dancer_charm_boosts_no_armor`
 
 ### 13. Claw Talisman and jump attacks
 
-P2. The talisman boosts jump attacks, so `Jump attacks only` goes top tier, and the rule brings the jump sets (#23). The talisman doesn't boost the sets itself, which would double-dip.
+P2. The talisman boosts jump attacks, so it boosts `Jump attacks only` `×25`, off-tier, for the rule on about one objective in three that holds the talisman (owner, 2026-11-24): the talisman is common on the melee classes, and a top-tier row filled their runs with the rule. The rule brings the jump sets (#23); the talisman doesn't boost the sets itself, which would double-dip.
 
-Rows: `claw_talisman_makes_jump_attacks_top`
+Rows: `claw_talisman_boosts_jump_attacks`
 
 ### 14. Shards and L2 only
 
-P2. `Shard of Alexander` and `Warrior Jar Shard` boost skills, so `L2 only` goes top tier. It loses to `Axe Talisman`'s rules about a third of the time, mostly beside a Dancer's weapon, which boosts both; the owner wants it well short of certain.
+P2. `Shard of Alexander` and `Warrior Jar Shard` boost skills, so they boost `L2 only` `×90`, off-tier, for the rule on about one objective in three that holds a shard (owner, 2026-11-24). It stays below `×100` because a parry ash's `×200` on `Parry only` shares the rule pool, and the build refuses two values of `boost` or above within one order (#Tiers).
 
-Rows: `shards_make_l2_only_top`
+Rows: `shards_boost_l2_only`
 
 ### 15. Axe Talisman and charged attacks
 
-P2. The talisman boosts charged attacks, so `Charged R2/ash/spell only` and `2x break stance with Stonebarb Cracked Tear` go top tier and split its objectives about evenly.
+P2. The talisman boosts charged attacks, so it boosts `Charged R2/ash/spell only` and `2x break stance with Stonebarb Cracked Tear` `×25`, off-tier, for one of the two on about one objective in three that holds the talisman, split about evenly (owner, 2026-11-24): like `Claw Talisman` (#13), it is common on the melee classes.
 
-Rows: `axe_talisman_makes_charged_rules_top`
+Rows: `axe_talisman_boosts_charged_rules`
 
 ### 17. Dancer's weapons
 
@@ -283,7 +282,7 @@ Rows: `dancers_weapon_makes_dancers_set_top`, `dancers_weapon_boosts_moveset_tal
 
 ### 18. Parry ashes
 
-P2. A parry ash in a hand boosts `Parry only` (`strong`) and `Dagger Talisman` (`boost` on its odds of 0.25, so `×400`), whose critical hits a parry sets up; `Blade of Mercy` joins it by the pair row (#37).
+P2. A parry ash in a hand boosts `Parry only` `×200`, off-tier, for about three a run over every class (owner, 2026-11-24): the rule is very hard and impossible against a few bosses, so it stays rare, and almost all of it falls to `Knight`, whose shield holds a parry ash on about a quarter of its objectives. The parry ash also boosts `Dagger Talisman` (`boost` on its odds of 0.25, so `×400`), whose critical hits a parry sets up; `Blade of Mercy` joins it by the pair row (#37).
 
 Rows: `parry_ash_boosts_parry_talismans`, `parry_ash_boosts_parry_only`
 
@@ -315,9 +314,9 @@ Rows: `rot_boosts_kindred_exultation`, `kindred_exultation_boosts_mushroom_sets`
 
 ### 25. Blasphemous Blade and Prayerful Strike
 
-P2. Their L2 heals a lot, so `No healing flasks` and `Overloaded` become playable and are boosted `×5`, and the rules that forbid L2 are removed.
+P2. Their L2 heals a lot, so `No healing flasks` goes top tier and `Overloaded` becomes playable at `×5` (owner, 2026-11-24), and the rules that forbid L2 are removed.
 
-Rows: `blasphemous_blade_boosts_healing_rules`, `prayerful_strike_boosts_healing_rules`, `blasphemous_blade_needs_l2`, `prayerful_strike_needs_l2`
+Rows: `blasphemous_blade_makes_no_healing_flasks_top`, `blasphemous_blade_boosts_overloaded`, `prayerful_strike_makes_no_healing_flasks_top`, `prayerful_strike_boosts_overloaded`, `blasphemous_blade_needs_l2`, `prayerful_strike_needs_l2`
 
 ### 26. Dual-Wield Warrior pairs
 
@@ -426,9 +425,9 @@ Rows: `perfumers_talisman_needs_pots_perfumes`, `companion_jar_needs_pots_perfum
 
 ### 40. Summons
 
-Owner, 2026-11-24. **Synergy:** `Dried Bouquet` makes `Use a summon` `strong`. The talisman shows on a share of objectives that varies by class, about 1% for `Knight` and 10% for the casters, so a top-tier row made the rule several times as common as the others there. The rule's own odds sit at 0.5 (#Base odds), so it shows less than the others without the talisman and more with it, and about as often as an unboosted rule over a run.
+Owner, 2026-11-24. **Synergy:** `Use a summon` rolls only beside `Dried Bouquet`, which boosts it `×40`: certain would make it several times as common as other rules for the casters, who roll the talisman on about a tenth of their objectives against about 1% for `Knight`. The rule wins about half of those objectives, more for classes with fewer rules.
 
-Rows: `dried_bouquet_boosts_summon_rule`
+Rows: `summon_rule_needs_dried_bouquet`, `dried_bouquet_boosts_summon_rule`
 
 ### 41. Retaliatory Crossed-Tree and Leda's sets
 
@@ -471,6 +470,6 @@ Rows: `pyromancer_weapon_keeps_a_seal_in_lh`, `faith_weapons_not_on_melee_classe
 
 ### 47. No healing flasks on Pyromancer
 
-Owner, 2026-11-24. **Preference:** `Pyromancer` has many powerful healing incantations, so `No healing flasks` rolls `×3` for it.
+Owner, 2026-11-24. **Preference:** `Pyromancer` has many powerful healing incantations, so `No healing flasks` rolls `×4` for it, making up what `Dried Bouquet` objectives take from it (#40. Summons).
 
 Rows: `pyromancer_prefers_no_healing_flasks`

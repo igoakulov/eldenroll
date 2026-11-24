@@ -299,6 +299,31 @@ describe("armor", () => {
     expect(hits).toBeGreaterThanOrEqual(95);
   });
 
+  it("rolls Use a summon only beside Dried Bouquet, also while the second talisman slot is closed", () => {
+    const random = seeded(8);
+    const margit = "margit_the_fell_omen_stormveil_castle";
+    const rules = (kept: Record<string, string>, alive: ReadonlySet<string>) =>
+      Array.from({ length: 200 }, () =>
+        id(
+          rollLoadout({
+            data,
+            characterClass: "sorcerer",
+            boss: null,
+            counted: CASES[0].counted,
+            limits: { stats: MAXED, maxStatGap: 0 },
+            random,
+            from: "rule",
+            kept,
+            alive,
+          }),
+          "rule",
+        ),
+      );
+    expect(rules({ talisman_1: "radagons_soreseal" }, new Set([margit]))).not.toContain("use_a_summon");
+    expect(rules({ talisman_1: "radagons_soreseal", talisman_2: "axe_talisman" }, new Set())).not.toContain("use_a_summon");
+    expect(rules({ talisman_1: "radagons_soreseal", talisman_2: "dried_bouquet" }, new Set())).toContain("use_a_summon");
+  });
+
   it("makes the Naked Set nearly certain under No armor", () => {
     const random = seeded(6);
     let hits = 0;

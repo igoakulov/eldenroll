@@ -121,7 +121,7 @@ RH is two-handed when the item has `str_bonus_2h` and LH is empty, or whatever L
 
 ## Closed slots
 
-A slot pool's `opened_by` names a boss. While that boss may still be an objective of the run (alive, not skipped, in the regions ticked so far), the slot is closed: it doesn't roll, adds nothing to the tally, and the card leaves its line out. The objective that fights the boss has it closed too. A slot of a pair then rolls its partner alone, as a reroll that keeps one slot does, so rows reading the pair find nothing in the closed slot. Felling, skipping or leaving out the boss opens it, so a slot never stays closed for good; a reroll decides it afresh for the slots it rolls.
+A slot pool's `opened_by` names a boss. While that boss may still be an objective of the run (alive, not skipped, in the regions ticked so far), the slot is closed: it doesn't roll, adds nothing to the tally, and the card leaves its line out. The objective that fights the boss has it closed too. A slot of a pair then rolls its partner alone, as a reroll that keeps one slot does, so rows reading the pair find nothing in the closed slot, and every row reads it as empty. Felling, skipping or leaving out the boss opens it, so a slot never stays closed for good; a reroll decides it afresh for the slots it rolls.
 
 ## Combat rules
 

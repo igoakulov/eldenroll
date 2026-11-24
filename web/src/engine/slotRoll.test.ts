@@ -213,7 +213,7 @@ describe("modifiers across slots", () => {
   it("makes a named talisman's rule top tier", () => {
     const result = pool("knight", "rule", { ...KNIGHT_MELEE, talisman_1: "claw_talisman" });
     expect(perRuleOdds(result, "jump_attacks_only") / perRuleOdds(result, "r1_only")).toBeCloseTo(
-      modifierRow("claw_talisman_makes_jump_attacks_top").value,
+      modifierRow("claw_talisman_boosts_jump_attacks").value,
     );
   });
 

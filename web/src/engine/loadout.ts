@@ -216,6 +216,10 @@ export function rollLoadout(input: LoadoutInput): Loadout {
     return pool !== undefined && (opener === null || input.alive?.has(opener) !== true);
   };
 
+  // A closed slot holds nothing this objective, so a row reading it sees it empty, not yet to roll
+  for (const slot of LOADOUT_ORDER) {
+    if (slot !== "armor" && !pooled(slot) && data.pools.has(poolKey(characterClass, slot))) rolled.set(slot, null);
+  }
   for (const slot of LOADOUT_ORDER.slice(start)) {
     if (loadout.has(slot) || !pooled(slot)) continue;
     const exclude = slot === from ? (input.exclude ?? null) : null;
