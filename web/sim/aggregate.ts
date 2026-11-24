@@ -11,6 +11,8 @@ import {
   ashOnShield,
   BUCKET,
   CHANCE_SLOTS,
+  EVERY_ROLL,
+  isSynergy,
   playRank,
   readChanceKey,
   type ChanceSum,
@@ -240,11 +242,12 @@ function foldChances(
     if (!picked.has(characterClass)) continue;
     const row = group({ slot, key, stretch });
     if (row === undefined) continue;
-    const total = rows.get(row) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0 };
+    const total = rows.get(row) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0, synergyRolls: 0 };
     total.chance += sum.chance;
     total.plain += sum.plain;
     total.boosted += sum.boosted;
     total.rolls += sum.rolls;
+    total.synergyRolls += sum.synergyRolls;
     rows.set(row, total);
   }
   return rows;
@@ -775,22 +778,6 @@ export interface SynergyRow {
 
 const inAnyRoll = (one: Obj, test: (roll: RollRow) => boolean) => [...one.rolls.values()].some(test);
 
-/** A boost that matches the left hand's weapon class to the right hand's: Slots' both-hands table reads these. */
-function pairsHands(modifier: Modifier): boolean {
-  const { target } = modifier;
-  return (
-    target.kind === "subcategory" &&
-    modifier.when.some(
-      (condition) =>
-        condition.kind === "rolled" &&
-        condition.selector.kind === "subcategory" &&
-        condition.selector.ids?.join() === target.ids?.join(),
-    )
-  );
-}
-
-/** Every boosting modifier the Synergies tab lists. */
-const isSynergy = (modifier: Modifier) => modifier.value > 1 && !pairsHands(modifier);
 
 /** Every boosting modifier in play for the picked classes: how often it was active, and how often what it boosted
  * won. Counted per objective, since a talisman boost is active in both of its slots. */
@@ -852,11 +839,11 @@ export function outsideSynergy(sample: Sample): readonly SynergyRow[] {
 
 // Items
 
-/** Each option's showings in each run: once per completed objective, every class, every slot. `none` is one key
+/** Each option's showings in each run: once per completed objective of a picked class, every slot. `none` is one key
  * across all slots. */
 function showings(sample: Sample): ReadonlyMap<string, readonly (readonly number[])[]> {
   const byKey = new Map<string, number[][]>();
-  for (const one of sample.all) {
+  for (const one of sample.objectives) {
     const keys = new Set([...one.rolls.values()].flatMap((roll) => (roll.chosenKey === null ? [] : [roll.chosenKey])));
     for (const key of keys) {
       const runs = byKey.get(key) ?? sample.results.map(() => []);
@@ -888,7 +875,7 @@ export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
   const keys = new Set<string>();
   for (const at of chances.keys()) {
     const { characterClass, key } = readChanceKey(at);
-    if (picked.has(characterClass)) keys.add(key);
+    if (picked.has(characterClass) && key !== EVERY_ROLL) keys.add(key);
   }
   return [...keys].map((key) => ({ key, name: nameOf(sample.data, key) }));
 }
@@ -896,13 +883,20 @@ export function items(sample: Sample, chances: ChanceSums): readonly ItemRow[] {
 interface ItemPoint {
   /** The stretch's first objective number. */
   readonly x: number;
-  /** Mean chance per roll in the stretch, with the catch-up boost and with it removed from every option. */
+  /** Mean chance per roll in the stretch where the option could roll, with the catch-up boost and with it removed
+   * from every option. */
   readonly chance: number;
   readonly plain: number;
+  /** Mean chance with the catch-up boost over every roll of the slot, 0 where a rule or the class left it out. */
+  readonly overall: number;
   /** The mean catch-up boost on it in the stretch. */
   readonly catchUp: number;
   /** Times shown by the stretch's end, averaged over runs. */
   readonly shown: number;
+  /** Share of the rolls where it could roll that a synergy boosted it. */
+  readonly synergy: number;
+  /** Share of its showings in the stretch that a synergy won; null when it never showed there. */
+  readonly synergyWon: number | null;
 }
 
 /** Slots whose showings mark a slot's chart: the second talisman slot shows on the first's. */
@@ -919,6 +913,7 @@ export function itemSeries(
 ): readonly { readonly slot: LoadoutSlot; readonly points: readonly ItemPoint[]; readonly shown: readonly number[] }[] {
   const bySlot = new Map<LoadoutSlot, Map<number, ChanceSum>>();
   const folded = foldChances(sample, chances, (entry) => (entry.key === key ? `${entry.slot}|${entry.stretch}` : undefined));
+  const everyRoll = foldChances(sample, chances, (entry) => (entry.key === EVERY_ROLL ? `${entry.slot}|${entry.stretch}` : undefined));
   for (const [row, total] of folded) {
     const [slot = "", stretch = ""] = row.split("|");
     const stretches = bySlot.get(slot as LoadoutSlot) ?? new Map<number, ChanceSum>();
@@ -926,6 +921,11 @@ export function itemSeries(
     bySlot.set(slot as LoadoutSlot, stretches);
   }
   const perRun = showings(sample).get(key) ?? sample.results.map(() => []);
+  const modifiers = new Map(sample.data.database.modifier.map((row) => [row.id, row]));
+  const won = (roll: RollRow) => roll.chosenBoosts.some((id) => {
+    const row = modifiers.get(id);
+    return row !== undefined && isSynergy(row);
+  });
   return CHANCE_SLOTS.filter((slot) => bySlot.has(slot)).map((slot) => ({
     slot,
     shown: sample.objectives.flatMap((one) =>
@@ -939,8 +939,21 @@ export function itemSeries(
           x,
           chance: total.chance / total.rolls,
           plain: total.plain / total.rolls,
+          overall: total.chance / (everyRoll.get(`${slot}|${x}`)?.rolls ?? total.rolls),
           catchUp: total.plain > 0 ? total.boosted / total.plain : 1,
           shown: mean(counts),
+          synergy: total.synergyRolls / total.rolls,
+          synergyWon: (() => {
+            const rolls = sample.objectives.flatMap((one) =>
+              one.row.objective >= x && one.row.objective <= x + BUCKET - 1
+                ? (MARKED[slot] ?? [slot]).flatMap((marked) => {
+                    const roll = one.rolls.get(marked);
+                    return roll?.chosenKey === key ? [roll] : [];
+                  })
+                : [],
+            );
+            return rolls.length === 0 ? null : rolls.filter(won).length / rolls.length;
+          })(),
         };
       }),
   }));

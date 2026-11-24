@@ -431,7 +431,7 @@ export const copy = {
     items: {
       overTheRun: "Over the run",
       chartLede: (shown: number, more: number) =>
-        `Each item's chance per stretch of 20 objectives: its share of its slot's roll, against every option competing with it at that moment. The gold line is the chance with the catch-up boost, the dashed one with the boost removed from every option. Items in reach from the start sit below the dashed line, since later items take a bigger share; a late item rises above it from when it comes into reach. Both lines fall as new regions and higher stats bring more competitors. A dot is an objective it showed on, in any run, for the picked classes.${
+        `Each item's chance per stretch of 20 objectives: its share of its slot's roll, against every option competing with it at that moment. The gold line is the chance on the rolls where it could roll, with the catch-up boost; the dashed line the same with the boost removed from every option. Items in reach from the start sit below the dashed line, since later items take a bigger share; a late item rises above it from when it comes into reach. Both fall as new regions and higher stats bring more competitors. The solid bronze line is the gold one over every roll of the slot, 0 where a rule or the class left the item out, so it shows how often the item comes up. Boosted by synergy is the share of the rolls where it could roll that a synergy boosted it, and Synergies won the share of its showings in the stretch that one won. A dot is an objective it showed on, in any run, for the picked classes.${
           more === 0 ? "" : ` Charts for the first ${shown} matches; ${more} more match, so narrow the search to chart them.`
         }`,
       searchToChart: "Search for an item to chart its chance over the run.",
@@ -441,10 +441,13 @@ export const copy = {
       inReach: "In a pool at some point, never shown",
       outOfReach: "Never in a pool under these settings",
       point: (from: number, to: number) => `Objectives ${from} to ${to}`,
-      chance: "Chance",
-      withoutCatchUp: "Without catch-up",
+      chance: "Chance where it can roll (gold)",
+      withoutCatchUp: "Without catch-up (dashed)",
+      overall: "Over every roll (bronze)",
       catchUpBoost: "Catch-up boost",
-      shownSoFar: (to: number) => `Shown by ${to}, any class`,
+      boostedBySynergy: "Boosted by synergy",
+      synergiesWon: "Synergies won",
+      shownSoFar: (to: number) => `Shown by ${to}`,
     },
     slotNames: {
       rh: "Right hand",

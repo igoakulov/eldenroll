@@ -46,6 +46,14 @@
   stroke-linejoin: round;
 }
 
+.line-chart-secondary {
+  fill: none;
+  stroke: var(--bronze);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
 .line-chart-mark {
   fill: var(--grace);
   stroke: var(--ground);
@@ -80,7 +88,7 @@
 .line-chart-readout dl {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: var(--space-2) var(--space-4);
+  gap: var(--space-5) var(--space-4);
   margin: var(--space-2) 0 0;
 }
 

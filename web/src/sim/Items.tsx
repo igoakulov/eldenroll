@@ -67,7 +67,7 @@ function ItemCharts({ sample, chances, row }: { readonly sample: Sample; readonl
       <SectionNote>{words.metrics(formatOdds(odds))}</SectionNote>
       <div className="sim-charts">
         {series.map(({ slot, points, shown }) => {
-          const yMax = niceMax(Math.max(0, ...points.flatMap((point) => [point.chance, point.plain])));
+          const yMax = niceMax(Math.max(0, ...points.flatMap((point) => [point.chance, point.plain, point.overall])));
           const digits = yMax < 0.1 ? 1 : 0;
           return (
             <LineChart
@@ -75,6 +75,7 @@ function ItemCharts({ sample, chances, row }: { readonly sample: Sample; readonl
               title={copy.sim.slotNames[slot]}
               points={points.map((point) => ({ x: point.x, y: point.chance }))}
               baseline={points.map((point) => ({ x: point.x, y: point.plain }))}
+              secondary={points.map((point) => ({ x: point.x, y: point.overall }))}
               marks={shown}
               xRange={[1, lastStretch]}
               yMax={yMax}
@@ -88,7 +89,10 @@ function ItemCharts({ sample, chances, row }: { readonly sample: Sample; readonl
                   facts: [
                     { label: words.chance, value: percent(point.chance, digits + 1) },
                     { label: words.withoutCatchUp, value: percent(point.plain, digits + 1) },
+                    { label: words.overall, value: percent(point.overall, digits + 1) },
                     { label: words.catchUpBoost, value: words.times(multiplier(point.catchUp)) },
+                    { label: words.boostedBySynergy, value: percent(point.synergy, 0) },
+                    { label: words.synergiesWon, value: point.synergyWon === null ? "–" : percent(point.synergyWon, 0) },
                     { label: words.shownSoFar(to), value: decimal(point.shown, 1) },
                   ],
                 };

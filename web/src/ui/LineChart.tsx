@@ -25,7 +25,8 @@ const TOP = 8;
 const BOTTOM = 22;
 
 /** One series as a gold line over a quiet grid, its title above; a `baseline`, such as the same series with one
- * effect removed, is drawn faint beneath it at the same points. `marks` are moments on the line, such as each time
+ * effect removed, is drawn dashed beneath it at the same points, and a `secondary` series, such as the same value
+ * over a wider count, solid in the baseline's colour. `marks` are moments on the line, such as each time
  * an item showed, drawn as small dots where the line passes them. `xRange` fixes the axis, so the line can start
  * part way along it. Under the chart, a readout describes the last point, or the one nearest the pointer, marked
  * with a rule and a dot. Marks past the last point sit on it. */
@@ -33,6 +34,7 @@ export function LineChart({
   title,
   points,
   baseline,
+  secondary,
   marks,
   xRange,
   yMax,
@@ -43,6 +45,7 @@ export function LineChart({
   readonly title: string;
   readonly points: readonly ChartPoint[];
   readonly baseline?: readonly ChartPoint[];
+  readonly secondary?: readonly ChartPoint[];
   /** x values; each sits on the line, between its points. */
   readonly marks?: readonly number[];
   readonly xRange?: readonly [number, number];
@@ -128,6 +131,7 @@ export function LineChart({
           </>
         )}
         {baseline !== undefined && <path className="line-chart-baseline" d={line(baseline)} />}
+        {secondary !== undefined && <path className="line-chart-secondary" d={line(secondary)} />}
         <path className="line-chart-line" d={line(points)} />
         {[...new Set((marks ?? []).filter((x) => x >= (points[0]?.x ?? Infinity)).map((x) => Math.min(x, lineEnd)))]
           .map((x) => (

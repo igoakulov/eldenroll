@@ -1,5 +1,5 @@
 // One full run from `Start run` until every boss is felled (web/sim/README.md#A run)
-import { isNone, type Database, type LoadoutSlot } from "../src/engine/database";
+import { isNone, type Database, type LoadoutSlot, type Modifier } from "../src/engine/database";
 import type { RolledSlots } from "../src/engine/display";
 import { done, editRun, rollNext, startRun, type Engine, type Run } from "../src/engine/run";
 import { DEFAULT_STATS, defaultSettings, derivedLevel, type Stats } from "../src/engine/settings";
@@ -43,12 +43,36 @@ export const CHANCE_SLOTS: readonly LoadoutSlot[] = ["rh", "rh_ash", "lh", "lh_a
  * stretch's mean boost. An alias counts once per roll, its members' chances added. */
 export type ChanceSums = Map<string, ChanceSum>;
 
+/** The key under which a class and slot's stretch counts every roll of the slot, whatever was in its pool, so an
+ * option's chance can also be read over every roll, 0 where a rule or the class left it out. */
+export const EVERY_ROLL = "*";
+
 export interface ChanceSum {
   chance: number;
   plain: number;
   boosted: number;
   rolls: number;
+  /** Rolls where a synergy boosted the option. */
+  synergyRolls: number;
 }
+
+/** A boost that matches the left hand's weapon class to the right hand's: Slots' both-hands table reads these. */
+function pairsHands(modifier: Modifier): boolean {
+  const { target } = modifier;
+  return (
+    target.kind === "subcategory" &&
+    modifier.when.some(
+      (condition) =>
+        condition.kind === "rolled" &&
+        condition.selector.kind === "subcategory" &&
+        condition.selector.ids?.join() === target.ids?.join(),
+    )
+  );
+}
+
+/** Every boosting modifier the Synergies tab lists. */
+export const isSynergy = (modifier: Modifier) => modifier.value > 1 && !pairsHands(modifier);
+
 
 function chanceKey(characterClass: string, slot: LoadoutSlot, key: string, stretch: number): string {
   return `${characterClass}|${slot}|${key}|${stretch}`;
@@ -144,7 +168,14 @@ interface Observed {
   readonly roll: SlotRoll;
 }
 
-function describe(observed: Observed, offered: Set<string>, sum?: (key: string, sums: Omit<ChanceSum, "rolls">) => void) {
+interface RollChance {
+  chance: number;
+  plain: number;
+  boosted: number;
+  synergy: boolean;
+}
+
+function describe(observed: Observed, offered: Set<string>, sum?: (key: string, sums: RollChance) => void) {
   const { roll } = observed;
   const options = roll.options;
   const total = options.reduce((sum, row) => sum + row.weight, 0);
@@ -153,17 +184,18 @@ function describe(observed: Observed, offered: Set<string>, sum?: (key: string, 
   let none: number | null = null;
   const keyOf = (option: Option) => (option.kind === "rule" && isNone(option.row.id) ? "rule:none" : repeatKey(option));
   const boostChance = new Map<string, number>();
-  const byKey = new Map<string, Omit<ChanceSum, "rolls">>();
+  const byKey = new Map<string, RollChance>();
   options.forEach((row, index) => {
     const key = keyOf(row.option);
     offered.add(key);
     const chance = row.weight / total;
     if (sum !== undefined) {
       const chancePlain = plain[index]! / plainTotal;
-      const sums = byKey.get(key) ?? { chance: 0, plain: 0, boosted: 0 };
+      const sums = byKey.get(key) ?? { chance: 0, plain: 0, boosted: 0, synergy: false };
       sums.chance += chance;
       sums.plain += chancePlain;
       sums.boosted += chancePlain * row.catchUp;
+      sums.synergy ||= row.modifiers.some(isSynergy);
       byKey.set(key, sums);
     }
     if (row.option.kind !== "armor_set" && isNone(row.option.row.id)) none = (none ?? 0) + chance;
@@ -308,6 +340,12 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
           result.rollable.set(at, (result.rollable.get(at) ?? 0) + 1 / rollable.length);
         }
       }
+      if (options.chances !== undefined && CHANCE_SLOTS.includes(one.slot)) {
+        const at = chanceKey(objective.characterClass, one.slot, EVERY_ROLL, stretchOf(objectiveNumber));
+        const sums = options.chances.get(at) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0, synergyRolls: 0 };
+        sums.rolls += 1;
+        options.chances.set(at, sums);
+      }
       result.rolls.push({
         objective: objectiveNumber,
         region,
@@ -321,11 +359,12 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
           options.chances !== undefined && CHANCE_SLOTS.includes(one.slot)
             ? (key, rolled) => {
                 const at = chanceKey(objective.characterClass, one.slot, key, stretchOf(objectiveNumber));
-                const sums = options.chances!.get(at) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0 };
+                const sums = options.chances!.get(at) ?? { chance: 0, plain: 0, boosted: 0, rolls: 0, synergyRolls: 0 };
                 sums.chance += rolled.chance;
                 sums.plain += rolled.plain;
                 sums.boosted += rolled.boosted;
                 sums.rolls += 1;
+                if (rolled.synergy) sums.synergyRolls += 1;
                 options.chances!.set(at, sums);
               }
             : undefined,

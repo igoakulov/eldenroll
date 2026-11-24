@@ -73,7 +73,7 @@ When two boosted options meet in one pool, compare them with each other:
 
 - **Keep guarantees two orders of magnitude apart**, so the higher wins about 99%; ×10 apart splits about 90/10. The build refuses two values of `boost` or above within one order in the same pool.
 - **Avoid two `top` targets in one pool:** they split about 50/50. Allowed where the pair is rare; `import-report.json` lists every such pool.
-- **When two boosted targets clash, the rarer trigger wins:** the more common one shows its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger.
+- **When two boosted targets clash, the rarer trigger wins:** the more common one shows its synergy on other objectives. A rule that would contradict the card, such as `No armor` beside a boosted set, is removed by the rarer trigger. `Jester`'s jar sets are the one exception (#39. Pots and perfumes).
 - **Off-tier values** are aimed at a target share rather than a feel, and tuned at the simulation.
 
 ## Paired slots
@@ -115,8 +115,8 @@ Playstyles and rules that grow tiresome or crowd the rest roll less.
 | Kind | Id | Odds | Why |
 |---|---|---:|---|
 | class | `ranger` `jester` | 0.25–0.5 | owner decision: `Ranger` plays less enjoyably, with less weapon variety than melee or magic; `Jester` mixes silly, quirky and hard ways to fell a boss, which grows annoying when it rolls often |
-| rule | `none` | 100 | half the rule slot, a fixed share (#Fixed shares): half of objectives roll no rule (owner, 2026-11-24) |
-| rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` `parry_only` `l2_only` | 0.5 | owner decision: hard rules, each at about 5%: they crowded out the others, limit the moveset a lot (`L2 only` sometimes clashes with an ash), and `No armor` pushed the `Naked Set` and the light sets past their guarantees' reach of each other |
+| rule | `none` | 100 | half the rule slot, a fixed share (#Fixed shares); rule synergies win part of it, so about 40% of objectives roll no rule, close enough to half (owner, 2026-11-24) |
+| rule | `do_not_get_hit` `no_healing_flasks` `no_armor` `no_rolling` `overloaded` `parry_only` `l2_only` | 0.5 | owner decision: hard rules: they crowded out the others, limit the moveset a lot (`L2 only` sometimes clashes with an ash), and `No armor` pushed the `Naked Set` and the light sets past their guarantees' reach of each other |
 | rule | `drink_deflecting_hardtear` `drink_crimson_sapping_cracked_tear` `drink_bloodsucking_cracked_tear` | 0 | these tears come only from DLC bosses, and rules have no location filter, so they could ask for something out of reach; owner decision: they stay off |
 
 ### Never rolled
@@ -218,7 +218,7 @@ Every row of `data/overrides/modifiers.csv` belongs to one rule below. A rule al
 
 ### Classes with extra rules
 
-Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand and `Jellyfish Shield` in the left beside a free right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); `Pyromancer` more `No healing flasks` (#47); the classes that can't use a talisman or rule lose it (#33, #34).
+Most classes are just their pools in `slot_pools.csv`. `Dual-Wield Warrior` has its pairs (#26) and no `Grafted Dragon` (#29); `Jester` its right hand and `Jellyfish Shield` in the left beside a free right hand (#19), and odd pairs such as `Spinning Weapon` on a staff are left alone on purpose; `Knight` its thrusting shield (#10) and no paired weapons (#28); `Sorcerer` and `Pyromancer` their left hand (#32); `Sorcerer` a left-hand ash for ripostes (#37); `2H Warrior` and `Dual-Wield Warrior` a `Poisoned Hand` beside poison (#45); `Pyromancer` a seal beside its weapons (#46); `Pyromancer` more `No healing flasks` (#47); `Dual-Wield Warrior` fewer jump attacks (#48); `Jester` talismans that follow its gear (#49); the classes that can't use a talisman or rule lose it (#33, #34).
 
 ### 1. Parry only needs a parry ash
 
@@ -294,13 +294,13 @@ Rows: `parry_ash_boosts_parry_talismans`, `parry_ash_boosts_parry_only`
 
 ### 19. Jester's right hand
 
-P2. An empty right hand is part of the joke: `none` at `×33` holds a quarter of the hand (#Fixed shares), the staff `×2`, torches `×0.5`, and `×3.5` more in the Limgrave region for about 30% torches there. Preliminary: tuned with `Jester`, last.
+P2. An empty right hand is part of the joke: `none` at `×33` holds a quarter of the hand (#Fixed shares), the staff `×2`, torches `×0.5`. While only Limgrave is open the torches take about 45% of the hand, since few other items are in reach there (owner, 2026-11-24).
 
 The staff is there to hold `Spinning Weapon`, the only ash a staff takes, which Rogier sells only past `Margit, the Fell Omen`; so the staff, like the ash, counts as found at Margit (`data/overrides/boss_slot_links.csv`, owner 2026-11-24).
 
 P1. `Jellyfish Shield` is `Jester`'s left hand, for its damage buff, beside a right hand that leaves the left free: `none`, a torch or a perfume bottle; any other right hand leaves the left empty (owner, 2026-11-24). The left hand's tally is per class (#Fair share), and with the rows the shield is the only option where it rolls, so its odds don't matter.
 
-Rows: `jester_none_x33`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_torches_in_limgrave`, `jester_jellyfish_needs_a_free_rh`, `jester_free_rh_keeps_jellyfish_in_lh`
+Rows: `jester_none_x33`, `jester_staff_x2`, `jester_torches_x0_5`, `jester_jellyfish_needs_a_free_rh`, `jester_free_rh_keeps_jellyfish_in_lh`
 
 ### 22. Buff ashes on weapons that refuse them
 
