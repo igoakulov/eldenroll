@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { fileURLToPath } from "node:url";
@@ -5,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
+
+import { serviceWorkerSource } from "./scripts/serviceWorker";
 
 const databasePath = fileURLToPath(new URL("../data/build/db.json", import.meta.url));
 
@@ -34,8 +37,41 @@ function redirect(request: IncomingMessage, response: ServerResponse, next: () =
   response.end();
 }
 
+/** Writes `sw.js` with the files the app needs offline: its own chunks, styles and assets, `db.json` among them,
+ * and the Latin fonts its text uses; never the UI kit's or the simulation's (web/README.md#Installing). */
+const serviceWorker: Plugin = {
+  name: "service-worker",
+  apply: "build",
+  generateBundle(_, bundle) {
+    const main = Object.values(bundle).find((file) => file.type === "chunk" && file.isEntry && file.name === "main");
+    if (main === undefined) throw new Error("The build has no main entry to keep offline");
+    const kept = new Set<string>();
+    const keep = (fileName: string) => {
+      const file = bundle[fileName];
+      if (file === undefined || kept.has(fileName)) return;
+      kept.add(fileName);
+      if (file.type !== "chunk") return;
+      [...file.imports, ...file.dynamicImports].forEach(keep);
+      file.viteMetadata?.importedCss.forEach((css) => kept.add(css));
+      // Fonts come below, only the subsets the app's text uses
+      file.viteMetadata?.importedAssets.forEach((asset) => {
+        if (!/\.woff2?$/.test(asset)) kept.add(asset);
+      });
+    };
+    keep(main.fileName);
+    for (const fileName of Object.keys(bundle))
+      if (/\/(?:cinzel|eb-garamond)-latin(?:-ext)?-\d+-(?:normal|italic)-[^/]+\.woff2$/.test(fileName)) kept.add(fileName);
+    const files = ["/", "/manifest.webmanifest", ...ICONS, ...[...kept].sort().map((fileName) => `/${fileName}`)];
+    // A new release, or a change to the worker itself, keeps its files under a new name and drops the old ones
+    const version = createHash("sha256").update(serviceWorkerSource(files, "")).digest("hex").slice(0, 12);
+    this.emitFile({ type: "asset", fileName: "sw.js", source: serviceWorkerSource(files, version) });
+  },
+};
+
+const ICONS = ["/icons/apple-touch-icon.png", "/icons/icon-192.png", "/icons/icon-512.png"];
+
 export default defineConfig({
-  plugins: [react(), pageSlash],
+  plugins: [react(), pageSlash, serviceWorker],
   // The UI kit and the simulation are pages of their own, each with its own bundle (web/src/ui/README.md#UI kit,
   // web/sim/README.md#The page)
   build: {

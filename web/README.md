@@ -1,6 +1,6 @@
 # Web app
 
-The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar `All runs`, which lists the runs; installing comes last. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
+The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar `All runs`, which lists the runs. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
 
 Scripts are in `package.json`. The app and the engine tests read `../data/build/db.json`, which is git-ignored, so build the database first (`pipeline/README.md`); without it they stop and say so. Vitest hides `console.log` unless run with `--reporter=verbose`. There is no Prettier config: `npx prettier --write` would reformat every file, so format by hand.
 
@@ -111,7 +111,16 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 - Rerolls are kept as counts of what they replaced, for `10 most rerolled`, and a finished run keeps them for the whole run, not per objective. The reroll after `Felled?` isn't counted: the player didn't turn that boss down.
 - The app asks the browser to keep its storage (`navigator.storage.persist()`), so a phone short of space clears it last. Safari deletes a site's storage after seven days of Safari use without a visit; an app added to the Home Screen counts only its own days of use, so playing keeps it.
 - No personal data, no cookies, no analytics.
-- The installable app keeps the app and `db.json` on the phone so rolls work offline. iPhone has no install prompt and keeps a home-screen app's storage apart from Safari's, so the `Elden Rold` card explains `Add to Home Screen` before the first run.
+
+## Installing
+
+The app installs from the browser's `Add to Home Screen` and then opens full screen, under a translucent status bar, and works offline. iPhone has no install prompt and keeps a home-screen app's storage apart from Safari's, so the `Elden Rold` card explains `Add to Home Screen` before the first run.
+
+- `public/manifest.webmanifest` and the tags in `index.html` make it installable. The icons in `public/icons/` are drawn by `scripts/appIcons.ts` (`pnpm app-icons`) from the wordmark's lozenge, our own glyph, and committed.
+- The build writes `sw.js` with the files the app needs: its own chunks, styles and assets, `db.json` among them, and the Latin and Latin Extended fonts its text uses, about 2.4 MB. The UI kit and the simulation are never kept: the player doesn't need them, and their requests go to the network untouched.
+- Kept files are served from the phone first; their names carry content hashes, so a kept copy is never stale. A page load goes to the network first, so a new release reaches the player the next time they open the app online, and falls back to the kept page offline. A new release keeps its files under a new name and drops the old ones.
+- Kept files are looked up ignoring `Vary`: a page asks for its scripts with an `Origin` header the kept copies lack, and a host that varies on it would miss every one offline.
+- The worker registers only in a production build, so development always serves fresh files. `pnpm build && pnpm preview` serves one to test offline: load it once, stop the server, reload.
 
 ## Summary
 

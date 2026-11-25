@@ -94,7 +94,7 @@ export const copy = {
     ],
     onYourPhone: "On your phone",
     homeScreen:
-      "Add EldenRoll to your Home Screen before your first run, and it opens full screen, like an app. On iPhone a run started in Safari stays in Safari.",
+      "Add EldenRoll to your Home Screen before your first run: it opens full screen, like an app, and works offline. On iPhone a run started in Safari stays in Safari.",
     howTo: [
       { device: "iPhone", how: "In Safari, tap Share, then Add to Home Screen." },
       { device: "Android", how: "In Chrome, tap ⋮, then Add to Home screen." },
