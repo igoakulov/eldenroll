@@ -12,6 +12,10 @@ import { LevelUp } from "../views/LevelUp";
 import { RerollPanel } from "../views/RerollPanel";
 import { REROLL_STOPS } from "../views/rerollScope";
 import { RoldCard } from "../views/RoldCard";
+import { RunView, currentHeading, finishedHeading, runStatus, type RunViewList, type RunViewTab } from "../views/RunView";
+import { summarize } from "../views/summary";
+import { gearPick, type Pick } from "../views/timeline";
+import { recordOf } from "../save/finished";
 import { FinishRunConfirm, NewRunConfirm, RunMenu, runTitle, type RunMenuActions } from "../views/RunMenu";
 import { RunSettings, type SettingsTab } from "../views/RunSettings";
 import { Start, StartFailed, StartLoading, StartResume } from "../views/Start";
@@ -28,7 +32,6 @@ export interface KitView {
 }
 
 const noop = () => {};
-const menu: RunMenuActions = { onHome: noop, onHowItWorks: noop, onRunSettings: noop, onFinish: noop };
 
 // Real queries that find rows in several groups, with the match inside names as well as at their start
 const BOSS_QUERY = "dragon";
@@ -39,6 +42,16 @@ const REROLL_SCOPE = REROLL_STOPS.findIndex((stop) => stop.target === "talisman_
  * it: the sheet after the screen, in the same scrolling box, dimming it. */
 export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
   const { database, engine, settings, gear, runs } = kit;
+  const menu: RunMenuActions = {
+    // The kit's one finished run
+    finishedRuns: 1,
+    onRuns: noop,
+    onSummary: noop,
+    onHome: noop,
+    onHowItWorks: noop,
+    onRunSettings: noop,
+    onFinish: noop,
+  };;
   const rollableBosses = database.boss_instance.filter((boss) => boss.odds > 0);
   const before = boardBefore([], []);
   const settingsOn = (tab: SettingsTab, query = ""): KitView => ({
@@ -70,6 +83,34 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
       onFelled={noop}
       onLevelUp={noop}
       {...(withMenu ? { menu } : {})}
+    />
+  );
+  const longRecord = recordOf(runs.long);
+  const longSummary = summarize(engine.data, longRecord);
+  // The first weapon of the run, and the first letters of its first boss: real picks that find something
+  const firstWeapon = longSummary.gear.weapons[0];
+  const runPick: Pick | null = firstWeapon === undefined ? null : gearPick(engine.data, "weapons", firstWeapon);
+  const runQuery = (engine.data.bosses.get(longRecord.objectives[0]?.boss ?? "")?.name ?? "").slice(0, 4).toLowerCase();
+  const runView = (opening: {
+    readonly tab?: RunViewTab;
+    readonly list?: RunViewList;
+    readonly query?: string;
+    readonly pick?: Pick | null;
+    readonly open?: readonly number[];
+  }) => (
+    <RunView
+      data={engine.data}
+      eyebrow={copy.runView.current}
+      heading={currentHeading(engine.data, runs.long)}
+      status={runStatus(null)}
+      stats={runs.long.stats}
+      record={longRecord}
+      onClose={noop}
+      {...(opening.tab === undefined ? {} : { defaultTab: opening.tab })}
+      {...(opening.list === undefined ? {} : { defaultList: opening.list })}
+      {...(opening.query === undefined ? {} : { defaultQuery: opening.query })}
+      {...(opening.pick === undefined ? {} : { defaultPick: opening.pick })}
+      {...(opening.open === undefined ? {} : { defaultOpen: opening.open })}
     />
   );
   const felled = (undoTo: RunWithObjective, label: string) => (
@@ -107,6 +148,8 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
       title={runTitle(engine.data, runs.progressed)}
       onOpenCard={noop}
       onResume={noop}
+      finishedRuns={1}
+      onRuns={noop}
       onNewRun={noop}
     />
   );
@@ -219,6 +262,48 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
           <FinishRunConfirm open run={runs.progressed} onClose={noop} onConfirm={noop} />
         </>
       ),
+    },
+    "run-view": {
+      title: "Current run's view, Summary",
+      render: () => runView({}),
+    },
+    "run-view-timeline": {
+      title: "Current run's view, Timeline, one objective open",
+      render: () => runView({ tab: "timeline", open: [2] }),
+    },
+    "run-view-search": {
+      title: `Current run's view, Timeline, searching “${runQuery}”`,
+      render: () => runView({ tab: "timeline", query: runQuery }),
+    },
+    "run-view-found": {
+      title: "Current run's view, Timeline, a weapon picked",
+      render: () => runView({ tab: "timeline", pick: runPick }),
+    },
+    "run-view-gear": {
+      title: "Unique gear, weapons",
+      render: () => runView({ list: { kind: "gear", gear: "weapons" } }),
+    },
+    "run-view-skipped": {
+      title: "Bosses skipped",
+      render: () => runView({ list: { kind: "skipped" } }),
+    },
+    "run-view-finished": {
+      title: "Finished run's view, Summary shown in full",
+      render: () => {
+        const last = runs.finished.objectives.at(-1);
+        return (
+          <RunView
+            data={engine.data}
+            eyebrow={copy.runView.finished}
+            heading={finishedHeading(engine.data, runs.finished)}
+            status={runStatus(runs.finished.finishedAt)}
+            stats={last?.stats ?? DEFAULT_STATS}
+            record={runs.finished}
+            onClose={noop}
+            defaultShowAll={["classes", "rerolled"]}
+          />
+        );
+      },
     },
     "start-resume-new-run": {
       title: "New run",

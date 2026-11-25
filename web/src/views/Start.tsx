@@ -10,7 +10,7 @@ import { LevelTotal } from "../ui/LevelTotal";
 import { FramedRow, ListRow } from "../ui/Rows";
 import { Screen } from "../ui/Screen";
 import { Wordmark } from "../ui/Wordmark";
-import { NewRunConfirm } from "./RunMenu";
+import { NewRunConfirm, runsDetail } from "./RunMenu";
 import { RegionCheck, StatSteppers, byLevel } from "./StatsAndRegions";
 import { Tagline } from "./Tagline";
 import "./Start.css";
@@ -92,12 +92,16 @@ export function StartResume({
   title,
   onOpenCard,
   onResume,
+  finishedRuns,
+  onRuns,
   onNewRun,
 }: {
   readonly run: Run;
   readonly title: string;
   readonly onOpenCard: () => void;
   readonly onResume: () => void;
+  readonly finishedRuns: number;
+  readonly onRuns: () => void;
   readonly onNewRun: () => void;
 }) {
   const [confirming, setConfirming] = useState(false);
@@ -113,6 +117,10 @@ export function StartResume({
       }
     >
       <Hero onOpenCard={onOpenCard} />
+      {/* Every run first, as the menu orders them, then this one's way back to its objective */}
+      <div className="in-run in-run-all">
+        <ListRow title={copy.common.runs} detail={runsDetail(true, finishedRuns)} onClick={onRuns} />
+      </div>
       <section className="in-run" aria-label={copy.start.runInProgress}>
         <SectionHeading>{copy.start.currentRun}</SectionHeading>
         <div className="in-run-rows">

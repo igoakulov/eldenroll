@@ -13,6 +13,7 @@ export const kit: readonly KitBlock[] = [
       { label: "title", render: () => <Wordmark /> },
       { label: "loading", render: () => <Wordmark loading /> },
       { label: "way home", render: () => <Wordmark onHome={noop} /> },
+      { label: "small, in a sheet's head", render: () => <Wordmark small onHome={noop} /> },
     ],
     Live: () => <Wordmark onHome={noop} />,
   },

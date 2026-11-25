@@ -31,13 +31,36 @@ export const kit: readonly KitBlock[] = [
     title: "Tabs",
     section: "groups",
     size: "phone",
-    states: TABS.map((tab, index) => ({
+    states: [
+      ...TABS.map((tab, index) => ({
       label: `${tab} selected`,
       render: () => (
         <Tabs label={copy.common.runSettings} tabs={TABS} selected={index} onSelect={noop} panels={TABS.map(() => null)} />
       ),
     })),
+      {
+        label: "fit: as tall as the selected panel",
+        render: () => (
+          <Tabs
+            label={copy.common.runSettings}
+            tabs={TABS}
+            selected={0}
+            onSelect={noop}
+            fit
+            panels={TABS.map((tab, index) => (
+              <KitPad key={tab}>
+                {TABS.slice(0, index + 1).map((line) => (
+                  <p key={line} className="kit-note">
+                    {line}
+                  </p>
+                ))}
+              </KitPad>
+            ))}
+          />
+        ),
+      },
+    ],
     Live: LiveTabs,
-    note: "The arrow keys, Home and End move between tabs.",
+    note: "The arrow keys, Home and End move between tabs. Without fit, every panel is as tall as the tallest; with it, choosing a tab from below the tab row scrolls back to it.",
   },
 ];

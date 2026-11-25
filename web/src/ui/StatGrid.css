@@ -1,0 +1,26 @@
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--space-7);
+  margin: 0 var(--gutter);
+}
+
+.stat-grid-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--type-body);
+  color: var(--text-2);
+}
+
+.stat-grid-row:nth-child(-n + 2) {
+  border-top: 0;
+}
+
+.stat-grid-row dd {
+  margin: 0;
+  color: var(--text);
+  font-variant-numeric: lining-nums tabular-nums;
+}

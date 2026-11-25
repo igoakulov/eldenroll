@@ -20,8 +20,8 @@ function finishParts(run: Run, cannotResume: string): readonly ConfirmPart[] {
   return [
     ...(run.current === null ? [] : [{ text: copy.confirm.abandonObjective(objectiveNumber(run)), lost: true }]),
     { text: cannotResume, lost: true },
-    // A run with no completed objective is not saved (web/README.md#Past runs)
-    ...(run.completed.length === 0 ? [] : [{ text: copy.confirm.saveToPastRuns, lost: false }]),
+    // A run with no completed objective is not saved (web/README.md#All runs)
+    ...(run.completed.length === 0 ? [] : [{ text: copy.confirm.saveToAllRuns, lost: false }]),
   ];
 }
 
@@ -73,7 +73,17 @@ export function FinishRunConfirm({
   );
 }
 
+/** What the `All runs` row holds, on Start and in the menu: this run, if one is in progress, and the finished ones. */
+export function runsDetail(inProgress: boolean, finished: number): string {
+  if (!inProgress) return copy.menu.finishedRuns(finished);
+  return finished === 0 ? copy.menu.thisRun : copy.menu.thisRunAnd(finished);
+}
+
 export interface RunMenuActions {
+  /** How many finished runs are kept, for the `All runs` row's line. */
+  readonly finishedRuns: number;
+  readonly onRuns: () => void;
+  readonly onSummary: () => void;
   readonly onHome: () => void;
   readonly onHowItWorks: () => void;
   readonly onRunSettings: () => void;
@@ -102,17 +112,24 @@ export function RunMenu({
 
   return (
     <>
-      <Sheet open={open && !finishing} eyebrow={copy.common.menu} closeLabel={copy.menu.close} onClose={onClose}>
-        <div className="run-menu-home">
-          <Wordmark onHome={actions.onHome} />
-        </div>
+      <Sheet
+        open={open && !finishing}
+        eyebrow={copy.common.menu}
+        mark={<Wordmark small onHome={actions.onHome} />}
+        closeLabel={copy.menu.close}
+        onClose={onClose}
+      >
+        {/* The app's own rows under the wordmark; the run's lower, nearer the thumb, after a wider gap */}
         <div className="run-menu">
-          {/* The run's own row, opening its view (9.6), joins the menu once that screen exists */}
           <ListRow
             title={copy.common.howItWorks}
             detail={copy.menu.howItWorksDetail}
             onClick={actions.onHowItWorks}
           />
+          <ListRow title={copy.common.runs} detail={runsDetail(true, actions.finishedRuns)} onClick={actions.onRuns} />
+        </div>
+        <div className="run-menu run-menu-run">
+          <ListRow title={copy.menu.summary} detail={copy.menu.summaryDetail} onClick={actions.onSummary} />
           <ListRow
             title={copy.common.runSettings}
             detail={copy.common.runSettingsDetail}

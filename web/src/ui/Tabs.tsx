@@ -3,7 +3,9 @@ import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type Keyb
 import "./Tabs.css";
 
 /** Tabs over their panels, one per tab. Every panel is laid out in one stack and only the selected one shows, so the
- * page is as tall as its tallest tab and choosing another never moves what is above the panels. The arrow keys,
+ * page is as tall as its tallest tab and choosing another never moves what is above the panels. With `fit`, as where
+ * one tab runs far longer than the other, the page is only as tall as the selected panel, and choosing another tab
+ * from below the tab row scrolls back to it, so the new panel opens at its top. The arrow keys,
  * `Home` and `End` move between tabs and select as they go; the gold underline glides to the new tab and the panel
  * fades in. */
 export function Tabs({
@@ -14,6 +16,7 @@ export function Tabs({
   panels,
   bar,
   dimmed = false,
+  fit = false,
 }: {
   readonly label: string;
   readonly tabs: readonly string[];
@@ -25,6 +28,7 @@ export function Tabs({
   /** The panels hold results that are no longer current, such as while new ones are counted: still readable,
    * plainly not current, the tab row still lit. */
   readonly dimmed?: boolean;
+  readonly fit?: boolean;
 }) {
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -43,6 +47,15 @@ export function Tabs({
     observer.observe(list.current);
     return () => observer.disconnect();
   }, [selected, tabs.length]);
+
+  // Not on the first render: a screen opens at its top
+  const shown = useRef(selected);
+  useLayoutEffect(() => {
+    if (!fit || shown.current === selected) return;
+    shown.current = selected;
+    const row = list.current;
+    if (row !== null && row.getBoundingClientRect().top < 0) row.scrollIntoView({ block: "start", behavior: "instant" });
+  }, [fit, selected]);
 
   const onKeyDown = (event: KeyboardEvent) => {
     const keys: Readonly<Record<string, number>> = {
@@ -97,7 +110,7 @@ export function Tabs({
   return (
     <>
       {bar === undefined ? row : bar(row)}
-      <div className={`tab-panels${dimmed ? " tab-panels-dimmed" : ""}`}>
+      <div className={`tab-panels${dimmed ? " tab-panels-dimmed" : ""}${fit ? " tab-panels-fit" : ""}`}>
         {tabs.map((tab, index) => (
           <div
             key={tab}

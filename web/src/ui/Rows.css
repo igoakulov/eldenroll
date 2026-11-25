@@ -89,6 +89,10 @@ div.list-row {
   text-overflow: ellipsis;
 }
 
+.list-row-found .row-title {
+  color: var(--text-3);
+}
+
 .list-row-danger .row-title {
   color: var(--blood-text);
 }
@@ -97,6 +101,26 @@ div.list-row {
   font-size: var(--type-body);
   color: var(--text-3);
   font-variant-numeric: lining-nums tabular-nums;
+}
+
+.list-row-count {
+  font-size: var(--type-name);
+  color: var(--text);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* A chevron's room, so a count beside no chevron lines up with one beside a chevron */
+.list-row-trail {
+  flex: none;
+  width: 20px;
+}
+
+.list-row-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  color: var(--gold-mute);
 }
 
 /* After its value, so a verdict's colour wins */

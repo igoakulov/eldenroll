@@ -8,10 +8,11 @@ const TYPING =
 /** Focused, these keep `Enter`: a slider or checkbox included, so `Enter` there never presses the glow band. */
 const CONTROL = "button, a[href], [role='tab'], summary, input";
 
-/** The topmost marked button: in an open sheet if there is one, else on the screen, never behind something inert. */
+/** The topmost marked button: in an open sheet if there is one, else on the screen, never behind something inert
+ * and never on a screen kept hidden under another. */
 function marked(key: "enter" | "escape", layer: ParentNode): HTMLElement | null {
   const found = [...layer.querySelectorAll<HTMLElement>(`[${KEY_ATTRIBUTE}="${key}"]`)].filter(
-    (element) => element.closest("[inert]") === null,
+    (element) => element.closest("[inert]") === null && element.getClientRects().length > 0,
   );
   return found.at(-1) ?? null;
 }

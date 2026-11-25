@@ -24,6 +24,13 @@ export const VIEW_NAMES = [
   "level-up-all-regions",
   "level-up-waiting",
   "level-up-mid",
+  "run-view",
+  "run-view-timeline",
+  "run-view-search",
+  "run-view-found",
+  "run-view-gear",
+  "run-view-skipped",
+  "run-view-finished",
 ] as const;
 
 export type ViewName = (typeof VIEW_NAMES)[number];

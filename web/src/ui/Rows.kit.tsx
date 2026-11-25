@@ -3,7 +3,9 @@ import { useState } from "react";
 import { copy } from "../copy";
 import { objectiveNumber } from "../engine/run";
 import type { KitBlock } from "../kit/kit";
+import { iconKey } from "../views/icons";
 import { Cycler } from "./Cycler";
+import { SearchMatch } from "./SearchField";
 import { ControlRow, FramedRow, ListRow } from "./Rows";
 
 const noop = () => {};
@@ -48,6 +50,31 @@ export const kit: readonly KitBlock[] = [
         render: ({ runs }) => (
           <div className="kit-pad">
             <ListRow title="Bosses felled" value={runs.progressed.deadBosses.length} onClick={noop} />
+          </div>
+        ),
+      },
+      {
+        label: "counts, opening or not, in one column",
+        render: ({ runs }) => (
+          <div className="kit-pad">
+            <ListRow title={copy.runView.bossesFelled} count={runs.finished.deadBosses.length} />
+            <ListRow title={copy.runView.bossesSkipped} count={runs.finished.skippedBosses.length} onClick={noop} />
+            <ListRow title={copy.runView.rerolls} detail={copy.runView.rerolledKinds.armor_set} count={runs.finished.rerolls} />
+          </div>
+        ),
+      },
+      {
+        label: "an icon, searching for its name",
+        render: ({ samples }) => (
+          <div className="kit-pad">
+            <ListRow icon={iconKey(samples.weapon)} title={samples.weapon.name} opens="search" onClick={noop} />
+            <ListRow
+              icon={iconKey(samples.weapon)}
+              title={<SearchMatch name={samples.weapon.name} match={[0, 4]} />}
+              opens="search"
+              found
+              onClick={noop}
+            />
           </div>
         ),
       },

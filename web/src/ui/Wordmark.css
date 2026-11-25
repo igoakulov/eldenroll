@@ -9,6 +9,10 @@
   text-shadow: var(--glow-quiet);
 }
 
+.wordmark-small {
+  font-size: var(--type-large);
+}
+
 .wordmark-o {
   display: inline-block;
   width: 0.8em;

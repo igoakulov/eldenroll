@@ -1,0 +1,33 @@
+/* The view stays mounted under a list it opens, so its counts don't count again on the way back */
+.run-view-hidden {
+  display: none;
+}
+
+.run-view-rows {
+  margin: 0 var(--gutter);
+}
+
+.run-view-more {
+  border-top: 1px solid var(--line);
+}
+
+.run-view-class {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.run-view-class-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--gold-mute);
+}
+
+.run-view-found {
+  padding: var(--space-4) var(--gutter) 0;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-body);
+  color: var(--gold-mute);
+}

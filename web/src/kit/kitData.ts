@@ -2,10 +2,23 @@ import type { Database } from "../engine/database";
 import { indexDatabase } from "../engine/engineData";
 import { DEFAULT_HYPERPARAMS } from "../engine/hyperparams";
 import { DEFAULT_REGIONS } from "../engine/regions";
-import { alreadyDead, done, editRun, rollNext, startRun, type Engine, type Run } from "../engine/run";
+import {
+  alreadyDead,
+  done,
+  editRun,
+  reroll,
+  rollNext,
+  setBossState,
+  startRun,
+  type Engine,
+  type RerollTarget,
+  type Run,
+} from "../engine/run";
+import { recordOf, type Finished } from "../save/finished";
 import { DEFAULT_STATS, defaultSettings, type Settings } from "../engine/settings";
 import { hasObjective, type RunWithObjective } from "../views/Card";
 import { neverRollEntries, shortlistEntries, type GearEntry } from "../views/gearList";
+import { rerollTarget } from "../views/rerollScope";
 import { samples, type Samples } from "./samples";
 
 /** What every block of the kit draws from: the database, the engine over it, and runs at fixed seeds, each built
@@ -27,6 +40,11 @@ export interface KitData {
     readonly toReroll: RunWithObjective;
     /** Two objectives done, a boss felled on the way between them, the third current. */
     readonly progressed: RunWithObjective;
+    /** Twelve objectives done across every region, each after a reroll, with bosses felled on the way and one
+     * skipped; the thirteenth current. */
+    readonly long: RunWithObjective;
+    /** `long` as a finished run. */
+    readonly finished: Finished;
   };
 }
 
@@ -49,6 +67,7 @@ export function kitData(database: Database): KitData {
   };
 
   const first = start(1);
+  const long = longRun(engine, settings, database);
   const afterDone = done(engine, first);
   return {
     database,
@@ -64,6 +83,32 @@ export function kitData(database: Database): KitData {
       progressed: withObjective(
         rollNext(engine, done(engine, alreadyDead(engine, rollNext(engine, done(engine, start(3)))))),
       ),
+      long,
+      finished: { runId: "kit", startedAt: "2026-12-01T18:00:00Z", finishedAt: "2027-01-10T21:00:00Z", ...recordOf(long) },
     },
   };
+}
+
+const LONG_REROLLS: readonly RerollTarget[] = ["boss", "character_class", "rh", "armor", "talisman_1", "rule", "spell", "lh"];
+
+function longRun(engine: Engine, settings: Settings, database: Database): RunWithObjective {
+  const result = startRun(
+    engine,
+    { stats: DEFAULT_STATS, settings, regions: database.region.map((row) => row.id), weaponShortlist: [], deadBosses: [] },
+    4,
+  );
+  if (!result.ok) throw new Error(`The kit's long run did not start: ${result.problems.join("; ")}`);
+  let run = result.run;
+  LONG_REROLLS.concat(LONG_REROLLS.slice(0, 4)).forEach((target, index) => {
+    if (run.current === null) return;
+    run = reroll(engine, run, rerollTarget(run.current.slots, target));
+    if (index === 3 || index === 7) run = alreadyDead(engine, run);
+    if (index === 5) {
+      const current = run.current?.boss;
+      const other = database.boss_instance.find((boss) => boss.odds > 0 && boss.id !== current && !run.deadBosses.some((row) => row.instanceId === boss.id));
+      if (other !== undefined) run = setBossState(engine, run, other.id, "skipped");
+    }
+    run = rollNext(engine, done(engine, run));
+  });
+  return withObjective(run);
 }

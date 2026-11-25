@@ -16,6 +16,7 @@ export const copy = {
     runSettingsDetail: "Classes, never roll, shortlist, bosses",
     howItWorks: "How it works",
     finishRun: "Finish run",
+    runs: "All runs",
     levelUp: "Level up",
     level: "Level",
     regions: "Regions",
@@ -229,15 +230,92 @@ export const copy = {
   // The menu, over the card or Level up
   menu: {
     close: "Close menu",
-    howItWorksDetail: "What a run asks of you, and keeping it on your phone",
-    finishRunDetail: "Ends this run and shows its summary",
+    howItWorksDetail: "How to play, getting started",
+    summary: "Run summary",
+    summaryDetail: "Stats and timeline",
+    /** The `All runs` row's line, on Start and here. */
+    finishedRuns: (count: number) =>
+      count === 0 ? "No finished runs yet" : count === 1 ? "1 finished run" : `${count} finished runs`,
+    thisRun: "This run",
+    thisRunAnd: (finished: number) => `This run and ${finished} finished`,
+    finishRunDetail: "Ends run and shows summary",
   },
 
   // The confirmations, for `Finish run` and `New run`
+  // A run's view, for the run in progress and a finished one, and the lists it opens
+  runView: {
+    current: "Current run",
+    finished: "Finished run",
+    inProgress: "In progress",
+    finishedOn: (date: string) => `Finished ${date}`,
+    /** Over a finished run's last boss, and in its row in All runs. */
+    objectives: (count: number) => (count === 1 ? "1 objective" : `${count} objectives`),
+    tabsLabel: "Run",
+    tabs: { summary: "Summary", timeline: "Timeline" },
+    totals: "Totals",
+    objectivesCompleted: "Objectives completed",
+    bossesFelled: "Bosses felled",
+    bossesSkipped: "Bosses skipped",
+    rerolls: "Rerolls",
+    /** Section headings, after their count. */
+    topClasses: "top classes",
+    uniqueGear: "unique gear",
+    mostRerolled: "most rerolled",
+    showAll: (count: number) => `Show all ${count}`,
+    showLess: "Show less",
+    /** Unique gear's rows, and its list's heading after the count. */
+    gearKinds: {
+      weapons: { row: "Weapons", counted: "weapons" },
+      shields: { row: "Shields", counted: "shields" },
+      sorceries: { row: "Sorceries", counted: "sorceries" },
+      incantations: { row: "Incantations", counted: "incantations" },
+      armor_sets: { row: "Armor sets", counted: "armor sets" },
+      shortlist: { row: "Shortlist", counted: "in the shortlist" },
+    },
+    /** Under a most rerolled name: what it is. */
+    rerolledKinds: {
+      boss: "Boss",
+      character_class: "Class",
+      weapon: "Weapon",
+      shield: "Shield",
+      sorcery: "Sorcery",
+      incantation: "Incantation",
+      talisman: "Talisman",
+      item: "Item",
+      armor_set: "Armor set",
+      rule: "Combat rule",
+    },
+    gearTitle: "Unique gear",
+    gearLede: "Tap to find it in objectives.",
+    skipped: "skipped",
+    felledOnTheWay: "Felled on the way",
+    atDone: "At Done",
+    /** The stats at Done, where an open objective has only a narrow column for all eight. */
+    statsShort: { vig: "VIG", mind: "MND", end: "END", str: "STR", dex: "DEX", int: "INT", fth: "FTH", arc: "ARC" },
+    levelAt: (level: number) => `Level ${level}`,
+    search: "Search this run",
+    notFound: "Nothing by that name in this run.",
+    found: (found: number, total: number) => `${found} of ${total} objectives`,
+    /** Search results' groups, in card order. */
+    searchGroups: {
+      boss: "Bosses",
+      character_class: "Classes",
+      weapon: "Weapons",
+      shield: "Shields",
+      ash: "Ashes of War",
+      sorcery: "Sorceries",
+      incantation: "Incantations",
+      talisman: "Talismans",
+      armor_set: "Armor",
+      item: "Items",
+      rule: "Combat rules",
+    },
+  },
+
   confirm: {
     chipsLabel: "What happens",
     abandonObjective: (number: number) => `Abandon objective ${number}`,
-    saveToPastRuns: "Save to Past runs",
+    saveToAllRuns: "Save to All runs",
     finishQuestion: "End this run and see its summary?",
     finishCannotResume: "Cannot resume",
     newRunQuestion: "Finish the current run and start a new one?",

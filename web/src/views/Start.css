@@ -100,6 +100,10 @@
   margin: var(--space-9) var(--gutter) 0;
 }
 
+.in-run-all + .in-run {
+  margin-top: var(--space-7);
+}
+
 .in-run .section-heading {
   padding: 0 0 var(--space-4);
 }

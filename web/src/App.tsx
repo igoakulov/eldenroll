@@ -20,7 +20,7 @@ import {
 } from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { loadDatabase } from "./loadDatabase";
-import { packFinished } from "./save/finished";
+import { PAST_RUNS_CAP, packFinished, recordOf, type Finished } from "./save/finished";
 import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh, type SavedRun, type Setup } from "./save/restore";
 import { browserStore, type SaveStore } from "./save/store";
 import { useDefaultKeys } from "./ui/keys";
@@ -33,6 +33,7 @@ import { neverRollEntries, shortlistEntries } from "./views/gearList";
 import { LevelUp } from "./views/LevelUp";
 import { rerollTarget } from "./views/rerollScope";
 import { RoldCard } from "./views/RoldCard";
+import { RunView, currentHeading, finishedHeading, runStatus } from "./views/RunView";
 import { runTitle, type RunMenuActions } from "./views/RunMenu";
 import { RunSettings, type RunLists, type SettingsTab } from "./views/RunSettings";
 import { Start, StartFailed, StartLoading, StartResume } from "./views/Start";
@@ -42,11 +43,13 @@ interface Boot {
   readonly engine: Engine;
   readonly saved: SavedRun | null;
   readonly setup: Setup | null;
+  /** How many finished runs are kept. */
+  readonly finishedRuns: number;
 }
 
 type Loaded = { readonly status: "loading" } | ({ readonly status: "ready" } & Boot) | { readonly status: "failed" };
 
-type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level" | "settings";
+type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level" | "settings" | "run";
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
@@ -65,17 +68,18 @@ const FRESH: Fresh = {
 const store: SaveStore = browserStore();
 
 /** Restores the saves once the data has loaded. A run saved as finished, as when the app closed on its last step,
- * moves to the past runs. */
+ * is kept with the finished runs. */
 async function restore(): Promise<Boot> {
   const [database, stored] = await Promise.all([loadDatabase(), store.load()]);
   const engine: Engine = { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
   let saved = restoreRun(engine, stored.active, FRESH);
   if (saved === null && stored.active !== null) store.setAsideActive();
+  let finishedRuns = stored.past.length;
   if (saved?.run.finished === true) {
-    finishSaved(saved, saved.run);
+    if (finishSaved(saved, saved.run) !== null) finishedRuns = Math.min(finishedRuns + 1, PAST_RUNS_CAP);
     saved = null;
   }
-  return { database, engine, saved, setup: saved === null ? restoreSetup(engine.data, stored.setup) : null };
+  return { database, engine, saved, setup: saved === null ? restoreSetup(engine.data, stored.setup) : null, finishedRuns };
 }
 
 // Restoring writes to the store, so it runs once even where React runs an effect twice; a failed load may retry
@@ -90,17 +94,17 @@ function boot(): Promise<Boot> {
 
 type Identity = Pick<SavedRun, "runId" | "startedAt">;
 
-/** A run with no completed objective isn't kept (web/README.md#Past runs). */
-function finishSaved(identity: Identity, run: Run): void {
-  if (run.completed.length > 0) {
-    store.addFinished(
-      packFinished(run, { runId: identity.runId, startedAt: identity.startedAt, finishedAt: FRESH.now() }),
-    );
-  }
+/** A run with no completed objective isn't kept (web/README.md#All runs): `null` then. */
+function finishSaved(identity: Identity, run: Run): Finished | null {
   store.saveActive(null);
+  if (run.completed.length === 0) return null;
+  const meta = { runId: identity.runId, startedAt: identity.startedAt, finishedAt: FRESH.now() };
+  store.addFinished(packFinished(run, meta));
+  return { ...meta, ...recordOf(run) };
 }
 
-function Game({ database, engine, saved, setup }: Boot) {
+function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
+  const [finishedRuns, setFinishedRuns] = useState(kept);
   const rollableBosses = useMemo(() => database.boss_instance.filter((boss) => boss.odds > 0), [database]);
   const gear = useMemo(
     () => ({ neverRoll: neverRollEntries(database), shortlist: shortlistEntries(database) }),
@@ -149,7 +153,7 @@ function Game({ database, engine, saved, setup }: Boot) {
   useEffect(
     () =>
       store.onActiveChange((value) => {
-        // A run the other tab finished is on its way to the past runs, so here it is no run
+        // A run the other tab finished is on its way to the finished runs, so here it is no run
         const restored = value === null ? null : restoreRun(engine, value, FRESH);
         const other = restored?.run.finished === true ? null : restored;
         identity.current = other === null ? null : { runId: other.runId, startedAt: other.startedAt };
@@ -160,10 +164,14 @@ function Game({ database, engine, saved, setup }: Boot) {
     [engine],
   );
 
-  // Until the finished run's view takes it, Start opens fresh after a run
-  const endRun = (finished: Run) => {
-    if (identity.current !== null) finishSaved(identity.current, finished);
+  // The finished run's view, over Start; `null` while the view shows the run in progress
+  const [finishedShown, setFinishedShown] = useState<Finished | null>(null);
+  // Start opens fresh after a run, under the run's view when `show` asks for it and the run was kept
+  const endRun = (finished: Run, show = false) => {
+    const kept = identity.current === null ? null : finishSaved(identity.current, finished);
+    if (kept !== null) setFinishedRuns((count) => Math.min(count + 1, PAST_RUNS_CAP));
     identity.current = null;
+    setFinishedShown(show ? kept : null);
     setRun(null);
     setUndoTo(null);
     setStats(DEFAULT_STATS);
@@ -173,16 +181,20 @@ function Game({ database, engine, saved, setup }: Boot) {
     setSkippedBosses([]);
     setLists({ neverRoll: [], weaponShortlist: [] });
     setProblems([]);
-    setView("start");
+    setView(show && kept !== null ? "run" : "start");
   };
   const menu = (current: Run): RunMenuActions => ({
+    finishedRuns,
+    // `All runs` is built last in the MVP; until then its row opens nothing
+    onRuns: () => {},
+    onSummary: () => setView("run"),
     onHome: () => setView("start"),
     onHowItWorks: () => {
       setRoldFromMenu(true);
       setView("rold");
     },
     onRunSettings: () => setView("settings"),
-    onFinish: () => endRun(finishRun(current)),
+    onFinish: () => endRun(finishRun(current), true),
   });
   // Home: the card while a run has an objective, `Level up` between objectives, Start otherwise
   const home = () => {
@@ -190,6 +202,37 @@ function Game({ database, engine, saved, setup }: Boot) {
     else if (run.current === null) setView("level");
     else showCard("none");
   };
+
+  if (view === "run" && finishedShown !== null) {
+    const last = finishedShown.objectives.at(-1);
+    return (
+      <RunView
+        data={engine.data}
+        eyebrow={copy.runView.finished}
+        heading={finishedHeading(engine.data, finishedShown)}
+        status={runStatus(finishedShown.finishedAt)}
+        stats={last?.stats ?? DEFAULT_STATS}
+        record={finishedShown}
+        onClose={() => {
+          setFinishedShown(null);
+          setView("start");
+        }}
+      />
+    );
+  }
+
+  if (view === "run" && run !== null)
+    return (
+      <RunView
+        data={engine.data}
+        eyebrow={copy.runView.current}
+        heading={currentHeading(engine.data, run)}
+        status={runStatus(null)}
+        stats={run.stats}
+        record={recordOf(run)}
+        onClose={home}
+      />
+    );
 
   if (view === "rold")
     return <RoldCard onClose={() => (roldFromMenu ? home() : setView("start"))} onHome={() => setView("start")} />;
@@ -354,6 +397,8 @@ function Game({ database, engine, saved, setup }: Boot) {
           setView("rold");
         }}
         onResume={home}
+        finishedRuns={finishedRuns}
+        onRuns={() => {}}
         onNewRun={() => endRun(finishRun(run))}
       />
     );
@@ -421,7 +466,7 @@ export function App() {
   return (
     <PhoneFrame>
       {state.status === "ready" ? (
-        <Game database={state.database} engine={state.engine} saved={state.saved} setup={state.setup} />
+        <Game database={state.database} engine={state.engine} saved={state.saved} setup={state.setup} finishedRuns={state.finishedRuns} />
       ) : state.status === "loading" ? (
         <StartLoading />
       ) : (

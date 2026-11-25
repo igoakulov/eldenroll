@@ -65,6 +65,15 @@
   visibility: visible;
 }
 
+/* Only the selected panel is laid out, so it alone sets the height; it fades in as it appears */
+.tab-panels-fit .tab-panel:not(.tab-panel-selected) {
+  display: none;
+}
+
+.tab-panels-fit .tab-panel-selected {
+  animation: fade-in var(--dur-sheet) var(--ease-out);
+}
+
 @media (hover: hover) {
   .tab[aria-selected="false"]:hover {
     color: var(--text-2);

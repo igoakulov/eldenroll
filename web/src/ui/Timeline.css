@@ -1,0 +1,222 @@
+.timeline {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline-entry {
+  position: relative;
+}
+
+/* From each marker down to the next, through the middle of the markers' column; the last has none below it */
+.timeline-entry:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--gutter) + var(--space-3));
+  top: calc(var(--space-4) + var(--space-2));
+  bottom: calc(-1 * (var(--space-4) + var(--space-2)));
+  width: 1px;
+  background: var(--frame);
+}
+
+.timeline-head {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--space-5) 1fr var(--space-5);
+  column-gap: var(--space-5);
+  align-items: start;
+  width: 100%;
+  padding: var(--space-4) var(--gutter);
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+div.timeline-head {
+  cursor: default;
+}
+
+/* The outline cuts the line, so the line seems to join one lozenge to the next */
+.timeline-marker {
+  justify-self: center;
+  width: 9px;
+  height: 9px;
+  margin-top: var(--space-2);
+  transform: rotate(45deg);
+  background: var(--gold-mute);
+  outline: var(--space-2) solid var(--ground);
+}
+
+.timeline-entry-hollow .timeline-marker {
+  background: var(--ground);
+  border: 1px solid var(--gold-dim);
+}
+
+.timeline-text {
+  min-width: 0;
+}
+
+.timeline-eyebrow,
+.timeline-label {
+  display: block;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--gold-mute);
+}
+
+.timeline-name {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--type-name);
+  line-height: var(--leading-tight);
+  color: var(--text);
+  transition: color var(--dur-state) var(--ease-out);
+}
+
+.timeline-entry-hollow .timeline-name {
+  color: var(--text-2);
+}
+
+.timeline-head[aria-expanded="true"] .timeline-name {
+  color: var(--gold);
+}
+
+.timeline-line {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--text-3);
+}
+
+.timeline-hit {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.timeline-hit .timeline-label {
+  flex: none;
+}
+
+/* What the search picked, in gold, closed or open */
+.timeline-hit-value {
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--gold);
+}
+
+.timeline-head .icon-svg {
+  margin-top: var(--space-1);
+  color: var(--gold-mute);
+  transform: rotate(90deg);
+  transition: transform var(--dur-state) var(--ease-out);
+}
+
+.timeline-head[aria-expanded="true"] .icon-svg {
+  transform: rotate(-90deg);
+}
+
+/* Lined up with the entry's text, past the markers' column */
+.timeline-detail {
+  margin: 0;
+  padding: 0 var(--gutter) var(--space-5) calc(var(--gutter) + var(--space-5) + var(--space-5));
+  animation: fade-in var(--dur-sheet) var(--ease-out);
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  column-gap: var(--space-4);
+  align-items: start;
+  padding: var(--space-3) 0;
+}
+
+.timeline-row-icon {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  min-height: 22px;
+  color: var(--gold-mute);
+}
+
+.timeline-value {
+  display: block;
+}
+
+.timeline-value-value {
+  font-size: var(--type-body);
+  line-height: var(--leading-tight);
+  color: var(--text);
+}
+
+.timeline-value-none {
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-tight);
+  font-size: var(--type-body);
+  line-height: var(--leading-tight);
+  color: var(--text-3);
+}
+
+.timeline-value-any {
+  font-style: italic;
+  font-size: var(--type-body);
+  line-height: var(--leading-tight);
+  color: var(--gold);
+}
+
+.timeline-value-under {
+  margin-top: var(--space-1);
+  font-style: italic;
+  font-size: var(--type-small);
+  line-height: var(--leading-tight);
+  color: var(--text-2);
+}
+
+.timeline-value-note {
+  margin-top: var(--space-1);
+  font-size: var(--type-small);
+  line-height: var(--leading);
+  color: var(--text-2);
+}
+
+@media (hover: hover) {
+  button.timeline-head:hover .timeline-name {
+    color: var(--gold);
+  }
+}
+
+.timeline-stats {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: start;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-2) 0 0;
+}
+
+.timeline-stats div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.timeline-stats dt {
+  font-size: var(--type-caps);
+  letter-spacing: var(--tracking-tight);
+  color: var(--gold-mute);
+}
+
+.timeline-stats dd {
+  margin: 0;
+  font-size: var(--type-small);
+  color: var(--text-2);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* Last, and two classes strong, so it wins over each kind's own colour */
+.timeline-value.timeline-value-matched {
+  color: var(--gold);
+}

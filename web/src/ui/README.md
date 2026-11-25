@@ -27,7 +27,7 @@ The pause menu at a Site of Grace: near-black warm ground, teal mist, thin bronz
 - **Talismans before armor on the card,** though the game's equipment screen lists armor first: the owner's choice, reasons not recorded.
 - **Red means irreversible.** Only the boss bar, rule lozenges and actions that can't be undone are red.
 - **The phone is the product everywhere.** Desktop shows the app inside a drawn phone (`web/README.md#Desktop`), and nothing inside the frame is desktop-only, so every screen is designed once.
-- **Tabs only where one screen holds two long views or several lists edited together:** the run view and `Run settings`. The card has none: a tab bar would compete with the boss and the bottom bar, and `Level up` is already one tap away.
+- **Tabs only where one screen holds two long views or several lists edited together:** the run view and `Run settings`. The card has none: a tab bar would compete with the boss and the bottom bar, and `Level up` is already one tap away. The page is as tall as the longest tab, so switching never moves anything; where one tab can run far longer than the other, as the run view's timeline, it is only as tall as the tab shown, so the short one doesn't end in a blank scroll.
 
 ## Motion
 
@@ -53,7 +53,7 @@ The game's menus fade and nothing in them bounces; ours follow. Motion shows wha
 ### Controls
 
 - **Sheets** (the menu, the reroll panel, `Felled?`, confirmations): the screen behind dims while the sheet fades in, rising a short way to show where it came from; closing is a little faster.
-- **Full screens** (`Run settings`, `Bosses`, `Level up`, the run view, `Past runs`) cross-fade, with no sideways push: `✕` returns home rather than back.
+- **Full screens** (`Run settings`, `Bosses`, `Level up`, the run view, `All runs`) cross-fade, with no sideways push: `✕` returns home rather than back.
 - **Tabs:** the gold underline glides to the new tab and the content cross-fades.
 - **The glow band** brightens for an instant when pressed, in place of the phone's grey tap flash; the dimmed button beside it brightens its rules. On desktop, hover brightens them a little.
 - **The reroll slider's** fill, glow and lit chips follow the finger with no lag; tapping a stop glides the handle there, and each chip lights quickly, so the scope visibly grows from the left.

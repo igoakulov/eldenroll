@@ -51,6 +51,11 @@
   margin-right: calc(-1 * var(--space-4));
 }
 
+/* A wordmark in the head starts at the gutter, past its own tap room and the indent that centres its letters */
+.sheet-head .wordmark-home {
+  margin-left: calc(-1 * var(--space-4) - var(--tracking-wide));
+}
+
 .sheet-close {
   display: grid;
   place-items: center;
