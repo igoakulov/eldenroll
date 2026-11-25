@@ -30,7 +30,8 @@ export function AllRuns({
 }) {
   return (
     <Screen className="all-runs">
-      <TopBar eyebrow={run === null ? copy.common.newRun : copy.common.objective(objectiveNumber(run))}>
+      {/* Where the player is: the objective mid-run, else the app itself, since the list belongs to no run */}
+      <TopBar eyebrow={run === null ? copy.common.appName : copy.common.objective(objectiveNumber(run))}>
         <FramedIconButton icon="close" label={copy.common.close} onClick={onClose} />
       </TopBar>
       <ScreenHead title={copy.common.runs} />
