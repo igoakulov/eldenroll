@@ -1,12 +1,12 @@
 // The save layer: `localStorage` now, a server once accounts exist (web/README.md#Saving). It moves JSON only;
 // `restore.ts` checks what it reads.
-import { withFinished, type FinishedRun } from "./finished";
+import { withFinished, withoutFinished, type FinishedRun } from "./finished";
 import type { SavedRun, Setup } from "./restore";
 
-export interface Stored {
+interface Stored {
   readonly active: unknown;
   readonly setup: unknown;
-  readonly past: readonly unknown[];
+  readonly finished: readonly unknown[];
 }
 
 export interface SaveStore {
@@ -17,6 +17,7 @@ export interface SaveStore {
   readonly setAsideActive: () => void;
   readonly saveSetup: (setup: Setup | null) => void;
   readonly addFinished: (run: FinishedRun) => void;
+  readonly deleteFinished: (runId: string) => void;
   /** Another tab saved or removed the active run. */
   readonly onActiveChange: (listener: (value: unknown) => void) => () => void;
 }
@@ -24,7 +25,8 @@ export interface SaveStore {
 /** The part of `Storage` the store uses, so tests can pass a plain map. */
 export type KeyValue = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
-const KEYS = { active: "eldenroll.active", setup: "eldenroll.setup", past: "eldenroll.pastRuns" } as const;
+// The finished runs keep the key they were first saved under, so no player loses them
+const KEYS = { active: "eldenroll.active", setup: "eldenroll.setup", finished: "eldenroll.pastRuns" } as const;
 
 export function keyValueStore(
   storage: KeyValue | null,
@@ -57,8 +59,12 @@ export function keyValueStore(
 
   return {
     load: () => {
-      const past = read(KEYS.past);
-      return Promise.resolve({ active: read(KEYS.active), setup: read(KEYS.setup), past: Array.isArray(past) ? past : [] });
+      const finished = read(KEYS.finished);
+      return Promise.resolve({
+        active: read(KEYS.active),
+        setup: read(KEYS.setup),
+        finished: Array.isArray(finished) ? finished : [],
+      });
     },
     saveActive: (value) => {
       if (value !== null && !saved) {
@@ -70,8 +76,12 @@ export function keyValueStore(
     setAsideActive: () => setAside(KEYS.active),
     saveSetup: (value) => write(KEYS.setup, value),
     addFinished: (run) => {
-      const past = read(KEYS.past);
-      write(KEYS.past, withFinished(Array.isArray(past) ? past : [], run));
+      const finished = read(KEYS.finished);
+      write(KEYS.finished, withFinished(Array.isArray(finished) ? finished : [], run));
+    },
+    deleteFinished: (runId) => {
+      const finished = read(KEYS.finished);
+      write(KEYS.finished, withoutFinished(Array.isArray(finished) ? finished : [], runId));
     },
     onActiveChange: (listener) => {
       const events = options.events;

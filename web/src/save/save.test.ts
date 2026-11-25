@@ -6,7 +6,7 @@ import { DEFAULT_HYPERPARAMS } from "../engine/hyperparams";
 import { realDatabase } from "../engine/realDatabase.testing";
 import { done, reroll, rollNext, startRun, type Engine, type Run } from "../engine/run";
 import { STATS, defaultSettings, type Stats } from "../engine/settings";
-import { PAST_RUNS_CAP, packFinished, recordOf, unpackFinished } from "./finished";
+import { FINISHED_RUNS_CAP, packFinished, recordOf, unpackFinished } from "./finished";
 import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh } from "./restore";
 import { keyValueStore, type KeyValue } from "./store";
 
@@ -147,18 +147,26 @@ describe("finished runs", () => {
     const run = packFinished(played(1), { runId: "run", startedAt: "s", finishedAt: "f" });
     store.addFinished(run);
     store.addFinished(run);
-    expect((await store.load()).past).toHaveLength(1);
+    expect((await store.load()).finished).toHaveLength(1);
+  });
+
+  it("delete one run and keep the others", async () => {
+    const store = keyValueStore(memory());
+    const run = played(1);
+    for (const runId of ["first", "second"]) store.addFinished(packFinished(run, { runId, startedAt: "s", finishedAt: "f" }));
+    store.deleteFinished("first");
+    expect((await store.load()).finished.map((one) => unpackFinished(one)?.runId)).toEqual(["second"]);
   });
 
   it("drop the oldest past the cap", async () => {
     const storage = memory();
     const store = keyValueStore(storage);
     const run = played(1);
-    for (let n = 0; n <= PAST_RUNS_CAP; n += 1)
+    for (let n = 0; n <= FINISHED_RUNS_CAP; n += 1)
       store.addFinished(packFinished(run, { runId: `run ${n}`, startedAt: "s", finishedAt: "f" }));
-    const past = (await store.load()).past.map((one) => unpackFinished(one)?.runId);
-    expect(past).toHaveLength(PAST_RUNS_CAP);
-    expect(past[0]).toBe(`run ${PAST_RUNS_CAP}`);
-    expect(past).not.toContain("run 0");
+    const kept = (await store.load()).finished.map((one) => unpackFinished(one)?.runId);
+    expect(kept).toHaveLength(FINISHED_RUNS_CAP);
+    expect(kept[0]).toBe(`run ${FINISHED_RUNS_CAP}`);
+    expect(kept).not.toContain("run 0");
   });
 });

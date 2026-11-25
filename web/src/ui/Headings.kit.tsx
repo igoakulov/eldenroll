@@ -77,7 +77,7 @@ export const kit: readonly KitBlock[] = [
     size: "phone",
     states: [
       { label: "with a lede", render: () => <ScreenHead title={copy.common.runSettings} lede={copy.common.changesApplyOnNextRoll} /> },
-      { label: "over two lines", render: () => <ScreenHead title={copy.rold.title} /> },
+      { label: "over two lines", render: () => <ScreenHead title={copy.howItWorks.title} /> },
     ],
   },
 ];

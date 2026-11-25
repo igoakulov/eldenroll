@@ -1,11 +1,11 @@
 /* Opens under the wordmark, as Start does, so the help reads as the app's own */
-.rold-home {
+.how-it-works-home {
   display: flex;
   justify-content: center;
   padding-top: var(--space-6);
 }
 
-.rold-pun {
+.how-it-works-pun {
   margin: 0 0 var(--space-4);
   font-style: italic;
   font-size: var(--type-name);
@@ -13,18 +13,18 @@
   color: var(--gold);
 }
 
-.rold-ui {
+.how-it-works-ui {
   color: var(--text);
 }
 
 /* The run in five steps: numbered, since it is one sequence */
-.rold-steps {
+.how-it-works-steps {
   padding: 0;
   list-style: none;
   counter-reset: step;
 }
 
-.rold-steps li {
+.how-it-works-steps li {
   display: grid;
   grid-template-columns: 28px 1fr;
   align-items: baseline;
@@ -36,11 +36,11 @@
   counter-increment: step;
 }
 
-.rold-steps li:first-child {
+.how-it-works-steps li:first-child {
   border-top: 0;
 }
 
-.rold-steps li::before {
+.how-it-works-steps li::before {
   content: counter(step);
   font-family: var(--display);
   font-weight: 500;
@@ -50,22 +50,22 @@
 }
 
 /* The steps' own markup sits in the second column */
-.rold-steps li > * {
+.how-it-works-steps li > * {
   grid-column: 2;
 }
 
-.rold-body {
+.how-it-works-body {
   padding: 0 var(--gutter) var(--space-2);
   font-size: var(--type-body);
   line-height: var(--leading);
   color: var(--text-2);
 }
 
-.rold-how {
+.how-it-works-how {
   margin: var(--space-3) 0 0;
 }
 
-.rold-how div {
+.how-it-works-how div {
   display: grid;
   grid-template-columns: 78px 1fr;
   column-gap: var(--space-3);
@@ -75,16 +75,16 @@
   line-height: var(--leading);
 }
 
-.rold-how dt {
+.how-it-works-how dt {
   color: var(--text);
 }
 
-.rold-how dd {
+.how-it-works-how dd {
   margin: 0;
   color: var(--text-2);
 }
 
-.rold-legal {
+.how-it-works-legal {
   margin: var(--space-8) var(--gutter) 0;
   font-size: var(--type-small);
   line-height: var(--leading);

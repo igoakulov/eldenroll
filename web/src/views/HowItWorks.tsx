@@ -3,7 +3,7 @@ import { SectionHeading, ScreenHead } from "../ui/Headings";
 import { Screen } from "../ui/Screen";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
 import { Wordmark } from "../ui/Wordmark";
-import "./RoldCard.css";
+import "./HowItWorks.css";
 
 /** A step's text with each `[word]` set apart as the app's own control. */
 function Step({ text }: { readonly text: string }) {
@@ -13,7 +13,7 @@ function Step({ text }: { readonly text: string }) {
     <span>
       {parts.map((part, index) =>
         index % 2 === 1 ? (
-          <span key={index} className="rold-ui">
+          <span key={index} className="how-it-works-ui">
             {part}
           </span>
         ) : (
@@ -24,23 +24,24 @@ function Step({ text }: { readonly text: string }) {
   );
 }
 
-/** The onboarding card `Elden Rold` opens from Start (`web/README.md#Elden Rold card`). */
-export function RoldCard({ onClose, onHome }: { readonly onClose: () => void; readonly onHome: () => void }) {
-  const text = copy.rold;
+/** How it works: the onboarding page, opened from `Elden Rold` in Start's tagline and from the menu
+ * (`web/README.md#How it works`). */
+export function HowItWorks({ onClose, onHome }: { readonly onClose: () => void; readonly onHome: () => void }) {
+  const text = copy.howItWorks;
   return (
     <Screen>
       <TopBar eyebrow={copy.common.howItWorks}>
         <FramedIconButton icon="close" label={copy.common.close} onClick={onClose} />
       </TopBar>
-      <header className="rold-home">
+      <header className="how-it-works-home">
         <Wordmark onHome={onHome} />
       </header>
       <ScreenHead title={text.title} lede={text.lede}>
-        <p className="rold-pun">{text.pun}</p>
+        <p className="how-it-works-pun">{text.pun}</p>
       </ScreenHead>
 
       <SectionHeading>{text.aRun}</SectionHeading>
-      <ol className="rold-steps">
+      <ol className="how-it-works-steps">
         {text.steps.map((step) => (
           <li key={step}>
             <Step text={step} />
@@ -49,8 +50,8 @@ export function RoldCard({ onClose, onHome }: { readonly onClose: () => void; re
       </ol>
 
       <SectionHeading>{text.onYourPhone}</SectionHeading>
-      <p className="rold-body">{text.homeScreen}</p>
-      <dl className="rold-how">
+      <p className="how-it-works-body">{text.homeScreen}</p>
+      <dl className="how-it-works-how">
         {text.howTo.map((row) => (
           <div key={row.device}>
             <dt>{row.device}</dt>
@@ -59,7 +60,7 @@ export function RoldCard({ onClose, onHome }: { readonly onClose: () => void; re
         ))}
       </dl>
 
-      <p className="rold-legal">{text.disclaimer}</p>
+      <p className="how-it-works-legal">{text.disclaimer}</p>
     </Screen>
   );
 }

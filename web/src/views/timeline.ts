@@ -36,7 +36,7 @@ export function timelineItems(record: RunRecord): readonly TimelineItem[] {
   return items;
 }
 
-export const PICK_GROUPS = [
+const PICK_GROUPS = [
   "boss",
   "character_class",
   "weapon",
@@ -49,7 +49,7 @@ export const PICK_GROUPS = [
   "item",
   "rule",
 ] as const;
-export type PickGroup = (typeof PICK_GROUPS)[number];
+type PickGroup = (typeof PICK_GROUPS)[number];
 
 /** Something the search can pick: a boss, a class, an item as the card names it, a set or a rule. */
 export interface Pick {
@@ -164,7 +164,7 @@ export function holds(data: EngineData, item: TimelineItem, pick: string): boole
   return hitIn(data, item.objective, pick) !== undefined;
 }
 
-export interface PickSection {
+interface PickSection {
   readonly group: PickGroup;
   readonly picks: readonly (Pick & { readonly match: readonly [number, number] })[];
 }

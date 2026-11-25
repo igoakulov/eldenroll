@@ -52,15 +52,6 @@
   padding: var(--space-6) var(--gutter) 0;
 }
 
-.screen-over {
-  margin-bottom: var(--space-2);
-  font-variant-caps: all-small-caps;
-  letter-spacing: var(--tracking-tight);
-  font-size: var(--type-body);
-  line-height: var(--leading-tight);
-  color: var(--gold-mute);
-}
-
 .screen-title {
   margin: 0 0 var(--space-4);
   font-weight: 500;

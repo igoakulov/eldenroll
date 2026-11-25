@@ -5,7 +5,7 @@ export const VIEW_NAMES = [
   "start-resume-new-run",
   "start-loading",
   "start-failed",
-  "rold-card",
+  "how-it-works",
   "run-settings-general",
   "run-settings-never-roll",
   "run-settings-never-roll-search",
@@ -31,6 +31,8 @@ export const VIEW_NAMES = [
   "run-view-gear",
   "run-view-skipped",
   "run-view-finished",
+  "run-view-delete",
+  "all-runs",
 ] as const;
 
 export type ViewName = (typeof VIEW_NAMES)[number];

@@ -8,7 +8,7 @@ import { SCHEMA_VERSION } from "./restore";
 
 /** Safari keeps 5 MB per site; read as two bytes a character, a run through the whole game and the active run beside it
  * leave room for about 50 of them. */
-export const PAST_RUNS_CAP = 40;
+export const FINISHED_RUNS_CAP = 40;
 
 /** `-1` in a slot: the class has no row for it, so it never rolled. */
 const NOT_ROLLED = -1;
@@ -165,9 +165,11 @@ export function unpackFinished(value: unknown): Finished | null {
 
 /** Newest first; past the cap the oldest goes, silently. A run already kept, as when two tabs finish it, is kept
  * once. */
-export function withFinished(past: readonly unknown[], run: FinishedRun): readonly unknown[] {
-  const others = past.filter(
-    (one) => typeof one !== "object" || one === null || (one as { runId?: unknown }).runId !== run.runId,
-  );
-  return [run, ...others].slice(0, PAST_RUNS_CAP);
+export function withFinished(finished: readonly unknown[], run: FinishedRun): readonly unknown[] {
+  return [run, ...withoutFinished(finished, run.runId)].slice(0, FINISHED_RUNS_CAP);
+}
+
+/** A deleted run is gone from every list; one stored in a shape no longer read stays untouched. */
+export function withoutFinished(finished: readonly unknown[], runId: string): readonly unknown[] {
+  return finished.filter((one) => typeof one !== "object" || one === null || (one as { runId?: unknown }).runId !== runId);
 }

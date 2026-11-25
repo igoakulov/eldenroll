@@ -6,12 +6,12 @@ import type { RunRecord } from "../save/finished";
 /** A catalyst's class attacks with spells, so its label says nothing about the weapon (web/README.md#Summary). */
 const SPELL_CATALYSTS: ReadonlySet<string> = new Set(["any_staff", "any_seal"]);
 
-export const MOST_REROLLED = 10;
+const MOST_REROLLED = 10;
 
 export const GEAR_KINDS = ["weapons", "shields", "sorceries", "incantations", "armor_sets", "shortlist"] as const;
 export type GearKind = (typeof GEAR_KINDS)[number];
 
-export type RerolledKind =
+type RerolledKind =
   | "boss"
   | "character_class"
   | "weapon"
@@ -38,7 +38,7 @@ export interface Rerolled extends Counted {
   readonly kind: RerolledKind | null;
 }
 
-export interface SkippedBoss extends Entry {
+interface SkippedBoss extends Entry {
   readonly location: string | null;
 }
 

@@ -100,7 +100,12 @@
   margin: var(--space-9) var(--gutter) 0;
 }
 
-.in-run-all + .in-run {
+/* All runs, under the tagline whether a run is in progress or not */
+.start-runs {
+  margin: var(--space-9) var(--gutter) 0;
+}
+
+.start-runs + .in-run {
   margin-top: var(--space-7);
 }
 

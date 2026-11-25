@@ -36,6 +36,8 @@ export function Start({
   onOpenCard,
   onRunSettings,
   onStartRun,
+  finishedRuns,
+  onRuns,
 }: {
   readonly regions: readonly Region[];
   readonly stats: Stats;
@@ -46,6 +48,8 @@ export function Start({
   readonly onOpenCard: () => void;
   readonly onRunSettings: () => void;
   readonly onStartRun: () => void;
+  readonly finishedRuns: number;
+  readonly onRuns: () => void;
 }) {
   return (
     <Screen
@@ -61,6 +65,12 @@ export function Start({
       }
     >
       <Hero onOpenCard={onOpenCard} />
+      {/* Where a returning player lands, so looking back never means scrolling or resuming first */}
+      {finishedRuns > 0 && (
+        <div className="start-runs">
+          <ListRow title={copy.common.runs} detail={runsDetail(false, finishedRuns)} onClick={onRuns} />
+        </div>
+      )}
 
       <div>
         <LevelTotal level={derivedLevel(stats)} />
@@ -118,7 +128,7 @@ export function StartResume({
     >
       <Hero onOpenCard={onOpenCard} />
       {/* Every run first, as the menu orders them, then this one's way back to its objective */}
-      <div className="in-run in-run-all">
+      <div className="start-runs">
         <ListRow title={copy.common.runs} detail={runsDetail(true, finishedRuns)} onClick={onRuns} />
       </div>
       <section className="in-run" aria-label={copy.start.runInProgress}>

@@ -20,20 +20,21 @@ import {
 } from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { loadDatabase } from "./loadDatabase";
-import { PAST_RUNS_CAP, packFinished, recordOf, type Finished } from "./save/finished";
+import { FINISHED_RUNS_CAP, packFinished, recordOf, unpackFinished, type Finished } from "./save/finished";
 import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh, type SavedRun, type Setup } from "./save/restore";
 import { browserStore, type SaveStore } from "./save/store";
 import { useDefaultKeys } from "./ui/keys";
 import { PhoneFrame } from "./ui/PhoneFrame";
 import { boardBefore, boardOf, countState, inState } from "./views/bossList";
+import { AllRuns } from "./views/AllRuns";
 import { Bosses } from "./views/Bosses";
 import { Card, hasObjective, type Reveal } from "./views/Card";
 import { Felled } from "./views/Felled";
 import { neverRollEntries, shortlistEntries } from "./views/gearList";
 import { LevelUp } from "./views/LevelUp";
 import { rerollTarget } from "./views/rerollScope";
-import { RoldCard } from "./views/RoldCard";
-import { RunView, currentHeading, finishedHeading, runStatus } from "./views/RunView";
+import { HowItWorks } from "./views/HowItWorks";
+import { RunView, currentHeading, finishedHeading } from "./views/RunView";
 import { runTitle, type RunMenuActions } from "./views/RunMenu";
 import { RunSettings, type RunLists, type SettingsTab } from "./views/RunSettings";
 import { Start, StartFailed, StartLoading, StartResume } from "./views/Start";
@@ -43,13 +44,13 @@ interface Boot {
   readonly engine: Engine;
   readonly saved: SavedRun | null;
   readonly setup: Setup | null;
-  /** How many finished runs are kept. */
-  readonly finishedRuns: number;
+  /** The finished runs kept, newest first. */
+  readonly finished: readonly Finished[];
 }
 
 type Loaded = { readonly status: "loading" } | ({ readonly status: "ready" } & Boot) | { readonly status: "failed" };
 
-type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level" | "settings" | "run";
+type View = "start" | "card" | "howItWorks" | "felled" | "rerolling" | "level" | "settings" | "run" | "runs";
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
@@ -74,12 +75,16 @@ async function restore(): Promise<Boot> {
   const engine: Engine = { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
   let saved = restoreRun(engine, stored.active, FRESH);
   if (saved === null && stored.active !== null) store.setAsideActive();
-  let finishedRuns = stored.past.length;
+  let kept = stored.finished;
   if (saved?.run.finished === true) {
-    if (finishSaved(saved, saved.run) !== null) finishedRuns = Math.min(finishedRuns + 1, PAST_RUNS_CAP);
+    // It ended when it was last saved, not when the app opened again
+    finishSaved(saved, saved.run, saved.updatedAt);
     saved = null;
+    kept = (await store.load()).finished;
   }
-  return { database, engine, saved, setup: saved === null ? restoreSetup(engine.data, stored.setup) : null, finishedRuns };
+  // A run stored in a shape no longer read stays stored, but isn't listed
+  const finished = kept.flatMap((one) => unpackFinished(one) ?? []);
+  return { database, engine, saved, setup: saved === null ? restoreSetup(engine.data, stored.setup) : null, finished };
 }
 
 // Restoring writes to the store, so it runs once even where React runs an effect twice; a failed load may retry
@@ -95,16 +100,16 @@ function boot(): Promise<Boot> {
 type Identity = Pick<SavedRun, "runId" | "startedAt">;
 
 /** A run with no completed objective isn't kept (web/README.md#All runs): `null` then. */
-function finishSaved(identity: Identity, run: Run): Finished | null {
+function finishSaved(identity: Identity, run: Run, finishedAt = FRESH.now()): Finished | null {
   store.saveActive(null);
   if (run.completed.length === 0) return null;
-  const meta = { runId: identity.runId, startedAt: identity.startedAt, finishedAt: FRESH.now() };
+  const meta = { runId: identity.runId, startedAt: identity.startedAt, finishedAt };
   store.addFinished(packFinished(run, meta));
   return { ...meta, ...recordOf(run) };
 }
 
-function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
-  const [finishedRuns, setFinishedRuns] = useState(kept);
+function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
+  const [finished, setFinished] = useState(keptRuns);
   const rollableBosses = useMemo(() => database.boss_instance.filter((boss) => boss.odds > 0), [database]);
   const gear = useMemo(
     () => ({ neverRoll: neverRollEntries(database), shortlist: shortlistEntries(database) }),
@@ -123,6 +128,8 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
   });
   const [problems, setProblems] = useState<readonly string[]>([]);
   const [run, setRun] = useState<Run | null>(saved?.run ?? null);
+  // Worked out once per change to the run, so the view's summary isn't redone on every render
+  const currentRecord = useMemo(() => (run === null ? null : recordOf(run)), [run]);
   // The run's identity in its save; set when it starts
   const identity = useRef<Identity | null>(saved === null ? null : { runId: saved.runId, startedAt: saved.startedAt });
   /** Every change to the run goes through here, so the save always holds the run on screen. */
@@ -139,8 +146,8 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
     store.saveSetup({ schemaVersion: SCHEMA_VERSION, stats, settings, regions, ...lists, deadBosses, skippedBosses });
   }, [run, stats, settings, regions, lists, deadBosses, skippedBosses]);
   const [view, setView] = useState<View>("start");
-  // The Elden Rold card closes back to where it opened: Start, or the screen whose menu opened it
-  const [roldFromMenu, setRoldFromMenu] = useState(false);
+  // How it works closes back to where it opened: Start, or the screen whose menu opened it
+  const [howItWorksFromMenu, setHowItWorksFromMenu] = useState(false);
   // The run as it was before `Done` or `Felled?`, which `Undo` puts back
   const [undoTo, setUndoTo] = useState<Run | null>(null);
   const [reveal, setReveal] = useState<{ readonly kind: Reveal; readonly id: number }>({ kind: "none", id: 0 });
@@ -159,19 +166,23 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
         identity.current = other === null ? null : { runId: other.runId, startedAt: other.startedAt };
         setRun(other?.run ?? null);
         setUndoTo(null);
+        setOpened(null);
         setView("start");
+        // It may have finished a run too, so the list is read again
+        void store.load().then((stored) => setFinished(stored.finished.flatMap((one) => unpackFinished(one) ?? [])));
       }),
     [engine],
   );
 
-  // The finished run's view, over Start; `null` while the view shows the run in progress
-  const [finishedShown, setFinishedShown] = useState<Finished | null>(null);
+  // A finished run's view, over Start after `Finish run` or over `All runs`; `null` while the view shows the run in
+  // progress
+  const [opened, setOpened] = useState<{ readonly finished: Finished; readonly fromList: boolean } | null>(null);
   // Start opens fresh after a run, under the run's view when `show` asks for it and the run was kept
   const endRun = (finished: Run, show = false) => {
     const kept = identity.current === null ? null : finishSaved(identity.current, finished);
-    if (kept !== null) setFinishedRuns((count) => Math.min(count + 1, PAST_RUNS_CAP));
+    if (kept !== null) setFinished((list) => [kept, ...list.filter((one) => one.runId !== kept.runId)].slice(0, FINISHED_RUNS_CAP));
     identity.current = null;
-    setFinishedShown(show ? kept : null);
+    setOpened(show && kept !== null ? { finished: kept, fromList: false } : null);
     setRun(null);
     setUndoTo(null);
     setStats(DEFAULT_STATS);
@@ -184,14 +195,16 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
     setView(show && kept !== null ? "run" : "start");
   };
   const menu = (current: Run): RunMenuActions => ({
-    finishedRuns,
-    // `All runs` is built last in the MVP; until then its row opens nothing
-    onRuns: () => {},
-    onSummary: () => setView("run"),
+    finishedRuns: finished.length,
+    onRuns: () => setView("runs"),
+    onSummary: () => {
+      setOpened(null);
+      setView("run");
+    },
     onHome: () => setView("start"),
     onHowItWorks: () => {
-      setRoldFromMenu(true);
-      setView("rold");
+      setHowItWorksFromMenu(true);
+      setView("howItWorks");
     },
     onRunSettings: () => setView("settings"),
     onFinish: () => endRun(finishRun(current), true),
@@ -203,23 +216,46 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
     else showCard("none");
   };
 
-  if (view === "run" && finishedShown !== null) {
-    const last = finishedShown.objectives.at(-1);
+  if (view === "run" && opened !== null) {
+    const shown = opened.finished;
+    const last = shown.objectives.at(-1);
+    // Back to the list it was opened from, or to Start after `Finish run`; with nothing left to list, to Start
+    const back = (remaining: number) => {
+      setOpened(null);
+      setView(opened.fromList && (run !== null || remaining > 0) ? "runs" : "start");
+    };
     return (
       <RunView
+        key={shown.runId}
         data={engine.data}
         eyebrow={copy.runView.finished}
-        heading={finishedHeading(engine.data, finishedShown)}
-        status={runStatus(finishedShown.finishedAt)}
+        heading={finishedHeading(engine.data, shown)}
         stats={last?.stats ?? DEFAULT_STATS}
-        record={finishedShown}
-        onClose={() => {
-          setFinishedShown(null);
-          setView("start");
+        record={shown}
+        onClose={() => back(finished.length)}
+        onDelete={() => {
+          store.deleteFinished(shown.runId);
+          setFinished((list) => list.filter((one) => one.runId !== shown.runId));
+          back(finished.length - 1);
         }}
       />
     );
   }
+
+  if (view === "runs")
+    return (
+      <AllRuns
+        data={engine.data}
+        run={run}
+        finished={finished}
+        onResume={home}
+        onOpen={(one) => {
+          setOpened({ finished: one, fromList: true });
+          setView("run");
+        }}
+        onClose={home}
+      />
+    );
 
   if (view === "run" && run !== null)
     return (
@@ -227,15 +263,14 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
         data={engine.data}
         eyebrow={copy.runView.current}
         heading={currentHeading(engine.data, run)}
-        status={runStatus(null)}
         stats={run.stats}
-        record={recordOf(run)}
+        record={currentRecord ?? recordOf(run)}
         onClose={home}
       />
     );
 
-  if (view === "rold")
-    return <RoldCard onClose={() => (roldFromMenu ? home() : setView("start"))} onHome={() => setView("start")} />;
+  if (view === "howItWorks")
+    return <HowItWorks onClose={() => (howItWorksFromMenu ? home() : setView("start"))} onHome={() => setView("start")} />;
 
   if (view === "settings") {
     const eyebrow = run === null ? copy.common.newRun : copy.common.objective(objectiveNumber(run));
@@ -395,12 +430,12 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
         run={run}
         title={runTitle(engine.data, run)}
         onOpenCard={() => {
-          setRoldFromMenu(false);
-          setView("rold");
+          setHowItWorksFromMenu(false);
+          setView("howItWorks");
         }}
         onResume={home}
-        finishedRuns={finishedRuns}
-        onRuns={() => {}}
+        finishedRuns={finished.length}
+        onRuns={() => setView("runs")}
         onNewRun={() => endRun(finishRun(run))}
       />
     );
@@ -421,10 +456,12 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
         setProblems([]);
       }}
       onOpenCard={() => {
-        setRoldFromMenu(false);
-        setView("rold");
+        setHowItWorksFromMenu(false);
+        setView("howItWorks");
       }}
       onRunSettings={() => setView("settings")}
+      finishedRuns={finished.length}
+      onRuns={() => setView("runs")}
       onStartRun={() => {
         const result = startRun(
           engine,
@@ -468,7 +505,7 @@ export function App() {
   return (
     <PhoneFrame>
       {state.status === "ready" ? (
-        <Game database={state.database} engine={state.engine} saved={state.saved} setup={state.setup} finishedRuns={state.finishedRuns} />
+        <Game database={state.database} engine={state.engine} saved={state.saved} setup={state.setup} finished={state.finished} />
       ) : state.status === "loading" ? (
         <StartLoading />
       ) : (

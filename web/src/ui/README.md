@@ -11,7 +11,7 @@ Elden Ring has no published brand guidelines or fan-content policy; Bandai Namco
 - **No game fonts:** reportedly Agmena (Linotype) for menus and a customised Mantinia (Carter & Cone) for the logo, neither confirmed by FromSoftware, both commercial and licensed to them. We use Cinzel and EB Garamond (SIL Open Font License), self-hosted so they work offline and nothing calls Google.
 - **No item or boss pictures:** FromSoftware's art, and the scraped set carries `FEXTRALIFE` watermarks and has gaps. Our own icons stand in (`design/icons/README.md`).
 - **Colours, layout ideas and short game phrases** (`Great enemy felled`, `Level up`, *felled*) are fine: not protectable, used sparingly.
-- The `Elden Rold` card carries, rather than every page: `Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.` The credit line `©Bandai Namco Entertainment Inc. / ©2026 FromSoftware, Inc.` is needed only if their art is ever shown.
+- `How it works` carries, rather than every page: `Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.` The credit line `©Bandai Namco Entertainment Inc. / ©2026 FromSoftware, Inc.` is needed only if their art is ever shown.
 
 ## Direction
 

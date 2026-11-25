@@ -61,22 +61,18 @@ export function HeadingCount({ children }: { readonly children: number }) {
   return <span className="section-heading-count">{children}</span>;
 }
 
-/** A screen's title and its lede, under the top bar; `children` go between them. `over` is a line above the title
- * that places it, as a run's objective number over its boss. */
+/** A screen's title and its lede, under the top bar; `children` go between them. */
 export function ScreenHead({
   title,
-  over,
   lede,
   children,
 }: {
   readonly title: ReactNode;
-  readonly over?: ReactNode;
   readonly lede?: ReactNode;
   readonly children?: ReactNode;
 }) {
   return (
     <div className="screen-head">
-      {over !== undefined && <p className="screen-over">{over}</p>}
       <h1 className="screen-title">{title}</h1>
       {children}
       {lede !== undefined && <p className="screen-lede">{lede}</p>}

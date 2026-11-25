@@ -14,8 +14,8 @@ import {
   type RerollTarget,
   type Run,
 } from "../engine/run";
-import { recordOf, type Finished } from "../save/finished";
 import { DEFAULT_STATS, defaultSettings, type Settings } from "../engine/settings";
+import { recordOf, type Finished } from "../save/finished";
 import { hasObjective, type RunWithObjective } from "../views/Card";
 import { neverRollEntries, shortlistEntries, type GearEntry } from "../views/gearList";
 import { rerollTarget } from "../views/rerollScope";

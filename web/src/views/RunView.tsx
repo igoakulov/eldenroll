@@ -1,12 +1,13 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { copy } from "../copy";
-import { isNone } from "../engine/database";
+import { isNone, type LoadoutSlot } from "../engine/database";
 import { displaySlots, type SlotDisplay } from "../engine/display";
 import type { EngineData } from "../engine/engineData";
 import { objectiveNumber, type Run } from "../engine/run";
 import { STATS, derivedLevel, type Stats } from "../engine/settings";
-import type { FinishedObjective, RunRecord } from "../save/finished";
+import type { Finished, FinishedObjective, RunRecord } from "../save/finished";
+import { Confirm } from "../ui/Confirm";
 import { CountUp } from "../ui/CountUp";
 import { HeadingCount, ScreenHead, SectionHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
@@ -21,7 +22,7 @@ import { Timeline, TimelineEntry, TimelineRow, TimelineStats, TimelineValue } fr
 import { FramedIconButton, TopBar } from "../ui/TopBar";
 import { ARMOR_PIECE_ICONS, CHARACTER_CLASS_ICONS, EMPTY_SLOT_ICONS, iconKey } from "./icons";
 import { STAT_NAMES } from "./StatsAndRegions";
-import { GEAR_KINDS, summarize, type GearKind, type Summary } from "./summary";
+import { GEAR_KINDS, nameFromId, summarize, type GearKind, type Summary } from "./summary";
 import { bossName, className, gearPick, hitIn, holds, pickKeyOf, searchRun, timelineItems, type Pick, type TimelineItem } from "./timeline";
 import "./RunView.css";
 
@@ -37,28 +38,34 @@ export type RunViewList = { readonly kind: "gear"; readonly gear: GearKind } | {
 
 const DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-export interface RunHeading {
-  readonly over: string | null;
+/** The view's title and the line under it. The title holds the place the card's boss holds, so opening the summary
+ * from the card moves nothing; what places the run goes under it. */
+interface RunHeading {
   readonly title: string;
+  readonly lede: string;
 }
 
-/** The run in progress: its current objective over that objective's boss, or the objective alone between them. */
+/** The run in progress: its current objective's boss, or the objective alone between objectives. The status under
+ * it is enough: `Totals` just below counts the objectives. */
 export function currentHeading(data: EngineData, run: Run): RunHeading {
-  const number = copy.common.objective(objectiveNumber(run));
-  return run.current === null ? { over: null, title: number } : { over: number, title: bossName(data, run.current.boss) };
+  const title =
+    run.current === null ? copy.common.objective(objectiveNumber(run)) : bossName(data, run.current.boss);
+  return { title, lede: copy.runView.inProgress };
 }
 
-/** A finished run: how many objectives it completed over the last boss it felled in one, never an objective's
- * name, since nothing about that objective opens. */
-export function finishedHeading(data: EngineData, record: RunRecord): RunHeading {
-  const last = record.objectives.at(-1);
-  const over = copy.runView.objectives(record.objectives.length);
-  return last === undefined ? { over: null, title: over } : { over, title: bossName(data, last.boss) };
+/** A finished run: the last boss it felled in an objective, never an objective's name, since nothing about that
+ * objective opens. */
+export function finishedHeading(data: EngineData, run: Finished): RunHeading {
+  const last = run.objectives.at(-1);
+  return {
+    title: last === undefined ? copy.runView.objectives(run.objectives.length) : bossName(data, last.boss),
+    lede: finishedOn(run.finishedAt),
+  };
 }
 
-/** `Finished 10 Jan 2027`, or `In progress` without a date. */
-export function runStatus(finishedAt: string | null): string {
-  return finishedAt === null ? copy.runView.inProgress : copy.runView.finishedOn(DATE.format(new Date(finishedAt)));
+/** `Finished 10 Jan 2027`. */
+export function finishedOn(finishedAt: string): string {
+  return copy.runView.finishedOn(DATE.format(new Date(finishedAt)));
 }
 
 function ClassIcons({ id }: { readonly id: string }) {
@@ -72,8 +79,18 @@ function ClassIcons({ id }: { readonly id: string }) {
 }
 
 /** What a slot holds as an open entry lists it, in gold when the search picked it. */
-function Shown({ display, pick }: { readonly display: SlotDisplay; readonly pick: string | null }) {
+function Shown({
+  display,
+  pick,
+  gone = null,
+}: {
+  readonly display: SlotDisplay;
+  readonly pick: string | null;
+  /** The name rebuilt from an id gone from the data, which shows in place of `none` (web/README.md#Saving). */
+  readonly gone?: string | null;
+}) {
   const matched = pick !== null && pickKeyOf(display) === pick;
+  if (display.kind === "none" && gone !== null) return <TimelineValue>{gone}</TimelineValue>;
   // The rule `None` is an empty slot, as on the card
   if (display.kind === "rule" && isNone(display.rule.id))
     return <TimelineValue kind="none">{copy.controls.none}</TimelineValue>;
@@ -110,9 +127,14 @@ function ObjectiveDetail({
 }) {
   const shown = displaySlots(data, objective.slots);
   const card = copy.card;
-  const hand = (label: string, held: SlotDisplay, ash: SlotDisplay, empty: string) => (
+  const gone = (slot: LoadoutSlot): string | null => {
+    const id = objective.slots[slot];
+    if (id === null || id === undefined || isNone(id)) return null;
+    return data.items.has(id) || data.rules.has(id) || data.armorSets.has(id) ? null : nameFromId(id);
+  };
+  const hand = (label: string, slot: "rh" | "lh", held: SlotDisplay, ash: SlotDisplay, empty: string) => (
     <TimelineRow icon={iconOf(held, empty)} label={label}>
-      <Shown display={held} pick={pick} />
+      <Shown display={held} pick={pick} gone={gone(slot)} />
       {(ash.kind === "item" || ash.kind === "alias") && (
         <TimelineValue kind="under" matched={pick !== null && pickKeyOf(ash) === pick}>
           {ash.kind === "item" ? ash.item.name : ash.label}
@@ -123,17 +145,17 @@ function ObjectiveDetail({
   const armor = shown.armor;
   return (
     <>
-      {hand(card.rightHand, shown.rh, shown.rh_ash, EMPTY_SLOT_ICONS.rh)}
-      {hand(card.leftHand, shown.lh, shown.lh_ash, EMPTY_SLOT_ICONS.lh)}
+      {hand(card.rightHand, "rh", shown.rh, shown.rh_ash, EMPTY_SLOT_ICONS.rh)}
+      {hand(card.leftHand, "lh", shown.lh, shown.lh_ash, EMPTY_SLOT_ICONS.lh)}
       <TimelineRow icon={iconOf(shown.spell, EMPTY_SLOT_ICONS.spell)} label={card.spell}>
-        <Shown display={shown.spell} pick={pick} />
+        <Shown display={shown.spell} pick={pick} gone={gone("spell")} />
       </TimelineRow>
       <TimelineRow icon={EMPTY_SLOT_ICONS.talisman} label={card.talismans}>
-        <Shown display={shown.talisman_1} pick={pick} />
-        <Shown display={shown.talisman_2} pick={pick} />
+        <Shown display={shown.talisman_1} pick={pick} gone={gone("talisman_1")} />
+        <Shown display={shown.talisman_2} pick={pick} gone={gone("talisman_2")} />
       </TimelineRow>
       <TimelineRow icon={ARMOR_PIECE_ICONS.body} label={card.armor}>
-        <Shown display={armor} pick={pick} />
+        <Shown display={armor} pick={pick} gone={gone("armor")} />
         {armor.kind === "armor_set" && (
           <TimelineValue kind="note">
             {Object.values(armor.pieces)
@@ -146,10 +168,10 @@ function ObjectiveDetail({
         )}
       </TimelineRow>
       <TimelineRow icon={iconOf(shown.item, EMPTY_SLOT_ICONS.item)} label={card.item}>
-        <Shown display={shown.item} pick={pick} />
+        <Shown display={shown.item} pick={pick} gone={gone("item")} />
       </TimelineRow>
       <TimelineRow rule label={card.combatRule}>
-        <Shown display={shown.rule} pick={pick} />
+        <Shown display={shown.rule} pick={pick} gone={gone("rule")} />
       </TimelineRow>
       <TimelineRow label={copy.runView.atDone}>
         <TimelineValue>{copy.runView.levelAt(derivedLevel(objective.stats))}</TimelineValue>
@@ -167,12 +189,15 @@ function SummaryTab({
   showAll,
   onShowAll,
   onList,
+  onDelete,
 }: {
   readonly summary: Summary;
   readonly stats: Stats;
   readonly showAll: ReadonlySet<string>;
   readonly onShowAll: (list: string) => void;
   readonly onList: (list: RunViewList) => void;
+  /** A finished run's way to delete it, which asks first. */
+  readonly onDelete?: () => void;
 }) {
   const words = copy.runView;
   // The rows past the top fade in as one group when the list opens
@@ -259,6 +284,12 @@ function SummaryTab({
             />
           ))}
         </section>
+      )}
+
+      {onDelete !== undefined && (
+        <div className="run-view-rows run-view-end">
+          <ListRow title={copy.allRuns.deleteRun} detail={copy.allRuns.deleteRunDetail} danger onClick={onDelete} />
+        </div>
       )}
     </>
   );
@@ -414,11 +445,12 @@ export function RunView({
   data,
   eyebrow,
   heading,
-  status,
   stats,
   record,
   onClose,
+  onDelete,
   defaultTab = "summary",
+  defaultDeleting = false,
   defaultList = null,
   defaultQuery = "",
   defaultPick = null,
@@ -428,12 +460,15 @@ export function RunView({
   readonly data: EngineData;
   readonly eyebrow: string;
   readonly heading: RunHeading;
-  readonly status: string;
   /** At the last `Done`, or the current ones for a run in progress. */
   readonly stats: Stats;
   readonly record: RunRecord;
   readonly onClose: () => void;
+  /** A finished run's: deletes it once the player confirms. */
+  readonly onDelete?: () => void;
   readonly defaultTab?: RunViewTab;
+  /** The `Delete run` confirmation open, for the kit. */
+  readonly defaultDeleting?: boolean;
   readonly defaultList?: RunViewList | null;
   readonly defaultQuery?: string;
   readonly defaultPick?: Pick | null;
@@ -448,12 +483,32 @@ export function RunView({
   const [pick, setPick] = useState<Pick | null>(defaultPick);
   const [open, setOpen] = useState<ReadonlySet<number>>(new Set(defaultOpen));
   const [showAll, setShowAll] = useState<ReadonlySet<string>>(new Set(defaultShowAll));
+  const [deleting, setDeleting] = useState(defaultDeleting);
   const toggled = <T,>(set: ReadonlySet<T>, one: T) => {
     const next = new Set(set);
     if (!next.delete(one)) next.add(one);
     return next;
   };
+  // Where a list was opened from, so closing it lands back there: the row keeps focus and the page its scroll
+  const opener = useRef<{ readonly row: HTMLElement | null; readonly scroller: Element | null; readonly top: number } | null>(
+    null,
+  );
+  const openList = (next: RunViewList) => {
+    const row = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const scroller = row?.closest(".phone-frame-screen") ?? document.scrollingElement;
+    opener.current = { row, scroller, top: scroller?.scrollTop ?? 0 };
+    setList(next);
+  };
+  useLayoutEffect(() => {
+    if (list !== null || opener.current === null) return;
+    const { row, scroller, top } = opener.current;
+    opener.current = null;
+    if (scroller !== null) scroller.scrollTop = top;
+    row?.focus({ preventScroll: true });
+  }, [list]);
   const choose = (chosen: Pick) => {
+    // A pick opens the timeline at its top, not the summary where the list was opened
+    opener.current = null;
     setPick(chosen);
     setQuery(chosen.name);
     setOpen(new Set());
@@ -467,14 +522,30 @@ export function RunView({
       {list !== null && (
         <RunViewListScreen data={data} eyebrow={eyebrow} summary={summary} list={list} onPick={choose} onClose={() => setList(null)} />
       )}
-      <Screen className={list === null ? "run-view" : "run-view run-view-hidden"}>
+      <Screen
+        className={list === null ? "run-view" : "run-view run-view-hidden"}
+        {...(onDelete === undefined
+          ? {}
+          : {
+              sheet: (
+                <Confirm
+                  open={deleting}
+                  title={copy.allRuns.deleteRun}
+                  question={copy.allRuns.deleteQuestion}
+                  parts={[{ text: copy.allRuns.cannotUndo, lost: true }]}
+                  action={copy.allRuns.deleteRun}
+                  onConfirm={onDelete}
+                  onClose={() => setDeleting(false)}
+                />
+              ),
+            })}
+      >
         <TopBar eyebrow={eyebrow}>
           <FramedIconButton icon="close" label={copy.common.close} onClick={onClose} />
         </TopBar>
         <ScreenHead
-          {...(heading.over === null ? {} : { over: heading.over })}
           title={heading.title}
-          lede={status}
+          lede={heading.lede}
         />
         <Tabs
           label={copy.runView.tabsLabel}
@@ -489,7 +560,8 @@ export function RunView({
               stats={stats}
               showAll={showAll}
               onShowAll={(id) => setShowAll(toggled(showAll, id))}
-              onList={setList}
+              onList={openList}
+              {...(onDelete === undefined ? {} : { onDelete: () => setDeleting(true) })}
             />,
             <TimelineTab
               key="timeline"

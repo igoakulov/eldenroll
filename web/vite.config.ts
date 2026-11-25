@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { fileURLToPath } from "node:url";
 
@@ -61,14 +61,19 @@ const serviceWorker: Plugin = {
     keep(main.fileName);
     for (const fileName of Object.keys(bundle))
       if (/\/(?:cinzel|eb-garamond)-latin(?:-ext)?-\d+-(?:normal|italic)-[^/]+\.woff2$/.test(fileName)) kept.add(fileName);
-    const files = ["/", "/manifest.webmanifest", ...ICONS, ...[...kept].sort().map((fileName) => `/${fileName}`)];
-    // A new release, or a change to the worker itself, keeps its files under a new name and drops the old ones
-    const version = createHash("sha256").update(serviceWorkerSource(files, "")).digest("hex").slice(0, 12);
+    const files = ["/", ...UNHASHED, ...[...kept].sort().map((fileName) => `/${fileName}`)];
+    // A new release, or a change to the worker, the manifest or an icon, keeps its files under a new name and drops the
+    // old ones; the hashed names cover the rest
+    const hash = createHash("sha256").update(serviceWorkerSource(files, ""));
+    for (const file of UNHASHED) hash.update(readFileSync(fileURLToPath(new URL(`public${file}`, import.meta.url))));
+    const version = hash.digest("hex").slice(0, 12);
     this.emitFile({ type: "asset", fileName: "sw.js", source: serviceWorkerSource(files, version) });
   },
 };
 
 const ICONS = ["/icons/apple-touch-icon.png", "/icons/icon-192.png", "/icons/icon-512.png"];
+/** Kept under names that never change, so their content decides when the worker updates. */
+const UNHASHED = ["/manifest.webmanifest", ...ICONS];
 
 export default defineConfig({
   plugins: [react(), pageSlash, serviceWorker],

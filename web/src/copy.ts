@@ -43,7 +43,7 @@ export const copy = {
       "Follow fate to become Elden Rold.",
       "Roll objectives, gather your gear, and fell your foes to become Elden Rold.",
     ] as readonly string[],
-    /** The words in each tagline that open the Elden Rold card. */
+    /** The words in each tagline that open How it works. */
     taglineLink: "Elden Rold",
     startRun: "Start run",
     resume: "Resume",
@@ -78,9 +78,9 @@ export const copy = {
     allDead: "Every boss is already felled.",
   },
 
-  // The Elden Rold card, opened from the tagline or `How it works`. Words in [brackets] are the app's own buttons,
+  // How it works, opened from the tagline's `Elden Rold` or the menu. Words in [brackets] are the app's own buttons,
   // set apart in the text
-  rold: {
+  howItWorks: {
     title: "Welcome to EldenRoll, Tarnished",
     lede: "A companion to keep open while you play. Each objective rolls a boss to fell and the class and gear to fell it with, so every playthrough feels new again.",
     pun: "Follow fate to become Elden Rold.",
@@ -241,14 +241,13 @@ export const copy = {
     finishRunDetail: "Ends run and shows summary",
   },
 
-  // The confirmations, for `Finish run` and `New run`
   // A run's view, for the run in progress and a finished one, and the lists it opens
   runView: {
     current: "Current run",
     finished: "Finished run",
     inProgress: "In progress",
     finishedOn: (date: string) => `Finished ${date}`,
-    /** Over a finished run's last boss, and in its row in All runs. */
+    /** A finished run's size, in its row in All runs. */
     objectives: (count: number) => (count === 1 ? "1 objective" : `${count} objectives`),
     tabsLabel: "Run",
     tabs: { summary: "Summary", timeline: "Timeline" },
@@ -312,6 +311,19 @@ export const copy = {
     },
   },
 
+  // All runs, from Start and the menu
+  allRuns: {
+    /** After the count of finished runs. */
+    finished: (count: number) => (count === 1 ? "finished run" : "finished runs"),
+    /** A finished run's row: its size first, then its last boss to tell apart runs of a similar size. */
+    finishedTitle: (objectives: string, boss: string) => `${objectives}, ${boss}`,
+    deleteRun: "Delete run",
+    deleteRunDetail: "Removes it from All runs",
+    deleteQuestion: "Delete this run from All runs?",
+    cannotUndo: "Cannot undo",
+  },
+
+  // The confirmations, for `Finish run` and `New run`; `Delete run`'s words are with All runs
   confirm: {
     chipsLabel: "What happens",
     abandonObjective: (number: number) => `Abandon objective ${number}`,

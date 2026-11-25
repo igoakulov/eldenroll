@@ -5,14 +5,15 @@ import { DEFAULT_REGIONS } from "../engine/regions";
 import { objectiveNumber } from "../engine/run";
 import { DEFAULT_STATS } from "../engine/settings";
 import { boardBefore, boardOf, countState } from "../views/bossList";
+import { AllRuns } from "../views/AllRuns";
 import { Bosses } from "../views/Bosses";
 import { Card, type RunWithObjective } from "../views/Card";
 import { Felled } from "../views/Felled";
 import { LevelUp } from "../views/LevelUp";
 import { RerollPanel } from "../views/RerollPanel";
 import { REROLL_STOPS } from "../views/rerollScope";
-import { RoldCard } from "../views/RoldCard";
-import { RunView, currentHeading, finishedHeading, runStatus, type RunViewList, type RunViewTab } from "../views/RunView";
+import { HowItWorks } from "../views/HowItWorks";
+import { RunView, currentHeading, finishedHeading, type RunViewList, type RunViewTab } from "../views/RunView";
 import { summarize } from "../views/summary";
 import { gearPick, type Pick } from "../views/timeline";
 import { recordOf } from "../save/finished";
@@ -51,7 +52,7 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
     onHowItWorks: noop,
     onRunSettings: noop,
     onFinish: noop,
-  };;
+  };
   const rollableBosses = database.boss_instance.filter((boss) => boss.odds > 0);
   const before = boardBefore([], []);
   const settingsOn = (tab: SettingsTab, query = ""): KitView => ({
@@ -102,7 +103,6 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
       data={engine.data}
       eyebrow={copy.runView.current}
       heading={currentHeading(engine.data, runs.long)}
-      status={runStatus(null)}
       stats={runs.long.stats}
       record={longRecord}
       onClose={noop}
@@ -168,13 +168,15 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
           onOpenCard={noop}
           onRunSettings={noop}
           onStartRun={noop}
+          finishedRuns={1}
+          onRuns={noop}
         />
       ),
     },
     "start-resume": { title: "Start, a run in progress", render: startResume },
     "start-loading": { title: "Start, loading", render: () => <StartLoading /> },
     "start-failed": { title: "Start, failed", render: () => <StartFailed onRetry={noop} /> },
-    "rold-card": { title: "Elden Rold card", render: () => <RoldCard onClose={noop} onHome={noop} /> },
+    "how-it-works": { title: "How it works", render: () => <HowItWorks onClose={noop} onHome={noop} /> },
     "run-settings-general": settingsOn("general"),
     "run-settings-never-roll": settingsOn("neverRoll"),
     "run-settings-never-roll-search": settingsOn("neverRoll", GEAR_QUERY),
@@ -296,14 +298,37 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
             data={engine.data}
             eyebrow={copy.runView.finished}
             heading={finishedHeading(engine.data, runs.finished)}
-            status={runStatus(runs.finished.finishedAt)}
             stats={last?.stats ?? DEFAULT_STATS}
             record={runs.finished}
             onClose={noop}
+            onDelete={noop}
             defaultShowAll={["classes", "rerolled"]}
           />
         );
       },
+    },
+    "all-runs": {
+      title: "All runs, a run in progress",
+      render: () => (
+        <AllRuns data={engine.data} run={runs.long} finished={[runs.finished]} onResume={noop} onOpen={noop} onClose={noop} />
+      ),
+    },
+    "run-view-delete": {
+      title: "Delete run",
+      sheet: true,
+      scrollTo: ".run-view-end",
+      render: () => (
+        <RunView
+          data={engine.data}
+          eyebrow={copy.runView.finished}
+          heading={finishedHeading(engine.data, runs.finished)}
+          stats={runs.finished.objectives.at(-1)?.stats ?? DEFAULT_STATS}
+          record={runs.finished}
+          onClose={noop}
+          onDelete={noop}
+          defaultDeleting
+        />
+      ),
     },
     "start-resume-new-run": {
       title: "New run",

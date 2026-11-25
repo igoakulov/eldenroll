@@ -31,3 +31,9 @@
   font-size: var(--type-body);
   color: var(--gold-mute);
 }
+
+/* Deleting ends the summary, set apart from the counts above it */
+.run-view-end {
+  margin-top: var(--space-8);
+  border-top: 1px solid var(--frame);
+}
