@@ -28,7 +28,7 @@ import {
 } from "../engine/settings";
 import type { TallyAdded } from "../engine/slotRoll";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /** The active run as stored. `runId` and `updatedAt` let copies from several devices merge later. */
 export interface SavedRun {
@@ -131,6 +131,11 @@ function rerolls(value: unknown): RerollTarget[] {
     : [];
 }
 
+/** Repeats kept: each is one time an id was replaced. An id gone from the data stays, for the summary to name. */
+function replaced(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((one): one is string => typeof one === "string") : [];
+}
+
 function tally(value: unknown): Record<string, number> {
   const out: Record<string, number> = {};
   for (const [key, chance] of Object.entries(record(value) ?? {}))
@@ -152,6 +157,7 @@ function completed(value: unknown): CompletedObjective[] {
         slots: slots(raw.slots),
         shortlistRh: raw.shortlistRh === true,
         rerolls: rerolls(raw.rerolls),
+        replaced: replaced(raw.replaced),
         stats: at,
         level: derivedLevel(at),
       },
@@ -185,6 +191,7 @@ function current(
     slots: read,
     shortlistRh: raw.shortlistRh === true,
     rerolls: rerolls(raw.rerolls),
+    replaced: replaced(raw.replaced),
     tally: slotTally,
   };
   return { objective, gone };
@@ -193,9 +200,10 @@ function current(
 /** Rerolls from the gone step on, as the reroll slider would, so gear fetched for the slots before it stays. The
  * player didn't ask for it, so it isn't counted as their reroll. */
 function repaired(engine: Engine, run: Run, gone: RerollTarget): Run {
-  const before = run.current?.rerolls ?? [];
   const next = reroll(engine, run, gone);
-  return next.current === null ? next : { ...next, current: { ...next.current, rerolls: before } };
+  if (next.current === null || run.current === null) return next;
+  const { rerolls: before, replaced: kept } = run.current;
+  return { ...next, current: { ...next.current, rerolls: before, replaced: kept } };
 }
 
 function deadBosses(data: EngineData, value: unknown): DeadBoss[] {

@@ -21,34 +21,63 @@ export interface FinishedRun {
   /** Every id the run names, once; the numbers below point into it. */
   readonly ids: readonly string[];
   /** Per objective: boss, class, the slots in `LOADOUT_ORDER` (an empty result is `null`), the stats in `STATS`, then
-   * its reroll count. */
+   * `1` if the right hand rolled from the shortlist, else `0`. */
   readonly objectives: readonly (readonly (number | null)[])[];
   /** Boss and the objective showing when it was marked. */
   readonly felled: readonly (readonly [number, number])[];
   readonly skipped: readonly number[];
+  readonly rerolls: number;
+  /** What the rerolls replaced, and how often. */
+  readonly replaced: readonly (readonly [number, number])[];
 }
 
 export interface FinishedObjective {
   readonly boss: string;
   readonly characterClass: string;
   readonly slots: RolledSlots;
+  readonly shortlistRh: boolean;
   readonly stats: Stats;
-  readonly rerolls: number;
 }
 
-export interface Finished {
-  readonly runId: string;
-  readonly startedAt: string;
-  readonly finishedAt: string;
+/** What a run's view shows, the same for the run in progress and a finished one. Rerolls count only once their
+ * objective is done, as everything in the summary does. */
+export interface RunRecord {
   readonly objectives: readonly FinishedObjective[];
   readonly deadBosses: readonly DeadBoss[];
   readonly skippedBosses: readonly string[];
+  readonly rerolls: number;
+  readonly replaced: Readonly<Record<string, number>>;
+}
+
+export interface Finished extends RunRecord {
+  readonly runId: string;
+  readonly startedAt: string;
+  readonly finishedAt: string;
+}
+
+export function recordOf(run: Run): RunRecord {
+  const replaced: Record<string, number> = {};
+  for (const id of run.completed.flatMap((objective) => objective.replaced)) replaced[id] = (replaced[id] ?? 0) + 1;
+  return {
+    objectives: run.completed.map(({ boss, characterClass, slots, shortlistRh, stats }) => ({
+      boss,
+      characterClass,
+      slots,
+      shortlistRh,
+      stats,
+    })),
+    deadBosses: run.deadBosses,
+    skippedBosses: run.skippedBosses,
+    rerolls: run.completed.reduce((sum, objective) => sum + objective.rerolls.length, 0),
+    replaced,
+  };
 }
 
 export function packFinished(
   run: Run,
   meta: { readonly runId: string; readonly startedAt: string; readonly finishedAt: string },
 ): FinishedRun {
+  const record = recordOf(run);
   const ids: string[] = [];
   const index = new Map<string, number>();
   const ref = (id: string): number => {
@@ -60,7 +89,7 @@ export function packFinished(
     }
     return at;
   };
-  const objectives = run.completed.map((objective) => [
+  const objectives = record.objectives.map((objective) => [
     ref(objective.boss),
     ref(objective.characterClass),
     ...LOADOUT_ORDER.map((slot) => {
@@ -68,14 +97,16 @@ export function packFinished(
       return id === undefined ? NOT_ROLLED : id === null ? null : ref(id);
     }),
     ...STATS.map((stat) => objective.stats[stat]),
-    objective.rerolls.length,
+    objective.shortlistRh ? 1 : 0,
   ]);
   return {
     schemaVersion: SCHEMA_VERSION,
     ...meta,
     objectives,
-    felled: run.deadBosses.map((row) => [ref(row.instanceId), row.objectiveIndex] as const),
-    skipped: run.skippedBosses.map(ref),
+    felled: record.deadBosses.map((row) => [ref(row.instanceId), row.objectiveIndex] as const),
+    skipped: record.skippedBosses.map(ref),
+    rerolls: record.rerolls,
+    replaced: Object.entries(record.replaced).map(([id, times]) => [ref(id), times] as const),
     ids,
   };
 }
@@ -109,7 +140,13 @@ export function unpackFinished(value: unknown): Finished | null {
     const stats = Object.fromEntries(
       STATS.map((stat, at) => [stat, Number(row[2 + LOADOUT_ORDER.length + at])]),
     ) as Stats;
-    read.push({ boss, characterClass, slots, stats, rerolls: Number(row[width - 1]) });
+    read.push({ boss, characterClass, slots, shortlistRh: row[width - 1] === 1, stats });
+  }
+  const replaced: Record<string, number> = {};
+  for (const row of Array.isArray(raw.replaced) ? (raw.replaced as unknown[]) : []) {
+    const named = Array.isArray(row) ? id(row[0]) : undefined;
+    const times: unknown = Array.isArray(row) ? row[1] : undefined;
+    if (named !== undefined && typeof times === "number" && times > 0) replaced[named] = times;
   }
   return {
     runId: raw.runId,
@@ -121,6 +158,8 @@ export function unpackFinished(value: unknown): Finished | null {
       return instanceId === undefined ? [] : [{ instanceId, objectiveIndex: Number((row as unknown[])[1]) }];
     }),
     skippedBosses: (skipped as unknown[]).flatMap((at) => id(at) ?? []),
+    rerolls: typeof raw.rerolls === "number" ? raw.rerolls : 0,
+    replaced,
   };
 }
 

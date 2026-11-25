@@ -255,6 +255,22 @@ describe("rerolls", () => {
     run = doneAndRoll(run);
     expect(run.completed[0]?.rerolls).toHaveLength(3);
     expect(current(run).rerolls).toEqual([]);
+    expect(current(run).replaced).toEqual([]);
+  });
+
+  it("counts as replaced what the stop names, not the armor every reroll redoes", () => {
+    let run = start(knight);
+    const first = current(run);
+    run = reroll(engine, run, "boss");
+    expect(current(run).replaced).toEqual([first.boss]);
+    const second = current(run);
+    run = reroll(engine, run, "rh");
+    const third = current(run);
+    const hands = [second.slots.rh, ...(third.slots.lh === second.slots.lh ? [] : [second.slots.lh])];
+    expect(third.replaced).toEqual([first.boss, ...hands]);
+    expect(third.replaced).not.toContain(second.slots.armor);
+    run = reroll(engine, run, "armor");
+    expect(current(run).replaced).toEqual([...third.replaced, third.slots.armor]);
   });
 });
 
@@ -285,6 +301,7 @@ describe("Already dead and Finish run", () => {
     const next = alreadyDead(engine, run);
     expect(current(next).boss).not.toBe(objective.boss);
     expect(current(next).rerolls).toEqual(["armor"]);
+    expect(current(next).replaced).toEqual(objective.replaced);
     expect(next.deadBosses).toEqual([{ instanceId: objective.boss, objectiveIndex: 1 }]);
     expect(next.completed).toHaveLength(0);
   });

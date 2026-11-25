@@ -23,6 +23,7 @@ The pause menu at a Site of Grace: near-black warm ground, teal mist, thin bronz
 - **States change items, not the layout.** Choosing a reroll scope lights the panel's chips; nothing moves or reflows. Every sheet, the reroll panel included, dims what is behind it.
 - **By how often it changes.** The two frequent actions sit in the bottom bar under the thumb; stats and regions sit on `Level up`, one tap away; rare settings sit in `Run settings`. Every layout works with no images.
 - **The bottom bar.** A secondary action beside the glow band takes the band's two rules, dimmed, never a box: a box's square corners clash with a phone's round ones. Two buttons of one style split the bar evenly, so their labels sit symmetrically; the glow alone marks the main one. The backdrop turns solid above the buttons and thins to a dimmed strip below them, so a screen that goes on shows it under the bar.
+- **The hands sit where they say.** Side by side, the left hand is on the left, as on the card; in a list one above the other, the right hand comes first, since it is the main weapon, rolled first and filled by the shortlist.
 - **Talismans before armor on the card,** though the game's equipment screen lists armor first: the owner's choice, reasons not recorded.
 - **Red means irreversible.** Only the boss bar, rule lozenges and actions that can't be undone are red.
 - **The phone is the product everywhere.** Desktop shows the app inside a drawn phone (`web/README.md#Desktop`), and nothing inside the frame is desktop-only, so every screen is designed once.

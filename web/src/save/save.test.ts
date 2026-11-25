@@ -6,7 +6,7 @@ import { DEFAULT_HYPERPARAMS } from "../engine/hyperparams";
 import { realDatabase } from "../engine/realDatabase.testing";
 import { done, reroll, rollNext, startRun, type Engine, type Run } from "../engine/run";
 import { STATS, defaultSettings, type Stats } from "../engine/settings";
-import { PAST_RUNS_CAP, packFinished, unpackFinished } from "./finished";
+import { PAST_RUNS_CAP, packFinished, recordOf, unpackFinished } from "./finished";
 import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh } from "./restore";
 import { keyValueStore, type KeyValue } from "./store";
 
@@ -137,16 +137,9 @@ describe("finished runs", () => {
     const run = played(5);
     const meta = { runId: "run", startedAt: "s", finishedAt: "f" };
     const back = unpackFinished(JSON.parse(JSON.stringify(packFinished(run, meta))));
-    expect(back?.objectives).toEqual(
-      run.completed.map((one) => ({
-        boss: one.boss,
-        characterClass: one.characterClass,
-        slots: one.slots,
-        stats: one.stats,
-        rerolls: one.rerolls.length,
-      })),
-    );
-    expect(back?.deadBosses).toEqual(run.deadBosses);
+    expect(back).toEqual({ ...meta, ...recordOf(run) });
+    expect(back?.rerolls).toBe(5);
+    expect(Object.keys(back?.replaced ?? {}).length).toBeGreaterThan(0);
   });
 
   it("keep a run once when two tabs both finish it", async () => {

@@ -73,6 +73,8 @@ boss → character_class → rh → rh_ash → lh → lh_ash → spell → item 
 
 Armor is last, so every reroll rerolls armor. A scope can skip a slot the card shows between two that change: `Talismans` keeps the item.
 
+Each objective keeps its rerolls' targets and the ids they replaced, which `Most rerolled` counts (`web/README.md#Summary`).
+
 Why this order: weapons gate ashes and rule requirements, talismans gate rule odds, rules gate armor synergies, and nothing rolls after armor.
 
 ### Edits during a run

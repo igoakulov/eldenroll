@@ -1,5 +1,5 @@
 import { copy } from "../copy";
-import type { LoadoutSlot } from "./database";
+import { isNone, type LoadoutSlot } from "./database";
 import type { RolledSlots } from "./display";
 import { countedItems } from "./eligibility";
 import type { EngineData } from "./engineData";
@@ -37,6 +37,8 @@ export interface Objective {
   readonly shortlistRh: boolean;
   /** Every reroll since the last `Done`, carried across `Reroll objective` and `Reroll items`. */
   readonly rerolls: readonly RerollTarget[];
+  /** The ids those rerolls replaced, once per time, for `Most rerolled`: what `REROLL_NAMES` lists. */
+  readonly replaced: readonly string[];
   /** What each slot's roll adds to `Run.tally` once the objective is done; a reroll replaces its slot's. */
   readonly tally: Readonly<Partial<Record<LoadoutSlot, TallyAdded>>>;
 }
@@ -218,13 +220,12 @@ function stopped(run: Run, status: Exclude<BossPool["status"], "ready">, rngStat
   return { ...run, rngState, current: null, waiting: status };
 }
 
+type Rerolled = Pick<Objective, "rerolls" | "replaced">;
+
+const NO_REROLLS: Rerolled = { rerolls: [], replaced: [] };
+
 /** Rolls a whole new objective, or leaves the run waiting or finished when no boss can roll. */
-function rollObjective(
-  engine: Engine,
-  run: Run,
-  rerolls: readonly RerollTarget[],
-  excludeBoss: string | null,
-): Run {
+function rollObjective(engine: Engine, run: Run, carried: Rerolled, excludeBoss: string | null): Run {
   const { random, state } = seededRandom(run.rngState);
   const boss = rollBoss(engine, run, random, excludeBoss);
   if (typeof boss === "string") return stopped(run, boss, state());
@@ -240,7 +241,8 @@ function rollObjective(
       characterClass,
       slots: loadout.slots,
       shortlistRh: loadout.shortlistRh ?? false,
-      rerolls,
+      rerolls: carried.rerolls,
+      replaced: carried.replaced,
       tally: loadout.tally,
     },
   };
@@ -274,7 +276,7 @@ export function startRun(engine: Engine, inputs: RunInputs, seed: number): Start
     completed: [],
     tally: {},
   };
-  return { ok: true, run: rollObjective(engine, run, [], null) };
+  return { ok: true, run: rollObjective(engine, run, NO_REROLLS, null) };
 }
 
 export function objectiveNumber(run: Run): number {
@@ -354,16 +356,54 @@ export function done(engine: Engine, run: Run): Run {
 /** The next objective after `Done`, or after the player ticks more regions while the run waits. */
 export function rollNext(engine: Engine, run: Run): Run {
   if (run.finished || run.current !== null) return run;
-  return rollObjective(engine, run, [], null);
+  return rollObjective(engine, run, NO_REROLLS, null);
 }
 
-/** Rerolls the target and everything after it; only the target avoids its current result. */
+type Named = "boss" | "character_class" | LoadoutSlot;
+
+/** What a reroll counts as replaced: what its stop names, so the armor every reroll redoes, and the ashes, count only
+ * when they are the target (web/README.md#Summary). */
+const REROLL_NAMES: Readonly<Record<RerollTarget, readonly Named[]>> = {
+  boss: ["boss"],
+  character_class: ["character_class"],
+  rh: ["rh", "lh"],
+  rh_ash: [],
+  lh: ["lh"],
+  lh_ash: [],
+  spell: ["spell"],
+  item: ["item"],
+  talisman_1: ["talisman_1", "talisman_2"],
+  talisman_2: ["talisman_2"],
+  rule: ["rule"],
+  armor: ["armor"],
+};
+
+function named(objective: Objective, key: Named): string | null {
+  if (key === "boss") return objective.boss;
+  if (key === "character_class") return objective.characterClass;
+  return objective.slots[key] ?? null;
+}
+
+/** Rerolls the target and everything after it; only the target avoids its current result. A named result that came
+ * back the same wasn't replaced, and an empty one replaced nothing. */
 export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
   const objective = run.current;
   if (objective === null || run.finished) return run;
-  const rerolls = [...objective.rerolls, target];
+  const next = rerolled(engine, run, objective, target);
+  if (next === run || next.current === null) return next;
+  const after = next.current;
+  const replaced = REROLL_NAMES[target].flatMap((key) => {
+    const was = named(objective, key);
+    return was === null || isNone(was) || was === named(after, key) ? [] : [was];
+  });
+  return {
+    ...next,
+    current: { ...after, rerolls: [...objective.rerolls, target], replaced: [...objective.replaced, ...replaced] },
+  };
+}
 
-  if (target === "boss") return rollObjective(engine, run, rerolls, objective.boss);
+function rerolled(engine: Engine, run: Run, objective: Objective, target: RerollTarget): Run {
+  if (target === "boss") return rollObjective(engine, run, objective, objective.boss);
 
   const { random, state } = seededRandom(run.rngState);
   if (target === "character_class") {
@@ -378,7 +418,6 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
         characterClass: characterClassId,
         slots: loadout.slots,
         shortlistRh: loadout.shortlistRh ?? false,
-        rerolls,
         tally: loadout.tally,
       },
     };
@@ -401,14 +440,13 @@ export function reroll(engine: Engine, run: Run, target: RerollTarget): Run {
       ...objective,
       slots: loadout.slots,
       shortlistRh: loadout.shortlistRh ?? objective.shortlistRh,
-      rerolls,
       tally: loadout.tally,
     },
   };
 }
 
 /** Marks the current boss dead and rerolls the full objective. The player didn't turn the boss down, so this
- * isn't a reroll: `rerolls` carries over without it. */
+ * isn't a reroll: `rerolls` and `replaced` carry over without it. */
 export function alreadyDead(engine: Engine, run: Run): Run {
   const objective = run.current;
   if (objective === null || run.finished) return run;
@@ -419,7 +457,7 @@ export function alreadyDead(engine: Engine, run: Run): Run {
       { instanceId: objective.boss, objectiveIndex: objectiveNumber(run) },
     ],
   };
-  return rollObjective(engine, marked, objective.rerolls, null);
+  return rollObjective(engine, marked, objective, null);
 }
 
 /** The current objective is discarded unless it was `Done`. */

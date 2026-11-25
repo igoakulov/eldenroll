@@ -160,7 +160,7 @@ function Game({ database, engine, saved, setup }: Boot) {
     [engine],
   );
 
-  // Until the finished run's view (9.6) takes it, Start opens fresh after a run
+  // Until the finished run's view takes it, Start opens fresh after a run
   const endRun = (finished: Run) => {
     if (identity.current !== null) finishSaved(identity.current, finished);
     identity.current = null;
