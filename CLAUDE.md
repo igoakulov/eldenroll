@@ -11,6 +11,8 @@ Run both before and after a change, and expect them clean with no skips:
 
 `data/build/` is git-ignored: build `db.json` before any web check (`pipeline/README.md`).
 
+After a change that shows on screen, before committing: `cd web && pnpm screenshots`, and open every view it names (`web/src/ui/README.md#UI kit`). It compares the working copy with the last commit, so a committed change shows nothing. A view you meant to change is expected; any other is a bug. It catches the slight drift of colour, spacing and size that the eye misses.
+
 ## Docs
 
 - A fact goes once, where it belongs: in the README beside the code or data it describes, written for a public reader, stating facts.

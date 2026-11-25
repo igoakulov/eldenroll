@@ -19,7 +19,9 @@
   margin-top: var(--space-4);
 }
 
-/* The ring starts whole at the top and empties clockwise, at an even pace, over the whole count */
+/* The boss bar's parts bent into a ring: bronze rims around a dark track and a gold band, shaded across its width as
+   the red bar is top to bottom. It starts whole at the top and shrinks back toward it, as a countdown should, rather
+   than a gap sweeping forward like a clock hand. */
 .countdown-ring {
   position: absolute;
   inset: 0;
@@ -27,26 +29,61 @@
   fill: none;
 }
 
-.countdown-ring-track {
-  stroke: var(--frame);
+.countdown-ring-rim {
+  stroke: var(--bronze);
   stroke-width: 1;
 }
 
-.countdown-ring-left {
-  stroke: var(--gold);
-  stroke-width: 1.5;
-  stroke-dasharray: 1;
-  animation: countdown-empty linear forwards;
+.countdown-ring-track {
+  stroke: var(--ground);
+  stroke-width: 6;
 }
 
-@keyframes countdown-empty {
+.countdown-ring-gold,
+.countdown-ring-trail {
+  stroke-width: 6;
+  stroke-dasharray: 1;
+}
+
+.countdown-ring-gold {
+  transition: stroke-dashoffset var(--dur-state) var(--ease-out);
+}
+
+.countdown-ring-inner {
+  stop-color: var(--gold-mute);
+}
+
+.countdown-ring-middle {
+  stop-color: var(--gold);
+}
+
+.countdown-ring-outer {
+  stop-color: var(--grace);
+}
+
+/* Spent gold, dark enough to stand well apart from the bright band, so each second reads as a hit. It holds where
+   the gold was, drains to meet it on the boss bar's timing, and stays there */
+.countdown-ring-trail {
+  stroke: var(--bronze);
+  stroke-dashoffset: var(--trail-to);
+  animation: countdown-trail var(--dur-trail) var(--ease-in-out) var(--trail-at) both;
+}
+
+@keyframes countdown-trail {
+  from {
+    stroke-dashoffset: var(--trail-from);
+  }
   to {
-    stroke-dashoffset: -1;
+    stroke-dashoffset: var(--trail-to);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .countdown-ring-left {
+  .countdown-ring-gold {
+    transition: none;
+  }
+
+  .countdown-ring-trail {
     animation: none;
   }
 }
@@ -67,8 +104,9 @@
   text-align: center;
 }
 
+/* A hand-off, not a cross-fade: two digits at half strength read as neither */
 .countdown-new {
-  animation: fade-in var(--dur-digit) var(--ease-out);
+  animation: fade-in var(--dur-digit) var(--ease-out) var(--dur-digit) backwards;
 }
 
 .countdown-old {

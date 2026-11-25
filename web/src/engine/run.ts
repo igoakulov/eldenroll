@@ -41,7 +41,8 @@ export interface Objective {
   readonly tally: Readonly<Partial<Record<LoadoutSlot, TallyAdded>>>;
 }
 
-export interface CompletedObjective extends Objective {
+/** Leaves out `tally`: `Done` adds it to `Run.tally`, and stored on every objective it would fill the browser's storage. */
+export interface CompletedObjective extends Omit<Objective, "tally"> {
   readonly stats: Stats;
   readonly level: number;
 }
@@ -323,14 +324,15 @@ export function setBossState(engine: Engine, run: Run, boss: string, state: Boss
 export function done(engine: Engine, run: Run): Run {
   const objective = run.current;
   if (objective === null || run.finished) return run;
+  const { tally, ...kept } = objective;
   const completed: CompletedObjective = {
-    ...objective,
+    ...kept,
     stats: run.stats,
     level: derivedLevel(run.stats),
   };
   const next: Run = {
     ...run,
-    tally: addTally(run.tally, ...Object.values(objective.tally)),
+    tally: addTally(run.tally, ...Object.values(tally)),
     completed: [...run.completed, completed],
     deadBosses: [
       ...run.deadBosses,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { copy } from "./copy";
 import type { Database } from "./engine/database";
@@ -20,6 +20,10 @@ import {
 } from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { loadDatabase } from "./loadDatabase";
+import { packFinished } from "./save/finished";
+import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh, type SavedRun, type Setup } from "./save/restore";
+import { browserStore, type SaveStore } from "./save/store";
+import { useDefaultKeys } from "./ui/keys";
 import { PhoneFrame } from "./ui/PhoneFrame";
 import { boardBefore, boardOf, countState, inState } from "./views/bossList";
 import { Bosses } from "./views/Bosses";
@@ -33,10 +37,14 @@ import { runTitle, type RunMenuActions } from "./views/RunMenu";
 import { RunSettings, type RunLists, type SettingsTab } from "./views/RunSettings";
 import { Start, StartFailed, StartLoading, StartResume } from "./views/Start";
 
-type Loaded =
-  | { readonly status: "loading" }
-  | { readonly status: "ready"; readonly database: Database }
-  | { readonly status: "failed" };
+interface Boot {
+  readonly database: Database;
+  readonly engine: Engine;
+  readonly saved: SavedRun | null;
+  readonly setup: Setup | null;
+}
+
+type Loaded = { readonly status: "loading" } | ({ readonly status: "ready" } & Boot) | { readonly status: "failed" };
 
 type View = "start" | "card" | "rold" | "felled" | "rerolling" | "level" | "settings";
 
@@ -44,33 +52,88 @@ function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
 }
 
-/** Until saving (9.1), `?resume` in development starts a run and lands on Start with it in progress. */
-const DEV_RESUME = import.meta.env.DEV && new URLSearchParams(window.location.search).has("resume");
+const FRESH: Fresh = {
+  seed: newSeed,
+  // `randomUUID` exists only on https and localhost; a phone testing over the local network has neither
+  id: () =>
+    typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : [...crypto.getRandomValues(new Uint8Array(16))].map((byte) => byte.toString(16).padStart(2, "0")).join(""),
+  now: () => new Date().toISOString(),
+};
 
-function Game({ database }: { readonly database: Database }) {
-  const engine = useMemo<Engine>(
-    () => ({ data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS }),
-    [database],
-  );
+const store: SaveStore = browserStore();
+
+/** Restores the saves once the data has loaded. A run saved as finished, as when the app closed on its last step,
+ * moves to the past runs. */
+async function restore(): Promise<Boot> {
+  const [database, stored] = await Promise.all([loadDatabase(), store.load()]);
+  const engine: Engine = { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
+  let saved = restoreRun(engine, stored.active, FRESH);
+  if (saved === null && stored.active !== null) store.setAsideActive();
+  if (saved?.run.finished === true) {
+    finishSaved(saved, saved.run);
+    saved = null;
+  }
+  return { database, engine, saved, setup: saved === null ? restoreSetup(engine.data, stored.setup) : null };
+}
+
+// Restoring writes to the store, so it runs once even where React runs an effect twice; a failed load may retry
+let restoring: Promise<Boot> | null = null;
+function boot(): Promise<Boot> {
+  restoring ??= restore().catch((error: unknown) => {
+    restoring = null;
+    throw error;
+  });
+  return restoring;
+}
+
+type Identity = Pick<SavedRun, "runId" | "startedAt">;
+
+/** A run with no completed objective isn't kept (web/README.md#Past runs). */
+function finishSaved(identity: Identity, run: Run): void {
+  if (run.completed.length > 0) {
+    store.addFinished(
+      packFinished(run, { runId: identity.runId, startedAt: identity.startedAt, finishedAt: FRESH.now() }),
+    );
+  }
+  store.saveActive(null);
+}
+
+function Game({ database, engine, saved, setup }: Boot) {
   const rollableBosses = useMemo(() => database.boss_instance.filter((boss) => boss.odds > 0), [database]);
   const gear = useMemo(
     () => ({ neverRoll: neverRollEntries(database), shortlist: shortlistEntries(database) }),
     [database],
   );
   // Before a run; once one starts, the run holds its own
-  const [settings, setSettings] = useState(() => defaultSettings(database));
+  const [settings, setSettings] = useState(() => setup?.settings ?? defaultSettings(database));
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
-  const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
-  const [regions, setRegions] = useState<readonly string[]>(DEFAULT_REGIONS);
-  const [deadBosses, setDeadBosses] = useState<readonly string[]>([]);
-  const [skippedBosses, setSkippedBosses] = useState<readonly string[]>([]);
-  const [lists, setLists] = useState<RunLists>({ neverRoll: [], weaponShortlist: [] });
-  const [problems, setProblems] = useState<readonly string[]>([]);
-  const [run, setRun] = useState<Run | null>(() => {
-    if (!DEV_RESUME) return null;
-    const result = startRun(engine, { stats, settings, regions, weaponShortlist: [], deadBosses: [] }, newSeed());
-    return result.ok ? result.run : null;
+  const [stats, setStats] = useState<Stats>(setup?.stats ?? DEFAULT_STATS);
+  const [regions, setRegions] = useState<readonly string[]>(setup?.regions ?? DEFAULT_REGIONS);
+  const [deadBosses, setDeadBosses] = useState<readonly string[]>(setup?.deadBosses ?? []);
+  const [skippedBosses, setSkippedBosses] = useState<readonly string[]>(setup?.skippedBosses ?? []);
+  const [lists, setLists] = useState<RunLists>({
+    neverRoll: setup?.neverRoll ?? [],
+    weaponShortlist: setup?.weaponShortlist ?? [],
   });
+  const [problems, setProblems] = useState<readonly string[]>([]);
+  const [run, setRun] = useState<Run | null>(saved?.run ?? null);
+  // The run's identity in its save; set when it starts
+  const identity = useRef<Identity | null>(saved === null ? null : { runId: saved.runId, startedAt: saved.startedAt });
+  /** Every change to the run goes through here, so the save always holds the run on screen. */
+  const commit = (next: Run) => {
+    identity.current ??= { runId: FRESH.id(), startedAt: FRESH.now() };
+    const { runId, startedAt } = identity.current;
+    setRun(next);
+    store.saveActive({ schemaVersion: SCHEMA_VERSION, runId, startedAt, updatedAt: FRESH.now(), run: next });
+  };
+
+  // Start's setup is saved as it is edited, until a run takes it
+  useEffect(() => {
+    if (run !== null) return;
+    store.saveSetup({ schemaVersion: SCHEMA_VERSION, stats, settings, regions, ...lists, deadBosses, skippedBosses });
+  }, [run, stats, settings, regions, lists, deadBosses, skippedBosses]);
   const [view, setView] = useState<View>("start");
   // The Elden Rold card closes back to where it opened: Start, or the screen whose menu opened it
   const [roldFromMenu, setRoldFromMenu] = useState(false);
@@ -82,8 +145,25 @@ function Game({ database }: { readonly database: Database }) {
     setView("card");
   };
 
-  // Until the finished run's view (9.7) and Past runs (9.9) take it, a finished run is dropped and Start is fresh
-  const endRun = (_finished: Run) => {
+  // Another tab saved or ended the run: this one shows the newer run on Start
+  useEffect(
+    () =>
+      store.onActiveChange((value) => {
+        // A run the other tab finished is on its way to the past runs, so here it is no run
+        const restored = value === null ? null : restoreRun(engine, value, FRESH);
+        const other = restored?.run.finished === true ? null : restored;
+        identity.current = other === null ? null : { runId: other.runId, startedAt: other.startedAt };
+        setRun(other?.run ?? null);
+        setUndoTo(null);
+        setView("start");
+      }),
+    [engine],
+  );
+
+  // Until the finished run's view (9.6) takes it, Start opens fresh after a run
+  const endRun = (finished: Run) => {
+    if (identity.current !== null) finishSaved(identity.current, finished);
+    identity.current = null;
     setRun(null);
     setUndoTo(null);
     setStats(DEFAULT_STATS);
@@ -142,7 +222,7 @@ function Game({ database }: { readonly database: Database }) {
               } else {
                 let next = run;
                 for (const [boss, state] of changes) next = setBossState(engine, next, boss, state);
-                setRun(next);
+                commit(next);
               }
               back();
             }}
@@ -155,7 +235,7 @@ function Game({ database }: { readonly database: Database }) {
             setLists(nextLists);
             setProblems([]);
           } else {
-            setRun(
+            commit(
               editRun(run, {
                 settings: next,
                 neverRoll: nextLists.neverRoll,
@@ -188,7 +268,7 @@ function Game({ database }: { readonly database: Database }) {
           />
         }
         onUndo={() => {
-          setRun(undoTo);
+          commit(undoTo);
           setUndoTo(null);
           showCard("none");
         }}
@@ -221,13 +301,13 @@ function Game({ database }: { readonly database: Database }) {
         onSave={(changes) => {
           const edited = editRun(run, changes);
           if (mid) {
-            setRun(edited);
+            commit(edited);
             showCard("none");
             return;
           }
           // With no living boss in the selected regions, the run stays here, waiting for more
           const next = rollNext(engine, edited);
-          setRun(next);
+          commit(next);
           if (next.current !== null) showCard("full");
         }}
       />
@@ -243,19 +323,19 @@ function Game({ database }: { readonly database: Database }) {
         reveal={reveal.kind}
         onReroll={(target) => {
           const next = reroll(engine, run, rerollTarget(run.current.slots, target));
-          setRun(next);
+          commit(next);
           // Only a full-objective reroll replays the reveal; any other keeps the card and swaps what changed
           if (target === "boss") showCard("quick");
         }}
         onDone={() => {
           setUndoTo(run);
-          setRun(done(engine, run));
+          commit(done(engine, run));
           setView("felled");
         }}
         onFelled={() => {
           const next = alreadyDead(engine, run);
           setUndoTo(run);
-          setRun(next);
+          commit(next);
           setView("rerolling");
         }}
         onLevelUp={() => setView("level")}
@@ -309,7 +389,9 @@ function Game({ database }: { readonly database: Database }) {
           return;
         }
         setProblems([]);
-        setRun(result.run);
+        store.saveSetup(null);
+        identity.current = { runId: FRESH.id(), startedAt: FRESH.now() };
+        commit(result.run);
         showCard("full");
       }}
     />
@@ -317,14 +399,15 @@ function Game({ database }: { readonly database: Database }) {
 }
 
 export function App() {
+  useDefaultKeys();
   const [state, setState] = useState<Loaded>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let current = true;
-    loadDatabase()
-      .then((database) => {
-        if (current) setState({ status: "ready", database });
+    boot()
+      .then((loaded) => {
+        if (current) setState({ status: "ready", ...loaded });
       })
       .catch((error: unknown) => {
         console.error(error);
@@ -338,7 +421,7 @@ export function App() {
   return (
     <PhoneFrame>
       {state.status === "ready" ? (
-        <Game database={state.database} />
+        <Game database={state.database} engine={state.engine} saved={state.saved} setup={state.setup} />
       ) : state.status === "loading" ? (
         <StartLoading />
       ) : (

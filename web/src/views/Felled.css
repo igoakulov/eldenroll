@@ -44,6 +44,11 @@
   padding: var(--top-bar) 0 var(--space-10);
 }
 
+/* Focused on arrival so the keyboard has a place; it isn't a control */
+.felled-stage:focus-visible {
+  outline: none;
+}
+
 .felled-boss {
   flex: none;
   width: 100%;
@@ -125,20 +130,26 @@
   margin-top: var(--space-6);
 }
 
+/* The tap area: the words and the countdown, wider than the dial, stopping well above `Undo` */
+.felled-hurry {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.felled-hurry-button {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
 .felled .countdown,
 .felled .undo-button {
   animation: fade-in var(--dur-dim) var(--ease-out) backwards;
-}
-
-.felled-settled .felled-behind,
-.felled-settled .felled-veil,
-.felled-settled .felled-name,
-.felled-settled .felled-bar i,
-.felled-settled .felled-band,
-.felled-settled .felled-band h1,
-.felled-settled .countdown,
-.felled-settled .undo-button {
-  animation: none;
 }
 
 @keyframes felled-dim {

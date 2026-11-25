@@ -36,7 +36,8 @@ export function defaultSettings(
   return {
     maxStatGap: hyperparams.defaultMaxStatGap,
     characterClasses: database.character_class.map((row) => row.id),
-    weaponShortlistEnabled: false,
+    // On from the start (web/README.md#Run settings)
+    weaponShortlistEnabled: true,
   };
 }
 

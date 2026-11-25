@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { copy } from "../copy";
 import { Icon, Lozenge } from "./Icon";
 import "./TopBar.css";
+import { KEY_ATTRIBUTE } from "./keys";
 
 export function TopBar({ eyebrow, children }: { readonly eyebrow: ReactNode; readonly children?: ReactNode }) {
   return (
@@ -29,7 +30,14 @@ export function FramedIconButton({
   readonly onClick?: () => void;
 }) {
   return (
-    <button type="button" className="framed-icon" aria-label={label} onClick={onClick}>
+    <button
+      type="button"
+      className="framed-icon"
+      aria-label={label}
+      // A close button is the screen's way back, so `Esc` presses it (`keys.ts`)
+      {...(icon === "close" ? { [KEY_ATTRIBUTE]: "escape" } : {})}
+      onClick={onClick}
+    >
       <Icon name={icon} size={18} />
     </button>
   );

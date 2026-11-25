@@ -140,7 +140,7 @@
   --dur-glow: 1000ms;
   --dur-swell: 4400ms;
   --swell: 1.04;
-  --dur-digit: 300ms;
+  --dur-digit: 120ms;
 
   /* Start: the caret's blink and the loading pulse, the only motion that runs on its own */
   --dur-caret: 1060ms;

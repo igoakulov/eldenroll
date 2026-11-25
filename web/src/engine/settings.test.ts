@@ -48,7 +48,7 @@ describe("defaultSettings", () => {
     expect(SETTINGS).toEqual({
       maxStatGap: 10,
       characterClasses: ["knight", "jester"],
-      weaponShortlistEnabled: false,
+      weaponShortlistEnabled: true,
     });
   });
 });

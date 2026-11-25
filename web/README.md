@@ -1,6 +1,6 @@
 # Web app
 
-The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar the run view and `Past runs`, which come with saving; installing comes last. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
+The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. The views are built, bar the run view and `Past runs`, which show the saved runs; installing comes last. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
 
 Scripts are in `package.json`. The app and the engine tests read `../data/build/db.json`, which is git-ignored, so build the database first (`pipeline/README.md`); without it they stop and say so. Vitest hides `console.log` unless run with `--reporter=verbose`. There is no Prettier config: `npx prettier --write` would reformat every file, so format by hand.
 
@@ -14,7 +14,7 @@ There are no item pictures. Every image slot shows our own icon for the item's s
 
 Home is the current objective's card while a run is in progress, and Start otherwise. Every other screen opens over home and its `✕` returns there; only a run opened from `Past runs` closes back to the list. There is no separate `Resume` inside the app: closing is enough.
 
-A sheet (the menu, the reroll panel, `Felled?` and the confirmations) holds the keyboard while it is open: `Esc` closes it, `Tab` stays inside it, and closing returns focus to the control that opened it. Keyboard focus shows on every control as one thin gold outline; on the reroll slider, whose input is invisible, it rings the handle.
+A sheet (the menu, the reroll panel, `Felled?` and the confirmations) holds the keyboard while it is open: `Esc` closes it, `Tab` stays inside it, and closing returns focus to the control that opened it. Two keys work everywhere, as a desktop expects: `Enter` presses the glow band of whatever is on top, and `Esc` its way back, the `✕` or, on the felled screen, `Undo`. Screens declare no keys: the kit's own buttons carry them. A confirmation takes no `Enter`, since each loses something; a focused control keeps `Enter`, and a text field keeps both, `Esc` leaving it. The felled screen puts focus on the screen rather than on `Undo`, so an `Enter` pressed again after `Done` can't undo it. There are no other shortcuts and no key hints: the app is played on a phone. Keyboard focus shows on every control as one thin gold outline; on the reroll slider, whose input is invisible, it rings the handle.
 
 The main flows:
 
@@ -46,7 +46,7 @@ One screen from Start and from the menu. It reopens on the last tab used, so a l
 - **General:**
   - **Bosses:** a row opening `Bosses`.
 - **Never roll** has no browsing by category, only search. It lists real item names, never an alias label, because the player picks from their inventory; excluding one alias member leaves the others rolling. Armor is listed as whole sets, since a set is what rolls; typing a piece's name finds every set that holds it.
-- **Shortlist** searches weapons and greatshields never narrowed by class, since classes can change at any time. The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`.
+- **Shortlist** searches weapons and greatshields never narrowed by class, since classes can change at any time. The tab says `Shortlist` to fit; everywhere else the feature is `Weapon shortlist`. `Roll Right Hand from shortlist` is on from the start: an empty list changes nothing, a player who starts one wants it rolled, and the tick is easy to forget; one who wants it off goes looking for it.
 - In both lists an unticked entry keeps its place until `Save`. Search results group like the card, names starting with the search first.
 
 ### Bosses
@@ -60,7 +60,7 @@ Every boss instance with `odds > 0`, under a legend of the three states. `Felled
 ### Current run
 
 - **Top bar:** `Objective N` at the left; at the right `Level N`, which opens `Level up` for the next roll, and the menu.
-- **Menu:** `How it works` opens the `Elden Rold` card, otherwise only reachable from Start, and closes back to the screen it opened from. The wordmark at its top opens Start with the run in progress, the way home for a player who wants the branded screen or `New run`. Once saving exists, the run's row opens its view.
+- **Menu:** `How it works` opens the `Elden Rold` card, otherwise only reachable from Start, and closes back to the screen it opened from. The wordmark at its top opens Start with the run in progress, the way home for a player who wants the branded screen or `New run`. Once the run view exists, the run's row opens it.
 - **Wiki links:** each item tile, a named ash, the armor set name and the boss's name open its wiki page where one exists. Item names and rows aren't tappable; an alias opens the wiki's page for its group, and `none` and `any` have no link. The card shows no item locations: the wiki covers them better, and the data's placements are sometimes adjusted for balance.
 - **Empty slots:** a `None` armor piece and the rule `None` show as `none`, like any empty slot, so they read apart from `any` and from a rule to obey.
 - **Reroll panel:** its chips run in reverse roll order, `Armor` first, so they read like the slider. The panel hides most of the card on a phone, so the chips carry the whole scope. The lit chips always form one run from the left, growing with the slider's fill and glow, which teaches that a reroll redoes everything from its target on.
@@ -90,7 +90,7 @@ The same view for the run in progress and a finished one, read-only. Its title i
 
 ### Past runs
 
-Opened from its row on Start; the menu has no way in, since it exists only mid-run. The finished runs, newest first, each its title over `Finished <date>`, cut with `…`, opening its run view. A run finished with no completed objective isn't saved, so trying the app leaves no clutter; any saved run can be deleted from its view. One run is active at a time, and nothing from a finished run reaches the engine.
+Opened from its row on Start; the menu has no way in, since it exists only mid-run. The finished runs, newest first, each its title over `Finished <date>`, cut with `…`, opening its run view. A run finished with no completed objective isn't saved, so trying the app leaves no clutter; any saved run can be deleted from its view, and past the cap the oldest goes silently (#Saving). One run is active at a time, and nothing from a finished run reaches the engine.
 
 ### Desktop
 
@@ -103,31 +103,20 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 
 ## Saving
 
-`localStorage`, one active run per browser, behind a save layer a server could replace.
+`localStorage`, one active run per browser, behind a save layer a server can replace once accounts exist. Not before: without an account, a server copy could be found only through an id kept in the same browser storage, and would be lost with it.
 
-```json
-{
-  "schemaVersion": 1,
-  "runId": "...", "seed": "...", "startedAt": "...", "updatedAt": "...",
-  "settings": {}, "stats": {}, "regions": [],
-  "currentObjective": {}, "completedObjectives": [],
-  "owned": {}, "ownedAliases": [],
-  "deadBosses": [{ "instanceId": "...", "objectiveIndex": 3 }],
-  "skippedBosses": [],
-  "neverRoll": [],
-  "weaponShortlist": [],
-  "rerollCount": 0, "rerollEvents": []
-}
-```
-
-- `schemaVersion` is bumped only when the stored shape changes; it is not a migration system.
-- `runId` is a random UUID and `updatedAt` changes on every save, so runs kept on several devices can later merge into one account: the same run uploaded twice stays one run, and the newer copy wins.
-- The app asks the browser to keep its storage (`navigator.storage.persist()`), so a phone short of space clears it last. Safari deletes a site's storage after seven days of Safari use without a visit; an app added to the Home Screen counts only its own days of use, so playing keeps it.
-- Completed objectives store snapshots with names: boss name and location, item names or alias labels, set and piece names, rule names, stats and level at `Done`. A finished run renders from them: a missing image shows the icon, a missing URL no link, a missing name `unknown item`.
-- An unknown `schemaVersion`, a missing id or an invalid shape keeps stats, settings, regions, felled bosses, the shortlist, owned state and completed objectives, and rerolls the current objective; if that fails, it offers a reset. A shortlisted weapon gone from the data is dropped from the list. Corrupt storage prompts a reset, never a crash.
+- The active run is saved as the engine's `Run` on every change, in an envelope with `schemaVersion`, `runId`, `startedAt` and `updatedAt`. `schemaVersion` is bumped only when the stored shape changes; it is not a migration system. `runId` is a random UUID and `updatedAt` changes on every save, so runs kept on several devices can later merge into one account: the same run uploaded twice stays one run, and the newer copy wins.
+- `Done` saves at once, so a reload during its countdown keeps the objective done and `Undo` is gone. With the app open in two tabs, a save in one moves the other to Start with the saved run, so an old tab can't save over newer progress.
+- Start's setup, its stats, regions and `Run settings`, is saved as it is edited, so a reload before `Start run` keeps it; `Start run` hands it to the run and removes it. It matters most for the weapon shortlist, which takes looking up in the game's inventory.
+- Catch-up's tally is kept only while it can steer a roll: the run's total while the run is active, and each slot's share only until `Done` adds it to the total. Kept on every objective, it would fill the browser's storage before a long run ended.
+- A finished run keeps only what its view shows: each objective's boss, class, loadout and stats at `Done`, the bosses felled on the way with the objective they were marked under, the skipped bosses, and how often each thing was rerolled. Each id is stored once per run and the objectives point to it. Level comes from the stats, and the summary is worked out when the view opens.
+- Owned gear isn't stored: it is what the completed objectives show (`src/engine/README.md#Eligibility`).
+- Names, images and links come from the current database by id, so an old run shows today's names. An id gone from the data shows a name rebuilt from the id, `margit_the_fell_omen_stormveil_castle` as `Margit The Fell Omen Stormveil Castle`, the icon and no link. Storing names would cover only that rare case.
+- Finished runs are capped so storage never fills: past the cap, the oldest goes, silently. Few players will reach it, so the app never mentions it. The cap sits under Safari's 5 MB per site, read as two bytes a character, with a margin.
+- Loading checks a run against the current data and never crashes. Regions, classes, shortlisted weapons, never-roll entries and felled or skipped bosses gone from the data are dropped; with no class left, every class is on. If one of the current objective's ids is gone, it rerolls from that step on in roll order, as the reroll slider would, keeping the boss, the class and every slot before it: the player may have spent effort fetching that gear. This reroll isn't counted as theirs. A missing tally counts as empty, and keys the data no longer holds stay but are never read. A save in an unknown shape keeps what it can read, and an objective it can't read rolls anew. One that holds nothing usable, unreadable or with no run in it, is set aside under a key of its own and Start opens fresh: only the app writes saves, so it means a bug, and a reset prompt would give the player nothing to choose.
 - `deadBosses` entries carry `instanceId` and the `objectiveIndex` showing when the boss was marked, `0` before objective 1, in marking order. The timeline draws a boss felled on the way from this index. It stays on the boss rather than becoming an event of its own, so such bosses could later fold into their objective as other kills.
-- Each reroll event records what it replaced in every slot it changed, for `10 most rerolled`. The reroll after `Felled?` isn't counted there: the player didn't turn that boss down.
-- Finished runs are kept beside the active one until deleted.
+- Rerolls are kept as counts of what they replaced, for `10 most rerolled`. The reroll after `Felled?` isn't counted: the player didn't turn that boss down.
+- The app asks the browser to keep its storage (`navigator.storage.persist()`), so a phone short of space clears it last. Safari deletes a site's storage after seven days of Safari use without a visit; an app added to the Home Screen counts only its own days of use, so playing keeps it.
 - No personal data, no cookies, no analytics.
 - The installable app keeps the app and `db.json` on the phone so rolls work offline. iPhone has no install prompt and keeps a home-screen app's storage apart from Safari's, so the `Elden Rold` card explains `Add to Home Screen` before the first run.
 

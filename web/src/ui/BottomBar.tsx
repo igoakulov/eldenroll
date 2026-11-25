@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 import { Icon } from "./Icon";
 import "./BottomBar.css";
+import { KEY_ATTRIBUTE } from "./keys";
 
 /** The bottom bar: one glow band, or a ruled button beside it at equal width. */
 export function BottomBar({
@@ -33,14 +34,22 @@ export function BottomBar({
 export function GlowBand({
   children,
   long = false,
+  enter = true,
   onClick,
 }: {
   readonly children: ReactNode;
   readonly long?: boolean;
+  /** `Enter` presses it (`keys.ts`), unless the action loses something. */
+  readonly enter?: boolean;
   readonly onClick?: () => void;
 }) {
   return (
-    <button type="button" className={`glow-band${long ? " glow-band-long" : ""}`} onClick={onClick}>
+    <button
+      type="button"
+      className={`glow-band${long ? " glow-band-long" : ""}`}
+      {...(enter ? { [KEY_ATTRIBUTE]: "enter" } : {})}
+      onClick={onClick}
+    >
       {children}
     </button>
   );

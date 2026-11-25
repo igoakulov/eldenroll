@@ -107,7 +107,7 @@ export function RunMenu({
           <Wordmark onHome={actions.onHome} />
         </div>
         <div className="run-menu">
-          {/* The run's own row, opening its view (9.7), joins the menu once that screen exists */}
+          {/* The run's own row, opening its view (9.6), joins the menu once that screen exists */}
           <ListRow
             title={copy.common.howItWorks}
             detail={copy.menu.howItWorksDetail}

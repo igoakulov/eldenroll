@@ -39,7 +39,10 @@ export function Confirm({
         ))}
       </Chips>
       <div className="confirm-action">
-        <GlowBand onClick={onConfirm}>{action}</GlowBand>
+        {/* Each confirmation loses something, so it takes a deliberate press, never `Enter` */}
+        <GlowBand enter={false} onClick={onConfirm}>
+          {action}
+        </GlowBand>
       </div>
     </Sheet>
   );

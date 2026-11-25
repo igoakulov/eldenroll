@@ -129,7 +129,7 @@ Items left out: unplayable with a loadout, pointless where they arrive, or crowd
 
 ### Rare, unique and worth seeing
 
-The largest raise: variety over strict parity (#Fair share, O140).
+The largest raise: variety over strict parity (#Fair share).
 
 | Kind | Id | Odds | Why |
 |---|---|---:|---|
@@ -139,7 +139,7 @@ The largest raise: variety over strict parity (#Fair share, O140).
 
 ### Synergy enablers
 
-Weapons and ashes that bring a synergy hold at least a fair share, most about twice, so the synergy shows (O141, O133).
+Weapons and ashes that bring a synergy hold at least a fair share, most about twice, so the synergy shows.
 
 | Kind | Id | Odds | Why |
 |---|---|---:|---|

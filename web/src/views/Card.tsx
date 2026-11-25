@@ -60,18 +60,20 @@ function Changed({ fade, leaving, onLeft, children }: {
 /** One key per part of the card that fades as a whole when a reroll changes it. */
 function changeKeys(objective: Objective) {
   const { slots } = objective;
-  const key = (...ids: (string | null | undefined)[]) => ids.map((id) => id ?? "-").join("|");
+  // Led by the part's name: siblings may hold the same id, as two `any` talismans or one weapon in both hands do
+  const key = (part: string, ...ids: (string | null | undefined)[]) =>
+    [part, ...ids.map((id) => id ?? "-")].join("|");
   return {
     boss: objective.boss,
     characterClass: objective.characterClass,
-    lh: key(slots.lh, slots.lh_ash),
-    rh: key(slots.rh, slots.rh_ash),
-    spell: key(slots.spell),
-    talisman_1: key(slots.talisman_1),
-    talisman_2: key(slots.talisman_2),
-    armor: key(slots.armor),
-    item: key(slots.item),
-    rule: key(slots.rule),
+    lh: key("lh", slots.lh, slots.lh_ash),
+    rh: key("rh", slots.rh, slots.rh_ash),
+    spell: key("spell", slots.spell),
+    talisman_1: key("talisman_1", slots.talisman_1),
+    talisman_2: key("talisman_2", slots.talisman_2),
+    armor: key("armor", slots.armor),
+    item: key("item", slots.item),
+    rule: key("rule", slots.rule),
   };
 }
 

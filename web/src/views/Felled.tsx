@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import { copy } from "../copy";
-import { Countdown } from "../ui/Countdown";
+import { Countdown, useCountdown } from "../ui/Countdown";
 import { Screen } from "../ui/Screen";
 import { UndoButton } from "../ui/UndoButton";
 import "./Felled.css";
 
+const COUNT = 5;
+
 /** The one big moment (web/src/ui/README.md#Sequences): over the dimmed card, `behind`, the boss's bar drains and
- * `Great enemy felled` holds while `label` counts down to `onZero`. A tap anywhere ends the entrance, never the
- * count. */
+ * `Great enemy felled` holds while `label` counts down to `onZero`. A tap on the words or the countdown takes a second
+ * off; the area is wider than the dial, so a finger beside it leaves the digit in sight. */
 export function Felled({
   bossName,
   label,
@@ -22,20 +24,21 @@ export function Felled({
   readonly onZero: () => void;
   readonly onUndo: () => void;
 }) {
-  const [settled, setSettled] = useState(false);
-  // The control that opened this is gone with the card, so the keyboard lands on `Undo`
-  const undo = useRef<HTMLButtonElement>(null);
+  const { left, remaining, skip } = useCountdown(COUNT, onZero);
+  // The control that opened this is gone with the card, so the keyboard lands on the stage, not on `Undo`: an
+  // `Enter` pressed again after `Done` would undo it
+  const stage = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    undo.current?.focus({ preventScroll: true });
+    stage.current?.focus({ preventScroll: true });
   }, []);
 
   return (
-    <Screen className={`felled${settled ? " felled-settled" : ""}`} onPointerDown={() => setSettled(true)}>
+    <Screen className="felled">
       <div className="felled-behind" inert aria-hidden="true">
         {behind}
       </div>
       <div className="felled-veil" aria-hidden="true" />
-      <div className="felled-stage">
+      <div ref={stage} className="felled-stage" tabIndex={-1}>
         <div className="felled-boss">
           <p className="felled-name">{bossName}</p>
           <div className="felled-bar" aria-hidden="true">
@@ -44,16 +47,19 @@ export function Felled({
           </div>
         </div>
         <div className="felled-main">
-          <div className="felled-band" role="status">
-            <h1>
-              {copy.felled.title[0]}
-              <br />
-              {copy.felled.title[1]}
-            </h1>
+          <div className="felled-hurry">
+            <div className="felled-band" role="status">
+              <h1>
+                {copy.felled.title[0]}
+                <br />
+                {copy.felled.title[1]}
+              </h1>
+            </div>
+            <Countdown from={COUNT} left={left} remaining={remaining} label={label} />
+            <button type="button" className="felled-hurry-button" aria-label={copy.felled.skipSecond} onClick={skip} />
           </div>
-          <Countdown from={5} label={label} onZero={onZero} />
         </div>
-        <UndoButton ref={undo} onClick={onUndo} />
+        <UndoButton onClick={onUndo} />
       </div>
     </Screen>
   );

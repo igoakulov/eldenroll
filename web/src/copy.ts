@@ -211,6 +211,8 @@ export const copy = {
     title: ["Great enemy", "felled"],
     nextObjectiveIn: "Next objective in",
     rerollingIn: "Rerolling in",
+    /** For screen readers: the tap area over the words and the countdown. */
+    skipSecond: "Skip a second",
   },
 
   // Level up, between objectives or from `Level N`
