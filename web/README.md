@@ -23,7 +23,7 @@ The main flows:
 3. **A boss already felled:** `Felled?` → `Felled on the way?` → `Accept and reroll` → `Rerolling in` with `Undo` → the card.
 4. **Change things mid-run:** `Level N` → `Level up` → `Save`. Menu → `Run settings` → `General`, `Never roll` or `Shortlist` → `Save`; `Bosses` opens from `General`.
 5. **Check progress:** menu → `Run summary` → `Summary` and `Timeline`.
-6. **Finish:** menu → `Finish run` → confirmation → the run's view over Start → `✕` → Start.
+6. **Finish:** menu → `Finish run` → confirmation → the run's view over Start → `✕` → Start. A run that ends by itself, every boss felled or skipped, lands on its view the same way: after the countdown of the `Done` or `Felled?` that ended it, or at `Roll objective N` when nothing is left to roll.
 7. **Come back later:** reopening the app with a run in progress lands on Start: `Resume` returns to where the run is, the card or `Level up` between objectives; `New run` asks first, finishes the current run, then shows a fresh Start.
 8. **Look back:** Start → `All runs` → a finished run → `Summary` and `Timeline`; `Delete run` at the end of `Summary`. The way in is on Start, where a returning player lands, so looking back never means resuming a run first.
 9. **Back to Start mid-run:** the wordmark at the top of the menu → Start with the run in progress → `Resume`.

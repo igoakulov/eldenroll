@@ -317,9 +317,9 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
         }}
         onZero={() => {
           setUndoTo(null);
-          // Every boss felled or skipped
+          // Every boss felled or skipped: the run ends by itself, as `Finish run` ends it
           if (run.finished) {
-            endRun(run);
+            endRun(run, true);
           } else if (view === "rerolling" && run.current !== null) {
             showCard("quick");
           } else {
@@ -351,7 +351,9 @@ function Game({ database, engine, saved, setup, finishedRuns: kept }: Boot) {
           // With no living boss in the selected regions, the run stays here, waiting for more
           const next = rollNext(engine, edited);
           commit(next);
-          if (next.current !== null) showCard("full");
+          // No boss left anywhere: the run ends by itself, as `Finish run` ends it
+          if (next.finished) endRun(next, true);
+          else if (next.current !== null) showCard("full");
         }}
       />
     );
