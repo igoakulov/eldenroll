@@ -71,7 +71,13 @@ const serviceWorker: Plugin = {
   },
 };
 
-const ICONS = ["/icons/apple-touch-icon.png", "/icons/icon-192.png", "/icons/icon-512.png"];
+const ICONS = [
+  "/favicon.ico",
+  "/icons/favicon.svg",
+  "/icons/apple-touch-icon.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+];
 /** Kept under names that never change, so their content decides when the worker updates. */
 const UNHASHED = ["/manifest.webmanifest", ...ICONS];
 
