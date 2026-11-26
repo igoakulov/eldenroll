@@ -1,3 +1,6 @@
+import { useRef, useState } from "react";
+
+import { isOwner, setOwner } from "../analytics";
 import { copy } from "../copy";
 import { SectionHeading, ScreenHead } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
@@ -66,8 +69,22 @@ function Terms({ rows }: { readonly rows: readonly { readonly term: string; read
 
 /** How it works: the onboarding page, opened from `Elden Rold` in Start's tagline and from the menu
  * (`web/README.md#How it works`). */
+/** Five taps, each within a second of the last, toggle the owner mark on this install; a slower tap starts again. */
+const OWNER_TAPS = 5;
+const OWNER_TAP_MS = 1000;
+
 export function HowItWorks({ onClose, onHome }: { readonly onClose: () => void; readonly onHome: () => void }) {
   const text = copy.howItWorks;
+  const [owner, setOwnerShown] = useState(isOwner);
+  const taps = useRef({ count: 0, at: 0 });
+  const tapPrivacy = () => {
+    const now = Date.now();
+    const count = now - taps.current.at <= OWNER_TAP_MS ? taps.current.count + 1 : 1;
+    taps.current = { count: count === OWNER_TAPS ? 0 : count, at: now };
+    if (count < OWNER_TAPS) return;
+    setOwner(!owner);
+    setOwnerShown(!owner);
+  };
   return (
     <Screen>
       <TopBar eyebrow={copy.common.howItWorks}>
@@ -129,7 +146,9 @@ export function HowItWorks({ onClose, onHome }: { readonly onClose: () => void; 
         </WikiText>
       </nav>
 
-      <p className="how-it-works-legal">{text.privacy}</p>
+      <p className="how-it-works-legal" onClick={tapPrivacy}>
+        {owner ? text.privacyOwner : text.privacy}
+      </p>
       <p className="how-it-works-legal">{text.disclaimer}</p>
     </Screen>
   );

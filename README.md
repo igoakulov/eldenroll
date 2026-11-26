@@ -44,6 +44,6 @@ cd ../web && pnpm install && pnpm dev
 
 Every push to `main` is a release. `.github/workflows/deploy.yml` builds `db.json` from the sources, runs every check, builds the app and deploys it to Cloudflare; a failed check deploys nothing, and the site stays as it was.
 
-- The site is a Cloudflare Worker with no code of its own, serving `web/dist` (`web/wrangler.jsonc`). The config attaches `eldenroll.com` and `www.eldenroll.com`, and the first deploy creates their DNS records; a record already on either name makes it fail.
+- The site is a Cloudflare Worker serving `web/dist` (`web/wrangler.jsonc`); its only code, `web/worker/ingest.ts`, forwards `/ingest` to PostHog (`web/README.md#Analytics`). The config attaches `eldenroll.com` and `www.eldenroll.com`, and the first deploy creates their DNS records; a record already on either name makes it fail.
 - `www` is sent to the apex by a redirect rule set in the Cloudflare dashboard, not in the repository.
 - The workflow deploys with two repository secrets: `CLOUDFLARE_ACCOUNT_ID`, and `CLOUDFLARE_API_TOKEN`, a token made from Cloudflare's "Edit Cloudflare Workers" template and limited to this account and zone.

@@ -1,5 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  bossChanges,
+  settingsChanges,
+  startAnalytics,
+  trackError,
+  trackHowItWorks,
+  trackObjectiveDone,
+  trackRunFinished,
+  trackRunStarted,
+  trackSettingsSaved,
+  type RunEnd,
+} from "./analytics";
 import { copy } from "./copy";
 import type { Database } from "./engine/database";
 import { indexDatabase } from "./engine/engineData";
@@ -74,7 +86,10 @@ async function restore(): Promise<Boot> {
   const [database, stored] = await Promise.all([loadDatabase(), store.load()]);
   const engine: Engine = { data: indexDatabase(database), hyperparams: DEFAULT_HYPERPARAMS };
   let saved = restoreRun(engine, stored.active, FRESH);
-  if (saved === null && stored.active !== null) store.setAsideActive();
+  if (saved === null && stored.active !== null) {
+    store.setAsideActive();
+    trackError("save set aside");
+  }
   let kept = stored.finished;
   if (saved?.run.finished === true) {
     // It ended when it was last saved, not when the app opened again
@@ -176,7 +191,8 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
   // progress
   const [opened, setOpened] = useState<{ readonly finished: Finished; readonly fromList: boolean } | null>(null);
   // Start opens fresh after a run, under the run's view when `show` asks for it and the run was kept
-  const endRun = (finished: Run, show = false) => {
+  const endRun = (finished: Run, how: RunEnd, show = false) => {
+    if (identity.current !== null) trackRunFinished(finished, identity.current, how);
     const kept = identity.current === null ? null : finishSaved(identity.current, finished);
     if (kept !== null) setFinished((list) => [kept, ...list.filter((one) => one.runId !== kept.runId)].slice(0, FINISHED_RUNS_CAP));
     identity.current = null;
@@ -202,9 +218,10 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
     onHome: () => setView("start"),
     onHowItWorks: () => openHowItWorks(true),
     onRunSettings: () => setView("settings"),
-    onFinish: () => endRun(finishRun(current), true),
+    onFinish: () => endRun(finishRun(current), "finish", true),
   });
   const openHowItWorks = (fromMenu: boolean) => {
+    trackHowItWorks(fromMenu ? "menu" : "tagline", run !== null);
     setHowItWorksFromMenu(fromMenu);
     setView("howItWorks");
   };
@@ -300,6 +317,9 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
                 let next = run;
                 for (const [boss, state] of changes) next = setBossState(engine, next, boss, state);
                 commit(next);
+                const changed = bossChanges(changes);
+                if (changed !== null && identity.current !== null)
+                  trackSettingsSaved(identity.current, objectiveNumber(run), "bosses", changed);
               }
               back();
             }}
@@ -319,6 +339,12 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
                 weaponShortlist: nextLists.weaponShortlist,
               }),
             );
+            const changed = settingsChanges(
+              { settings: run.settings, neverRoll: run.neverRoll, weaponShortlist: run.weaponShortlist },
+              { settings: next, ...nextLists },
+            );
+            if (changed !== null && identity.current !== null)
+              trackSettingsSaved(identity.current, objectiveNumber(run), settingsTab, changed);
           }
           home();
         }}
@@ -351,9 +377,11 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
         }}
         onZero={() => {
           setUndoTo(null);
+          // Sent once `Undo` is gone, so an undone `Done` sends nothing
+          if (view === "felled" && identity.current !== null) trackObjectiveDone(run, identity.current);
           // Every boss felled or skipped: the run ends by itself, as `Finish run` ends it
           if (run.finished) {
-            endRun(run, true);
+            endRun(run, "all_felled", true);
           } else if (view === "rerolling" && run.current !== null) {
             showCard("quick");
           } else {
@@ -386,7 +414,7 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
           const next = rollNext(engine, edited);
           commit(next);
           // No boss left anywhere: the run ends by itself, as `Finish run` ends it
-          if (next.finished) endRun(next, true);
+          if (next.finished) endRun(next, "all_felled", true);
           else if (next.current !== null) showCard("full");
         }}
       />
@@ -432,7 +460,7 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
         onResume={home}
         finishedRuns={finished.length}
         onRuns={() => setView("runs")}
-        onNewRun={() => endRun(finishRun(run))}
+        onNewRun={() => endRun(finishRun(run), "new_run")}
       />
     );
   }
@@ -468,6 +496,11 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
         setProblems([]);
         store.saveSetup(null);
         commit(result.run);
+        if (identity.current !== null)
+          trackRunStarted(database, result.run, identity.current, {
+            finishedRuns: finished.length,
+            firstStartedAt: finished.map((one) => one.startedAt).sort()[0] ?? null,
+          });
         showCard("full");
       }}
     />
@@ -484,6 +517,7 @@ export function App() {
     boot()
       .then((loaded) => {
         if (current) setState({ status: "ready", ...loaded });
+        startAnalytics();
       })
       .catch((error: unknown) => {
         console.error(error);

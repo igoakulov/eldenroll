@@ -1,9 +1,11 @@
-// The site on Cloudflare: a Worker with no code of its own, serving the built files (README.md#Releasing).
+// The site on Cloudflare: a Worker serving the built files (README.md#Releasing), with one route of code.
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "eldenroll",
   "compatibility_date": "2026-11-26",
-  "assets": { "directory": "./dist" },
+  "main": "./worker/ingest.ts",
+  // Built files are served first; only analytics reaches the code (web/README.md#Analytics)
+  "assets": { "directory": "./dist", "run_worker_first": ["/ingest/*"] },
   // Served only at the domain: no workers.dev address or preview links to count as a second site
   "workers_dev": false,
   "preview_urls": false,

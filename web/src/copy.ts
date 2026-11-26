@@ -129,6 +129,8 @@ export const copy = {
     beforeFirstRun: "Do this before your first run – Safari and Home Screen app do not share runs!",
     links: { github: "Source code on GitHub", x: "Contact on X", sim: "Sim", kit: "Kit" },
     privacy: "Your runs stay on your device, no server. May send anonymous general run stats to improve your rolls.",
+    /** The privacy line while this install carries the owner mark. */
+    privacyOwner: "Owner device: stats tagged as yours.",
     disclaimer:
       "Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.",
   },

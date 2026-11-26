@@ -148,15 +148,15 @@ Anonymous run stats in PostHog, to tune the odds and the app from real runs. The
 
 | Event | Sent at | Carries |
 |---|---|---|
-| App opened | each load, as PostHog's page view | installed or in the browser, the time zone; PostHog adds device, OS, screen and referring site |
+| App opened | each load, as PostHog's page view | installed or in the browser; PostHog adds device, OS, time zone, screen and referring site |
 | How it works opened | its page opening | where from, Start's tagline or the menu, and whether a run is in progress: a player who never finds it may never start |
 | Run started | `Start run` | level, stats, regions, classes left off, `Max stat gap`, shortlist size and whether it rolls, `Never roll` entries, bosses felled before the run, skipped bosses, finished runs on the device and days since the earliest |
-| Objective done | `Done` | objective number, boss, class; level, stats and regions at `Done`, so leveling and the regions finished before moving on show per objective; each reroll's scope and what its target replaced, the slot the player meant to change rather than the slots after it, both talismans for `Talismans` since they roll as one draw; bosses felled on the way since the last `Done` |
+| Objective done | the end of `Done`'s countdown, so an undone `Done` sends nothing | objective number, boss, class; level, stats and regions at `Done`, so leveling and the regions finished before moving on show per objective; each reroll's scope and what its target replaced, the slot the player meant to change rather than the slots after it, both talismans for `Talismans` since they roll as one draw; bosses marked felled on the way during the objective |
 | Settings saved | `Save` in `Run settings` or `Bosses` during a run | objective number, the tab, and what was added or removed |
 | Run finished | `Finish run`, `New run`, or every boss felled or skipped | how it ended, objectives done, the run's age in days |
 | Error | an uncaught error, or a save set aside | the message |
 
-Every event but App opened carries `runId`.
+The run events, from Run started to Run finished, carry `runId`.
 
 ### Reading the data
 
@@ -164,12 +164,12 @@ Questions are answered on demand through PostHog's MCP, run by run where needed.
 
 ### Checklist
 
-- [ ] Owner: PostHog account on the US cloud, a project with cookieless tracking on, its project token to the agent
+- [x] Owner: PostHog account on the US cloud, a project with cookieless tracking on, its project token to the agent
 - [ ] Owner: PostHog's MCP added for the user and signed in
 - [x] Owner: Cloudflare Web Analytics on for `eldenroll.com`
-- [ ] PostHog loaded on `eldenroll.com` only, after the app shows, cookieless and with everything but our events and errors off
-- [ ] `/ingest` forwarded to PostHog by the Worker
-- [ ] The events, each with what the table lists
+- [x] PostHog loaded on `eldenroll.com` only, after the app shows, cookieless and with everything but our events and errors off
+- [x] `/ingest` forwarded to PostHog by the Worker
+- [x] The events, each with what the table lists
 - [ ] Events seen arriving in PostHog
 - [ ] The dashboard
 - [ ] This section trimmed to what the code can't say
