@@ -23,3 +23,6 @@ Each icon is the generic shape of an item subcategory, drawn from a reference pi
 - The Ash of War means weapon magic: a close-up of a sword's hilt cropped by the tile, a rhombus gem in one round bezel with its long axis along the blade, wrapped grip, a fuller on the blade, and two pairs of stars in the open space beside the blade, never over it. Without those details it stops reading as a sword.
 - The colossal weapon is a great hammer with a much heftier rectangular head, about half as tall as it is wide.
 - A class's icon group follows the item icons: when an item icon changes, its class groups change with it.
+- `share` and `add` copy Safari's icons for `Share` and `Add to Home Screen` in our line style, so `How it works` points the player at buttons they will recognise.
+
+The GitHub and X marks are not drawn here: they stay as their owners draw them, from Simple Icons, in `web/src/assets/marks/`.

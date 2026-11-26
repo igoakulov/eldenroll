@@ -1,4 +1,4 @@
-# EldenRoll — agent notes
+# Elden Roll — agent notes
 
 How to work in this repo. Facts about the project live in the READMEs beside what they describe; start at `README.md`.
 
@@ -27,6 +27,7 @@ After a change that shows on screen, before committing: `cd web && pnpm screensh
 ## Naming
 
 - A rename reaches everything in one pass: UI text (`web/src/copy.ts`), docs, code identifiers and tests. Grep every spelling of the old name.
+- The app is "Elden Roll", two words, wherever text names it; the wordmark draws it as one, and the repository, domain, package and storage keys stay `eldenroll`.
 - "Class" alone means the character class; code says `character_class` and `CharacterClass`. A weapon's class is `weapon_class` in code and `subcategory` as a field. "Build" means only the pipeline step (`eldenroll.build`, `data/build/`), never a character. The game's own classes are "starting classes".
 - UI text uses the game's word where one exists: a boss is *felled*. Code and stored data keep `dead`.
 

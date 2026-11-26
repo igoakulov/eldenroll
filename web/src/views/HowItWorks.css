@@ -17,7 +17,7 @@
   color: var(--text);
 }
 
-/* The run in five steps: numbered, since it is one sequence */
+/* A run in steps: numbered, since it is one sequence */
 .how-it-works-steps {
   padding: 0;
   list-style: none;
@@ -54,34 +54,94 @@
   grid-column: 2;
 }
 
-.how-it-works-body {
+/* Each section's one-line case for itself, before the rows give the detail */
+.how-it-works-intro {
   padding: 0 var(--gutter) var(--space-2);
   font-size: var(--type-body);
   line-height: var(--leading);
   color: var(--text-2);
 }
 
-.how-it-works-how {
-  margin: var(--space-3) 0 0;
+/* Terms beside what they mean: one column of terms, as wide as the longest */
+.how-it-works-terms {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  margin: 0;
 }
 
-.how-it-works-how div {
+.how-it-works-terms div {
   display: grid;
-  grid-template-columns: 78px 1fr;
-  column-gap: var(--space-3);
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  column-gap: var(--space-5);
   padding: var(--space-4) var(--gutter);
   border-top: 1px solid var(--line);
   font-size: var(--type-body);
   line-height: var(--leading);
 }
 
-.how-it-works-how dt {
+.how-it-works-terms div:first-child {
+  border-top: 0;
+}
+
+.how-it-works-terms dt {
   color: var(--text);
 }
 
-.how-it-works-how dd {
+.how-it-works-terms dd {
   margin: 0;
   color: var(--text-2);
+}
+
+.how-it-works-note {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--type-small);
+  color: var(--text-3);
+}
+
+.how-it-works-glued {
+  white-space: nowrap;
+}
+
+/* Inline in a line of text: Safari's buttons, and the app's icon with the Home Screen's rounded corners */
+.how-it-works-icon {
+  color: var(--text);
+}
+
+.how-it-works-icon .icon-svg {
+  vertical-align: -0.2em;
+}
+
+.how-it-works-app-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: -0.2em;
+  border-radius: 22.5%; /* raw: the Home Screen's corner, as a share of the icon's side */
+}
+
+/* The repository, contact and the two pages behind the app, on one line */
+.how-it-works-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-7);
+  margin: var(--space-9) var(--gutter) 0;
+  font-size: var(--type-small);
+  color: var(--text-2);
+}
+
+.how-it-works-mark {
+  position: relative;
+  color: var(--gold-mute);
+}
+
+/* A tap target past the mark, as the text links have */
+.how-it-works-mark::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--space-4));
 }
 
 .how-it-works-legal {
@@ -89,4 +149,8 @@
   font-size: var(--type-small);
   line-height: var(--leading);
   color: var(--text-3);
+}
+
+.how-it-works-legal + .how-it-works-legal {
+  margin-top: var(--space-4);
 }

@@ -34,7 +34,7 @@ Read this before changing a loader, a build step or an override file. It holds w
 | wiki.gg | <https://eldenring.wiki.gg/wiki/Armor_Sets>, transcribed by a small model | unknown | n/a | unknown |
 | Fextralife | <https://eldenring.wiki.fextralife.com>, read page by page for what the other sources lack (#Wiki lookups); answers land in `data/overrides/`, not here | while building, 2026 | n/a | unknown |
 
-The game's text and data belong to FromSoftware and Bandai Namco. Attribution and licensing are not settled yet.
+The game's text and data belong to FromSoftware and Bandai Namco. This table is the credit to each source; the app doesn't repeat it, to keep `How it works` about playing.
 
 ## Precedence
 

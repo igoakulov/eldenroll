@@ -1,6 +1,7 @@
 import "./Icon.css";
 
-const files = import.meta.glob<string>("../assets/icons/*.svg", {
+// `marks/` holds the GitHub and X marks, kept as their owners draw them, apart from the generated icons
+const files = import.meta.glob<string>(["../assets/icons/*.svg", "../assets/marks/*.svg"], {
   query: "?raw",
   import: "default",
   eager: true,
@@ -10,7 +11,7 @@ const icons = new Map(
   Object.entries(files).map(([path, svg]) => [path.slice(path.lastIndexOf("/") + 1, -".svg".length), svg]),
 );
 
-/** `name` is a file in `src/assets/icons/` without `.svg`; item icons come as `<key>`, `<key>-40`, `<key>-22`. */
+/** `name` is a file in `src/assets/icons/` or `src/assets/marks/` without `.svg`; item icons come as `<key>`, `<key>-40`, `<key>-22`. */
 export function Icon({ name, size }: { readonly name: string; readonly size: number }) {
   const svg = icons.get(name);
   if (svg === undefined) return null;

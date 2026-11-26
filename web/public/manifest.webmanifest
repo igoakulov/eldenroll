@@ -1,6 +1,6 @@
 {
-  "name": "EldenRoll",
-  "short_name": "EldenRoll",
+  "name": "Elden Roll",
+  "short_name": "Elden Roll",
   "description": "Rolls the boss, class and gear for each objective of an Elden Ring playthrough.",
   "start_url": "/",
   "scope": "/",

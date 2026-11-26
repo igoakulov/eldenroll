@@ -1,12 +1,14 @@
-# EldenRoll
+# Elden Roll
 
 A mobile-first challenge generator for Elden Ring, for console players who can't run randomizer mods, and PC players who'd rather not install one into the game.
 
-The player says which regions they can reach and what their stats are. EldenRoll rolls one objective: a boss to fight, a class loadout to fight it with, and a combat rule, or none. The player gets the gear, beats the boss and taps `Done`. Felled bosses leave the pool and what has been used grows less likely, so a run is a sequence of non-repeating objectives that grows with the character.
+The player says which regions they can reach and what their stats are. Elden Roll rolls one objective: a boss to fight, a class loadout to fight it with, and a combat rule, or none. The player gets the gear, beats the boss and taps `Done`. Felled bosses leave the pool and what has been used grows less likely, so a run is a sequence of non-repeating objectives that grows with the character.
 
 No account, no backend, and nothing checks the game: completion is self-reported.
 
 Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.
+
+The code is under the MIT licence (`LICENSE`). The game's names and data belong to FromSoftware and Bandai Namco; `data/sources/README.md` credits where the data comes from.
 
 ## Layout
 

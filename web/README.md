@@ -1,6 +1,6 @@
 # Web app
 
-The EldenRoll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. Every view is built. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
+The Elden Roll app: React, Vite and TypeScript, mobile first, with no backend. The rules live in `src/engine/README.md`; this file covers the views, saving and the finished-run summary. Every view is built. The look lives in `src/ui/` (`src/ui/README.md`), the design tokens and shared controls, and every screen in `src/views/` is built only from them. Every word the UI shows is in `src/copy.ts`, grouped by screen, and `src/copyInComponents.test.ts` fails on text written straight into a component; game data's names come from the database. Until a view is built, this file is its spec; once it is, the code is, and this file keeps only what the code can't say.
 
 Scripts are in `package.json`. The app and the engine tests read `../data/build/db.json`, which is git-ignored, so build the database first (`pipeline/README.md`); without it they stop and say so. Vitest hides `console.log` unless run with `--reporter=verbose`. There is no Prettier config: `npx prettier --write` would reformat every file, so format by hand.
 
@@ -38,6 +38,15 @@ The main flows:
 ### How it works
 
 The onboarding page, opened from `Elden Rold` in Start's tagline and from the menu's `How it works`. It opens under the wordmark, as Start does, so the help reads as the app's own. Adding the app to the Home Screen comes before the first run because iPhone keeps a home-screen app's storage apart from Safari's: a run started in Safari stays there.
+
+- It opens on the case for the app: a companion for the phone, kept beside the game, that rolls the bosses to fell, the builds to try and the gear to gather.
+- Each section opens with one sentence on what it offers; the rows under it give the detail. `A run` is the routine in numbered steps; `An objective` and `Run settings` set each term beside what it means.
+- Starting mid-playthrough is in `A run`'s opening sentence, so a player with a game under way sees at once that they needn't start over.
+- `An objective` says that gear that works together rolls together more often, so a player expects rolls that make sense, not pure chance.
+- The Home Screen steps are chains of the buttons to tap, with Safari's own icons for `Share` and `Add to Home Screen` and the app's icon as the Home Screen shows it. No screenshots: they date with every iOS release. The note to add it before the first run sits under the iPhone steps, since only iPhone keeps a Safari run apart.
+- One line of links, no heading: contact and the repository as their X and GitHub marks, then `Sim` and `Kit`, the simulation (`/sim/`) and the UI kit (`/kit/`). Each opens in a new tab, since the installed app has no back button to return from a page.
+- The privacy notice is two plain sentences: runs stay on the device, and anonymous run stats may be sent. It holds only while the analytics stay anonymous and cookieless (`#Saving`).
+- The data sources are credited in the repository (`data/sources/README.md`), not on the page.
 
 ### Run settings
 
@@ -110,7 +119,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 - `deadBosses` entries carry `instanceId` and the `objectiveIndex` showing when the boss was marked, `0` before objective 1, in marking order. The timeline draws a boss felled on the way from this index. It stays on the boss rather than becoming an event of its own, so such bosses could later fold into their objective as other kills.
 - Rerolls are kept as counts of what they replaced, for `10 most rerolled`, and a finished run keeps them for the whole run, not per objective. The reroll after `Felled?` isn't counted: the player didn't turn that boss down.
 - The app asks the browser to keep its storage (`navigator.storage.persist()`), so a phone short of space clears it last. Safari deletes a site's storage after seven days of Safari use without a visit; an app added to the Home Screen counts only its own days of use, so playing keeps it.
-- No personal data and no cookies. Web analytics come with the release, described with the rest in the privacy notice at the bottom of `How it works`.
+- No personal data and no cookies. Runs never leave the device; the only thing sent anywhere is anonymous usage stats, from the release on, as the privacy line at the bottom of `How it works` says.
 
 ## Installing
 

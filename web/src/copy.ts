@@ -6,7 +6,7 @@
 export const copy = {
   // Words several screens share, so a feature reads the same wherever it appears
   common: {
-    appName: "EldenRoll",
+    appName: "Elden Roll",
     objective: (number: number) => `Objective ${number}`,
     /** A run as a row names it: the objective and its boss, or the objective alone between objectives. */
     runTitle: (number: number, boss?: string) =>
@@ -79,26 +79,56 @@ export const copy = {
   },
 
   // How it works, opened from the tagline's `Elden Rold` or the menu. Words in [brackets] are the app's own buttons,
-  // set apart in the text
+  // set apart in the text; `{name}` is where an icon shows
   howItWorks: {
-    title: "Welcome to EldenRoll, Tarnished",
-    lede: "A companion to keep open while you play. Each objective rolls a boss to fell and the class and gear to fell it with, so every playthrough feels new again.",
+    title: "Welcome back, Tarnished",
+    lede: "A companion app for your phone to keep by your side as you play. Rolls bosses to fell, builds to try, and gear to gather and use in combat.",
     pun: "Follow fate to become Elden Rold.",
     aRun: "A run",
-    steps: [
-      "Set your stats and the regions you can reach, then start a run.",
-      "Fell the rolled boss with only the rolled class, gear and combat rule.",
-      "Not for you? [Reroll] the whole objective, or only from one slot on, as often as you like.",
-      "Tap [Done], level up, and roll the next objective.",
-      "Felled that boss already? Tap [Felled?] on its health bar for a new one.",
+    runIntro: "Start a new run and jump into your first objective at any time. Even in your existing playthrough.",
+    /** A run in order, numbered. */
+    run: [
+      "Set your stats and reachable regions, and tap [Start run].",
+      "Fell the boss and tap [Done] to complete the objective.",
+      "[Level up] as in the game and add regions to unlock more bosses and gear.",
+      "Check run stats, timeline and gear in [Run summary].",
+      "Fell every boss to become Elden Rold.",
+    ],
+    anObjective: "An objective",
+    objectiveIntro:
+      "A boss, a build. Each item has a fair share, and gear that synergizes rolls together more often! Nonsense is rare.",
+    objective: [
+      {
+        term: "Boss",
+        text: "The foe. Already felled earlier? Tap its [health bar] to mark felled and unlock its gear.",
+      },
+      { term: "Class", text: "The general archetype, such as Knight or Sorcerer. Each has its own gear." },
+      { term: "Gear", text: "Weapons, spells, talismans and armor (only what you can reach)." },
+      { term: "Combat rule", text: "Fight a certain way for extra challenge or silliness." },
+      { term: "Reroll", text: "Don't like it? [Reroll] any part of the objective." },
+    ],
+    runSettings: "Run settings",
+    settingsIntro: "Make the rolls yours, at any time; changes apply on the next roll.",
+    settings: [
+      { term: "Classes", text: "Which classes can roll." },
+      { term: "Never roll", text: "Gear and combat rules you never want." },
+      { term: "Shortlist", text: "Your favorite or upgraded weapons to always prefer for the [Right Hand]." },
+      {
+        term: "Bosses",
+        text: 'Mark bosses you [felled] in pre-existing playthrough, or [skip] ones you never want to fight. Royal Revenant "fans" rejoice!',
+      },
+      { term: "Max stat gap", text: "How much rolled gear requirements can exceed your character stats." },
     ],
     onYourPhone: "On your phone",
-    homeScreen:
-      "Add EldenRoll to your Home Screen before your first run: it opens full screen, like an app, and works offline. On iPhone a run started in Safari stays in Safari.",
+    homeScreen: "Add Elden Roll {app} to your Home Screen – it opens full screen and works offline.",
     howTo: [
-      { device: "iPhone", how: "In Safari, tap Share, then Add to Home Screen." },
-      { device: "Android", how: "In Chrome, tap ⋮, then Add to Home screen." },
+      { device: "iPhone", how: "Safari → Share {share} → Add to Home Screen {add}" },
+      { device: "Android", how: "Chrome → ⋮ → Add to Home screen" },
     ],
+    /** Under the iPhone steps. */
+    beforeFirstRun: "Do this before your first run – Safari and Home Screen app do not share runs!",
+    links: { github: "Source code on GitHub", x: "Contact on X", sim: "Sim", kit: "Kit" },
+    privacy: "Your runs stay on your device, no server. May send anonymous general run stats to improve your rolls.",
     disclaimer:
       "Unofficial fan tool. Not affiliated with or endorsed by FromSoftware or Bandai Namco. ELDEN RING is a trademark of its owners.",
   },
@@ -342,7 +372,7 @@ export const copy = {
     /** An empty slot, and one whose pick is the player's. */
     none: "none",
     any: "any",
-    toStart: "EldenRoll, to Start",
+    toStart: "Elden Roll, to Start",
     onTheWiki: (name: string) => `${name} on the wiki`,
     levelButton: (level: number) => `Level up, level ${level}`,
     /** Between the old level and the new one. */
@@ -359,7 +389,7 @@ export const copy = {
   sim: {
     title: "Simulation",
     lede: "Plays whole runs the way a player would and counts what they were shown.",
-    toApp: "Open EldenRoll",
+    toApp: "Open Elden Roll",
     settings: "Settings",
     runs: "Runs",
     runsDetail: "Up to 10",

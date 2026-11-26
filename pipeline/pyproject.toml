@@ -14,7 +14,7 @@ packages = ["eldenroll"]
 [project]
 name = "eldenroll"
 version = "0.1.0"
-description = "Offline ETL that builds the EldenRoll database from raw game data"
+description = "Offline ETL that builds the Elden Roll database from raw game data"
 requires-python = ">=3.13"
 dependencies = [
     "pyyaml>=6.0",

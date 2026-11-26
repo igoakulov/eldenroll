@@ -1,6 +1,6 @@
 # Data
 
-The database EldenRoll rolls from: what is in it and why, and the rules no single file states. Values and per-row reasons are in the override files; this file doesn't repeat them.
+The database Elden Roll rolls from: what is in it and why, and the rules no single file states. Values and per-row reasons are in the override files; this file doesn't repeat them.
 
 | Folder or file | Holds |
 |---|---|

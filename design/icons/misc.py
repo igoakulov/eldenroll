@@ -424,6 +424,21 @@ def chevron_b():
     return ic.place(0, 22)
 
 
+# Safari's own two steps to add the app, drawn as iOS draws them so the player finds them on screen
+def share_a():
+    ic = Icon()
+    ic.wire(L('M-5.4 -5 L-11 -5 L-11 15 L11 15 L11 -5 L5.4 -5'), 'thin')
+    ic.wire(L('M0 7 L0 -15 M-5.6 -9.4 L0 -15 L5.6 -9.4'), 'thin')
+    return ic.place(0, 32)
+
+
+def add_a():
+    ic = Icon()
+    ic.wire(L('M-8 -13 L8 -13 A5 5 0 0 1 13 -8 L13 8 A5 5 0 0 1 8 13 L-8 13 A5 5 0 0 1 -13 8 L-13 -8 A5 5 0 0 1 -8 -13 Z'), 'thin')
+    ic.wire(L('M0 -6.5 L0 6.5 M-6.5 0 L6.5 0'), 'thin')
+    return ic.place(0, 30)
+
+
 SPELLS = [
     ('sorcery', 'Sorcery', sorcery_a, sorcery_b),
     ('incantation', 'Incantation', incantation_a, incantation_b),
@@ -448,5 +463,7 @@ UI = [
     ('menu', 'Menu', menu_a, menu_b),
     ('close', 'Close', close_a, close_b),
     ('chevron', 'Chevron', chevron_a, chevron_b),
+    ('share', 'Share', share_a, share_a),
+    ('add', 'Add to Home Screen', add_a, add_a),
 ]
 ICONS = SPELLS + TALISMAN + ARMOR + ITEMS + ASH + UI

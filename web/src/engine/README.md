@@ -1,6 +1,6 @@
 # Engine
 
-The rules of an EldenRoll run, and the code that rolls it. Plain TypeScript with no React: the UI holds a `Run` and calls its actions. This file holds what the code doesn't say plainly: the run as the player sees it, the reasons, and the traps. Values live in code (`settings.ts`, `hyperparams.ts`, `run.ts`) and data (`data/overrides/`); each module's tests are its spec in practice. Row meanings are in `data/README.md#Rows`.
+The rules of an Elden Roll run, and the code that rolls it. Plain TypeScript with no React: the UI holds a `Run` and calls its actions. This file holds what the code doesn't say plainly: the run as the player sees it, the reasons, and the traps. Values live in code (`settings.ts`, `hyperparams.ts`, `run.ts`) and data (`data/overrides/`); each module's tests are its spec in practice. Row meanings are in `data/README.md#Rows`.
 
 ## Modules
 

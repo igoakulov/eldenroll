@@ -168,7 +168,7 @@ export function KitPage() {
   return (
     <div className="kit-page">
       <StickyHeader className="kit-header">
-        <h1 className="kit-title" aria-label="EldenRoll UI kit">
+        <h1 className="kit-title" aria-label="Elden Roll UI kit">
           <span className="kit-wordmark" aria-hidden="true">
             ELDENR
             <WordmarkO className="kit-wordmark-o" />
