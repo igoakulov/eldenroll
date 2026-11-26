@@ -1,0 +1,15 @@
+// The site on Cloudflare: a Worker with no code of its own, serving the built files (README.md#Releasing).
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "eldenroll",
+  "compatibility_date": "2026-11-26",
+  "assets": { "directory": "./dist" },
+  // Served only at the domain: no workers.dev address or preview links to count as a second site
+  "workers_dev": false,
+  "preview_urls": false,
+  // www is redirected to the apex by a rule in the Cloudflare dashboard, which runs before the site
+  "routes": [
+    { "pattern": "eldenroll.com", "custom_domain": true },
+    { "pattern": "www.eldenroll.com", "custom_domain": true },
+  ],
+}
