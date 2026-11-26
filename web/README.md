@@ -119,7 +119,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 - `deadBosses` entries carry `instanceId` and the `objectiveIndex` showing when the boss was marked, `0` before objective 1, in marking order. The timeline draws a boss felled on the way from this index. It stays on the boss rather than becoming an event of its own, so such bosses could later fold into their objective as other kills.
 - Rerolls are kept as counts of what they replaced, for `10 most rerolled`, and a finished run keeps them for the whole run, not per objective. The reroll after `Felled?` isn't counted: the player didn't turn that boss down.
 - The app asks the browser to keep its storage (`navigator.storage.persist()`), so a phone short of space clears it last. Safari deletes a site's storage after seven days of Safari use without a visit; an app added to the Home Screen counts only its own days of use, so playing keeps it.
-- No personal data and no cookies. Runs never leave the device; the only thing sent anywhere is anonymous usage stats, from the release on, with nothing that identifies a player.
+- No personal data and no cookies. Runs never leave the device; the only thing sent anywhere is anonymous run stats (#Analytics), with nothing that identifies a player.
 
 ## Installing
 
@@ -132,6 +132,47 @@ The app installs from the browser's `Add to Home Screen` and then opens full scr
 - Kept files are served from the phone first. Most names carry content hashes, so a kept copy is never stale; the worker's version also hashes the manifest and the icons, whose names never change, so a new one of those updates it too. A page load goes to the network first, so a new release reaches the player the next time they open the app online, and falls back to the kept page offline. A new release keeps its files under a new name and drops the old ones.
 - Kept files are looked up ignoring `Vary`: a page asks for its scripts with an `Origin` header the kept copies lack, and a host that varies on it would miss every one offline.
 - The worker registers only in a production build, so development always serves fresh files. `pnpm build && pnpm preview` serves one to test offline: load it once, stop the server, reload.
+
+## Analytics
+
+Anonymous run stats in PostHog, to tune the odds and the app from real runs. The privacy line in #How it works and the last rule of #Saving must stay true: nothing identifies a player, and PostHog stores nothing on the device. Until it is built, this section is its spec and the checklist at its end tracks the build.
+
+- **Cookieless.** PostHog's cookieless mode `always` on its US cloud, with person profiles off, so no consent prompt is needed. The project must have cookieless tracking on (Settings → Project → Web analytics), or PostHog drops every event.
+- **What cookieless mode costs.** PostHog strips the IP address before anything else, so events carry no country, and its visitor id changes daily, so it can't tell a returning player. The time zone stands in for country; visitors and countries come from Cloudflare's Web Analytics, a separate cookieless counter Cloudflare adds to the page.
+- **The run, not the player.** Every run event carries the run's stored `runId`, so one run can be followed from start to finish; nothing links two runs or two days to a player. The device's run history, finished runs kept and days since the earliest, is worked out from the saved runs.
+- **As little as the questions need.** At most one event per objective, so quota lasts and there is less to read: no event per roll or reroll, no autocapture, session recording, surveys, feature flags or page-leave. An item's reroll rate is judged against rolls per run or the simulation's exposure, not against logged rolls.
+- **Only from the live site.** Events are sent only from `eldenroll.com`: development and local builds never send. PostHog loads after the app shows; events made offline may be lost when the app closes.
+- **Past ad blockers.** Events go to `eldenroll.com/ingest`, which the site's Worker forwards to PostHog, so blockers that refuse PostHog's own address don't drop them.
+
+### Events
+
+| Event | Sent at | Carries |
+|---|---|---|
+| App opened | each load, as PostHog's page view | installed or in the browser, the time zone; PostHog adds device, OS, screen and referring site |
+| How it works opened | its page opening | where from, Start's tagline or the menu, and whether a run is in progress: a player who never finds it may never start |
+| Run started | `Start run` | level, stats, regions, classes left off, `Max stat gap`, shortlist size and whether it rolls, `Never roll` entries, bosses felled before the run, skipped bosses, finished runs on the device and days since the earliest |
+| Objective done | `Done` | objective number, boss, class; level, stats and regions at `Done`, so leveling and the regions finished before moving on show per objective; each reroll's scope and what its target replaced, the slot the player meant to change rather than the slots after it, both talismans for `Talismans` since they roll as one draw; bosses felled on the way since the last `Done` |
+| Settings saved | `Save` in `Run settings` or `Bosses` during a run | objective number, the tab, and what was added or removed |
+| Run finished | `Finish run`, `New run`, or every boss felled or skipped | how it ended, objectives done, the run's age in days |
+| Error | an uncaught error, or a save set aside | the message |
+
+Every event but App opened carries `runId`.
+
+### Reading the data
+
+Questions are answered on demand through PostHog's MCP, run by run where needed. One small dashboard covers runs started, objectives done, installed share, devices and referring sites; Cloudflare's own analytics covers visitors and countries.
+
+### Checklist
+
+- [ ] Owner: PostHog account on the US cloud, a project with cookieless tracking on, its project token to the agent
+- [ ] Owner: PostHog's MCP added for the user and signed in
+- [x] Owner: Cloudflare Web Analytics on for `eldenroll.com`
+- [ ] PostHog loaded on `eldenroll.com` only, after the app shows, cookieless and with everything but our events and errors off
+- [ ] `/ingest` forwarded to PostHog by the Worker
+- [ ] The events, each with what the table lists
+- [ ] Events seen arriving in PostHog
+- [ ] The dashboard
+- [ ] This section trimmed to what the code can't say
 
 ## Summary
 
