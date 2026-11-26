@@ -21,3 +21,41 @@
   flex: 1;
   padding-bottom: var(--space-6);
 }
+
+/* The Home Screen app's full screens rise over the screen they open from and fall away on ✕ (slideScreen.ts). The
+   view transition moves the phone's screen: the page itself on a phone, the drawn phone's screen in the frame
+   (PhoneFrame.css). The slide replaces the screen's own fade. */
+html[data-slide] .screen {
+  animation: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(screen),
+::view-transition-new(screen) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-slide="open"]::view-transition-new(root),
+html[data-slide="open"]::view-transition-new(screen) {
+  animation: screen-rise var(--dur-rise) var(--ease-out);
+}
+
+html[data-slide="close"]::view-transition-old(root),
+html[data-slide="close"]::view-transition-old(screen) {
+  z-index: 1;
+  animation: screen-fall var(--dur-rise) var(--ease-in) forwards;
+}
+
+@keyframes screen-rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes screen-fall {
+  to {
+    transform: translateY(100%);
+  }
+}

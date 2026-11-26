@@ -37,6 +37,7 @@ import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh, type SavedRun, ty
 import { browserStore, type SaveStore } from "./save/store";
 import { useDefaultKeys } from "./ui/keys";
 import { PhoneFrame } from "./ui/PhoneFrame";
+import { slideScreen } from "./ui/slideScreen";
 import { boardBefore, boardOf, countState, inState } from "./views/bossList";
 import { AllRuns } from "./views/AllRuns";
 import { Bosses } from "./views/Bosses";
@@ -63,6 +64,11 @@ interface Boot {
 type Loaded = { readonly status: "loading" } | ({ readonly status: "ready" } & Boot) | { readonly status: "failed" };
 
 type View = "start" | "card" | "howItWorks" | "felled" | "rerolling" | "level" | "settings" | "run" | "runs";
+
+// Full screens open over home, or the run's view over `All runs`, and rise in the Home Screen app; one that rose falls
+// away when it closes (web/src/ui/README.md#Controls). `Level up` after `Done` follows the felled screen instead.
+const HOME: ReadonlySet<View> = new Set(["start", "card"]);
+const FULL: ReadonlySet<View> = new Set(["howItWorks", "level", "settings", "run", "runs"]);
 
 function newSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
@@ -158,7 +164,30 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
     if (run !== null) return;
     store.saveSetup({ schemaVersion: SCHEMA_VERSION, stats, settings, regions, ...lists, deadBosses, skippedBosses });
   }, [run, stats, settings, regions, lists, deadBosses, skippedBosses]);
-  const [view, setView] = useState<View>("start");
+  const [view, setViewNow] = useState<View>("start");
+  const shown = useRef<View>(view);
+  shown.current = view;
+  // The full screens that rose, the top one showing
+  const risen = useRef<View[]>([]);
+  /** `along` holds the other changes that come with the screen, so a slide moves from the screen as it was. */
+  const setView = (next: View, along: () => void = () => {}) => {
+    const from = shown.current;
+    shown.current = next;
+    const update = () => {
+      along();
+      setViewNow(next);
+    };
+    if (FULL.has(next) && (HOME.has(from) || (from === "runs" && next === "run"))) {
+      risen.current.push(next);
+      slideScreen("open", update);
+    } else if (next !== from && risen.current.at(-1) === from) {
+      risen.current.pop();
+      slideScreen("close", update);
+    } else {
+      update();
+    }
+    if (HOME.has(next)) risen.current = [];
+  };
   // How it works closes back to where it opened: Start, or the screen whose menu opened it
   const [howItWorksFromMenu, setHowItWorksFromMenu] = useState(false);
   // The run as it was before `Done` or `Felled?`, which `Undo` puts back
@@ -194,19 +223,21 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
   const endRun = (finished: Run, how: RunEnd, show = false) => {
     if (identity.current !== null) trackRunFinished(finished, identity.current, how);
     const kept = identity.current === null ? null : finishSaved(identity.current, finished);
-    if (kept !== null) setFinished((list) => [kept, ...list.filter((one) => one.runId !== kept.runId)].slice(0, FINISHED_RUNS_CAP));
     identity.current = null;
-    setOpened(show && kept !== null ? { finished: kept, fromList: false } : null);
-    setRun(null);
-    setUndoTo(null);
-    setStats(DEFAULT_STATS);
-    setRegions(DEFAULT_REGIONS);
-    setSettings(defaultSettings(database));
-    setDeadBosses([]);
-    setSkippedBosses([]);
-    setLists({ neverRoll: [], weaponShortlist: [] });
-    setProblems([]);
-    setView(show && kept !== null ? "run" : "start");
+    setView(show && kept !== null ? "run" : "start", () => {
+      if (kept !== null)
+        setFinished((list) => [kept, ...list.filter((one) => one.runId !== kept.runId)].slice(0, FINISHED_RUNS_CAP));
+      setOpened(show && kept !== null ? { finished: kept, fromList: false } : null);
+      setRun(null);
+      setUndoTo(null);
+      setStats(DEFAULT_STATS);
+      setRegions(DEFAULT_REGIONS);
+      setSettings(defaultSettings(database));
+      setDeadBosses([]);
+      setSkippedBosses([]);
+      setLists({ neverRoll: [], weaponShortlist: [] });
+      setProblems([]);
+    });
   };
   const menu = (current: Run): RunMenuActions => ({
     finishedRuns: finished.length,
@@ -236,10 +267,11 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
     const shown = opened.finished;
     const last = shown.objectives.at(-1);
     // Back to the list it was opened from, or to Start after `Finish run`; with nothing left to list, to Start
-    const back = (remaining: number) => {
-      setOpened(null);
-      setView(opened.fromList && (run !== null || remaining > 0) ? "runs" : "start");
-    };
+    const back = (remaining: number, along: () => void = () => {}) =>
+      setView(opened.fromList && (run !== null || remaining > 0) ? "runs" : "start", () => {
+        setOpened(null);
+        along();
+      });
     return (
       <RunView
         key={shown.runId}
@@ -251,8 +283,7 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
         onClose={() => back(finished.length)}
         onDelete={() => {
           store.deleteFinished(shown.runId);
-          setFinished((list) => list.filter((one) => one.runId !== shown.runId));
-          back(finished.length - 1);
+          back(finished.length - 1, () => setFinished((list) => list.filter((one) => one.runId !== shown.runId)));
         }}
       />
     );

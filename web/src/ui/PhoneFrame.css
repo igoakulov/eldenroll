@@ -32,6 +32,11 @@
     background: var(--ground);
   }
 
+  /* A full screen's slide moves the drawn phone's screen, not the page (Screen.css) */
+  .phone-frame-screen {
+    view-transition-name: screen;
+  }
+
   .phone-frame {
     --phone-scale: 1;
     display: grid;

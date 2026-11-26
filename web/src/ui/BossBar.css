@@ -1,5 +1,5 @@
-/* Felled? sits near the bar's right end, under the thumb, in its top red; the two parts lose their inner frame and
-   fade 12px, 4px from the word. A mask reads only alpha, so any opaque colour does. */
+/* Felled? sits in the middle of the bar, in its top red; the halves lose their inner frame and fade 12px, 4px from
+   the word. A mask reads only alpha, so any opaque colour does. */
 .boss-bar {
   position: relative;
   display: flex;
@@ -42,15 +42,15 @@
 }
 
 .boss-bar-right {
-  flex: 0 0 var(--space-6);
   border-left: 0;
   padding-left: 0;
   mask-image: linear-gradient(to left, var(--ground) calc(100% - 12px), transparent);
 }
 
+/* Not positioned, so its tap target below takes the whole bar's width; a negative margin lifts it, as centring
+   splits the margin */
 .boss-bar-felled {
-  position: relative;
-  top: -2px;
+  margin-top: calc(-1 * var(--space-2));
   flex: none;
   padding: 0;
   border: 0;
@@ -65,9 +65,10 @@
     no-repeat;
 }
 
-/* The tap target reaches down over the location, which taps nothing, and only a little up, clear of the boss name's */
+/* The whole bar is the tap target, as How it works says, reaching down over the location, which taps nothing, and not
+   up, clear of the boss name's */
 .boss-bar-felled::after {
   content: "";
   position: absolute;
-  inset: calc(-1 * var(--space-2)) calc(-1 * var(--space-4)) calc(-1 * var(--space-6));
+  inset: 0 0 calc(-1 * var(--space-6));
 }

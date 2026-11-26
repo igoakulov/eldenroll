@@ -1,8 +1,8 @@
 import { copy } from "../copy";
 import "./BossBar.css";
 
-/** The boss bar, broken near its right end by `Felled?`. As the boss arrives a whole bar fills over it, then gives
- * way as `Felled?` fades into the gap (web/src/ui/README.md#Sequences). */
+/** The boss bar, broken in the middle by `Felled?`, the whole bar its tap target. As the boss arrives a whole bar
+ * fills over it, then gives way as `Felled?` fades into the gap (web/src/ui/README.md#Sequences). */
 export function BossBar({ onFelled }: { readonly onFelled: () => void }) {
   return (
     <div className="boss-bar">
