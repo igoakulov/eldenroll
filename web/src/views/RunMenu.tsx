@@ -15,13 +15,17 @@ export function runTitle(data: EngineData, run: Run): string {
   return copy.common.runTitle(objectiveNumber(run), boss?.name);
 }
 
+/** A run with no completed objective is not saved (web/README.md#All runs), so finishing it discards it. */
+function discards(run: Run): boolean {
+  return run.completed.length === 0;
+}
+
 /** What finishing `run` does. Each sheet words `Cannot resume` its own way. */
 function finishParts(run: Run, cannotResume: string): readonly ConfirmPart[] {
   return [
     ...(run.current === null ? [] : [{ text: copy.confirm.abandonObjective(objectiveNumber(run)), lost: true }]),
-    { text: cannotResume, lost: true },
-    // A run with no completed objective is not saved (web/README.md#All runs)
-    ...(run.completed.length === 0 ? [] : [{ text: copy.confirm.saveToAllRuns, lost: false }]),
+    discards(run) ? { text: copy.confirm.notSaved, lost: true } : { text: cannotResume, lost: true },
+    ...(discards(run) ? [] : [{ text: copy.confirm.saveToAllRuns, lost: false }]),
   ];
 }
 
@@ -40,7 +44,7 @@ export function NewRunConfirm({
     <Confirm
       open={open}
       title={copy.common.newRun}
-      question={copy.confirm.newRunQuestion}
+      question={discards(run) ? copy.confirm.newRunDiscardQuestion : copy.confirm.newRunQuestion}
       parts={finishParts(run, copy.confirm.newRunCannotResume)}
       action={copy.confirm.newRunAction}
       onConfirm={onConfirm}
@@ -63,10 +67,10 @@ export function FinishRunConfirm({
   return (
     <Confirm
       open={open}
-      title={copy.common.finishRun}
-      question={copy.confirm.finishQuestion}
+      title={discards(run) ? copy.common.discardRun : copy.common.finishRun}
+      question={discards(run) ? copy.confirm.discardQuestion : copy.confirm.finishQuestion}
       parts={finishParts(run, copy.confirm.finishCannotResume)}
-      action={copy.common.finishRun}
+      action={discards(run) ? copy.common.discardRun : copy.common.finishRun}
       onConfirm={onConfirm}
       onClose={onClose}
     />
@@ -136,8 +140,8 @@ export function RunMenu({
             onClick={actions.onRunSettings}
           />
           <ListRow
-            title={copy.common.finishRun}
-            detail={copy.menu.finishRunDetail}
+            title={discards(run) ? copy.common.discardRun : copy.common.finishRun}
+            detail={discards(run) ? copy.menu.discardRunDetail : copy.menu.finishRunDetail}
             danger
             onClick={() => setFinishing(true)}
           />

@@ -13,78 +13,6 @@
   color: var(--text);
 }
 
-/* Felled? sits in the middle of the bar, in its top red; the halves lose their inner frame and fade 12px,
-   4px from the word. A mask reads only alpha, so any opaque colour does. */
-.boss-bar {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  height: 11px;
-}
-
-.boss-bar-whole {
-  display: none;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-.boss-bar-half {
-  flex: 1;
-}
-
-.boss-bar-whole,
-.boss-bar-half {
-  height: 11px;
-  padding: 1px; /* raw: the hairline between the frame and the red, as thin as the frame */
-  border: 1px solid var(--bronze);
-  background: var(--blood-4);
-}
-
-.boss-bar-whole i,
-.boss-bar-half i {
-  display: block;
-  height: 100%;
-  background: linear-gradient(180deg, var(--blood) 0%, var(--blood-2) 55%, var(--blood-3) 100%);
-  transform-origin: left;
-}
-
-.boss-bar-left {
-  border-right: 0;
-  padding-right: 0;
-  mask-image: linear-gradient(to right, var(--ground) calc(100% - 12px), transparent);
-}
-
-.boss-bar-right {
-  border-left: 0;
-  padding-left: 0;
-  mask-image: linear-gradient(to left, var(--ground) calc(100% - 12px), transparent);
-}
-
-.felled-link {
-  position: relative;
-  top: -2px;
-  flex: none;
-  padding: 0;
-  border: 0;
-  background: none;
-  font-size: var(--type-small);
-  color: var(--blood);
-  white-space: nowrap;
-}
-
-.felled-word {
-  background: repeating-linear-gradient(to right, var(--blood) 0 1.5px, transparent 1.5px 4.5px) 0 100% / 100% 1px
-    no-repeat;
-}
-
-.felled-link::after {
-  content: "";
-  position: absolute;
-  inset: -14px -8px;
-}
-
 .boss-location {
   margin-top: var(--space-4);
   font-variant-caps: all-small-caps;
@@ -160,8 +88,9 @@
   animation: fade-out var(--dur-swap) var(--ease-in) forwards;
 }
 
-/* Wherever a slot fades in, its icon leads and its text follows (web/src/ui/README.md#Sequences) */
-.card :is(.slot-hand-label, .slot-name:not(.slot-armor > .slot-name), .slot-ash, .slot-armor-piece-name) {
+/* A new objective's or a reroll's slot fades in icon first, its text following; returning to the card shows it at
+   once (web/src/ui/README.md#Sequences) */
+:is(.card-revealing, .slot-changed) :is(.slot-hand-label, .slot-name:not(.slot-armor > .slot-name), .slot-ash, .slot-armor-piece-name) {
   animation: fade-in var(--dur-sheet) var(--ease-out) var(--cascade) backwards;
 }
 
@@ -203,7 +132,7 @@
   animation-delay: calc(var(--bar-at) * var(--k));
 }
 
-.card-revealing .felled-link {
+.card-revealing .boss-bar-felled {
   animation: fade-in var(--dur-sheet) var(--ease-in-out) backwards;
   animation-delay: calc(var(--question-at) * var(--k));
 }

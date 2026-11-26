@@ -265,6 +265,16 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
         </>
       ),
     },
+    "card-discard-run": {
+      title: "Discard run, before any objective is done",
+      sheet: true,
+      render: () => (
+        <>
+          {card(runs.first, true)}
+          <FinishRunConfirm open run={runs.first} onClose={noop} onConfirm={noop} />
+        </>
+      ),
+    },
     "run-view": {
       title: "Current run's view, Summary",
       render: () => runView({}),

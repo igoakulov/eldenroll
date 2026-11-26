@@ -20,6 +20,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* The Home Screen app has no pull-to-refresh, so a pulled page only stretched, taking the bottom bar off the screen */
+@media (display-mode: standalone) {
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+}
+
 body {
   margin: 0;
   background: var(--ground);

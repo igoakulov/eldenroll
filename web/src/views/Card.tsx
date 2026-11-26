@@ -5,6 +5,7 @@ import { displaySlots } from "../engine/display";
 import type { EngineData } from "../engine/engineData";
 import { objectiveNumber, type Objective, type RerollTarget, type Run } from "../engine/run";
 import { derivedLevel } from "../engine/settings";
+import { BossBar } from "../ui/BossBar";
 import { BottomBar, GlowBand, RuledButton } from "../ui/BottomBar";
 import { SlotHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
@@ -84,27 +85,6 @@ function changedParts(from: Objective, to: Objective): ReadonlySet<Part> {
   const before = changeKeys(from);
   const after = changeKeys(to);
   return new Set((Object.keys(before) as Part[]).filter((part) => before[part] !== after[part]));
-}
-
-/** The boss bar, broken in the middle by `Felled?`. As the boss arrives a whole bar fills over it, then gives
- * way as `Felled?` fades into the gap. */
-function BossBar({ onFelled }: { readonly onFelled: () => void }) {
-  return (
-    <div className="boss-bar">
-      <div className="boss-bar-whole" aria-hidden="true">
-        <i />
-      </div>
-      <div className="boss-bar-half boss-bar-left" aria-hidden="true">
-        <i />
-      </div>
-      <button type="button" className="felled-link" onClick={onFelled}>
-        <span className="felled-word">{copy.card.felled}</span>?
-      </button>
-      <div className="boss-bar-half boss-bar-right" aria-hidden="true">
-        <i />
-      </div>
-    </div>
-  );
 }
 
 /** The current objective: the boss as the hero, then the class and the loadout to fell it with. Without `menu`, as

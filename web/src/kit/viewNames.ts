@@ -18,6 +18,7 @@ export const VIEW_NAMES = [
   "card-reroll",
   "card-felled",
   "card-finish-run",
+  "card-discard-run",
   "felled-next",
   "felled-rerolling",
   "level-up-next",

@@ -105,6 +105,9 @@
   --space-10: 64px;
   --gutter: 20px;
   --top-bar: 60px;
+  /* Above the wordmark on Start; a step less in the Home Screen app, which adds the status bar above it, so the line
+     under the bottom bar shows whole */
+  --hero-top: calc(var(--space-10) + var(--space-6));
 
   /* Locked controls, and what fades while it changes */
   --dimmed: 0.4;
@@ -148,6 +151,12 @@
   /* Start: the caret's blink and the loading pulse, the only motion that runs on its own */
   --dur-caret: 1060ms;
   --dur-pulse: 1600ms;
+}
+
+@media (display-mode: standalone) {
+  :root {
+    --hero-top: calc(var(--space-10) + var(--space-4));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

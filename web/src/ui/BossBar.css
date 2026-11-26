@@ -1,0 +1,73 @@
+/* Felled? sits near the bar's right end, under the thumb, in its top red; the two parts lose their inner frame and
+   fade 12px, 4px from the word. A mask reads only alpha, so any opaque colour does. */
+.boss-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 11px;
+}
+
+.boss-bar-whole {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.boss-bar-half {
+  flex: 1;
+}
+
+.boss-bar-whole,
+.boss-bar-half {
+  height: 11px;
+  padding: 1px; /* raw: the hairline between the frame and the red, as thin as the frame */
+  border: 1px solid var(--bronze);
+  background: var(--blood-4);
+}
+
+.boss-bar-whole i,
+.boss-bar-half i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, var(--blood) 0%, var(--blood-2) 55%, var(--blood-3) 100%);
+  transform-origin: left;
+}
+
+.boss-bar-left {
+  border-right: 0;
+  padding-right: 0;
+  mask-image: linear-gradient(to right, var(--ground) calc(100% - 12px), transparent);
+}
+
+.boss-bar-right {
+  flex: 0 0 var(--space-6);
+  border-left: 0;
+  padding-left: 0;
+  mask-image: linear-gradient(to left, var(--ground) calc(100% - 12px), transparent);
+}
+
+.boss-bar-felled {
+  position: relative;
+  top: -2px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--type-small);
+  color: var(--blood);
+  white-space: nowrap;
+}
+
+.boss-bar-word {
+  background: repeating-linear-gradient(to right, var(--blood) 0 1.5px, transparent 1.5px 4.5px) 0 100% / 100% 1px
+    no-repeat;
+}
+
+/* The tap target reaches down over the location, which taps nothing, and only a little up, clear of the boss name's */
+.boss-bar-felled::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--space-2)) calc(-1 * var(--space-4)) calc(-1 * var(--space-6));
+}

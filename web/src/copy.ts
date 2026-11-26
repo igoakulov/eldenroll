@@ -16,6 +16,8 @@ export const copy = {
     runSettingsDetail: "Classes, never roll, shortlist, bosses",
     howItWorks: "How it works",
     finishRun: "Finish run",
+    /** `Finish run` while no objective is done, so nothing is saved. */
+    discardRun: "Discard run",
     runs: "All runs",
     levelUp: "Level up",
     level: "Level",
@@ -271,6 +273,7 @@ export const copy = {
     thisRun: "This run",
     thisRunAnd: (finished: number) => `This run and ${finished} finished`,
     finishRunDetail: "Ends run and shows summary",
+    discardRunDetail: "Ends run without saving",
   },
 
   // A run's view, for the run in progress and a finished one, and the lists it opens
@@ -361,8 +364,11 @@ export const copy = {
     abandonObjective: (number: number) => `Abandon objective ${number}`,
     saveToAllRuns: "Save to All runs",
     finishQuestion: "End this run and see its summary?",
+    discardQuestion: "Discard this run? Nothing is saved before an objective is done.",
+    notSaved: "Not saved",
     finishCannotResume: "Cannot resume",
     newRunQuestion: "Finish the current run and start a new one?",
+    newRunDiscardQuestion: "Discard the current run and start a new one?",
     newRunCannotResume: "Cannot resume current run",
     newRunAction: "Start new run",
   },

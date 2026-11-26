@@ -79,7 +79,7 @@ Every boss instance with `odds > 0`, under a legend of the three states. `Felled
 
 ### Confirmations
 
-`Finish run`, `New run` and `Delete run` share one sheet. Its chips are in the active voice with no contractions; `Delete run`'s is `Cannot undo`.
+`Finish run`, `New run` and `Delete run` share one sheet. Its chips are in the active voice with no contractions; `Delete run`'s is `Cannot undo`. A run with no objective done isn't saved (#All runs), so until one is, `Finish run` reads `Discard run` in the menu, on its sheet and its button, and both run sheets say `Not saved` where they would say it can't be resumed.
 
 ### Run view
 
@@ -125,6 +125,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 
 The app installs from the browser's `Add to Home Screen` and then opens full screen, under a translucent status bar, and works offline. iPhone has no install prompt and keeps a home-screen app's storage apart from Safari's, so `How it works` explains `Add to Home Screen` before the first run.
 
+- In the Home Screen app a pulled page doesn't stretch: the app has no pull-to-refresh there, and a stretched page took the bottom bar off the screen. Safari keeps its own pull-to-refresh.
 - `public/manifest.webmanifest` and the tags in `index.html` make it installable. The icons in `public/icons/` and `public/favicon.ico` are drawn by `scripts/appIcons.ts` (`pnpm app-icons`) from the wordmark's lozenge, our own glyph, and committed.
 - The app icon is the wordmark's lozenge, flat in `--grace` on `--mist`, with no glow or gradient: at icon size both blur the gap inside the lozenge. Gold on a dark tile keeps the wordmark's own figure, gold lines lit; a gold tile inverts it, so it reads thinner and paler.
 - The tab's favicon is the one inverted mark, dark on a rounded gold tile with clear corners, because Safari sets a white plate behind a tab icon too dark for its dark tab bar. Browsers that read SVG favicons take `favicon.svg`; Safari and anything asking for `/favicon.ico` get the `.ico`.

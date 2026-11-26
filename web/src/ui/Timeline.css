@@ -1,7 +1,20 @@
 .timeline {
+  position: relative;
   margin: var(--space-3) 0 0;
   padding: 0;
   list-style: none;
+}
+
+/* The line comes down from above the first marker too, so one entry still reads as a timeline under way; drawn
+   before the entries, so the marker's outline cuts it */
+.timeline:has(.timeline-entry)::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--gutter) + var(--space-3));
+  top: calc(-1 * var(--space-3));
+  height: calc(var(--space-3) + var(--space-4) + var(--space-2));
+  width: 1px;
+  background: var(--frame);
 }
 
 .timeline-entry {
