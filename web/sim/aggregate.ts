@@ -2,17 +2,21 @@
 // the page's: this returns ids, game names and numbers.
 import type { Condition, Item, LoadoutSlot, Modifier, Selector } from "../src/engine/database";
 import { isNone, POOL_SLOTS } from "../src/engine/database";
+import { countedItems, isSetReachable } from "../src/engine/eligibility";
 import { ashFits } from "../src/engine/loadout";
+import { selectedLocations } from "../src/engine/regions";
 import type { EngineData } from "../src/engine/engineData";
 import { derivedLevel, STATS, type Stat } from "../src/engine/settings";
 import { optionKey, repeatKey, slotOptions } from "../src/engine/slotRoll";
 import { matchesOption, type Option } from "../src/engine/selectors";
+import { className } from "../src/views/timeline";
 import {
   ashOnShield,
   BUCKET,
   CHANCE_SLOTS,
   EVERY_ROLL,
   isSynergy,
+  playOrder,
   playRank,
   readChanceKey,
   type ChanceSum,
@@ -74,12 +78,8 @@ function nameOf(data: EngineData, key: string): string {
   if (kind === "item") return data.items.get(id)?.name ?? id;
   if (kind === "rule") return data.rules.get(id)?.name ?? id;
   if (kind === "armor_set") return data.armorSets.get(id)?.name ?? id;
-  if (kind === "character_class") return data.database.character_class.find((row) => row.id === id)?.name ?? id;
+  if (kind === "character_class") return className(data, id);
   return key;
-}
-
-export function className(data: EngineData, id: string): string {
-  return nameOf(data, `character_class:${id}`);
 }
 
 function regionName(data: EngineData, id: string): string {
@@ -256,7 +256,7 @@ function foldChances(
 /** The items an option key stands for: an alias's members, or the item itself. */
 function membersOf(data: EngineData, key: string): readonly Item[] {
   const [kind, id = ""] = key.split(/:(.*)/s) as [string, string];
-  if (kind === "alias") return data.database.item.filter((row) => row.alias === id);
+  if (kind === "alias") return (data.aliasMembers.get(id) ?? []).flatMap((member) => data.items.get(member) ?? []);
   const item = kind === "item" ? data.items.get(id) : undefined;
   return item === undefined ? [] : [item];
 }
@@ -548,7 +548,7 @@ const REPEAT_KEYS: Readonly<Record<RepeatKind, (one: Obj) => readonly string[]>>
 
 /** Too often for the player: the same thing this many objectives in a row, or `ofLast` of the last `window`
  * (`data/balance.md#Late-game crowding`). */
-export const REPEAT_LIMIT = { inARow: 4, ofLast: 5, window: 10 } as const;
+const REPEAT_LIMIT = { inARow: 4, ofLast: 5, window: 10 } as const;
 
 export interface RepeatRow {
   readonly kind: RepeatKind;
@@ -665,31 +665,31 @@ export const NO_LOCATION = "";
 const firstRegions = new WeakMap<EngineData, ReadonlyMap<string, string>>();
 
 /** By `optionKey`: the region in play order where an item first comes into reach, and where a set's last piece
- * does. Items with no location row are left out. */
+ * does, by the engine's own reach rules with every boss of the open regions felled. Items with no location row, and
+ * sets of nothing else, are left out. */
 function regionsOf(data: EngineData): ReadonlyMap<string, string> {
   const cached = firstRegions.get(data);
   if (cached !== undefined) return cached;
   const { database } = data;
-  const rank = playRank(database);
-  const locationRegion = new Map(database.location.map((row) => [row.id, row.region_id]));
-  const items = new Map<string, string>();
-  for (const row of database.item_location) {
-    const location = row.location_id ?? data.bosses.get(row.boss_instance_id ?? "")?.location_id;
-    const region = location === undefined ? undefined : locationRegion.get(location);
-    if (region === undefined) continue;
-    const current = items.get(row.item_id);
-    if (current === undefined || (rank.get(region) ?? 0) < (rank.get(current) ?? 0)) items.set(row.item_id, region);
-  }
-  const found = new Map<string, string>([...items].map(([id, region]) => [`item:${id}`, region]));
-  for (const set of database.armor_set) {
-    // A piece in an alias arrives with its earliest member
-    const pieceRegion = (piece: string) => {
-      const alias = data.items.get(piece)?.alias;
-      const found = (alias == null ? [piece] : (data.aliasMembers.get(alias) ?? [])).flatMap((id) => (items.has(id) ? [items.get(id)!] : []));
-      return found.length === 0 ? [] : [found.reduce((a, b) => ((rank.get(b) ?? 0) < (rank.get(a) ?? 0) ? b : a))];
-    };
-    const regions = set.pieces.flatMap(pieceRegion);
-    if (regions.length > 0) found.set(`armor_set:${set.id}`, regions.reduce((a, b) => ((rank.get(a) ?? 0) >= (rank.get(b) ?? 0) ? a : b)));
+  const regionOfLocation = new Map(database.location.map((row) => [row.id, row.region_id]));
+  const found = new Map<string, string>();
+  const open = new Set<string>();
+  for (const region of playOrder(database)) {
+    open.add(region);
+    const deadBosses = new Set(
+      database.boss_instance
+        .filter((boss) => boss.odds > 0 && open.has(regionOfLocation.get(boss.location_id) ?? ""))
+        .map((boss) => boss.id),
+    );
+    const counted = countedItems(data, { locations: selectedLocations(database, open, deadBosses), deadBosses });
+    for (const id of counted) {
+      if (!data.foundEverywhere.has(id) && !found.has(`item:${id}`)) found.set(`item:${id}`, region);
+    }
+    for (const set of database.armor_set) {
+      const key = `armor_set:${set.id}`;
+      const placed = set.pieces.some((piece) => !data.foundEverywhere.has(piece));
+      if (placed && !found.has(key) && isSetReachable(data, set, counted)) found.set(key, region);
+    }
   }
   firstRegions.set(data, found);
   return found;
@@ -963,12 +963,12 @@ export function itemSeries(
 // Furthest from fair
 
 /** Vs fair inside this range reads as even. */
-export const EVEN = { low: 0.8, high: 1.25 } as const;
+const EVEN = { low: 0.8, high: 1.25 } as const;
 /** A gap smaller than this many showings a run is no concern for play, however far from 1 its Vs fair reads. */
-export const MIN_GAP_PER_RUN = 0.5;
+const MIN_GAP_PER_RUN = 0.5;
 /** How many standard deviations of its sample, √(fair showings), a gap must pass to count as more than luck
  * (`web/sim/README.md#The page`). */
-export const LUCK_DEVIATIONS = 3;
+const LUCK_DEVIATIONS = 3;
 /** Region tables Furthest from fair reads: the item slot's shares follow odds that differ by design, so its Vs fair
  * says little. */
 export const FAIR_TABLES: readonly RegionTable[] = REGION_TABLES.filter((table) => table !== "item");
@@ -1064,3 +1064,4 @@ export function worstLines(lines: readonly FairLine[], runs: number): readonly F
   }
   return listed.sort((a, b) => Math.abs(gap(b)) - Math.abs(gap(a)));
 }
+

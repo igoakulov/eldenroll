@@ -1,13 +1,13 @@
 """The approved icon set: line style, gold outline with a faint fill."""
 import math
 
-from shapely.geometry import LineString, MultiLineString, Point
+from shapely.geometry import LineString, MultiLineString
 
 import hafted
 import misc
 import ranged
 import swords
-from geo import (C, E, Icon, L, M, ML, R, S, U, _lines, band, band_line, hlines, mv, poly, ring, rot, sc, star, taper, wraps)
+from geo import (C, E, Icon, L, M, ML, R, S, U, band, band_line, hlines, mv, poly, ring, rot, sc, star, wraps)
 from ranged import FLAME
 
 D45 = 45
@@ -199,21 +199,8 @@ def throwing_blade():
     return ic.place(D45, 36)
 
 
-# ---------------------------------------------------------------- hafted
-
 CLUB = ('M-1.3 26 L1.3 26 L2.2 6 C3.4 -4 4.4 -13 4.4 -20 C4.4 -25 2.6 -27.6 0 -27.6 '
         'C-2.6 -27.6 -4.4 -25 -4.4 -20 C-4.4 -13 -3.4 -4 -2.2 6 Z')
-
-
-def hammer_club():
-    ic = Icon()
-    ic.shape(S(CLUB))
-    ic.detail(MultiLineString([LineString([(-1.4, -22), (-0.4, -16), (-1.2, -10)]), LineString([(1.8, -12), (1.2, -5)]),
-                               LineString([(-2.6, -18.6), (-1.8, -17)])]), fine=True)
-    ic.shape(poly((-1.9, 15), (1.9, 15), (1.5, 26), (-1.5, 26)), tone=.3)
-    ic.detail(wraps(-1.8, 1.8, 15, 26, 2), fine=True)
-    ic.shape(E(0, 26.8, 1.9, 1.1), tone=.3)
-    return ic.place(D45, 43)
 
 
 def hammer_spiked():
@@ -265,22 +252,6 @@ def spear():
     ic.shape(sc(lug, -1, 1), tone=.3, fine=True)
     ic.shape(R(-1.3, -15.2, 2.6, 3.6), tone=.3)
     ic.shape(poly((-1.1, 28), (1.1, 28), (0, 30.6)), tone=.3)
-    return ic.place(D45, 46)
-
-
-def great_spear_serpent():
-    ic = Icon()
-    hafted._haft(ic, -6, 23, 2.8, 3.1)
-    ic.detail(hlines(-1.55, 1.55, [3, 4.4, 12, 13.4]), fine=True)
-    ic.shape(R(-2.1, -0.4, 4.2, 2.4), tone=.3)
-    ic.shape(S('M-2.2 23 L2.2 23 L3 24 L3 28.6 L-3 28.6 L-3 24 Z'), tone=.3)
-    ic.detail(hlines(-3, 3, [26.2]), fine=True)
-    truss = poly((-7, -9.4), (7, -9.4), (1.6, -3), (-1.6, -3))
-    ic.shape(truss.difference(poly((-3.6, -8), (3.6, -8), (0.8, -4.6), (-0.8, -4.6))), tone=.3)
-    ic.shape(S('M-8.4 -11.6 L8.4 -11.6 L9.4 -9.2 L-9.4 -9.2 Z'), tone=.3)
-    ic.shape(S('M-2.4 -11.6 L-2.4 -26 C-2.4 -28.6 -2 -30.6 -1 -32.6 C3.2 -30.6 6.6 -27 7.4 -22.4 '
-               'C8 -18.6 7 -14.4 5 -11.6 Z'))
-    ic.detail(L('M-0.4 -13 L-0.4 -27.6'), fine=True)
     return ic.place(D45, 46)
 
 
@@ -394,12 +365,6 @@ def _jar(ic):
     ic.shape(R(-4.6, 15.4, 9.2, 2.2), tone=.3)
 
 
-def ballista():
-    ic = Icon()
-    _jar(ic)
-    return ic.place(D45, 44)
-
-
 def ballista_ammo():
     ic = Icon()
     _jar(ic)
@@ -428,19 +393,6 @@ def _triquetra(ic, cx, cy, r, off):
         a = math.radians(-90 + k * 120)
         rings.append(C(cx + off * math.cos(a), cy + off * math.sin(a), r).exterior)
     ic.detail(MultiLineString(rings), free=True)
-
-
-def seal_erdtree():
-    ic = Icon()
-    arm = S('M-2.6 -6 C-3.6 -9.6 -5.6 -12.6 -7.2 -14.6 L-4.4 -16.6 L0 -15.4 L4.4 -16.6 L7.2 -14.6 '
-            'C5.6 -12.6 3.6 -9.6 2.6 -6 Z')
-    cross = U(arm, rot(arm, 90), rot(arm, -90), C(0, 0, 7.2),
-              S('M-2.6 6 C-3.2 10.4 -5.8 14.4 -9 17.6 L-4.6 19 L0 17.6 L4.6 19 L9 17.6 C5.8 14.4 3.2 10.4 2.6 6 Z'))
-    ic.shape(cross, tone=.17)
-    ic.detail(C(0, 0, 5.6).exterior)
-    _triquetra(ic, 0, 0, 2.3, 1.7)
-    ic.detail(MultiLineString([LineString([(0, 7.6), (0, 15.4)]), LineString([(0, 11), (-3, 15)]), LineString([(0, 11), (3, 15)])]), fine=True)
-    return ic.place(0, 42)
 
 
 def seal_golden():
@@ -512,18 +464,6 @@ def greatshield_tower():
     return ic.place(0, 45)
 
 
-def greatshield_pavise():
-    ic = Icon()
-    body = S('M-11.4 -25 L11.4 -25 L12.6 -23.6 L12.6 23.6 L11.4 25 L-11.4 25 L-12.6 23.6 L-12.6 -23.6 Z')
-    ic.shape(body)
-    ic.detail(body.buffer(-2.2, join_style='mitre').exterior, fine=True)
-    ic.shape(R(-2.8, -25, 5.6, 50), tone=.45)
-    for x in (-8, 8):
-        for y in (-19, 0, 19):
-            ic.pip(C(x, y, 1.2))
-    return ic.place(0, 45)
-
-
 # ---------------------------------------------------------------- spells, talisman
 
 def incantation():
@@ -549,10 +489,6 @@ def _talisman(chain_op):
         ic.shape(C(5.6 * math.cos(a), 2 + 5.6 * math.sin(a), 1.3), tone=.6, fine=True)
     ic.shape(C(0, 2, 3.4), tone=.6)
     return ic.place(0, 40)
-
-
-def talisman():
-    return _talisman(.4)
 
 
 def talisman_bare():
@@ -639,13 +575,6 @@ def throwables():
     return ic.place(-10, 42)
 
 
-def _ash_sword(ic, s=1.0, dy=-1.4):
-    ic.shape(mv(sc(poly((0, -9.4), (1.3, -6.6), (1.3, 3), (0, 3.6), (-1.3, 3)), s), 0, dy), tone=.45)
-    ic.shape(mv(sc(R(-3.6, 3.6, 7.2, 1.5), s), 0, dy), tone=.45)
-    ic.shape(mv(sc(R(-0.8, 5.1, 1.6, 3.4), s), 0, dy), tone=.45)
-    ic.shape(mv(sc(C(0, 9.4, 1.1), s), 0, dy), tone=.45)
-
-
 def ash():
     """A close-up of a sword's hilt, cropped by the tile, with a gem set in the guard along the blade."""
     ic = Icon()
@@ -675,79 +604,76 @@ def ash():
 
 # ---------------------------------------------------------------- the set
 
-# key, label, now, option 2 (label, fn) or None, changed
+# key, label, drawing
 WEAPONS = [
-    ('dagger', 'Dagger', dagger, None, True),
-    ('straight_sword', 'Straight sword', straight_sword, None, True),
-    ('greatsword', 'Greatsword', greatsword, None, True),
-    ('colossal_sword', 'Colossal sword', colossal_sword, None, True),
-    ('light_greatsword', 'Light greatsword', light_greatsword, None, True),
-    ('thrusting_sword', 'Thrusting sword', swords.thrusting_a, None, False),
-    ('heavy_thrusting_sword', 'Heavy thrusting sword', heavy_thrusting_sword, None, True),
-    ('curved_sword', 'Curved sword', curved_sword, None, True),
-    ('curved_greatsword', 'Curved greatsword', curved_greatsword, None, True),
-    ('katana', 'Katana', katana, None, True),
-    ('great_katana', 'Great katana', great_katana, None, True),
-    ('twinblade', 'Twinblade', twinblade, None, True),
-    ('backhand_blade', 'Backhand blade', backhand_blade, None, True),
-    ('throwing_blade', 'Throwing blade', throwing_blade, None, True),
-    ('axe', 'Axe', hafted.axe_a, None, False),
-    ('greataxe', 'Greataxe', hafted.greataxe_a, None, False),
-    ('hammer', 'Hammer', hammer_spiked, None, True),
-    ('great_hammer', 'Great hammer', hafted.great_hammer_a, None, False),
-    ('colossal_weapon', 'Colossal weapon', colossal_weapon, None, True),
-    ('flail', 'Flail', flail, None, True),
-    ('spear', 'Spear', spear, None, True),
-    ('great_spear', 'Great spear', great_spear_trident, None, True),
-    ('halberd', 'Halberd', halberd, None, True),
-    ('reaper', 'Reaper', reaper, None, True),
-    ('whip', 'Whip', hafted.whip_a, None, False),
-    ('fist', 'Fist', fist, None, True),
-    ('claw', 'Claw', claw, None, True),
-    ('beast_claw', 'Beast claw', beast_claw, None, True),
-    ('hand_to_hand', 'Hand-to-hand', hafted.hand_to_hand_a, None, False),
+    ('dagger', 'Dagger', dagger),
+    ('straight_sword', 'Straight sword', straight_sword),
+    ('greatsword', 'Greatsword', greatsword),
+    ('colossal_sword', 'Colossal sword', colossal_sword),
+    ('light_greatsword', 'Light greatsword', light_greatsword),
+    ('thrusting_sword', 'Thrusting sword', swords.thrusting_sword),
+    ('heavy_thrusting_sword', 'Heavy thrusting sword', heavy_thrusting_sword),
+    ('curved_sword', 'Curved sword', curved_sword),
+    ('curved_greatsword', 'Curved greatsword', curved_greatsword),
+    ('katana', 'Katana', katana),
+    ('great_katana', 'Great katana', great_katana),
+    ('twinblade', 'Twinblade', twinblade),
+    ('backhand_blade', 'Backhand blade', backhand_blade),
+    ('throwing_blade', 'Throwing blade', throwing_blade),
+    ('axe', 'Axe', hafted.axe),
+    ('greataxe', 'Greataxe', hafted.greataxe),
+    ('hammer', 'Hammer', hammer_spiked),
+    ('great_hammer', 'Great hammer', hafted.great_hammer),
+    ('colossal_weapon', 'Colossal weapon', colossal_weapon),
+    ('flail', 'Flail', flail),
+    ('spear', 'Spear', spear),
+    ('great_spear', 'Great spear', great_spear_trident),
+    ('halberd', 'Halberd', halberd),
+    ('reaper', 'Reaper', reaper),
+    ('whip', 'Whip', hafted.whip),
+    ('fist', 'Fist', fist),
+    ('claw', 'Claw', claw),
+    ('beast_claw', 'Beast claw', beast_claw),
+    ('hand_to_hand', 'Hand-to-hand', hafted.hand_to_hand),
 ]
 RANGED = [
-    ('light_bow', 'Light bow', ranged.light_bow_a, None, False),
-    ('bow', 'Bow', ranged.bow_a, None, False),
-    ('greatbow', 'Greatbow', ranged.greatbow_a, None, False),
-    ('crossbow', 'Crossbow', crossbow, None, True),
-    ('ballista', 'Ballista', ballista_ammo, None, True),
+    ('light_bow', 'Light bow', ranged.light_bow),
+    ('bow', 'Bow', ranged.bow),
+    ('greatbow', 'Greatbow', ranged.greatbow),
+    ('crossbow', 'Crossbow', crossbow),
+    ('ballista', 'Ballista', ballista_ammo),
 ]
 CATALYSTS = [
-    ('glintstone_staff', 'Glintstone staff', staff, None, True),
-    ('sacred_seal', 'Sacred seal', seal_golden, None, True),
+    ('glintstone_staff', 'Glintstone staff', staff),
+    ('sacred_seal', 'Sacred seal', seal_golden),
 ]
 ODD = [
-    ('thrusting_shield', 'Thrusting shield', thrusting_shield, None, True),
-    ('torch', 'Torch', torch, None, True),
-    ('perfume_bottle', 'Perfume bottle', ranged.perfume_a, None, False),
+    ('thrusting_shield', 'Thrusting shield', thrusting_shield),
+    ('torch', 'Torch', torch),
+    ('perfume_bottle', 'Perfume bottle', ranged.perfume_bottle),
 ]
 SHIELDS = [
-    ('small_shield', 'Small shield', small_shield, None, True),
-    ('medium_shield', 'Medium shield', ranged.medium_shield_a, None, False),
-    ('greatshield', 'Greatshield', greatshield_tower, None, True),
+    ('small_shield', 'Small shield', small_shield),
+    ('medium_shield', 'Medium shield', ranged.medium_shield),
+    ('greatshield', 'Greatshield', greatshield_tower),
 ]
 SPELLS = [
-    ('sorcery', 'Sorcery', misc.sorcery_a, None, False),
-    ('incantation', 'Incantation', incantation, None, True),
+    ('sorcery', 'Sorcery', misc.sorcery),
+    ('incantation', 'Incantation', incantation),
 ]
-TALISMAN = [('talisman', 'Talisman', talisman_bare, None, True)]
+TALISMAN = [('talisman', 'Talisman', talisman_bare)]
 ARMOR = [
-    ('head', 'Head', head, None, True),
-    ('body', 'Body', body, None, True),
-    ('arms', 'Arms', arms, None, True),
-    ('legs', 'Legs', misc.legs_a, None, False),
+    ('head', 'Head', head),
+    ('body', 'Body', body),
+    ('arms', 'Arms', arms),
+    ('legs', 'Legs', misc.legs),
 ]
 ITEMS = [
-    ('tool', 'Tool', tool, None, True),
-    ('pots', 'Pots and perfumes', misc.pots_a, None, False),
-    ('throwables', 'Other throwables', throwables, None, True),
+    ('tool', 'Tool', tool),
+    ('pots', 'Pots and perfumes', misc.pots),
+    ('throwables', 'Other throwables', throwables),
 ]
-ASH = [('ash', 'Ash of War', ash, None, True)]
-UI = [(k, label, a, None, False) for k, label, a, b in misc.UI]
+ASH = [('ash', 'Ash of War', ash)]
 
-BEFORE = {k: a for k, label, a, b in swords.ICONS + hafted.ICONS + ranged.ICONS + misc.ICONS}
+UI = misc.UI
 ALL = WEAPONS + RANGED + CATALYSTS + ODD + SHIELDS + SPELLS + TALISMAN + ARMOR + ITEMS + ASH + UI
-NOW = {k: now for k, label, now, alt, ch in ALL}
-ICONS = [(k, label, now, alt[1] if alt else now) for k, label, now, alt, ch in ALL]

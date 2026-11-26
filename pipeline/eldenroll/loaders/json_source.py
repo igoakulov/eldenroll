@@ -15,12 +15,11 @@ from typing import cast
 from eldenroll.loaders.schema import LoaderError, require_mapping
 
 # Logical name -> the only fields the build reads beyond `id` and `name`. An empty tuple
-# means the file is parsed for its record count and identity, nothing else.
+# means a test reads the file for its names alone.
 JSON_FILES: dict[str, tuple[str, ...]] = {
     "armors": ("category",),
     "ashes": (),
     "incantations": ("requires",),
-    "location_names": (),
     "shields": ("requiredAttributes",),
     "sorceries": ("requires",),
     "talismans": (),

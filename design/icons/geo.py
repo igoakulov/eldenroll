@@ -460,7 +460,6 @@ def _snap_line(line, outlines, sil, retreat=True):
 
 def prepare(icon, z):
     """The parts at one size, with gaps closed, plus each part's cover by the parts above it."""
-    import copy
     parts = []
     for p in _active(icon, z):
         p = dict(p)
@@ -566,43 +565,6 @@ def render_line(icon, size='lg', px=None):
     return ''.join(out)
 
 
-def solid_geom(icon, size='lg'):
-    z = SIZES[size]
-    acc = Polygon()
-    for p in _active(icon, z):
-        k = p['k']
-        if k == 'shape':
-            if not p['solid']:
-                continue
-            g = p['g'].buffer(z['grow'], join_style='mitre', mitre_limit=2)
-        elif k == 'wire':
-            g = p['g'].buffer(_wire_w(p, z) / 2 + z['grow'] * .6,
-                              cap_style='round' if p['cap'] == 'round' else 'flat')
-        elif k == 'detail':
-            if p['solid']:
-                acc = acc.difference(p['g'].buffer(z['cut'] / 2))
-            continue
-        elif k == 'pip':
-            acc = acc.difference(p['g'].buffer(z['cut'] * .15))
-            continue
-        if p['knock']:
-            acc = acc.difference(g.buffer(z['gap']))
-        acc = acc.union(g)
-    return acc
-
-
-def render_solid(icon, size='lg', px=None):
-    z = SIZES[size]
-    px = px or z['px']
-    d = poly_d(solid_geom(icon, size))
-    return (f'<svg width="{px}" height="{px}" viewBox="0 0 48 48" aria-hidden="true">'
-            f'<path d="{d}" fill="currentColor" fill-rule="evenodd"></path></svg>')
-
-
-def render(icon, style, size='lg', px=None):
-    return render_line(icon, size, px) if style == 'line' else render_solid(icon, size, px)
-
-
 # ---------------------------------------------------------------- bands and helpers
 
 def _interp(keys, t):
@@ -666,11 +628,6 @@ def hlines(x0, x1, ys):
     return MultiLineString([LineString([(x0, y), (x1, y)]) for y in ys])
 
 
-def inset(g, d):
-    """The outline of a shape pulled in by d: a rim line."""
-    return g.buffer(-d, join_style='mitre', mitre_limit=3).exterior
-
-
 def band_line(d, wl, wr=None, frac=.5, t0=0, t1=1, n=40):
     """A line inside a band, a fixed fraction of the way from its right edge to its left edge."""
     wr = wl if wr is None else wr
@@ -693,11 +650,3 @@ def band_line(d, wl, wr=None, frac=.5, t0=0, t1=1, n=40):
     return LineString(out)
 
 
-def taper(ic, d, a='thick', b='hair', n=16, t0=0.0, t1=1.0):
-    """A stroke that thins from width preset a to b along the path, as short overlapping round-capped pieces."""
-    from shapely.ops import substring
-    ln = LineString(parse(d, 40)[0][0])
-    for k in range(n):
-        s0, s1 = ln.length * k / n, ln.length * (k + 1) / n
-        t = t0 + (t1 - t0) * (k + .5) / n
-        ic.wire(substring(ln, s0, s1), (a, b, t))

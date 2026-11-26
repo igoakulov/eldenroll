@@ -142,7 +142,7 @@ export interface RunResult {
 }
 
 /** A slot, or for an ash slot the ash table its hand puts it in. */
-export function rollableKey(characterClass: string, group: string, key: string): string {
+function rollableKey(characterClass: string, group: string, key: string): string {
   return `${characterClass}|${group}|${key}`;
 }
 
@@ -386,7 +386,7 @@ export function simulateRun(base: Engine, options: SimOptions): RunResult {
     }
     record(run, rolled);
     if (options.allocation === "ITEMS") {
-      meetRequirements(player, requirements(engine.data, run.current.slots));
+      meetRequirements(player, requirements(engine.data, run.current.characterClass, run.current.slots));
     }
     // Nobody clears a region before moving on: the next one opens once `completion` of it is felled, rounding up, or
     // all of a linear one, rather than waiting for its last boss (web/sim/README.md#A run). This boss counts as

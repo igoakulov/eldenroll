@@ -13,6 +13,7 @@ import {
   type Run,
   type RunInputs,
   type Waiting,
+  WAITING,
   reroll,
   rollNext,
 } from "../engine/run";
@@ -143,25 +144,31 @@ function tally(value: unknown): Record<string, number> {
   return out;
 }
 
+/** What a completed objective and the current one both hold; `null` when it names no boss or class. */
+function objectiveRead(value: unknown): { readonly raw: Loose; readonly base: Omit<Objective, "tally"> } | null {
+  const raw = record(value);
+  if (raw === null || typeof raw.boss !== "string" || typeof raw.characterClass !== "string") return null;
+  return {
+    raw,
+    base: {
+      boss: raw.boss,
+      characterClass: raw.characterClass,
+      slots: slots(raw.slots),
+      shortlistRh: raw.shortlistRh === true,
+      rerolls: rerolls(raw.rerolls),
+      replaced: replaced(raw.replaced),
+    },
+  };
+}
+
 /** A finished objective is kept even when its ids are gone from the data: the run view shows what it can. */
 function completed(value: unknown): CompletedObjective[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((one: unknown) => {
-    const raw = record(one);
-    if (raw === null || typeof raw.boss !== "string" || typeof raw.characterClass !== "string") return [];
-    const at = stats(raw.stats);
-    return [
-      {
-        boss: raw.boss,
-        characterClass: raw.characterClass,
-        slots: slots(raw.slots),
-        shortlistRh: raw.shortlistRh === true,
-        rerolls: rerolls(raw.rerolls),
-        replaced: replaced(raw.replaced),
-        stats: at,
-        level: derivedLevel(at),
-      },
-    ];
+    const read = objectiveRead(one);
+    if (read === null) return [];
+    const at = stats(read.raw.stats);
+    return [{ ...read.base, stats: at, level: derivedLevel(at) }];
   });
 }
 
@@ -171,30 +178,21 @@ function current(
   data: EngineData,
   value: unknown,
 ): { readonly objective: Objective; readonly gone: RerollTarget | null } | null {
-  const raw = record(value);
-  if (raw === null || typeof raw.boss !== "string" || typeof raw.characterClass !== "string") return null;
-  const read = slots(raw.slots);
-  const gone: RerollTarget | null = !data.bosses.has(raw.boss)
+  const read = objectiveRead(value);
+  if (read === null) return null;
+  const { raw, base } = read;
+  const gone: RerollTarget | null = !data.bosses.has(base.boss)
     ? "boss"
-    : !data.database.character_class.some((row) => row.id === raw.characterClass)
+    : !data.database.character_class.some((row) => row.id === base.characterClass)
       ? "character_class"
       : (LOADOUT_ORDER.find((slot) => {
-          const id = read[slot];
+          const id = base.slots[slot];
           return typeof id === "string" && !knownSlotId(data, slot, id);
         }) ?? null);
   const slotTally: Partial<Record<LoadoutSlot, TallyAdded>> = {};
   for (const [slot, added] of Object.entries(record(raw.tally) ?? {}))
     if (LOADOUT_SLOTS.has(slot)) slotTally[slot as LoadoutSlot] = tally(added);
-  const objective: Objective = {
-    boss: raw.boss,
-    characterClass: raw.characterClass,
-    slots: read,
-    shortlistRh: raw.shortlistRh === true,
-    rerolls: rerolls(raw.rerolls),
-    replaced: replaced(raw.replaced),
-    tally: slotTally,
-  };
-  return { objective, gone };
+  return { objective: { ...base, tally: slotTally }, gone };
 }
 
 /** Rerolls from the gone step on, as the reroll slider would, so gear fetched for the slots before it stays. The
@@ -219,7 +217,20 @@ function deadBosses(data: EngineData, value: unknown): DeadBoss[] {
   });
 }
 
-const WAITING: ReadonlySet<string> = new Set<Waiting>(["no_region", "no_bosses", "regions_cleared"]);
+const WAITING_STATES: ReadonlySet<string> = new Set(WAITING);
+
+/** The inputs a run and Start's setup both hold; dead bosses differ in shape, so each reads its own. */
+function inputs(data: EngineData, raw: Loose): Omit<Required<RunInputs>, "deadBosses"> {
+  const regionIds = new Set(data.database.region.map((row) => row.id));
+  return {
+    stats: stats(raw.stats),
+    settings: settings(data, raw.settings),
+    regions: strings(raw.regions, (id) => regionIds.has(id)),
+    weaponShortlist: strings(raw.weaponShortlist, (id) => data.items.has(id)),
+    neverRoll: strings(raw.neverRoll, (key) => knownOptionKey(data, key)),
+    skippedBosses: strings(raw.skippedBosses, (id) => data.bosses.has(id)),
+  };
+}
 
 /** Keeps whatever it can read. `null` only when nothing of a run is there. */
 export function restoreRun(engine: Engine, value: unknown, fresh: Fresh): SavedRun | null {
@@ -228,22 +239,16 @@ export function restoreRun(engine: Engine, value: unknown, fresh: Fresh): SavedR
   if (envelope === null || raw === null) return null;
   const data = engine.data;
   const seed = int32(raw.seed) ?? fresh.seed();
-  const regionIds = new Set(data.database.region.map((row) => row.id));
   const saved = current(data, raw.current);
   const objective = saved?.objective ?? null;
-  const waiting = typeof raw.waiting === "string" && WAITING.has(raw.waiting) ? (raw.waiting as Waiting) : null;
+  const waiting = typeof raw.waiting === "string" && WAITING_STATES.has(raw.waiting) ? (raw.waiting as Waiting) : null;
   const finished = raw.finished === true;
   const run: Run = {
     seed,
     rngState: int32(raw.rngState) ?? seed,
     finished,
-    stats: stats(raw.stats),
-    settings: settings(data, raw.settings),
-    regions: strings(raw.regions, (id) => regionIds.has(id)),
-    weaponShortlist: strings(raw.weaponShortlist, (id) => data.items.has(id)),
+    ...inputs(data, raw),
     deadBosses: deadBosses(data, raw.deadBosses),
-    skippedBosses: strings(raw.skippedBosses, (id) => data.bosses.has(id)),
-    neverRoll: strings(raw.neverRoll, (key) => knownOptionKey(data, key)),
     current: objective,
     waiting: objective === null ? waiting : null,
     completed: completed(raw.completed),
@@ -270,16 +275,9 @@ export function restoreRun(engine: Engine, value: unknown, fresh: Fresh): SavedR
 export function restoreSetup(data: EngineData, value: unknown): Setup | null {
   const raw = record(value);
   if (raw === null) return null;
-  const regionIds = new Set(data.database.region.map((row) => row.id));
-  const bossIds = (id: string) => data.bosses.has(id);
   return {
     schemaVersion: SCHEMA_VERSION,
-    stats: stats(raw.stats),
-    settings: settings(data, raw.settings),
-    regions: strings(raw.regions, (id) => regionIds.has(id)),
-    weaponShortlist: strings(raw.weaponShortlist, (id) => data.items.has(id)),
-    neverRoll: strings(raw.neverRoll, (key) => knownOptionKey(data, key)),
-    deadBosses: strings(raw.deadBosses, bossIds),
-    skippedBosses: strings(raw.skippedBosses, bossIds),
+    ...inputs(data, raw),
+    deadBosses: strings(raw.deadBosses, (id) => data.bosses.has(id)),
   };
 }

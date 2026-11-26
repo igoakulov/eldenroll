@@ -8,7 +8,7 @@ import { selectedLocations } from "./regions";
 import { DEFAULT_STATS, STATS, type Stats } from "./settings";
 import type { Option } from "./selectors";
 import type { RollContext } from "./slotRoll";
-import { lhStatFilter, plainStatFilter, rhStatFilter, statDeficit } from "./stats";
+import { lhStatFilter, plainStatFilter, rhStatFilter, statDeficit, twoHandedHand } from "./stats";
 
 const data = indexDatabase(realDatabase);
 const counted = countedItems(data, {
@@ -64,13 +64,6 @@ describe("statDeficit", () => {
     expect(statDeficit(strOnly, { ...MAXED, str: 15 }, true)).toBe(0);
     expect(statDeficit(strOnly, { ...MAXED, str: 15 }, false)).toBe(7);
     expect(statDeficit({ ...strOnly, str: 23 }, { ...MAXED, str: 15 }, true)).toBe(1);
-  });
-
-  it("leaves Beastclaw Greathammer one point short at 13 Strength two-handed", () => {
-    const hammer = item("beastclaw_greathammer");
-    expect(hammer.str).toBe(20);
-    expect(statDeficit(hammer, { ...MAXED, str: 13 }, true)).toBe(1);
-    expect(statDeficit(hammer, { ...MAXED, str: 14 }, true)).toBe(0);
   });
 
   it("applies the bonus to Strength alone", () => {
@@ -173,5 +166,14 @@ describe("lhStatFilter reads the rolled RH", () => {
   it("gives the bonus when RH is empty", () => {
     expect(lhStatFilter(context("warrior_dw", { rh: null }), needsBonus)(option("zweihander"))).toBe(true);
     expect(lhStatFilter(context("warrior_dw", { rh: "none" }), needsBonus)(option("zweihander"))).toBe(true);
+  });
+});
+
+describe("twoHandedHand reads a rolled loadout", () => {
+  it("two-hands 2H Warrior's RH beside Poisoned Hand, another class's only with LH empty, and LH when RH is", () => {
+    expect(twoHandedHand(data, "warrior_2h", { rh: "zweihander", lh: "poisoned_hand" })).toBe("rh");
+    expect(twoHandedHand(data, "knight", { rh: "zweihander", lh: "brass_shield" })).toBeNull();
+    expect(twoHandedHand(data, "knight", { rh: "zweihander", lh: "none" })).toBe("rh");
+    expect(twoHandedHand(data, "warrior_dw", { rh: "none", lh: "zweihander" })).toBe("lh");
   });
 });

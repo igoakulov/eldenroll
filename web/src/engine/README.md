@@ -6,14 +6,19 @@ The rules of an Elden Roll run, and the code that rolls it. Plain TypeScript wit
 
 | Module | Holds |
 |---|---|
+| `database.ts` | the types of `db.json`, mirroring `pipeline/eldenroll/model/` |
 | `engineData.ts` | indexes built once from `db.json` |
+| `settings.ts` | stats, level and the run settings, with their limits and defaults |
 | `eligibility.ts` | which location rows count (#Eligibility); `countedItems` also counts every item with no row, everywhere |
 | `regions.ts` | selected locations, the Ashen Capital and Maliketh rules, the boss pool |
+| `selectors.ts`, `modifiers.ts` | what a selector matches, and which modifier rows hold for the slots rolled so far |
+| `stats.ts` | the stat gap filters, two-handing's Strength bonus included |
 | `slotRoll.ts` | one pool: filters, odds, modifiers, catch-up and its tally, sampling |
 | `loadout.ts` | every slot in roll order, ash and spell rules, rerolls, the weapon shortlist |
 | `pairRoll.ts` | the two talisman slots, rolled as one draw (`data/balance.md#Paired slots`) |
 | `run.ts` | the run as plain data and every action |
 | `display.ts` | what each card row shows |
+| `random.ts` | the seeded generator and weighted picking |
 | `hyperparams.ts` | balance values passed in, so a hidden page can tune them live; game mechanics never go here |
 
 ## Pitfalls

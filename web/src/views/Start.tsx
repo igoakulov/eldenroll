@@ -16,11 +16,11 @@ import { Tagline } from "./Tagline";
 import "./Start.css";
 
 
-function Hero({ onOpenCard }: { readonly onOpenCard: () => void }) {
+function Hero({ onHowItWorks }: { readonly onHowItWorks: () => void }) {
   return (
     <header className="hero">
       <Wordmark />
-      <Tagline onOpen={onOpenCard} />
+      <Tagline onOpen={onHowItWorks} />
     </header>
   );
 }
@@ -33,7 +33,7 @@ export function Start({
   problems,
   onStats,
   onRegions,
-  onOpenCard,
+  onHowItWorks,
   onRunSettings,
   onStartRun,
   finishedRuns,
@@ -45,7 +45,7 @@ export function Start({
   readonly problems: readonly string[];
   readonly onStats: (stats: Stats) => void;
   readonly onRegions: (regions: readonly string[]) => void;
-  readonly onOpenCard: () => void;
+  readonly onHowItWorks: () => void;
   readonly onRunSettings: () => void;
   readonly onStartRun: () => void;
   readonly finishedRuns: number;
@@ -64,7 +64,7 @@ export function Start({
         </BottomBar>
       }
     >
-      <Hero onOpenCard={onOpenCard} />
+      <Hero onHowItWorks={onHowItWorks} />
       {/* Where a returning player lands, so looking back never means scrolling or resuming first */}
       {finishedRuns > 0 && (
         <div className="start-runs">
@@ -100,7 +100,7 @@ export function Start({
 export function StartResume({
   run,
   title,
-  onOpenCard,
+  onHowItWorks,
   onResume,
   finishedRuns,
   onRuns,
@@ -108,7 +108,7 @@ export function StartResume({
 }: {
   readonly run: Run;
   readonly title: string;
-  readonly onOpenCard: () => void;
+  readonly onHowItWorks: () => void;
   readonly onResume: () => void;
   readonly finishedRuns: number;
   readonly onRuns: () => void;
@@ -126,7 +126,7 @@ export function StartResume({
         </BottomBar>
       }
     >
-      <Hero onOpenCard={onOpenCard} />
+      <Hero onHowItWorks={onHowItWorks} />
       {/* Every run first, as the menu orders them, then this one's way back to its objective */}
       <div className="start-runs">
         <ListRow title={copy.common.runs} detail={runsDetail(true, finishedRuns)} onClick={onRuns} />

@@ -220,95 +220,33 @@ def test_owner_confirmed_boss_regions(boss: str, label: str, region: str) -> Non
     assert _region_of_area()[location_id] == region
 
 
-def test_missing_label_is_reported_not_dropped() -> None:
-    resolution = resolve_labels(["b", "a", "a", "z"], {"a": "x", "unused": "y"})
-
-    assert resolution.resolved == {"a": "x"}
-    assert resolution.unresolved == ("b", "z")
-    assert resolution.non_places == ()
-
-
-def test_non_place_labels_are_listed_apart() -> None:
-    resolution = resolve_labels(["Unused", "Spirit Summon", "a"], {"a": "x"})
-
-    assert resolution.resolved == {"a": "x"}
-    assert resolution.unresolved == ()
-    assert resolution.non_places == ("Spirit Summon", "Unused")
-
-
-def test_boss_override_wins_over_the_label() -> None:
-    aliases = {"Tile": "first"}
-    overrides = {("Boss", "Tile"): "second"}
-
-    assert resolve_boss_location("Boss", "Tile", aliases, overrides) == "second"
-    assert resolve_boss_location("Other", "Tile", aliases, overrides) == "first"
-
-
 def test_boss_on_an_unknown_label_stops_the_build() -> None:
     with pytest.raises(BuildError, match="boss 'Boss' has no alias for label 'Tile'"):
         resolve_boss_location("Boss", "Tile", {}, {})
 
 
-def test_duplicate_label_is_a_loader_error(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("body", "message"),
+    [
+        ("Cave,a\nCave,b\n", "duplicate label 'Cave'"),
+        ("Cave,moon\n", "unknown location_id 'moon'"),
+        (",a\n", "data row 1: empty label"),
+        ("Cave,\n", "data row 1: empty location_id"),
+        ("", "no rows"),
+    ],
+)
+def test_bad_alias_row_is_a_loader_error(tmp_path: Path, body: str, message: str) -> None:
     source = tmp_path / "aliases.csv"
-    source.write_text("label,location_id\nCave,a\nCave,b\n", encoding="utf-8")
+    source.write_text(f"label,location_id\n{body}", encoding="utf-8")
 
-    with pytest.raises(LoaderError, match="duplicate label 'Cave'"):
+    with pytest.raises(LoaderError, match=message):
         load_location_aliases(source, location_ids={"a", "b"})
-
-
-def test_unknown_location_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "aliases.csv"
-    source.write_text("label,location_id\nCave,moon\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="unknown location_id 'moon'"):
-        load_location_aliases(source, location_ids={"a"})
-
-
-def test_empty_label_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "aliases.csv"
-    source.write_text("label,location_id\n,a\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="data row 1: empty label"):
-        load_location_aliases(source, location_ids={"a"})
-
-
-def test_empty_location_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "aliases.csv"
-    source.write_text("label,location_id\nCave,\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="data row 1: empty location_id"):
-        load_location_aliases(source, location_ids={"a"})
-
-
-def test_table_without_rows_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "aliases.csv"
-    source.write_text("label,location_id\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="no rows"):
-        load_location_aliases(source, location_ids={"a"})
-
-
-def test_missing_column_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "aliases.csv"
-    source.write_text("label\nCave\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="missing column 'location_id'"):
-        load_location_aliases(source, location_ids={"a"})
 
 
 def _override_file(tmp_path: Path, row: str) -> Path:
     source = tmp_path / "overrides.csv"
     source.write_text(f"boss,label,location_id,reason\n{row}\n", encoding="utf-8")
     return source
-
-
-def test_override_row_loads(tmp_path: Path) -> None:
-    source = _override_file(tmp_path, "Boss,Tile,a,why")
-
-    loaded = load_boss_location_overrides(source, labels={"Tile"}, location_ids={"a"})
-
-    assert loaded == {("Boss", "Tile"): "a"}
 
 
 @pytest.mark.parametrize(

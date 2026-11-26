@@ -4,6 +4,7 @@ import type { BossInstance, ItemLocation } from "./database";
 import { countedItems, isSetReachable, rowCounts } from "./eligibility";
 import { indexDatabase } from "./engineData";
 import { realDatabase } from "./realDatabase.testing";
+import { selectedLocations } from "./regions";
 
 function boss(id: string, odds = 1): [string, BossInstance] {
   return [id, { id, name: id, location_id: "tile", location: "Tile", odds, url: null }];
@@ -56,5 +57,32 @@ describe("isSetReachable", () => {
     const other = data.aliasMembers.get(data.items.get(helm)!.alias!)!.find((id) => id !== helm)!;
     expect(isSetReachable(data, set, new Set([...rest, other]))).toBe(true);
     expect(isSetReachable(data, set, new Set(rest))).toBe(false);
+  });
+});
+
+describe("on the real data", () => {
+  const data = indexDatabase(realDatabase);
+  const regions = realDatabase.region.map((row) => row.id);
+  const reach = (open: readonly string[], dead: ReadonlySet<string>) =>
+    countedItems(data, { locations: selectedLocations(realDatabase, new Set(open)), deadBosses: dead });
+
+  it("keeps a staff and a seal in reach from the first region on, before any boss is felled", () => {
+    for (let open = 1; open <= regions.length; open += 1) {
+      const classes = new Set([...reach(regions.slice(0, open), NOWHERE)].map((id) => data.items.get(id)?.subcategory));
+      expect(classes.has("glintstone_staff") && classes.has("sacred_seal"), regions[open - 1]).toBe(true);
+    }
+  });
+
+  it("lets every armor set roll once its regions are open and its bosses felled", () => {
+    const dead = new Set(realDatabase.boss_instance.map((row) => row.id));
+    const withAshen = reach(regions, dead);
+    const withoutAshen = reach(
+      regions.filter((id) => id !== "leyndell_ashen"),
+      dead,
+    );
+    const never = realDatabase.armor_set.filter(
+      (set) => !isSetReachable(data, set, withAshen) && !isSetReachable(data, set, withoutAshen),
+    );
+    expect(never.map((set) => set.id)).toEqual([]);
   });
 });

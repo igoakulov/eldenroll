@@ -1,4 +1,5 @@
-import { className, fairDistance, gap, worstLines, type FairLine, type Sample } from "../../sim/aggregate";
+import { fairDistance, gap, worstLines, type FairLine, type Sample } from "../../sim/aggregate";
+import { className } from "../views/timeline";
 import { copy } from "../copy";
 import { DataTable } from "../ui/DataTable";
 import { Section } from "../ui/Headings";

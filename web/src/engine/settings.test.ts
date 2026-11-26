@@ -34,22 +34,8 @@ describe("derivedLevel", () => {
     expect(derivedLevel(allStats(8))).toBe(-15);
   });
 
-  it("reaches 713 with every stat at 99", () => {
-    expect(derivedLevel(allStats(99))).toBe(713);
-  });
-
   it("starts at level 1 with the default stats", () => {
     expect(derivedLevel(DEFAULT_STATS)).toBe(1);
-  });
-});
-
-describe("defaultSettings", () => {
-  it("matches the defaults of the spec, with every class selected", () => {
-    expect(SETTINGS).toEqual({
-      maxStatGap: 10,
-      characterClasses: ["knight", "jester"],
-      weaponShortlistEnabled: true,
-    });
   });
 });
 

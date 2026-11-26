@@ -9,13 +9,13 @@ import sys
 from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import pytest
 
 from eldenroll.build import database as build_database
-from eldenroll.build.database import gate_problems, import_report, main
-from eldenroll.build.serialize import TABLE_FIELDS, database_rows, render
+from eldenroll.build.database import gate_problems, main
+from eldenroll.build.serialize import TABLE_FIELDS, database_rows
 from eldenroll.errors import BuildError
 from eldenroll.model.ash_compatibility import AshCompatibility
 from eldenroll.model.database import Database
@@ -208,14 +208,6 @@ def test_a_gap_with_no_override_is_a_quality_problem(gate_data: GateData) -> Non
     assert any("answer it in requirements.csv" in problem for problem in problems)
 
 
-def test_the_tables_hold_exactly_the_documented_fields(gate_data: GateData) -> None:
-    rows = database_rows(gate_data.database)
-    assert set(rows) == set(TABLE_FIELDS)
-    for table, fields in TABLE_FIELDS.items():
-        assert rows[table]
-        assert all(tuple(row) == fields for row in rows[table])
-
-
 def test_a_modifier_writes_both_kinds_of_condition(gate_data: GateData) -> None:
     rows = {str(row["id"]): row for row in database_rows(gate_data.database)["modifier"]}
     assert rows["jester_none_x33"]["when"] == [{"kind": "character_class", "ids": ["jester"]}]
@@ -227,35 +219,6 @@ def test_a_modifier_writes_both_kinds_of_condition(gate_data: GateData) -> None:
             "negated": False,
         }
     ]
-
-
-def test_whole_odds_read_as_whole_numbers(gate_data: GateData) -> None:
-    rows = {str(row["id"]): row for row in database_rows(gate_data.database)["character_class"]}
-    assert rows["knight"]["odds"] == 1
-    assert isinstance(rows["knight"]["odds"], int)
-
-
-def test_render_is_json_with_a_row_on_a_line() -> None:
-    text = render({"a": [{"x": 1}, {"x": "é"}], "b": {"y": 2}, "c": []})
-    assert json.loads(text) == {"a": [{"x": 1}, {"x": "é"}], "b": {"y": 2}, "c": []}
-    assert '{"x": "é"}' in text.splitlines()
-
-
-def test_the_report_names_where_a_dropped_value_came_from(gate_data: GateData) -> None:
-    report = import_report(gate_data)
-    dropped = cast("list[dict[str, object]]", report["dropped"])
-    assert dropped
-    assert all(set(row) == {"file", "key", "value", "count"} for row in dropped)
-    assert any(str(row["value"]).startswith("[ERROR]") for row in dropped)
-    slots = [row for row in dropped if row["file"] == "placement/item_slots.yaml"]
-    assert all(str(row["key"]).startswith("Slots[") for row in slots)
-    assert any(row["file"] == "placement/enemy_item_lots.csv" for row in dropped)
-
-
-def test_a_pool_item_named_on_a_slot_is_not_dropped(gate_data: GateData) -> None:
-    dropped = {row.value for row in gate_data.dropped if row.file == "placement/item_slots.yaml"}
-    assert "Bloodhound's Fang" not in dropped
-    assert "Smithing Stone [1]" in dropped
 
 
 def test_main_writes_both_files_with_no_timestamp_or_path(

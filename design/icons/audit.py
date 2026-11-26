@@ -8,7 +8,7 @@ import pathlib
 import subprocess
 import sys
 
-from shapely.geometry import LineString, MultiLineString, Point
+from shapely.geometry import Point
 from shapely.ops import linemerge, nearest_points, unary_union
 
 import iconset as rev
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     only = [a for a in sys.argv[1:] if not a.startswith('--')]
     report = {}
     items = []
-    for key, label, fn, alt, ch in rev.ALL:
+    for key, label, fn in rev.ALL:
         if only and key not in only:
             continue
         issues = lint(fn())

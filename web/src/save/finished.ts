@@ -111,6 +111,11 @@ export function packFinished(
   };
 }
 
+/** A run stored in a shape no longer read stays stored, but isn't listed. */
+export function unpackAll(stored: readonly unknown[]): Finished[] {
+  return stored.flatMap((one) => unpackFinished(one) ?? []);
+}
+
 /** `null` for anything unreadable; ids gone from the data stay, for the view to name from the id. */
 export function unpackFinished(value: unknown): Finished | null {
   if (typeof value !== "object" || value === null) return null;

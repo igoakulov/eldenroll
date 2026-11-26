@@ -3,6 +3,7 @@ import type { Database, Item } from "../src/engine/database";
 import type { RolledSlots } from "../src/engine/display";
 import type { EngineData } from "../src/engine/engineData";
 import { MAX_STAT, type Stat, type Stats } from "../src/engine/settings";
+import { strengthNeeded, twoHandedHand } from "../src/engine/stats";
 
 export const ALLOCATIONS = ["ITEMS", "STR", "DEX", "INT", "FTH", "ARC", "ALL"] as const;
 export type Allocation = (typeof ALLOCATIONS)[number];
@@ -195,19 +196,17 @@ export function levelUp(player: PlayerState, progress: Progress): void {
 
 const WIELDED = ["rh", "lh", "spell"] as const;
 
-/** What each stat must reach to wield the objective's gear; Strength counts two-handing. */
-export function requirements(data: EngineData, slots: RolledSlots): Record<ItemStat, number> {
+/** What each stat must reach to wield the objective's gear; Strength counts two-handing as the rolls do. */
+export function requirements(data: EngineData, characterClass: string, slots: RolledSlots): Record<ItemStat, number> {
   const needs: Record<ItemStat, number> = { str: 0, dex: 0, int: 0, fth: 0, arc: 0 };
-  const lh = slots.lh;
-  const lhEmpty = lh === undefined || lh === null || lh === "none";
+  const twoHanded = twoHandedHand(data, characterClass, slots);
   for (const slot of WIELDED) {
     const id = slots[slot];
     if (id === undefined || id === null) continue;
     const item: Item | undefined = data.items.get(id);
     if (item === undefined) continue;
-    const twoHanded = slot === "rh" && lhEmpty && item.str_bonus_2h === true;
     for (const stat of ITEM_STATS) {
-      const need = stat === "str" && twoHanded ? Math.ceil(item.str / 1.5) : item[stat];
+      const need = stat === "str" ? strengthNeeded(item, slot === twoHanded) : item[stat];
       needs[stat] = Math.max(needs[stat], need);
     }
   }

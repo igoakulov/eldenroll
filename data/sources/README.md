@@ -8,7 +8,6 @@ Read this before changing a loader, a build step or an override file. It holds w
 |---|---|---|---|
 | `locations/areas.yaml` | the 174 areas | PC randomizer mod | `annotations_stable.txt` |
 | `locations/submaps.yaml` | test: label cross-check | PC randomizer mod | `submaps.txt` |
-| `locations/location_names.json` | test: name cross-check | eldenring-api | `locations.json` |
 | `placement/item_slots.yaml` | where each item is placed | PC randomizer mod | `itemslots_stable.txt` |
 | `placement/enemy_drops.csv` | enemy drops | spreadsheet | `item_drop_locations.csv` |
 | `placement/enemy_item_lots.csv` | more enemy drops | spreadsheet | `item_drops.csv` |
@@ -22,7 +21,6 @@ Read this before changing a loader, a build step or an override file. It holds w
 | `items/sorceries.json`, `incantations.json` | base requirements | eldenring-api | same |
 | `items/talismans.json`, `ashes.json` | test: name cross-checks | eldenring-api | same |
 | `armor/armors.json` | armor slots | eldenring-api | same |
-| `armor/armor_sets.txt` | test: set memberships | wiki.gg | `armor_sets_transcribed.txt` |
 
 ## Where each source came from
 

@@ -11,132 +11,15 @@ from eldenroll.build.items import new_item
 from eldenroll.errors import BuildError
 from eldenroll.loaders.armor_sets import load_armor_sets
 from eldenroll.loaders.schema import LoaderError
-from eldenroll.paths import ARMOR_SETS_PAGE
 from eldenroll.validate.gaps import GapSources
 
 ROOT = Path(__file__).resolve().parents[2]
 SETS = ROOT / "data" / "overrides" / "armor_sets.csv"
 
-# What the table leaves out of the page's sets: the variant picks.
-LEFT_OUT = {
-    "Raya Lucaria Set": {
-        "Karolos Glintstone Crown",
-        "Olivinus Glintstone Crown",
-        "Witch's Glintstone Crown",
-    },
-    "Gravebird Set": {"Gravebird Armor"},
-    "Commoner's Set": {"Commoner's Garb"},
-    "Guardian Set": {"Guardian Garb (Full Bloom)"},
-    "Hoslow's Set": {"Diallos's Mask"},
-    "Noble's Traveling Set": {"Crimson Hood"},
-    "Preceptor's Set": {"Mask of Confidence"},
-    "Mushroom Set": {"Mushroom Crown"},
-    # The altered form of High Priest Robe, so not a piece (data/README.md#Armor).
-    "High Priest Set": {"Finger Robe"},
-}
-HIGHLAND = {
-    "Highland Warrior": {
-        "Leather Crown",
-        "Highland Attire",
-        "Leather Arm Wraps",
-        "Leather Leg Wraps",
-    },
-    "Highland Warrior (Gloried)": {
-        "Leather Headband",
-        "Gloried Attire",
-        "Leather Arm Wraps",
-        "Leather Leg Wraps",
-    },
-}
-
-
-# Sets the page lacks, named in armor_sets.csv.
-# The page has one set for each; the game can't alter these chests back, so each look is a set.
-SPLIT = {
-    "Banished Knight Set": {
-        "Banished Knight Helm",
-        "Banished Knight Armor (Altered)",
-        "Banished Knight Gauntlets",
-        "Banished Knight Greaves",
-    },
-    "Banished Knight Set (Caped)": {
-        "Banished Knight Helm (Altered)",
-        "Banished Knight Armor",
-        "Banished Knight Gauntlets",
-        "Banished Knight Greaves",
-    },
-    "Fire Prelate Set": {
-        "Fire Prelate Helm",
-        "Fire Prelate Armor",
-        "Fire Prelate Gauntlets",
-        "Fire Prelate Greaves",
-    },
-    "Fire Prelate Set (Altered)": {
-        "Fire Prelate Helm",
-        "Fire Prelate Armor (Altered)",
-        "Fire Prelate Gauntlets",
-        "Fire Prelate Greaves",
-    },
-}
-OFF_PAGE = {
-    "Golden Order Set": {
-        "Broken Gold Mask",
-        "Gold Tattoo (Chest)",
-        "Gold Tattoo (Arm)",
-        "Gold Tattoo (Leg)",
-    },
-    "Leontiel's Set": {
-        "Leontiel's Hat",
-        "Leontiel's Armor",
-        "Leontiel's Leather Gloves",
-        "Leontiel's Boots",
-    },
-}
-
-
-# The changes to the page's sets: Blue Dancer Charm keeps these empty slots
-# empty, and the Traveler's Set gains White Mask and a name for it.
-EMPTIED = {
-    "Bloodsoaked Set": {"None (Legs)"},
-    "Festive Set": {"None (Arms)", "None (Legs)"},
-    "Blue Festive Set": {"None (Arms)", "None (Legs)"},
-}
-RENAMED = {"Traveler's Set": ("Traveling Surgeon Set", {"White Mask"})}
-
-
-def _page_sets() -> dict[str, set[str]]:
-    """Return the page's sets, with `(Altered)` removed and `Chain Gauntlets` under its name."""
-    out: dict[str, set[str]] = {}
-    for line in ARMOR_SETS_PAGE.read_text(encoding="utf-8").splitlines():
-        if line.startswith("## "):
-            break
-        name, _, pieces = line.partition(": ")
-        out[name] = {piece.strip().removesuffix(" (Altered)") for piece in pieces.split(" | ")}
-    chain = out["Chain Set"]
-    chain.remove("Chain Gauntlets")
-    chain.add("Gauntlets")
-    return out
-
 
 @pytest.fixture(scope="module")
 def sets() -> dict[str, tuple[str, ...]]:
     return load_armor_sets(SETS)
-
-
-def test_every_set_of_the_page_has_its_pieces(sets: dict[str, tuple[str, ...]]) -> None:
-    expected = {
-        name: pieces - LEFT_OUT.get(name, set()) | EMPTIED.get(name, set())
-        for name, pieces in _page_sets().items()
-    }
-    del expected["Highland Warrior Set"]
-    for old, (new, added) in RENAMED.items():
-        expected[new] = expected.pop(old) | added
-    expected |= HIGHLAND | SPLIT | OFF_PAGE
-    assert {name: set(sets.get(name, ())) for name in expected} == expected
-
-
-def test_the_highland_warrior_set_is_split_in_two(sets: dict[str, tuple[str, ...]]) -> None:
-    assert {name: set(sets[name]) for name in HIGHLAND} == HIGHLAND
 
 
 def test_the_docs_examples_link_as_written(

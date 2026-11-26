@@ -16,7 +16,7 @@ Every odds reason names what it serves, so a preference can be retuned while the
 
 ## How to tune
 
-- **Read the full-run simulation per stat allocation** (`web/sim/README.md`), never a mix of builds: what a build can use decides what reaches it. Weapons and ashes read in Even, STR and DEX; spells in the builds whose stats they need; talismans and armor in Even, STR and ARC. Completion 80 at 200 runs per allocation tells real gaps from luck down to a tenth of a showing a run.
+- **Read the full-run simulation per stat allocation** (`web/sim/README.md`), never a mix of builds: what a build can use decides what reaches it. Weapons and ashes read in ALL, STR and DEX; spells in the builds whose stats they need; talismans and armor in ALL, STR and ARC. Completion 80 at 200 runs per allocation tells real gaps from luck down to a tenth of a showing a run.
 - **Vs fair is the yardstick for catch-up.** It compares an item's showings with an even share of its slot over the run and doesn't depend on odds, so raising an item's odds raises its Vs fair. Items with rows are read by their share where the condition holds instead, against the aim their rule states.
 - **A row above ×1 lifts its target past catch-up.** The target is weighed at least at its base share while the row holds, even where catch-up or the ceiling would give it less (#Hyperparameters). A class-wide or always-true boost row therefore acts far beyond its multiplier; lower a class with a row below ×1, which leaves catch-up alone.
 - **A pair row is always in play.** In the paired talisman slots, a row linking two options boosts the pair in every objective where both can roll, and catch-up never pays a rule back, so a strong pair row floods both. Aim it at a share and check the peaks by region.

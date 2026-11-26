@@ -20,7 +20,7 @@ def main(out):
     out.mkdir(parents=True, exist_ok=True)
     for old in out.glob('*.svg'):
         old.unlink()
-    for key, label, fn, alt, changed in iconset.ALL:
+    for key, label, fn in iconset.ALL:
         if key in UI:
             (out / f'{key}.svg').write_text(standalone(render_line(fn(), 'xs')))
             continue

@@ -19,7 +19,7 @@ export type SlotDisplay =
       readonly pieces: Readonly<Record<ArmorPiece, SlotDisplay>>;
     };
 
-export const DISPLAY_SLOTS = [
+const DISPLAY_SLOTS = [
   "rh",
   "rh_ash",
   "lh",

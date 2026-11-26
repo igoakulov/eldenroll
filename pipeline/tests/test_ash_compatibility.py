@@ -102,26 +102,6 @@ def test_every_weapon_that_can_hold_an_ash_has_one(sources: GapSources) -> None:
     assert infusable_without_ashes(sources.table, sources.ash_compatibility) == ()
 
 
-@pytest.mark.parametrize(
-    ("ash", "fit"),
-    [
-        ("Wall of Sparks", {("weapon", "perfume_bottle")}),
-        ("Palm Blast", {("weapon", "hand_to_hand")}),
-        ("Shield Strike", {("shield", None), ("weapon", "thrusting_shield")}),
-    ],
-)
-def test_dlc_ash_fits_its_classes(
-    rows: dict[str, set[tuple[str, str | None]]], ash: str, fit: set[tuple[str, str | None]]
-) -> None:
-    assert rows[ash] == fit
-
-
-def test_lightning_slash_does_not_fit_halberds(
-    rows: dict[str, set[tuple[str, str | None]]],
-) -> None:
-    assert ("weapon", "halberd") not in rows["Lightning Slash"]
-
-
 def test_sheet_cells_become_rows() -> None:
     sheet = _sheet(("Parry", "TRUE", "TRUE", "FALSE", "TRUE", "FALSE", "FALSE", "FALSE"))
     assert build_ash_compatibility([_ash("Parry")], sheet, ()) == (

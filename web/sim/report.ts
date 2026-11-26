@@ -2,7 +2,6 @@
 // the page's own counting in aggregate.ts, so a wide sample reads exactly as the page would read it.
 import { copy } from "../src/copy";
 import {
-  className,
   FAIR_TABLES,
   fairLines,
   gap,
@@ -24,6 +23,7 @@ import {
   type SynergyRow,
   vsFair,
 } from "./aggregate";
+import { className } from "../src/views/timeline";
 import { STATS } from "../src/engine/settings";
 import { decimal, lineClasses, multiplier, percent, perRun, rowName, signedPerRun } from "../src/sim/format";
 

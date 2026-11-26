@@ -17,7 +17,7 @@ const GEAR_KINDS = [
   "rule",
 ] as const;
 export type GearGroup = (typeof GEAR_KINDS)[number];
-export const GEAR_GROUPS = GEAR_KINDS.map((kind) => ({ kind, label: copy.runSettings.gearGroups[kind] }));
+const GEAR_GROUPS = GEAR_KINDS.map((kind) => ({ kind, label: copy.runSettings.gearGroups[kind] }));
 
 export interface GearEntry {
   /** What the list stores: an `optionKey` for `Never roll`, an item id for the `Weapon shortlist`. */

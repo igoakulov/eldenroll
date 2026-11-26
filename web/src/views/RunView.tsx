@@ -92,11 +92,9 @@ function Shown({
   const matched = pick !== null && pickKeyOf(display) === pick;
   if (display.kind === "none" && gone !== null) return <TimelineValue>{gone}</TimelineValue>;
   // The rule `None` is an empty slot, as on the card
-  if (display.kind === "rule" && isNone(display.rule.id))
+  if (display.kind === "none" || (display.kind === "rule" && isNone(display.rule.id)))
     return <TimelineValue kind="none">{copy.controls.none}</TimelineValue>;
   switch (display.kind) {
-    case "none":
-      return <TimelineValue kind="none">{copy.controls.none}</TimelineValue>;
     case "any":
       return <TimelineValue kind="any">{copy.controls.any}</TimelineValue>;
     case "item":

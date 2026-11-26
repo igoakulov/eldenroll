@@ -22,15 +22,6 @@ class CsvTable:
     header: tuple[str, ...]
     rows: tuple[tuple[str, ...], ...]
 
-    @property
-    def row_count(self) -> int:
-        """Blank rows are included in the count."""
-        return len(self.rows)
-
-    @property
-    def blank_row_count(self) -> int:
-        return sum(1 for row in self.rows if all(cell == "" for cell in row))
-
     def column(self, name: str) -> int:
         """Return the index of the single header cell named `name`."""
         return _column_index(self.header, name, str(self.path))

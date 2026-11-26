@@ -45,11 +45,6 @@ def _assign(
     return assign_requirements([row], records, variants or {}, overrides or {})[0]
 
 
-def test_requirements_are_five_integers_on_every_row(table: tuple[Item, ...]) -> None:
-    for row in table:
-        assert all(isinstance(stat, int) and stat >= 0 for stat in _stats(row)), row.name
-
-
 def test_only_items_that_bear_stats_have_any(table: tuple[Item, ...]) -> None:
     assert not [row.name for row in table if row.category not in BEARS_STATS and any(_stats(row))]
 

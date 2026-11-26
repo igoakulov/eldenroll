@@ -7,7 +7,7 @@ import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 
-import { serviceWorkerSource } from "./scripts/serviceWorker";
+import { serviceWorkerSource } from "./scripts/serviceWorker.ts";
 
 const databasePath = fileURLToPath(new URL("../data/build/db.json", import.meta.url));
 

@@ -1,7 +1,4 @@
-"""Tests for the authored region seed.
-
-The expected ids, names and levels here are the record; no doc repeats them.
-"""
+"""Tests for the authored region seed: a mistake in it stops the load."""
 
 from __future__ import annotations
 
@@ -13,49 +10,19 @@ from eldenroll.loaders.regions import load_regions
 from eldenroll.loaders.schema import LoaderError
 
 
-def test_duplicate_region_id_is_a_loader_error(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("body", "message"),
+    [
+        ("a,One,1\na,Two,2\n", "duplicate region id 'a'"),
+        ("a,One,1\nb,Two,1\n", "region_level 1 is used by both 'a' and 'b'"),
+        ("a,One,30\nb,Two,1\n", "region_level 1 at 'b' does not follow 30 at 'a'"),
+        ("a,One,early\n", "region_level 'early' is not an integer"),
+        ("a,,1\n", "data row 1: empty region name"),
+    ],
+)
+def test_bad_region_row_is_a_loader_error(tmp_path: Path, body: str, message: str) -> None:
     source = tmp_path / "regions.csv"
-    source.write_text("id,name,region_level\na,One,1\na,Two,2\n", encoding="utf-8")
+    source.write_text(f"id,name,region_level\n{body}", encoding="utf-8")
 
-    with pytest.raises(LoaderError, match="duplicate region id 'a'"):
-        load_regions(source)
-
-
-def test_duplicate_region_level_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "regions.csv"
-    source.write_text("id,name,region_level\na,One,1\nb,Two,1\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="region_level 1 is used by both 'a' and 'b'"):
-        load_regions(source)
-
-
-def test_descending_region_level_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "regions.csv"
-    source.write_text("id,name,region_level\na,One,30\nb,Two,1\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="region_level 1 at 'b' does not follow 30 at 'a'"):
-        load_regions(source)
-
-
-def test_non_integer_region_level_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "regions.csv"
-    source.write_text("id,name,region_level\na,One,early\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="region_level 'early' is not an integer"):
-        load_regions(source)
-
-
-def test_empty_region_name_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "regions.csv"
-    source.write_text("id,name,region_level\na,,1\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="data row 1: empty region name"):
-        load_regions(source)
-
-
-def test_missing_column_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "regions.csv"
-    source.write_text("id,name\na,One\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="missing column 'region_level'"):
+    with pytest.raises(LoaderError, match=message):
         load_regions(source)

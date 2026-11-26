@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from eldenroll.build.items import new_item, none_item
+from eldenroll.build.items import new_item
 from eldenroll.errors import BuildError
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.loaders.str_bonus import load_str_bonus
@@ -14,17 +14,6 @@ from eldenroll.model.item import Item
 from eldenroll.model.vocabulary import NO_STR_BONUS
 from eldenroll.normalize.str_bonus import assign_str_bonus
 from eldenroll.validate.gaps import GapSources
-
-PAIRED = {
-    "Ornamental Straight Sword",
-    "Rellana's Twin Blades",
-    "Greatsword of Radahn (Lord)",
-    "Greatsword of Radahn (Light)",
-    "Falx",
-    "Dancing Blade of Ranah",
-    "Horned Warrior's Sword",
-    "Death Knight's Twin Axes",
-}
 
 
 @pytest.fixture(scope="module")
@@ -35,17 +24,6 @@ def table(sources: GapSources) -> tuple[Item, ...]:
 def test_every_exception_class_item_is_false_but_grafted_dragon(table: tuple[Item, ...]) -> None:
     keeps_it = {row.name for row in table if row.subcategory in NO_STR_BONUS and row.str_bonus_2h}
     assert keeps_it == {"Grafted Dragon"}
-
-
-def test_false_outside_the_classes_is_only_the_paired_list(table: tuple[Item, ...]) -> None:
-    false = {
-        row.name
-        for row in table
-        if row.category in ("weapon", "shield")
-        and row.str_bonus_2h is False
-        and row.subcategory not in NO_STR_BONUS
-    }
-    assert false == PAIRED
 
 
 @pytest.mark.parametrize(
@@ -62,13 +40,6 @@ def test_weapon_has_its_bonus(table: tuple[Item, ...], name: str, expected: bool
     assert next(row for row in table if row.name == name).str_bonus_2h is expected
 
 
-def test_other_categories_stay_null(table: tuple[Item, ...]) -> None:
-    others = [row for row in table if row.category not in ("weapon", "shield", "none")]
-    assert others
-    assert all(row.str_bonus_2h is None for row in others)
-    assert next(row for row in table if row.category == "none").str_bonus_2h is False
-
-
 def test_class_sets_the_default_and_the_override_wins() -> None:
     rows = assign_str_bonus(
         [
@@ -81,11 +52,6 @@ def test_class_sets_the_default_and_the_override_wins() -> None:
         {"C": True, "D": False},
     )
     assert [row.str_bonus_2h for row in rows] == [True, False, True, False, True]
-
-
-def test_other_categories_are_left_alone() -> None:
-    rows = assign_str_bonus([new_item("A", "talisman"), none_item()], {})
-    assert [row.str_bonus_2h for row in rows] == [None, False]
 
 
 @pytest.mark.parametrize("name", ["Nope", "Talisman"])

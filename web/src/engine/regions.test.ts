@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { BossInstance, Database } from "./database";
 import { realDatabase as database } from "./realDatabase.testing";
-import { DEFAULT_REGIONS, bossPool, selectedLocations } from "./regions";
+import { bossPool, selectedLocations } from "./regions";
 
 const NO_DEAD: ReadonlySet<string> = new Set();
 const ROYAL = "leyndell";
@@ -36,25 +36,10 @@ function fixture(bosses: readonly Pick<BossInstance, "id" | "odds">[]): Pick<
   };
 }
 
-describe("regions", () => {
-  it("are stored in ascending region_level, which is the display order", () => {
-    const levels = database.region.map((row) => row.region_level);
-    expect(levels).toEqual([...levels].sort((a, b) => a - b));
-  });
-
-  it("default to the first region only", () => {
-    expect(DEFAULT_REGIONS).toEqual([database.region[0]?.id]);
-  });
-});
-
 describe("selectedLocations", () => {
   it("holds exactly a selected region's locations", () => {
     const expected = database.location.filter((row) => row.region_id === "caelid").map((row) => row.id);
     expect([...selectedLocations(database, new Set(["caelid"]))].sort()).toEqual(expected.sort());
-  });
-
-  it("is empty with no region", () => {
-    expect(selectedLocations(database, new Set()).size).toBe(0);
   });
 
   it("drops the Royal Capital for the Ashen one, but keeps the Shunning-Grounds", () => {

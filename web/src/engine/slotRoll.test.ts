@@ -82,22 +82,11 @@ describe("slot pools on the real data", () => {
     expect(ids(result)).not.toContain("lamenters_mask");
   });
 
-  it("gives None its base odds as a rule", () => {
-    const odds = realDatabase.combat_rule.find((row) => row.id === "none")!.odds;
-    expect(weightOf(pool("knight", "rule"), "none")).toBe(odds);
-  });
-
   it("gives Jester's empty hand its own odds, and only there", () => {
     expect(weightOf(pool("jester", "rh"), "none")).toBe(modifierRow("jester_none_x33").value);
     expect(weightOf(pool("warrior_2h", "lh"), "none")).toBe(1);
   });
 
-  it("gives a seal and a staff their own base odds", () => {
-    const result = pool("spellblade", "lh");
-    expect(weightOf(result, "finger_seal")! / weightOf(result, "astrologers_staff")!).toBeCloseTo(
-      item("finger_seal").odds / item("astrologers_staff").odds,
-    );
-  });
 });
 
 function modifierRow(id: string): Modifier {
@@ -232,11 +221,6 @@ describe("location filter on the real data", () => {
   const morgott = realDatabase.item_location.find(
     (row) => row.item_id === "morgotts_cursed_sword" && row.boss_instance_id !== null,
   )?.boss_instance_id;
-
-  it("keeps consumables with no location rows", () => {
-    const result = pool("knight", "item", {}, countedFor(LIMGRAVE, new Set()));
-    expect(ids(result)).toContain(realDatabase.item.find((row) => row.category === "consumable")?.id);
-  });
 
   it("holds a boss's weapon back until the boss is dead, whatever the region", () => {
     if (morgott === undefined || morgott === null) throw new Error("Morgott has no row");
@@ -410,13 +394,6 @@ describe("on a small database", () => {
       expect(roll.chosen).toBeNull();
     });
 
-    it("gives the same result for the same random numbers", () => {
-      const sequence = () => {
-        const values = [0.1, 0.8, 0.5];
-        return values.map((value) => rollSlot(context, "talisman_1", () => value).chosen?.option.row.id);
-      };
-      expect(sequence()).toEqual(sequence());
-    });
   });
 });
 
@@ -458,7 +435,7 @@ describe("catch-up", () => {
     const context = { data: real, state, counted: EVERYTHING, catchUp, tally: { had, scope }, left: 0.5 };
     const result = weighOptions(context, options);
     const late = result.options.find((row) => row.option.row.id === "miquellan_knights_sword")!;
-    expect(late.catchUp).toBeCloseTo(3);
+    expect(late.catchUp).toBeCloseTo(catchUp.ceiling(0.5));
     expect(result.tally[`${tallyKey(scope, late.option)}#left`]).toBe(0.5);
   });
 

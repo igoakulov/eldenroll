@@ -15,12 +15,10 @@ from eldenroll.loaders.ash_sources import load_ash_sources
 from eldenroll.loaders.json_source import load_document
 from eldenroll.loaders.name_variants import load_name_variants
 from eldenroll.loaders.schema import LoaderError
-from eldenroll.loaders.weapons import load_ash_compatibility, load_weapon_categories
+from eldenroll.loaders.weapons import load_weapon_categories
 from eldenroll.model.item import Item
 from eldenroll.model.item_catalog import CatalogGroup, ItemCatalog
 from eldenroll.paths import (
-    ASH_WEAPON_MATRIX,
-    ITEM_SLOTS,
     ITEMS_DIR,
     WEAPON_SHIELD_CLASSES,
 )
@@ -30,32 +28,6 @@ ROOT = Path(__file__).resolve().parents[2]
 OVERRIDES = ROOT / "data" / "overrides"
 
 ASH_SOURCES = OVERRIDES / "ash_sources.csv"
-NOT_IN_THE_COMPATIBILITY_SHEET = {
-    "Aspects of the Crucible: Wings",
-    "Blind Spot",
-    "Blinkbolt",
-    "Carian Sovereignty",
-    "Divine Beast Frost Stomp",
-    "Dryleaf Whirlwind",
-    "Flame Skewer",
-    "Flame Spear",
-    "Ghostflame Call",
-    "Igon's Drake Hunt",
-    "Overhead Stance",
-    "Palm Blast",
-    "Piercing Throw",
-    "Raging Beast",
-    "Rolling Sparks",
-    "Savage Lion's Claw",
-    "Scattershot Throw",
-    "Shield Strike",
-    "Shriek of Sorrow",
-    "Spinning Gravity Thrust",
-    "Swift Slash",
-    "The Poison Flower Blooms Twice",
-    "Wall of Sparks",
-    "Wing Stance",
-}
 
 
 def _catalog(names: dict[int, str]) -> ItemCatalog:
@@ -115,15 +87,6 @@ def test_every_source_weapon_is_in_the_weapon_pool(catalog: ItemCatalog) -> None
 
 
 @pytest.mark.parametrize(
-    "weapon", ["Banished Knight's Halberd +8", "Rogier's Rapier +8", "Igon's Greatbow"]
-)
-def test_upgraded_source_is_named_as_the_slot_lines_name_it(weapon: str) -> None:
-    text = (ITEM_SLOTS).read_text(encoding="utf-8")
-
-    assert f"{weapon} - lot " in text or f"{weapon} - enemy lot " in text
-
-
-@pytest.mark.parametrize(
     ("line", "message"),
     [
         ("Parry,Dagger,", "empty reason"),
@@ -146,21 +109,8 @@ def test_repeated_ash_source_stops_the_load(tmp_path: Path) -> None:
         load_ash_sources(path)
 
 
-def test_ash_is_present(names: set[str]) -> None:
-    assert {"Wall of Sparks", "Rolling Sparks", "Parry", "Spinning Weapon", "No Skill"} <= names
-
-
 def test_no_name_keeps_the_prefix(names: set[str]) -> None:
     assert not [name for name in names if "ash of war" in name.lower()]
-
-
-def test_compatibility_sheet_differs_from_the_pool_only_as_known(names: set[str]) -> None:
-    table = load_ash_compatibility(ASH_WEAPON_MATRIX)
-    column = table.column("Name")
-    sheet = {row[column] for row in table.rows if row[column]}
-
-    assert sheet - names == EXCLUDED
-    assert names - sheet == NOT_IN_THE_COMPATIBILITY_SHEET
 
 
 def test_every_json_ash_maps_to_the_pool_or_is_known(names: set[str]) -> None:

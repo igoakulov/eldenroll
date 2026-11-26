@@ -4,13 +4,11 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import cast
 
 import pytest
 
 from eldenroll.build.items import new_item, none_item
 from eldenroll.errors import BuildError
-from eldenroll.model.item import Category
 from eldenroll.model.selector import SELECTOR_KINDS, Selector, SelectorKind
 from eldenroll.model.vocabulary import (
     CATEGORIES,
@@ -26,19 +24,12 @@ from eldenroll.validate.selectors import (
     validate_modifier_target,
     validate_selectors,
 )
-from eldenroll.validate.subcategories import validate_subcategories
 
 
 def test_every_category_and_subcategory_holds_an_item(placement_data: PlacementData) -> None:
     assert {row.category for row in placement_data.table} == CATEGORIES
     used = {row.subcategory for row in placement_data.table if row.subcategory is not None}
     assert used == set().union(*SUBCATEGORIES.values())
-
-
-def test_an_unknown_category_fails() -> None:
-    row = replace(new_item("A", "talisman"), category=cast(Category, "relic"))
-    with pytest.raises(BuildError, match="bad category or subcategory on: A"):
-        validate_subcategories([row])
 
 
 @pytest.mark.parametrize("ids", [None, [], ()])

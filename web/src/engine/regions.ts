@@ -52,15 +52,6 @@ function royalCapitalGone(
   );
 }
 
-/** Bosses that can never be fought, alive or not. */
-export function lockedOutBosses(
-  database: Pick<Database, "location" | "boss_instance">,
-  deadBosses: ReadonlySet<string>,
-): ReadonlySet<string> {
-  const gone = royalCapitalGone(database, deadBosses);
-  return new Set(database.boss_instance.filter((row) => gone.has(row.location_id)).map((row) => row.id));
-}
-
 /** A skipped boss leaves the pool like a dead one, and counts as gone for finishing the run.
  * `bosses` keeps the table's row order, so a seed always samples the same sequence. */
 export function bossPool(

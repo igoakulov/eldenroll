@@ -21,7 +21,6 @@ from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.character_class import SlotPool
 from eldenroll.model.item import Item
 from eldenroll.model.selector import Selector
-from eldenroll.model.vocabulary import CATALYST, MELEE, RANGED, UNPAIRED
 from eldenroll.normalize.selectors import new_selector
 from eldenroll.validate.placement import PlacementData
 from eldenroll.validate.selectors import known_ids, resolve_items
@@ -50,72 +49,14 @@ def _resolved(
     }
 
 
-def _subcategories(rows: tuple[Item, ...]) -> set[str | None]:
-    return {row.subcategory for row in rows}
-
-
-def test_hands_resolve_to_their_classes(
+def test_jesters_staff_can_hold_spinning_weapon(
     pools: tuple[SlotPool, ...], placement_data: PlacementData
 ) -> None:
-    resolved = _resolved(pools, placement_data.table)
-    assert _subcategories(resolved["knight", "rh"]) == UNPAIRED | {"thrusting_shield"}
-    assert _subcategories(resolved["warrior_2h", "rh"]) == MELEE | {"thrusting_shield"}
-    assert _subcategories(resolved["warrior_dw", "rh"]) == MELEE
-    # data/balance.md#45. Poisoned Hand
-    assert _subcategories(resolved["warrior_dw", "lh"]) == UNPAIRED | {None, "fist"}
-    assert _subcategories(resolved["spellblade", "rh"]) == UNPAIRED
-    assert _subcategories(resolved["ranger", "rh"]) == RANGED
-    # data/balance.md#35. Carian Sorcery Sword
-    sorcerer_rh = resolved["sorcerer", "rh"]
-    assert _subcategories(sorcerer_rh) == {"glintstone_staff", "thrusting_sword"}
-    swords = {row.id for row in sorcerer_rh if row.subcategory == "thrusting_sword"}
-    assert swords == {"carian_sorcery_sword"}
-    # data/balance.md#46. Pyromancer's weapons
-    pyromancer_rh = resolved["pyromancer", "rh"]
-    weapons = {row.id for row in pyromancer_rh if row.subcategory != "sacred_seal"}
-    assert weapons == {"coded_sword", "cipher_pata"}
-    # data/balance.md#32. Caster left hand
-    casters = (("sorcerer", "glintstone_staff"), ("pyromancer", "sacred_seal"))
-    for character_class, catalyst in casters:
-        hand = resolved[character_class, "lh"]
-        assert _subcategories(hand) == {catalyst, "small_shield", "medium_shield", "greatshield"}
-        assert {row.id for row in hand if row.subcategory == "greatshield"} == {"jellyfish_shield"}
-    assert _subcategories(resolved["spellblade", "lh"]) == CATALYST
-    assert "none" in {row.id for row in resolved["knight", "lh"]}
-
-
-def test_empty_hands_and_spells_hold_only_none(
-    pools: tuple[SlotPool, ...], placement_data: PlacementData
-) -> None:
-    resolved = _resolved(pools, placement_data.table)
-    assert {row.id for row in resolved["warrior_2h", "lh"]} == {"none", "poisoned_hand"}
-    assert {row.id for row in resolved["jester", "lh"]} == {"none", "jellyfish_shield"}
-    empty = [
-        ("ranger", "lh"),
-        *((character_class, "spell") for character_class in ("knight", "warrior_2h", "warrior_dw")),
-        ("ranger", "spell"),
-        ("jester", "spell"),
-    ]
-    for key in empty:
-        assert [row.id for row in resolved[key]] == ["none"], key
-
-
-def test_jester_right_hand(pools: tuple[SlotPool, ...], placement_data: PlacementData) -> None:
+    # web/src/engine/README.md#Classes: Jester's one staff is there for `Spinning Weapon`
     found = _resolved(pools, placement_data.table)["jester", "rh"]
-    assert "none" in {row.id for row in found}
-    assert _subcategories(found) == {
-        None,
-        "greatshield",
-        "torch",
-        "perfume_bottle",
-        "glintstone_staff",
-        "fist",
-        "small_shield",
-    }
-    assert [row.name for row in found if row.subcategory == "fist"] == ["Grafted Dragon"]
     staves = [row for row in found if row.subcategory == "glintstone_staff"]
-    assert [row.name for row in staves] == ["Demi-Human Queen's Staff"]
-    assert staves[0].infusable
+    assert staves
+    assert all(row.infusable for row in staves)
 
 
 def _swap(

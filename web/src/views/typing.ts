@@ -7,14 +7,14 @@ export const TAGLINE_LINK: string = copy.start.taglineLink;
 /** A person's rhythm rather than a constant beat, but flowing: keys vary a little, a word's first letter comes a
  * touch slower, and a space or punctuation adds a short breath rather than a stop. Deleting goes a word at a
  * time, as a person holding Option-Backspace would. */
-export const TYPE_MS = 34;
+const TYPE_MS = 34;
 const JITTER = 0.12;
 const WORD_START = 1.35;
 const WORD_PAUSE_MS = 30;
 const COMMA_PAUSE_MS = 95;
 const STOP_PAUSE_MS = 140;
-export const DELETE_WORD_MS = 45;
-export const PAUSE_MS = 450;
+const DELETE_WORD_MS = 45;
+const PAUSE_MS = 450;
 
 /** The wait after typing `typed`, the character just shown, before `next`; `random` is in [0, 1). */
 export function keyDelay(typed: string, random: number, next = ""): number {

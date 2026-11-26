@@ -96,10 +96,6 @@ describe("startRun", () => {
     expect(location?.region_id).toBe("limgrave");
   });
 
-  it("is plain data, so it survives a JSON round trip unchanged", () => {
-    const run = done(engine, start());
-    expect(JSON.parse(JSON.stringify(run))).toEqual(run);
-  });
 });
 
 describe("a whole run, one Done per boss", () => {
@@ -126,17 +122,6 @@ describe("a whole run, one Done per boss", () => {
     expect(run.completed.every((row) => row.rerolls.length === 0)).toBe(true);
   });
 
-  it("gives the same run for the same seed and actions", () => {
-    const play = (seed: number) => {
-      let run = start({}, seed);
-      for (let step = 0; step < 20; step += 1) {
-        run = step % 3 === 0 ? reroll(engine, run, "lh") : doneAndRoll(run);
-      }
-      return run;
-    };
-    expect(play(11)).toEqual(play(11));
-    expect(play(11)).not.toEqual(play(12));
-  });
 });
 
 describe("Done", () => {

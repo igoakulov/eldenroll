@@ -1,4 +1,5 @@
-import { className, NO_LOCATION, type FairLine, type ModifierText, type Sample, type ShareRow, type Trigger } from "../../sim/aggregate";
+import { className } from "../views/timeline";
+import { NO_LOCATION, type FairLine, type ModifierText, type Sample, type ShareRow, type Trigger } from "../../sim/aggregate";
 import { copy } from "../copy";
 import type { TableFold } from "../ui/DataTable";
 

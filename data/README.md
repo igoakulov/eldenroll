@@ -9,7 +9,7 @@ The database Elden Roll rolls from: what is in it and why, and the rules no sing
 | `balance.md` | the reason for every odds value other than 1 and every conditional rule |
 | `build/` | `db.json`, the only file the app reads, and `import-report.json`; git-ignored |
 
-Field types are `pipeline/eldenroll/model/`, mirrored in `web/src/engine/database.ts`. The data gate is `pipeline/eldenroll/validate/`. Counts are pinned by the tests. How the engine uses each row: `web/src/engine/README.md`.
+Field types are `pipeline/eldenroll/model/`, mirrored in `web/src/engine/database.ts`. The data gate is `pipeline/eldenroll/validate/`; it holds the expected counts (`quality.py`). How the engine uses each row: `web/src/engine/README.md`.
 
 ## Scope
 

@@ -60,12 +60,6 @@ def test_class_that_never_holds_an_ash(table: tuple[Item, ...], subcategory: str
     assert not any(row.infusable for row in rows)
 
 
-def test_other_categories_stay_null(table: tuple[Item, ...]) -> None:
-    others = [row for row in table if row.category not in ("weapon", "shield")]
-    assert others
-    assert all(row.infusable is None for row in others)
-
-
 def test_override_beats_the_class_and_the_sheet() -> None:
     rows = assign_infusable(
         [

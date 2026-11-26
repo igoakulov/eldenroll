@@ -26,4 +26,3 @@ ASH_WEAPON_MATRIX = ITEMS_DIR / "ash_weapon_matrix.csv"
 WEAPON_SKILLS = ITEMS_DIR / "weapon_skills.csv"
 
 ARMOR_DIR = SOURCES / "armor"
-ARMOR_SETS_PAGE = ARMOR_DIR / "armor_sets.txt"

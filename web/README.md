@@ -37,7 +37,7 @@ The main flows:
 
 ### How it works
 
-The onboarding page, opened from `Elden Rold` in Start's tagline and from the menu's `How it works`. It opens under the wordmark, as Start does, so the help reads as the app's own. Adding the app to the Home Screen comes before the first run because iPhone keeps a home-screen app's storage apart from Safari's: a run started in Safari stays there.
+The onboarding page, opened from `Elden Rold` in Start's tagline and from the menu's `How it works`. It opens under the wordmark, as Start does, so the help reads as the app's own. Adding the app to the Home Screen comes before the first run (#Installing).
 
 - It opens on the case for the app: a companion for the phone, kept beside the game, that rolls the bosses to fell, the builds to try and the gear to gather.
 - Each section opens with one sentence on what it offers; the rows under it give the detail. `A run` is the routine in numbered steps; `An objective` and `Run settings` set each term beside what it means.
@@ -45,7 +45,7 @@ The onboarding page, opened from `Elden Rold` in Start's tagline and from the me
 - `An objective` says that gear that works together rolls together more often, so a player expects rolls that make sense, not pure chance.
 - The Home Screen steps are chains of the buttons to tap, with Safari's own icons for `Share` and `Add to Home Screen` and the app's icon as the Home Screen shows it. No screenshots: they date with every iOS release. The note to add it before the first run sits under the iPhone steps, since only iPhone keeps a Safari run apart.
 - One line of links, no heading: contact and the repository as their X and GitHub marks, then `Sim` and `Kit`, the simulation (`/sim/`) and the UI kit (`/kit/`). Each opens in a new tab, since the installed app has no back button to return from a page.
-- The privacy notice is two plain sentences: runs stay on the device, and anonymous run stats may be sent. It holds only while the analytics stay anonymous and cookieless (`#Saving`).
+- The privacy notice is two plain sentences: runs stay on the device, and anonymous run stats may be sent. It must stay true to the last rule of #Saving.
 - The data sources are credited in the repository (`data/sources/README.md`), not on the page.
 
 ### Run settings
@@ -119,7 +119,7 @@ Most players keep this open on a phone beside a console, so desktop gets no layo
 - `deadBosses` entries carry `instanceId` and the `objectiveIndex` showing when the boss was marked, `0` before objective 1, in marking order. The timeline draws a boss felled on the way from this index. It stays on the boss rather than becoming an event of its own, so such bosses could later fold into their objective as other kills.
 - Rerolls are kept as counts of what they replaced, for `10 most rerolled`, and a finished run keeps them for the whole run, not per objective. The reroll after `Felled?` isn't counted: the player didn't turn that boss down.
 - The app asks the browser to keep its storage (`navigator.storage.persist()`), so a phone short of space clears it last. Safari deletes a site's storage after seven days of Safari use without a visit; an app added to the Home Screen counts only its own days of use, so playing keeps it.
-- No personal data and no cookies. Runs never leave the device; the only thing sent anywhere is anonymous usage stats, from the release on, as the privacy line at the bottom of `How it works` says.
+- No personal data and no cookies. Runs never leave the device; the only thing sent anywhere is anonymous usage stats, from the release on, with nothing that identifies a player.
 
 ## Installing
 
@@ -128,7 +128,7 @@ The app installs from the browser's `Add to Home Screen` and then opens full scr
 - `public/manifest.webmanifest` and the tags in `index.html` make it installable. The icons in `public/icons/` and `public/favicon.ico` are drawn by `scripts/appIcons.ts` (`pnpm app-icons`) from the wordmark's lozenge, our own glyph, and committed.
 - The app icon is the wordmark's lozenge, flat in `--grace` on `--mist`, with no glow or gradient: at icon size both blur the gap inside the lozenge. Gold on a dark tile keeps the wordmark's own figure, gold lines lit; a gold tile inverts it, so it reads thinner and paler.
 - The tab's favicon is the one inverted mark, dark on a rounded gold tile with clear corners, because Safari sets a white plate behind a tab icon too dark for its dark tab bar. Browsers that read SVG favicons take `favicon.svg`; Safari and anything asking for `/favicon.ico` get the `.ico`.
-- The build writes `sw.js` with the files the app needs: its own chunks, styles and assets, `db.json` among them, and the Latin and Latin Extended fonts its text uses, about 2.4 MB. The UI kit and the simulation are never kept: the player doesn't need them, and their requests go to the network untouched.
+- The build writes `sw.js` with the files the app needs: its own chunks, styles and assets, `db.json` among them, and the Latin and Latin Extended fonts its text uses. The UI kit and the simulation are never kept: the player doesn't need them, and their requests go to the network untouched.
 - Kept files are served from the phone first. Most names carry content hashes, so a kept copy is never stale; the worker's version also hashes the manifest and the icons, whose names never change, so a new one of those updates it too. A page load goes to the network first, so a new release reaches the player the next time they open the app online, and falls back to the kept page offline. A new release keeps its files under a new name and drops the old ones.
 - Kept files are looked up ignoring `Vary`: a page asks for its scripts with an `Origin` header the kept copies lack, and a host that varies on it would miss every one offline.
 - The worker registers only in a production build, so development always serves fresh files. `pnpm build && pnpm preview` serves one to test offline: load it once, stop the server, reload.

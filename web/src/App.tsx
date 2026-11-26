@@ -20,7 +20,7 @@ import {
 } from "./engine/run";
 import { DEFAULT_STATS, defaultSettings, type Stats } from "./engine/settings";
 import { loadDatabase } from "./loadDatabase";
-import { FINISHED_RUNS_CAP, packFinished, recordOf, unpackFinished, type Finished } from "./save/finished";
+import { FINISHED_RUNS_CAP, packFinished, recordOf, unpackAll, type Finished } from "./save/finished";
 import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh, type SavedRun, type Setup } from "./save/restore";
 import { browserStore, type SaveStore } from "./save/store";
 import { useDefaultKeys } from "./ui/keys";
@@ -82,9 +82,7 @@ async function restore(): Promise<Boot> {
     saved = null;
     kept = (await store.load()).finished;
   }
-  // A run stored in a shape no longer read stays stored, but isn't listed
-  const finished = kept.flatMap((one) => unpackFinished(one) ?? []);
-  return { database, engine, saved, setup: saved === null ? restoreSetup(engine.data, stored.setup) : null, finished };
+  return { database, engine, saved, setup: saved === null ? restoreSetup(engine.data, stored.setup) : null, finished: unpackAll(kept) };
 }
 
 // Restoring writes to the store, so it runs once even where React runs an effect twice; a failed load may retry
@@ -169,7 +167,7 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
         setOpened(null);
         setView("start");
         // It may have finished a run too, so the list is read again
-        void store.load().then((stored) => setFinished(stored.finished.flatMap((one) => unpackFinished(one) ?? [])));
+        void store.load().then((stored) => setFinished(unpackAll(stored.finished)));
       }),
     [engine],
   );
@@ -202,13 +200,14 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
       setView("run");
     },
     onHome: () => setView("start"),
-    onHowItWorks: () => {
-      setHowItWorksFromMenu(true);
-      setView("howItWorks");
-    },
+    onHowItWorks: () => openHowItWorks(true),
     onRunSettings: () => setView("settings"),
     onFinish: () => endRun(finishRun(current), true),
   });
+  const openHowItWorks = (fromMenu: boolean) => {
+    setHowItWorksFromMenu(fromMenu);
+    setView("howItWorks");
+  };
   // Home: the card while a run has an objective, `Level up` between objectives, Start otherwise
   const home = () => {
     if (run === null) setView("start");
@@ -429,10 +428,7 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
       <StartResume
         run={run}
         title={runTitle(engine.data, run)}
-        onOpenCard={() => {
-          setHowItWorksFromMenu(false);
-          setView("howItWorks");
-        }}
+        onHowItWorks={() => openHowItWorks(false)}
         onResume={home}
         finishedRuns={finished.length}
         onRuns={() => setView("runs")}
@@ -455,10 +451,7 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
         setRegions(next);
         setProblems([]);
       }}
-      onOpenCard={() => {
-        setHowItWorksFromMenu(false);
-        setView("howItWorks");
-      }}
+      onHowItWorks={() => openHowItWorks(false)}
       onRunSettings={() => setView("settings")}
       finishedRuns={finished.length}
       onRuns={() => setView("runs")}
@@ -474,7 +467,6 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
         }
         setProblems([]);
         store.saveSetup(null);
-        identity.current = { runId: FRESH.id(), startedAt: FRESH.now() };
         commit(result.run);
         showCard("full");
       }}

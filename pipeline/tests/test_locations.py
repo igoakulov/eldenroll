@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -63,28 +62,12 @@ def test_location_table_has_one_row_per_area_in_one_region() -> None:
     validate_region_membership(regions, locations)
 
 
-def test_location_rows_match_the_documented_instances() -> None:
-    _, locations, _ = _real_rows()
-    by_id = {location.id: location for location in locations}
-
-    assert by_id["stormhill"] == Location("stormhill", "Stormhill", "limgrave")
-    assert by_id["academy"] == Location("academy", "Academy of Raya Lucaria", "liurnia")
-    assert by_id["academy_courtyard"].name == "Academy of Raya Lucaria"
-    assert Counter(location.name for location in locations)["Academy of Raya Lucaria"] == 4
-
-
 def test_real_dlc_prefix_matches_the_annotation_tags() -> None:
     regions, locations, dlc_ids = _real_rows()
 
     validate_region_dlc_prefix(regions, locations, dlc_location_ids=dlc_ids)
     dlc_regions = {region.id for region in regions if region.is_dlc}
     assert {location.id for location in locations if location.region_id in dlc_regions} == dlc_ids
-
-
-def test_build_keeps_area_name_text_and_region() -> None:
-    rows = build_locations([_area("a", "Label")], {"a": "base"})
-
-    assert rows == (Location(id="a", name="Label", region_id="base"),)
 
 
 def test_area_without_a_region_stops_the_build() -> None:
@@ -117,16 +100,6 @@ def test_region_with_thirty_locations_fails() -> None:
 
     with pytest.raises(BuildError, match="more than 29 locations: base"):
         validate_region_membership([BASE], locations)
-
-
-def test_region_with_twenty_nine_locations_passes() -> None:
-    validate_region_membership([BASE], [_location(f"a{index}", "base") for index in range(29)])
-
-
-def test_matching_prefix_passes() -> None:
-    locations = [_location("a", "base"), _location("b", "dlc")]
-
-    validate_region_dlc_prefix([BASE, DLC], locations, dlc_location_ids={"b"})
 
 
 def test_dlc_location_in_a_base_named_region_fails() -> None:

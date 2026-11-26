@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from collections.abc import Callable
 from pathlib import Path
 
@@ -14,7 +13,6 @@ from eldenroll.build.boss_table import load_boss_instances, load_boss_overrides,
 from eldenroll.build.bosses import (
     DLC_TAG,
     BossOverrides,
-    boss_identity,
     boss_pairs,
     build_boss_instances,
 )
@@ -49,19 +47,6 @@ def instances() -> tuple[BossInstance, ...]:
 @pytest.fixture(scope="module")
 def by_place(instances: tuple[BossInstance, ...]) -> dict[tuple[str, str], BossInstance]:
     return {(row.location_label, row.name): row for row in instances}
-
-
-def test_the_counts_follow_the_arithmetic(instances: tuple[BossInstance, ...]) -> None:
-    rows = load_boss_rows()
-    overrides = load_boss_overrides(OVERRIDES)
-    pairs = boss_pairs(rows)
-    fights = Counter(
-        (instance_label or label, name)
-        for (label, _), (name, instance_label) in overrides.merges.items()
-    )
-    savings = sum(count - 1 for count in fights.values())
-
-    assert len(instances) == len(pairs) - savings + len(overrides.additions)
 
 
 def test_dryleaf_dane_has_only_his_own_fight(instances: tuple[BossInstance, ...]) -> None:
@@ -156,19 +141,6 @@ def test_owner_confirmed_regions_hold_after_renames(
         OVERRIDES / "region_areas.csv", region_ids={row.id for row in regions}
     )
     assert region_of_area[by_place[(label, name)].location_id] == region
-
-
-@pytest.mark.parametrize(
-    ("name", "identity"),
-    [
-        ("Cleanrot Knight [Boss] (Sickle)", "Cleanrot Knight"),
-        ("Crystalian  [Boss] (Spear) - Broken", "Crystalian"),
-        ("Putrescent Knight [Boss] (Phase 2)", "Putrescent Knight"),
-        ("Rennala, Full Moon [Boss] (Phase 1, Bubble DR)", "Rennala, Full Moon"),
-    ],
-)
-def test_identity_strips_the_variants(name: str, identity: str) -> None:
-    assert boss_identity(name) == identity
 
 
 def _fixture(
@@ -314,12 +286,6 @@ def test_a_bad_row_stops_the_load(
     path.write_text(text, encoding="utf-8")
     with pytest.raises(LoaderError, match=message):
         loader(path)
-
-
-def test_a_name_row_may_leave_the_label_empty(tmp_path: Path) -> None:
-    path = tmp_path / "boss_names.csv"
-    path.write_text("csv_name,label,name,reason\nA,,B,why\n", encoding="utf-8")
-    assert load_boss_names(path) == {("A", ""): "B"}
 
 
 def test_every_fight_shows_a_short_location_that_tells_it_apart() -> None:

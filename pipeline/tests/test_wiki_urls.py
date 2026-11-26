@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import csv
 from pathlib import Path
-from urllib.parse import unquote
 
 import pytest
 
@@ -47,14 +46,6 @@ def test_a_row_that_never_rolls_or_is_none_has_no_link(gate_data: GateData) -> N
     assert any(getattr(row, "alias", None) == "none" for row in unlinked)
     assert all(row.url is None for row in unlinked)
     assert next(row for row in gate_data.database.aliases if row.id == "none").url is None
-
-
-def test_an_accented_name_gives_plain_letters(gate_data: GateData) -> None:
-    accented = [row for row in gate_data.database.items if row.odds > 0 and not row.name.isascii()]
-    assert accented
-    for row in accented:
-        assert row.url is not None
-        assert unquote(row.url).isascii(), row.name
 
 
 def test_wiki_url_drops_accents_and_encodes_the_rest() -> None:

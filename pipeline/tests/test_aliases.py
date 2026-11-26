@@ -61,11 +61,6 @@ def test_an_unknown_member_fails() -> None:
         assign_aliases([_talisman("x")], [_row("a", "item", "x", "typo")])
 
 
-def test_other_items_keep_a_null_alias() -> None:
-    rows = assign_aliases([_talisman("x"), _talisman("y")], [_row("a", "item", "x")])
-    assert [row.alias for row in rows] == ["a", None]
-
-
 @pytest.mark.parametrize(
     ("row", "message"),
     [

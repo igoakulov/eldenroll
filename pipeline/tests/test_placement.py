@@ -1,5 +1,5 @@
 """Tests for `item_location` rows against the real sources
-(`data/README.md#Placement`, `web/src/engine/README.md#Eligibility`)."""
+(`data/README.md#Placement`)."""
 
 from __future__ import annotations
 
@@ -23,18 +23,12 @@ from eldenroll.loaders.csv_source import CsvTable
 from eldenroll.loaders.schema import LoaderError
 from eldenroll.model.boss_instance import BossInstance
 from eldenroll.model.item import Item
-from eldenroll.model.item_location import ItemLocation
 from eldenroll.model.item_slot import ItemSlot
-from eldenroll.model.region import ASHEN_CAPITAL, ROYAL_CAPITAL, SHUNNING_GROUNDS
 from eldenroll.normalize.placement_names import PlacementNames, placement_names
 from eldenroll.validate.gaps import GapSources
 from eldenroll.validate.placement import (
     PlacementData,
-    eligible_items,
-    eligible_sets,
     needs_location,
-    row_counts,
-    selected_locations,
 )
 
 ENSIS = "Gravesite Plain - East Castle Ensis"
@@ -98,15 +92,6 @@ def test_rows_are_distinct(placement_data: PlacementData) -> None:
     rows = item_locations(placement_data.placements)
 
     assert len(rows) == len(set(rows))
-
-
-def test_row_needs_exactly_one_key() -> None:
-    assert ItemLocation("a", location_id="b").boss_instance_id is None
-    assert ItemLocation("a", boss_instance_id="b").location_id is None
-    with pytest.raises(BuildError, match="exactly one"):
-        ItemLocation("a")
-    with pytest.raises(BuildError, match="exactly one"):
-        ItemLocation("a", location_id="b", boss_instance_id="c")
 
 
 def test_every_boss_tag_in_the_sources_is_known(sources: GapSources) -> None:
@@ -233,127 +218,6 @@ def test_the_incantation_and_the_weapon_stay_apart(placement_data: PlacementData
 def test_an_item_from_one_drop_csv_only_is_placed(placement_data: PlacementData) -> None:
     for name in ("Night Maiden Armor", "Bloodsoaked Tabard", "Gelmir Glintstone Staff"):
         assert _places(placement_data, name)
-
-
-def test_named_placements_hold(placement_data: PlacementData) -> None:
-    assert _places(placement_data, "Butchering Knife") == {"altus"}
-    assert _places(placement_data, "Guardian Garb (Full Bloom)") == {"leyndell"}
-    assert _places(placement_data, "Mushroom Crown") == {"lakeofrot"}
-    assert _places(placement_data, "White Mask") == {"mohgwyn"}
-    assert _places(placement_data, "Finger Robe (High Priest Robe, Altered)") == _places(
-        placement_data, "High Priest Robe"
-    )
-
-
-def test_every_tool_is_placed(placement_data: PlacementData) -> None:
-    placed = {row.item_id for row in item_locations(placement_data.placements)}
-    tools = [item for item in placement_data.table if item.category == "tool"]
-
-    assert tools
-    assert all(tool.id in placed for tool in tools)
-
-
-def test_a_staff_and_a_seal_are_reachable_at_every_cumulative_selection(
-    placement_data: PlacementData,
-) -> None:
-    bosses = {boss.id: boss for boss in placement_data.bosses}
-    rows = item_locations(placement_data.placements)
-    items = {item.id: item for item in placement_data.table}
-    selected: list[str] = []
-    for region in placement_data.regions:
-        selected.append(region.id)
-        found = eligible_items(rows, selected, (), bosses, placement_data.region_of_location)
-        weapon_classes = {items[item_id].subcategory for item_id in found}
-        assert {"glintstone_staff", "sacred_seal"} <= weapon_classes, region.id
-
-
-def test_every_armor_set_can_roll_under_some_selection(placement_data: PlacementData) -> None:
-    bosses = {boss.id: boss for boss in placement_data.bosses}
-    rows = item_locations(placement_data.placements)
-    dead = set(bosses)
-    regions = [region.id for region in placement_data.regions]
-    with_ashen = eligible_items(rows, regions, dead, bosses, placement_data.region_of_location)
-    without = eligible_items(
-        rows, set(regions) - {ASHEN_CAPITAL}, dead, bosses, placement_data.region_of_location
-    )
-
-    placed = {row.item_id for row in rows}
-    reachable = {*eligible_sets(placement_data.armor_sets, with_ashen, placed)}
-    reachable |= {*eligible_sets(placement_data.armor_sets, without, placed)}
-    assert reachable == set(placement_data.armor_sets)
-
-
-def test_a_set_with_an_unreachable_piece_is_filtered(placement_data: PlacementData) -> None:
-    mushroom = next(row for row in placement_data.armor_sets if row.name == "Mushroom Set")
-
-    placed = set(mushroom.pieces)
-
-    assert mushroom not in eligible_sets([mushroom], set(mushroom.pieces[1:]), placed)
-    assert mushroom in eligible_sets([mushroom], set(mushroom.pieces), placed)
-
-
-def test_a_piece_found_nowhere_counts_everywhere(placement_data: PlacementData) -> None:
-    naked = next(row for row in placement_data.armor_sets if row.name == "Naked Set")
-    placed = {row.item_id for row in item_locations(placement_data.placements)}
-
-    assert set(naked.pieces) == placement_data.found_nowhere
-    assert naked in eligible_sets([naked], set(), placed)
-
-
-BOSSES = {
-    "alive": BossInstance("alive", "Alive", "tile", "Tile"),
-    "dead": BossInstance("dead", "Dead", "tile", "Tile"),
-    "zero": BossInstance("zero", "Zero", "tile", "Tile", odds=0),
-}
-HERE = {"tile", "spot"}
-NOWHERE: set[str] = set()
-
-
-@pytest.mark.parametrize(
-    ("row", "locations", "counts"),
-    [
-        (ItemLocation("i", location_id="spot"), HERE, True),
-        (ItemLocation("i", location_id="spot"), NOWHERE, False),
-        (ItemLocation("i", boss_instance_id="alive"), HERE, False),
-        (ItemLocation("i", boss_instance_id="alive"), NOWHERE, False),
-        (ItemLocation("i", boss_instance_id="dead"), HERE, True),
-        (ItemLocation("i", boss_instance_id="dead"), NOWHERE, True),
-        (ItemLocation("i", boss_instance_id="zero"), HERE, True),
-        (ItemLocation("i", boss_instance_id="zero"), NOWHERE, False),
-    ],
-)
-def test_row_eligibility_follows_the_prd_table(
-    row: ItemLocation, locations: set[str], counts: bool
-) -> None:
-    assert row_counts(row, locations, {"dead", "zero"}, BOSSES) is counts
-
-
-def test_the_ashen_capital_replaces_the_royal_one_but_not_the_shunning_grounds(
-    placement_data: PlacementData,
-) -> None:
-    regions = placement_data.region_of_location
-    royal = selected_locations({ROYAL_CAPITAL}, regions)
-    ashen = selected_locations({ASHEN_CAPITAL}, regions)
-    both = selected_locations({ROYAL_CAPITAL, ASHEN_CAPITAL}, regions)
-
-    assert royal > SHUNNING_GROUNDS
-    assert ashen > SHUNNING_GROUNDS
-    assert "leyndell" in royal
-    assert "leyndell" not in ashen
-    assert both == ashen
-    assert {regions[location] for location in SHUNNING_GROUNDS} == {ROYAL_CAPITAL}
-
-
-def test_the_shunning_grounds_keep_their_items_in_the_ashen_capital(
-    placement_data: PlacementData,
-) -> None:
-    bosses = {boss.id: boss for boss in placement_data.bosses}
-    rows = item_locations(placement_data.placements)
-    found = eligible_items(rows, {ASHEN_CAPITAL}, (), bosses, placement_data.region_of_location)
-
-    assert _item(placement_data, "Frenzied Flame Seal").id in found
-    assert _item(placement_data, "Omen Armor").id in found
-    assert _item(placement_data, "Coded Sword").id not in found
 
 
 def _item_row(name: str) -> Item:

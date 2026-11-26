@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 
 import {
-  className,
   FAIR_TABLES,
   empties,
   fairLines,
@@ -17,6 +16,7 @@ import {
   type Sample,
   type ShareTable,
 } from "../../sim/aggregate";
+import { className } from "../views/timeline";
 import { copy } from "../copy";
 import { Cycler } from "../ui/Cycler";
 import { DataTable } from "../ui/DataTable";

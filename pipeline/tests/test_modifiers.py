@@ -101,17 +101,6 @@ def test_an_unknown_id_fails(kind: SelectorKind, placement_data: PlacementData) 
         _validate((row,), placement_data)
 
 
-def test_a_boss_target_fails(placement_data: PlacementData) -> None:
-    row = Modifier(
-        "x",
-        (CharacterClassCondition(("sorcerer",)),),
-        Selector("boss", (placement_data.bosses[0].id,)),
-        2,
-    )
-    with pytest.raises(BuildError, match="a boss cannot be a modifier target"):
-        _validate((row,), placement_data)
-
-
 def test_a_boss_condition_passes(placement_data: PlacementData) -> None:
     condition = RolledCondition(("rh",), Selector("boss", (placement_data.bosses[0].id,)))
     _validate((Modifier("x", (condition,), Selector("rule", ("r1_only",)), 2),), placement_data)

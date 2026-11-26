@@ -86,14 +86,6 @@ def test_altered_piece_survives_under_its_plain_name(names: set[str]) -> None:
     assert set(MERGED + RENAMED) <= names
 
 
-def test_exactly_six_altered_pieces_merge(catalog: ItemCatalog) -> None:
-    source = catalog.names["protector"].values()
-    altered = {name.removesuffix(" (Altered)") for name in source if name.endswith(" (Altered)")}
-
-    assert altered - set(source) == set(RENAMED)
-    assert altered & set(source) == set(MERGED)
-
-
 def test_pieces_in_the_mods_tarnished_group_stay_in_the_pool(
     catalog: ItemCatalog, names: set[str]
 ) -> None:

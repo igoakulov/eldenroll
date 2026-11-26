@@ -1,8 +1,4 @@
-"""Tests for the authored area → region map.
-
-Area names come from `areas.yaml`; the per-region slot counts here are
-the record, recomputed from `item_slots.yaml`.
-"""
+"""Tests for the authored area → region map (`data/overrides/README.md#Regions`)."""
 
 from __future__ import annotations
 
@@ -41,41 +37,18 @@ def test_places_reached_only_from_liurnia_are_in_liurnia(area: str) -> None:
     assert areas[area] == "liurnia"
 
 
-def test_duplicate_area_is_a_loader_error(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("body", "message"),
+    [
+        ("limgrave,limgrave\nlimgrave,liurnia\n", "duplicate area 'limgrave'"),
+        ("limgrave,moon\n", "unknown region_id 'moon'"),
+        (",limgrave\n", "data row 1: empty area"),
+        ("limgrave,\n", "data row 1: empty region_id"),
+    ],
+)
+def test_bad_area_row_is_a_loader_error(tmp_path: Path, body: str, message: str) -> None:
     source = tmp_path / "region_areas.csv"
-    source.write_text("area,region_id\nlimgrave,limgrave\nlimgrave,liurnia\n", encoding="utf-8")
+    source.write_text(f"area,region_id\n{body}", encoding="utf-8")
 
-    with pytest.raises(LoaderError, match="duplicate area 'limgrave'"):
+    with pytest.raises(LoaderError, match=message):
         load_region_areas(source, region_ids={"limgrave", "liurnia"})
-
-
-def test_unknown_region_id_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "region_areas.csv"
-    source.write_text("area,region_id\nlimgrave,moon\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="unknown region_id 'moon'"):
-        load_region_areas(source, region_ids={"limgrave"})
-
-
-def test_empty_area_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "region_areas.csv"
-    source.write_text("area,region_id\n,limgrave\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="data row 1: empty area"):
-        load_region_areas(source, region_ids={"limgrave"})
-
-
-def test_empty_region_id_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "region_areas.csv"
-    source.write_text("area,region_id\nlimgrave,\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="data row 1: empty region_id"):
-        load_region_areas(source, region_ids={"limgrave"})
-
-
-def test_missing_column_is_a_loader_error(tmp_path: Path) -> None:
-    source = tmp_path / "region_areas.csv"
-    source.write_text("area\nlimgrave\n", encoding="utf-8")
-
-    with pytest.raises(LoaderError, match="missing column 'region_id'"):
-        load_region_areas(source, region_ids={"limgrave"})

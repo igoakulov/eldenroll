@@ -1,9 +1,8 @@
-"""Which rows count for a selection of regions and dead bosses
-(`web/src/engine/README.md#Eligibility`)."""
+"""The placement data the gate and the tests check, and which items must have a location row."""
 
 from __future__ import annotations
 
-from collections.abc import Collection, Iterable, Mapping
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -32,8 +31,7 @@ from eldenroll.loaders.regions import load_regions
 from eldenroll.model.armor_set import ArmorSet
 from eldenroll.model.boss_instance import BossInstance
 from eldenroll.model.item import Item
-from eldenroll.model.item_location import ItemLocation
-from eldenroll.model.region import ASHEN_CAPITAL, ROYAL_CAPITAL, SHUNNING_GROUNDS, Region
+from eldenroll.model.region import Region
 from eldenroll.normalize.odds import assign_armor_set_odds
 from eldenroll.normalize.placement_names import placement_names
 from eldenroll.paths import ENEMY_DROPS, ENEMY_ITEM_LOTS
@@ -59,61 +57,6 @@ def needs_location(item: Item, found_nowhere: Collection[str]) -> bool:
         item.category not in ("consumable", "none")
         and not item.id.startswith("none_")
         and item.id not in found_nowhere
-    )
-
-
-def selected_locations(
-    regions: Collection[str], region_of_location: Mapping[str, str]
-) -> frozenset[str]:
-    """The Ashen Capital replaces the Royal one, except for the Shunning-Grounds, which it reaches
-    whether or not the Royal Capital is selected.
-    """
-    selected = {
-        location for location, region in region_of_location.items() if region in regions
-    }
-    if ASHEN_CAPITAL in regions:
-        selected = {loc for loc in selected if region_of_location[loc] != ROYAL_CAPITAL}
-        selected |= SHUNNING_GROUNDS
-    return frozenset(selected)
-
-
-def row_counts(
-    row: ItemLocation,
-    locations: Collection[str],
-    dead: Collection[str],
-    bosses: Mapping[str, BossInstance],
-) -> bool:
-    """Return whether one row makes its item eligible, by the table in
-    `web/src/engine/README.md#Eligibility`."""
-    if row.location_id is not None:
-        return row.location_id in locations
-    boss = bosses[str(row.boss_instance_id)]
-    if boss.odds > 0:
-        return boss.id in dead
-    return boss.location_id in locations
-
-
-def eligible_items(
-    rows: Iterable[ItemLocation],
-    regions: Collection[str],
-    dead: Collection[str],
-    bosses: Mapping[str, BossInstance],
-    region_of_location: Mapping[str, str],
-) -> frozenset[str]:
-    locations = selected_locations(regions, region_of_location)
-    return frozenset(row.item_id for row in rows if row_counts(row, locations, dead, bosses))
-
-
-def eligible_sets(
-    sets: Iterable[ArmorSet], items: Collection[str], placed: Collection[str]
-) -> tuple[ArmorSet, ...]:
-    """Return the sets whose every piece is reachable; a set short a piece is not filtered, and a
-    piece with no row is found everywhere.
-    """
-    return tuple(
-        row
-        for row in sets
-        if all(piece in items or piece not in placed for piece in row.pieces)
     )
 
 

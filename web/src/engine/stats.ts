@@ -1,4 +1,6 @@
 import type { Item, PoolSlot } from "./database";
+import type { RolledSlots } from "./display";
+import type { EngineData } from "./engineData";
 import type { Option } from "./selectors";
 import type { Stats } from "./settings";
 import {
@@ -15,6 +17,22 @@ export interface StatLimits {
   readonly maxStatGap: number;
 }
 
+/** The hand that holds its weapon in both hands in a rolled loadout (web/src/engine/README.md#Two-handing): RH when
+ * its weapon takes the bonus and LH is empty or the class always two-hands, LH when RH is empty. */
+export function twoHandedHand(data: EngineData, characterClass: string, slots: RolledSlots): "rh" | "lh" | null {
+  const empty = (id: string | null | undefined) => id === undefined || id === null || id === "none";
+  const takesBonus = (id: string | null | undefined) => typeof id === "string" && data.items.get(id)?.str_bonus_2h === true;
+  const alwaysTwoHands = data.database.character_class.find((row) => row.id === characterClass)?.two_handed === true;
+  if (takesBonus(slots.rh) && (empty(slots.lh) || alwaysTwoHands)) return "rh";
+  if (empty(slots.rh) && takesBonus(slots.lh)) return "lh";
+  return null;
+}
+
+/** The Strength that wields `item`, the least that two-handing raises to its requirement. */
+export function strengthNeeded(item: Item, twoHanded: boolean): number {
+  return twoHanded ? Math.ceil(item.str / TWO_HANDED_STR_MULTIPLIER) : item.str;
+}
+
 export function statDeficit(item: Item, stats: Stats, twoHanded: boolean): number {
   const strength = twoHanded ? Math.floor(stats.str * TWO_HANDED_STR_MULTIPLIER) : stats.str;
   return (
@@ -28,11 +46,6 @@ export function statDeficit(item: Item, stats: Stats, twoHanded: boolean): numbe
 
 function withinGap(item: Item, limits: StatLimits, twoHanded: boolean): boolean {
   return statDeficit(item, limits.stats, twoHanded) <= limits.maxStatGap;
-}
-
-/** Within reach in some hand: two-handing's Strength bonus counts where the item takes it. */
-export function inStatReach(item: Item, limits: StatLimits): boolean {
-  return withinGap(item, limits, false) || (item.str_bonus_2h === true && withinGap(item, limits, true));
 }
 
 /** For a slot no hand's bonus can reach, such as a spell. */

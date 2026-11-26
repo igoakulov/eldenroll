@@ -146,7 +146,7 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
     <StartResume
       run={runs.progressed}
       title={runTitle(engine.data, runs.progressed)}
-      onOpenCard={noop}
+      onHowItWorks={noop}
       onResume={noop}
       finishedRuns={1}
       onRuns={noop}
@@ -165,7 +165,7 @@ export function kitViews(kit: KitData): Readonly<Record<ViewName, KitView>> {
           problems={[]}
           onStats={noop}
           onRegions={noop}
-          onOpenCard={noop}
+          onHowItWorks={noop}
           onRunSettings={noop}
           onStartRun={noop}
           finishedRuns={1}

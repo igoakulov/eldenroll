@@ -49,7 +49,8 @@ export interface CompletedObjective extends Omit<Objective, "tally"> {
   readonly level: number;
 }
 
-export type Waiting = "no_region" | "no_bosses" | "regions_cleared";
+export const WAITING = ["no_region", "no_bosses", "regions_cleared"] as const;
+export type Waiting = (typeof WAITING)[number];
 
 export const WAITING_MESSAGES: Readonly<Record<Waiting, string>> = {
   no_region: copy.notices.noRegion,
