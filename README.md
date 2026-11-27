@@ -1,6 +1,6 @@
 # Elden Roll
 
-<a href="https://eldenroll.com"><img src="media/preview.gif" width="100%" alt="Elden Roll's Start screen on desktop, its tagline typing in"></a>
+<a href="https://eldenroll.com"><img src="media/preview.webp" width="100%" alt="Elden Roll's Start screen on desktop, its tagline typing in"></a>
 
 **[eldenroll.com](https://eldenroll.com)**
 
