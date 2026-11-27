@@ -92,6 +92,9 @@
     display: block;
     position: relative;
     padding: calc(10px * var(--phone-scale)) calc(11px * var(--phone-scale)); /* raw: the bezel */
+    /* Puts the screen's corner on a whole device pixel (PhoneFrame.tsx) */
+    left: var(--phone-nudge-x, 0px);
+    top: var(--phone-nudge-y, 0px);
   }
 
   /* The bezel and band behind the screen, and the punch hole over it, are zoomed whole */
