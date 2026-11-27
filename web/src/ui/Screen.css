@@ -1,8 +1,11 @@
+/* Clips sideways overflow, such as the tagline's hidden measuring line, so the drawn phone's screen can never scroll
+   sideways and shift when a control is brought into view */
 .screen {
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  overflow-x: clip;
   padding-top: env(safe-area-inset-top, 0px);
   background-color: var(--ground);
   background-repeat: no-repeat;
