@@ -31,6 +31,7 @@ export const kit: readonly KitBlock[] = [
   {
     id: "level-total",
     title: "Level",
+    note: "On the run view the level counts up as it first appears, with the stats and totals.",
     section: "controls",
     size: "phone",
     states: [

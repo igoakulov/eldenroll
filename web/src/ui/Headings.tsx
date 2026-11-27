@@ -3,9 +3,18 @@ import type { ReactNode } from "react";
 import "./Headings.css";
 
 /** A section on Start and Level up: Cinzel caps and a rule fading to the right, then an optional action. */
-export function SectionHeading({ children, action }: { readonly children: ReactNode; readonly action?: ReactNode }) {
+export function SectionHeading({
+  children,
+  action,
+  id,
+}: {
+  readonly children: ReactNode;
+  readonly action?: ReactNode;
+  /** Where a `JumpText` on the same screen scrolls to. */
+  readonly id?: string;
+}) {
   return (
-    <div className="section-heading">
+    <div className="section-heading" id={id}>
       <h2>{children}</h2>
       <span className="fading-rule" />
       {action}

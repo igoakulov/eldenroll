@@ -124,6 +124,12 @@
   --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
   --rise-y: 6px;
   --sheet-y: 16px;
+  /* A sheet's opacity at the start of its rise and the end of its fall, and how long and with what ease it moves:
+     in the browser a short rise with a fade; in the Home Screen app from the bottom edge, opaque, as iOS sheets do */
+  --sheet-fade: 0;
+  --dur-sheet-rise: var(--dur-sheet);
+  --dur-sheet-fall: var(--dur-sheet-out);
+  --ease-sheet-fall: var(--ease-in);
   --cycle-x: 4px;
 
   /* A new objective: a slot's text follows its icon; the boss bar fills, then gives way to Felled? */
@@ -156,6 +162,11 @@
 @media (display-mode: standalone) {
   :root {
     --hero-top: calc(var(--space-10) + var(--space-4));
+    --sheet-y: 100%;
+    --sheet-fade: 1;
+    --dur-sheet-rise: var(--dur-rise);
+    --dur-sheet-fall: var(--dur-rise);
+    --ease-sheet-fall: var(--ease-out);
   }
 }
 
@@ -164,6 +175,7 @@
     --dur-glide: 0ms;
     --rise-y: 0px;
     --sheet-y: 0px;
+    --sheet-fade: 0;
     --cycle-x: 0px;
     --swell: 1;
   }

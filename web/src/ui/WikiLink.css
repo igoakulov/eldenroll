@@ -6,10 +6,25 @@
   background: var(--dots) 0 100% / 100% 1px no-repeat;
 }
 
+/* A link within the screen stands out of the text around it, in its brightest colour */
+.jump-text {
+  color: var(--text);
+}
+
 .wiki-text::after {
   content: "";
   position: absolute;
   inset: -12px -4px;
+}
+
+/* Only the drawn target takes taps, so the link's own box, down to its underline, doesn't */
+.wiki-text-up {
+  pointer-events: none;
+}
+
+.wiki-text-up::after {
+  inset: calc(-1 * var(--space-4)) calc(-1 * var(--space-2)) var(--space-2);
+  pointer-events: auto;
 }
 
 .tile-link {

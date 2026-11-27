@@ -213,8 +213,8 @@ function SummaryTab({
   const gearCount = (kind: GearKind) => summary.gear[kind].length;
   return (
     <>
-      <LevelTotal level={derivedLevel(stats)} />
-      <StatGrid stats={STATS.map((stat) => ({ key: stat, label: STAT_NAMES[stat], value: stats[stat] }))} />
+      <LevelTotal level={derivedLevel(stats)} count />
+      <StatGrid count stats={STATS.map((stat) => ({ key: stat, label: STAT_NAMES[stat], value: stats[stat] }))} />
 
       <section>
         <SectionHeading>{words.totals}</SectionHeading>

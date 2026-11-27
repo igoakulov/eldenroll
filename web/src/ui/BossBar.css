@@ -65,10 +65,12 @@
     no-repeat;
 }
 
-/* The whole bar is the tap target, as How it works says, reaching down over the location, which taps nothing, and not
-   up, clear of the boss name's */
+/* The whole bar is the tap target, as How it works says, reaching a little down, short of the location, which a
+   player may take for a link, and not up; the boss name's reaches up, so the two never meet */
 .boss-bar-felled::after {
   content: "";
   position: absolute;
-  inset: 0 0 calc(-1 * var(--space-6));
+  /* Above the bar's halves, whose fade puts them in a layer of their own over it */
+  z-index: 2;
+  inset: 0 0 calc(-1 * (var(--space-4) + var(--space-1)));
 }

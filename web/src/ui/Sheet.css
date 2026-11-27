@@ -24,7 +24,7 @@
   border-top: 1px solid var(--frame);
   background: var(--sheet);
   box-shadow: var(--shadow-sheet);
-  animation: sheet-in var(--dur-sheet) var(--ease-out);
+  animation: sheet-in var(--dur-sheet-rise) var(--ease-out);
 }
 
 .sheet:focus-visible {
@@ -36,7 +36,7 @@
 }
 
 .sheet.sheet-closing {
-  animation: sheet-out var(--dur-sheet-out) var(--ease-in) forwards;
+  animation: sheet-out var(--dur-sheet-fall) var(--ease-sheet-fall) forwards;
 }
 
 .sheet-scrim.sheet-closing,
@@ -69,14 +69,14 @@
 
 @keyframes sheet-in {
   from {
-    opacity: 0;
+    opacity: var(--sheet-fade);
     transform: translateY(var(--sheet-y));
   }
 }
 
 @keyframes sheet-out {
   to {
-    opacity: 0;
+    opacity: var(--sheet-fade);
     transform: translateY(var(--sheet-y));
   }
 }

@@ -187,7 +187,7 @@ export function Card({
       <section className="boss" aria-labelledby="boss-name">
         <Changed key={keys.boss} {...change("boss")}>
           <h1 className="boss-name r" id="boss-name" style={at(80)}>
-            <WikiText url={boss?.url ?? null} className="boss-name-text">
+            <WikiText url={boss?.url ?? null} className="boss-name-text" up>
               {boss?.name ?? copy.common.unknownBoss}
             </WikiText>
           </h1>

@@ -84,7 +84,12 @@ export const copy = {
   // set apart in the text; `{name}` is where an icon shows
   howItWorks: {
     title: "Welcome back, Tarnished",
-    lede: "A companion app for your phone to keep by your side as you play. Rolls bosses to fell, builds to try, and gear to gather and use in combat.",
+    /** `phone` links down to `On your phone`. */
+    lede: {
+      before: "A companion app for ",
+      phone: "your phone",
+      after: " to keep by your side as you play. Rolls bosses to fell, builds to try, and gear to gather and use in combat.",
+    },
     pun: "Follow fate to become Elden Rold.",
     aRun: "A run",
     runIntro: "Start a new run and jump into your first objective at any time. Even in your existing playthrough.",
@@ -122,13 +127,13 @@ export const copy = {
       { term: "Max stat gap", text: "How much rolled gear requirements can exceed your character stats." },
     ],
     onYourPhone: "On your phone",
-    homeScreen: "Add Elden Roll {app} to your Home Screen – it opens full screen and works offline.",
+    homeScreen: "Add app to your Home Screen: saves your runs, works offline, fullscreen.",
     howTo: [
       { device: "iPhone", how: "Safari → Share {share} → Add to Home Screen {add}" },
       { device: "Android", how: "Chrome → ⋮ → Add to Home screen" },
     ],
     /** Under the iPhone steps. */
-    beforeFirstRun: "Do this before your first run – Safari and Home Screen app do not share runs!",
+    beforeFirstRun: "Add it before your first run: Safari !!deletes your runs!! after a week away.",
     links: { github: "Source code on GitHub", x: "Contact on X", sim: "Sim", kit: "Kit" },
     privacy: "Your runs stay on your device, no server. May send anonymous general run stats to improve your rolls.",
     /** The privacy line while this install carries the owner mark. */

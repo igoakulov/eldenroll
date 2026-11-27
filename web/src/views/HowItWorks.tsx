@@ -1,11 +1,12 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { isOwner, setOwner } from "../analytics";
 import { copy } from "../copy";
+import { AppIcon } from "../ui/AppIcon";
 import { SectionHeading, ScreenHead } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
 import { Screen } from "../ui/Screen";
-import { WikiText } from "../ui/WikiLink";
+import { JumpText, WikiText } from "../ui/WikiLink";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
 import { Wordmark } from "../ui/Wordmark";
 import "./HowItWorks.css";
@@ -17,12 +18,11 @@ const LINKS = {
   kit: "/kit/",
 } as const;
 
-/** A line with each `[word]` set apart as the app's own control, and each `{name}` replaced by its icon, sized to the
- * text: Safari's buttons, or the app's own icon as the Home Screen shows it. An icon stays on the line of the word
- * before it. */
+/** A line with each `[word]` set apart as the app's own control, `!!words!!` as a warning, and each `{name}` replaced
+ * by Safari's button of that name, sized to the text. An icon stays on the line of the word before it. */
 function Rich({ text }: { readonly text: string }) {
-  // Splitting on capturing groups puts each match at an odd index, its bracket kept to tell the two apart
-  const parts = text.split(/(\[[^\]]+\]|\{\w+\})/);
+  // Splitting on capturing groups puts each match at an odd index, its marks kept to tell them apart
+  const parts = text.split(/(\[[^\]]+\]|!![^!]+!!|\{\w+\})/);
   return parts.map((part, index) => {
     const next = parts[index + 1];
     const glued = next?.startsWith("{") === true ? /\S+\s*$/.exec(part) : null;
@@ -34,32 +34,47 @@ function Rich({ text }: { readonly text: string }) {
           {inner}
         </span>
       );
+    if (part.startsWith("!!"))
+      return (
+        <strong key={index} className="how-it-works-warning">
+          {part.slice(2, -2)}
+        </strong>
+      );
     const before = /\S+\s*$/.exec(parts[index - 1] ?? "")?.[0] ?? "";
     return (
       <span key={index} className="how-it-works-glued">
         {before}
-        {inner === "app" ? (
-          <img className="how-it-works-app-icon" src="/icons/apple-touch-icon.png" alt="" />
-        ) : (
-          <span className="how-it-works-icon">
-            <Icon name={inner} size={18} />
-          </span>
-        )}
+        <span className="how-it-works-icon">
+          <Icon name={inner} size={18} />
+        </span>
       </span>
     );
   });
 }
 
 /** Terms beside what they mean, the terms in one column as wide as the longest. */
-function Terms({ rows }: { readonly rows: readonly { readonly term: string; readonly text: string; readonly note?: string }[] }) {
+interface Term {
+  readonly key: string;
+  readonly term: ReactNode;
+  readonly text: string;
+  readonly note?: string;
+  /** The text centred on a term as tall as the app icon. */
+  readonly beside?: boolean;
+}
+
+function Terms({ rows }: { readonly rows: readonly Term[] }) {
   return (
     <dl className="how-it-works-terms">
       {rows.map((row) => (
-        <div key={row.term}>
+        <div key={row.key}>
           <dt>{row.term}</dt>
-          <dd>
+          <dd className={row.beside === true ? "how-it-works-beside" : undefined}>
             <Rich text={row.text} />
-            {row.note !== undefined && <span className="how-it-works-note">{row.note}</span>}
+            {row.note !== undefined && (
+              <span className="how-it-works-note">
+                <Rich text={row.note} />
+              </span>
+            )}
           </dd>
         </div>
       ))}
@@ -71,6 +86,7 @@ function Terms({ rows }: { readonly rows: readonly { readonly term: string; read
  * (`web/README.md#How it works`). */
 /** Five taps, each within a second of the last, toggle the owner mark on this install; a slower tap starts again. */
 const OWNER_TAPS = 5;
+const PHONE_SECTION = "on-your-phone";
 const OWNER_TAP_MS = 1000;
 
 export function HowItWorks({ onClose, onHome }: { readonly onClose: () => void; readonly onHome: () => void }) {
@@ -93,7 +109,16 @@ export function HowItWorks({ onClose, onHome }: { readonly onClose: () => void; 
       <header className="how-it-works-home">
         <Wordmark onHome={onHome} />
       </header>
-      <ScreenHead title={text.title} lede={text.lede}>
+      <ScreenHead
+        title={text.title}
+        lede={
+          <>
+            {text.lede.before}
+            <JumpText to={PHONE_SECTION}>{text.lede.phone}</JumpText>
+            {text.lede.after}
+          </>
+        }
+      >
         <p className="how-it-works-pun">{text.pun}</p>
       </ScreenHead>
 
@@ -113,22 +138,23 @@ export function HowItWorks({ onClose, onHome }: { readonly onClose: () => void; 
 
       <SectionHeading>{text.anObjective}</SectionHeading>
       <p className="how-it-works-intro">{text.objectiveIntro}</p>
-      <Terms rows={text.objective} />
+      <Terms rows={text.objective.map((row) => ({ key: row.term, ...row }))} />
 
       <SectionHeading>{text.runSettings}</SectionHeading>
       <p className="how-it-works-intro">{text.settingsIntro}</p>
-      <Terms rows={text.settings} />
+      <Terms rows={text.settings.map((row) => ({ key: row.term, ...row }))} />
 
-      <SectionHeading>{text.onYourPhone}</SectionHeading>
-      <p className="how-it-works-intro">
-        <Rich text={text.homeScreen} />
-      </p>
+      <SectionHeading id={PHONE_SECTION}>{text.onYourPhone}</SectionHeading>
       <Terms
-        rows={text.howTo.map((row, index) => ({
-          term: row.device,
-          text: row.how,
-          ...(index === 0 ? { note: text.beforeFirstRun } : {}),
-        }))}
+        rows={[
+          { key: "app", term: <AppIcon />, text: text.homeScreen, beside: true },
+          ...text.howTo.map((row, index) => ({
+            key: row.device,
+            term: row.device,
+            text: row.how,
+            ...(index === 0 ? { note: text.beforeFirstRun } : {}),
+          })),
+        ]}
       />
 
       <nav className="how-it-works-links">

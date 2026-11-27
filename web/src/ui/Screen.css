@@ -45,7 +45,7 @@ html[data-slide="open"]::view-transition-new(screen) {
 html[data-slide="close"]::view-transition-old(root),
 html[data-slide="close"]::view-transition-old(screen) {
   z-index: 1;
-  animation: screen-fall var(--dur-rise) var(--ease-in) forwards;
+  animation: screen-fall var(--dur-rise) var(--ease-out) forwards;
 }
 
 @keyframes screen-rise {

@@ -1,6 +1,6 @@
 import { copy } from "../copy";
 import type { EngineData } from "../engine/engineData";
-import { objectiveNumber, type Run } from "../engine/run";
+import type { Run } from "../engine/run";
 import type { Finished } from "../save/finished";
 import { HeadingCount, ScreenHead, SectionHeading } from "../ui/Headings";
 import { ListRow } from "../ui/Rows";
@@ -31,7 +31,7 @@ export function AllRuns({
   return (
     <Screen className="all-runs">
       {/* Where the player is: the objective mid-run, else the app itself, since the list belongs to no run */}
-      <TopBar eyebrow={run === null ? copy.common.appName : copy.common.objective(objectiveNumber(run))}>
+      <TopBar eyebrow={copy.common.appName}>
         <FramedIconButton icon="close" label={copy.common.close} onClick={onClose} />
       </TopBar>
       <ScreenHead title={copy.common.runs} />
