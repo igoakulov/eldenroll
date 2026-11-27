@@ -1,8 +1,10 @@
 /* Opens under the wordmark, as Start does, so the help reads as the app's own */
+/* The wordmark lands where Start's does, in the Home Screen app too: Start's top space, less the top bar above and
+   the wordmark button's own padding */
 .how-it-works-home {
   display: flex;
   justify-content: center;
-  padding-top: var(--space-6);
+  padding-top: calc(var(--hero-top) - var(--top-bar) - var(--space-2));
 }
 
 .how-it-works-pun {
