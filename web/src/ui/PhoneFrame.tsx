@@ -14,18 +14,20 @@ const LINE_PX = 40;
  * phone-sized window gets the app alone. Only CSS tells the two apart: the screen is a scroll container only in
  * the frame. */
 export function PhoneFrame({ children }: { readonly children: ReactNode }) {
-  const frame = useRef<HTMLDivElement>(null);
   const screen = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const fit = () => {
       const height = document.documentElement.clientHeight;
       const scale = Math.max(MIN_SCALE, (height - 2 * PAGE_MARGIN) / DEVICE_HEIGHT);
-      frame.current?.style.setProperty("--phone-scale", String(scale));
+      document.documentElement.style.setProperty("--phone-scale", String(scale));
     };
     fit();
     window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
+    return () => {
+      window.removeEventListener("resize", fit);
+      document.documentElement.style.removeProperty("--phone-scale");
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -49,15 +51,16 @@ export function PhoneFrame({ children }: { readonly children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={frame} className="phone-frame">
+    <div className="phone-frame">
       <div className="phone-frame-side phone-frame-left" aria-hidden="true">
         {/* not copy: the wordmark's letters */}
         <p className="phone-frame-mark">ELDEN</p>
       </div>
       <div className="phone-frame-device">
+        <span className="phone-frame-bezel" aria-hidden="true" />
         <span className="phone-frame-hole" aria-hidden="true" />
         <div ref={screen} className="phone-frame-screen">
-          {children}
+          <div className="phone-frame-content">{children}</div>
         </div>
       </div>
       <div className="phone-frame-side phone-frame-right" aria-hidden="true">
