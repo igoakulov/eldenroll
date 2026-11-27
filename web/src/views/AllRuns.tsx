@@ -6,6 +6,7 @@ import { HeadingCount, ScreenHead, SectionHeading } from "../ui/Headings";
 import { ListRow } from "../ui/Rows";
 import { Screen } from "../ui/Screen";
 import { FramedIconButton, TopBar } from "../ui/TopBar";
+import { Wordmark } from "../ui/Wordmark";
 import { runTitle } from "./RunMenu";
 import { finishedHeading, finishedOn } from "./RunView";
 import "./AllRuns.css";
@@ -31,7 +32,7 @@ export function AllRuns({
   return (
     <Screen className="all-runs">
       {/* Where the player is: the objective mid-run, else the app itself, since the list belongs to no run */}
-      <TopBar eyebrow={copy.common.appName}>
+      <TopBar eyebrow={copy.common.runs} mark={<Wordmark small />}>
         <FramedIconButton icon="close" label={copy.common.close} onClick={onClose} />
       </TopBar>
       <ScreenHead title={copy.common.runs} />

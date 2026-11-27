@@ -3,6 +3,7 @@ import { derivedLevel } from "../engine/settings";
 import { objectiveNumber } from "../engine/run";
 import type { KitBlock } from "../kit/kit";
 import { FramedIconButton, LevelButton, TopBar } from "./TopBar";
+import { Wordmark } from "./Wordmark";
 
 const noop = () => {};
 
@@ -39,6 +40,14 @@ export const kit: readonly KitBlock[] = [
           <TopBar eyebrow={copy.common.objective(objectiveNumber(runs.first))}>
             <LevelButton level={derivedLevel(runs.first.stats)} onClick={noop} />
             <FramedIconButton icon="menu" label={copy.common.menu} onClick={noop} />
+          </TopBar>
+        ),
+      },
+      {
+        label: "with the wordmark",
+        render: () => (
+          <TopBar eyebrow={copy.common.runs} mark={<Wordmark small />}>
+            <FramedIconButton icon="close" label={copy.common.close} onClick={noop} />
           </TopBar>
         ),
       },

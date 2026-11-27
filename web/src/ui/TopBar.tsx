@@ -5,15 +5,32 @@ import { Icon, Lozenge } from "./Icon";
 import "./TopBar.css";
 import { KEY_ATTRIBUTE } from "./keys";
 
-export function TopBar({ eyebrow, children }: { readonly eyebrow: ReactNode; readonly children?: ReactNode }) {
+/** `mark` takes the lozenge and eyebrow's place, as the wordmark does on a screen that belongs to no run; the eyebrow
+ * then only names the screen for screen readers. */
+export function TopBar({
+  eyebrow,
+  mark,
+  children,
+}: {
+  readonly eyebrow: ReactNode;
+  readonly mark?: ReactNode;
+  readonly children?: ReactNode;
+}) {
   return (
     <header className="top-bar">
-      <div className="top-bar-left">
-        <span className="top-bar-glyph">
-          <Lozenge />
-        </span>
-        <span className="eyebrow">{eyebrow}</span>
-      </div>
+      {mark === undefined ? (
+        <div className="top-bar-left">
+          <span className="top-bar-glyph">
+            <Lozenge />
+          </span>
+          <span className="eyebrow">{eyebrow}</span>
+        </div>
+      ) : (
+        <div className="top-bar-left">
+          <span className="sr-only">{eyebrow}</span>
+          {mark}
+        </div>
+      )}
       <div className="top-bar-right">{children}</div>
     </header>
   );

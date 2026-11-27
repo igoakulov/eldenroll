@@ -50,9 +50,7 @@ export function RerollPanel({
           <Chip lit={false} red>
             {copy.reroll.felledOnTheWay}
           </Chip>
-          <Chip lit={false} red>
-            {copy.reroll.gearUnlocked}
-          </Chip>
+          <Chip lit>{copy.reroll.gearUnlocked}</Chip>
           <Chip lit>{copy.reroll.newObjective}</Chip>
         </Chips>
       ) : (
