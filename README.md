@@ -1,5 +1,7 @@
 # Elden Roll
 
+<a href="https://eldenroll.com"><img src="media/preview.gif" width="100%" alt="Elden Roll's Start screen on desktop, its tagline typing in"></a>
+
 **[eldenroll.com](https://eldenroll.com)**
 
 A companion app for Elden Ring, kept on your phone beside the game. It picks bosses to beat, builds to try and gear to collect, for console players who can't run randomizer mods and PC players who'd rather not install one into the game. A run can start in a new playthrough or one already under way.
@@ -17,6 +19,17 @@ A run is a chain of objectives. Each objective is a boss and a build to beat it 
 3. Level up as in the game, and add regions as you reach them to unlock more bosses and gear.
 4. Beat every boss to finish the run.
 
+<p align="center">
+  <img src="media/start.png" width="15%" alt="Start: stats and level">
+  <img src="media/objective.png" width="15%" alt="An objective: Godrick the Grafted as a Spellblade">
+  <img src="media/reroll.png" width="15%" alt="Reroll, from armor only to the full objective">
+  <img src="media/done.png" width="15%" alt="Great enemy felled, with a countdown to the next objective">
+  <img src="media/timeline.png" width="15%" alt="Run summary timeline">
+  <img src="media/shortlist.png" width="15%" alt="Run settings: weapon shortlist">
+  <br>
+  <sub>Start · an objective · reroll · boss beaten · the run's timeline · weapon shortlist</sub>
+</p>
+
 Defeated bosses leave the pool, and each item gets a fair share over the run, so objectives don't repeat and grow with the character. Gear that works together rolls together more often. Any part of an objective can be rerolled, and a boss defeated earlier can be marked so its gear unlocks. Run settings shape what can roll, from classes and favourite weapons to gear never to roll and bosses to skip.
 
 Added to the Home Screen, it opens full screen and works offline. Runs stay on the device, with no account and no server; only anonymous usage stats may be sent. Nothing checks the game, so completion is self-reported.
@@ -31,6 +44,7 @@ The simulation that tunes the odds and the UI kit are public too: [eldenroll.com
 | `pipeline/` | the Python build that makes `db.json` |
 | `web/` | the app; `web/src/engine/` holds the rules of a run, `web/sim/` plays whole runs to tune the odds |
 | `design/` | the icon generator |
+| `media/` | the screenshots and recording this README shows |
 
 ## Getting started
 
