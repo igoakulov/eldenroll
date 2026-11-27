@@ -8,6 +8,7 @@ import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 
 import { serviceWorkerSource } from "./scripts/serviceWorker.ts";
+import { copy } from "./src/copy.ts";
 
 const databasePath = fileURLToPath(new URL("../data/build/db.json", import.meta.url));
 
@@ -71,6 +72,35 @@ const serviceWorker: Plugin = {
   },
 };
 
+const SITE = "https://eldenroll.com/";
+
+/** The app page's description and link preview, for search engines and for links shared in chats and posts. */
+const siteHead: Plugin = {
+  name: "site-head",
+  transformIndexHtml: {
+    order: "pre",
+    handler(html, context) {
+      if (context.path !== "/index.html") return html;
+      const attribute = (text: string) => text.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+      const name = attribute(copy.common.appName);
+      const title = attribute(copy.site.title);
+      const description = attribute(copy.site.description);
+      const tags = [
+        `<meta name="description" content="${description}" />`,
+        `<link rel="canonical" href="${SITE}" />`,
+        `<meta property="og:type" content="website" />`,
+        `<meta property="og:url" content="${SITE}" />`,
+        `<meta property="og:site_name" content="${name}" />`,
+        `<meta property="og:title" content="${title}" />`,
+        `<meta property="og:description" content="${description}" />`,
+        `<meta property="og:image" content="${SITE}icons/icon-512.png" />`,
+        `<meta name="twitter:card" content="summary" />`,
+      ];
+      return html.replace(/<title>.*<\/title>/, `<title>${title}</title>\n    ${tags.join("\n    ")}`);
+    },
+  },
+};
+
 const ICONS = [
   "/favicon.ico",
   "/icons/favicon.svg",
@@ -82,7 +112,7 @@ const ICONS = [
 const UNHASHED = ["/manifest.webmanifest", ...ICONS];
 
 export default defineConfig({
-  plugins: [react(), pageSlash, serviceWorker],
+  plugins: [react(), pageSlash, siteHead, serviceWorker],
   // The UI kit and the simulation are pages of their own, each with its own bundle (web/src/ui/README.md#UI kit,
   // web/sim/README.md#The page)
   build: {

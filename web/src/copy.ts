@@ -4,6 +4,13 @@
 // word written straight into a screen.
 
 export const copy = {
+  // What search results and shared links show of the site, set into index.html's head by vite.config.ts
+  site: {
+    title: "Elden Roll: Elden Ring randomizer app for challenge runs",
+    description:
+      "Elden Ring randomizer app for console and PC players. Use on your phone beside the game. Rolls bosses to fell, builds to try, and gear to gather and use in combat.",
+  },
+
   // Words several screens share, so a feature reads the same wherever it appears
   common: {
     appName: "Elden Roll",

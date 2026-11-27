@@ -106,6 +106,10 @@ The app installs from the browser's `Add to Home Screen` and then opens full scr
 - Kept files are looked up ignoring `Vary`: a page asks for its scripts with an `Origin` header the kept copies lack, and a host that varies on it would miss every one offline.
 - The worker registers only in a production build, so development always serves fresh files. `pnpm build && pnpm preview` serves one to test offline: load it once, stop the server, reload.
 
+## Search
+
+The app's page carries a search title, a description and a link preview, set into its head at build from `copy.site` (`vite.config.ts`), so search results and shared links say what it is before any script runs. They name the game and call the app a randomizer, the word players search for, and the description names console players first: PC players have randomizer mods, so consoles are what a search for one adds. Installed, the app keeps its own name. `public/sitemap.xml` lists only the app: the UI kit and the simulation are public but are tools, not a page to land on from a search.
+
 ## Analytics
 
 Anonymous run stats in PostHog, to tune the odds and the app from real runs. The privacy line in #How it works and the last rule of #Saving must stay true: nothing identifies a player, and PostHog stores nothing on the device.
