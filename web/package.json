@@ -11,7 +11,8 @@
     "test": "vitest run",
     "sim": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sim.ts",
     "screenshots": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/screenshots.ts",
-    "app-icons": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/appIcons.ts"
+    "app-icons": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/appIcons.ts",
+    "share-image": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/shareImage.ts"
   },
   "dependencies": {
     "@fontsource/cinzel": "5",

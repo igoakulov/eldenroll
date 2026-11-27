@@ -93,8 +93,22 @@ const siteHead: Plugin = {
         `<meta property="og:site_name" content="${name}" />`,
         `<meta property="og:title" content="${title}" />`,
         `<meta property="og:description" content="${description}" />`,
-        `<meta property="og:image" content="${SITE}icons/icon-512.png" />`,
-        `<meta name="twitter:card" content="summary" />`,
+        `<meta property="og:image" content="${SITE}share.png" />`,
+        `<meta property="og:image:width" content="1200" />`,
+        `<meta property="og:image:height" content="630" />`,
+        `<meta property="og:image:alt" content="${name}" />`,
+        `<meta name="twitter:card" content="summary_large_image" />`,
+        // Tells search engines it's a free web app, a game's
+        `<script type="application/ld+json">${JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: copy.common.appName,
+          url: SITE,
+          description: copy.site.description,
+          applicationCategory: "GameApplication",
+          operatingSystem: "Any",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }).replaceAll("<", "\\u003c")}</script>`,
       ];
       return html.replace(/<title>.*<\/title>/, `<title>${title}</title>\n    ${tags.join("\n    ")}`);
     },

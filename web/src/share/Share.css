@@ -1,0 +1,27 @@
+/* The link preview (web/README.md#Search): Start's wordmark and main tagline on the desktop page's backdrop
+   (PhoneFrame.css), at the size of the image shared links show. The title and description show beside it. */
+.share {
+  display: grid;
+  place-items: center;
+  width: 1200px; /* raw: the preview image's size */
+  height: 630px; /* raw: the preview image's size */
+  background: radial-gradient(56rem 34rem at 50% 45%, var(--mist) 0%, var(--mist-2) 42%, transparent 76%), var(--ground);
+}
+
+.share-mark {
+  zoom: 3;
+  text-align: center;
+}
+
+.share-mark .wordmark {
+  margin: 0;
+}
+
+/* As on Start, two steps smaller, and without the link its words open there */
+.share-tagline {
+  margin: var(--space-5) 0 0;
+  font-style: italic;
+  font-size: var(--type-small);
+  line-height: var(--leading);
+  color: var(--text-2);
+}

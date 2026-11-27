@@ -108,7 +108,7 @@ The app installs from the browser's `Add to Home Screen` and then opens full scr
 
 ## Search
 
-The app's page carries a search title, a description and a link preview, set into its head at build from `copy.site` (`vite.config.ts`), so search results and shared links say what it is before any script runs. They name the game and call the app a randomizer, the word players search for, and the description names console players first: PC players have randomizer mods, so consoles are what a search for one adds. Installed, the app keeps its own name. `public/sitemap.xml` lists only the app: the UI kit and the simulation are public but are tools, not a page to land on from a search.
+The app's page carries a search title, a description and a link preview, set into its head at build from `copy.site` (`vite.config.ts`), so search results and shared links say what it is before any script runs. They name the game and call the app a randomizer, the word players search for, and the description names console players first: PC players have randomizer mods, so consoles are what a search for one adds. Installed, the app keeps its own name. The preview image, `public/share.png`, is Start's wordmark and main tagline, two steps smaller, on the desktop backdrop, drawn from the `share/` page (never built) by `pnpm share-image` and committed; the title and description show beside it, so it doesn't repeat them. The head also tells search engines the page is a free web app, a game's. `public/sitemap.xml` lists only the app: the UI kit and the simulation are public but are tools, not a page to land on from a search.
 
 ## Analytics
 
