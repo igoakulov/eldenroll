@@ -32,9 +32,14 @@
     background: var(--ground);
   }
 
-  /* A full screen's slide moves the drawn phone's screen, not the page (Screen.css) */
+  /* A full screen's slide moves the drawn phone's screen, not the page around it (Screen.css) */
   .phone-frame-screen {
     view-transition-name: screen;
+  }
+
+  :root[data-slide]::view-transition-old(root),
+  :root[data-slide]::view-transition-new(root) {
+    animation: none;
   }
 
   .phone-frame {

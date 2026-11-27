@@ -37,7 +37,7 @@ import { SCHEMA_VERSION, restoreRun, restoreSetup, type Fresh, type SavedRun, ty
 import { browserStore, type SaveStore } from "./save/store";
 import { useDefaultKeys } from "./ui/keys";
 import { PhoneFrame } from "./ui/PhoneFrame";
-import { slideScreen } from "./ui/slideScreen";
+import { plainScreen, slideScreen } from "./ui/slideScreen";
 import { boardBefore, boardOf, countState, inState } from "./views/bossList";
 import { AllRuns } from "./views/AllRuns";
 import { Bosses } from "./views/Bosses";
@@ -184,6 +184,7 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
       risen.current.pop();
       slideScreen("close", update);
     } else {
+      plainScreen();
       update();
     }
     if (HOME.has(next)) risen.current = [];

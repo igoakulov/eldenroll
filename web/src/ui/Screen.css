@@ -25,7 +25,7 @@
 /* The Home Screen app's full screens rise over the screen they open from and fall away on ✕ (slideScreen.ts). The
    view transition moves the phone's screen: the page itself on a phone, the drawn phone's screen in the frame
    (PhoneFrame.css). The slide replaces the screen's own fade. */
-html[data-slide] .screen {
+html[data-slid] .screen {
   animation: none;
 }
 
