@@ -8,7 +8,6 @@ import { objectiveNumber, type Run } from "../engine/run";
 import { STATS, derivedLevel, type Stats } from "../engine/settings";
 import type { Finished, FinishedObjective, RunRecord } from "../save/finished";
 import { Confirm } from "../ui/Confirm";
-import { CountUp } from "../ui/CountUp";
 import { HeadingCount, ScreenHead, SectionHeading } from "../ui/Headings";
 import { Icon } from "../ui/Icon";
 import { LevelTotal } from "../ui/LevelTotal";
@@ -213,20 +212,20 @@ function SummaryTab({
   const gearCount = (kind: GearKind) => summary.gear[kind].length;
   return (
     <>
-      <LevelTotal level={derivedLevel(stats)} count />
-      <StatGrid count stats={STATS.map((stat) => ({ key: stat, label: STAT_NAMES[stat], value: stats[stat] }))} />
+      <LevelTotal level={derivedLevel(stats)} />
+      <StatGrid stats={STATS.map((stat) => ({ key: stat, label: STAT_NAMES[stat], value: stats[stat] }))} />
 
       <section>
         <SectionHeading>{words.totals}</SectionHeading>
         <div className="run-view-rows">
-          <ListRow title={words.objectivesCompleted} count={<CountUp value={summary.objectives} />} />
-          <ListRow title={words.bossesFelled} count={<CountUp value={summary.bossesFelled} />} />
+          <ListRow title={words.objectivesCompleted} count={summary.objectives} />
+          <ListRow title={words.bossesFelled} count={summary.bossesFelled} />
           <ListRow
             title={words.bossesSkipped}
-            count={<CountUp value={summary.skipped.length} />}
+            count={summary.skipped.length}
             {...(summary.skipped.length === 0 ? {} : { onClick: () => onList({ kind: "skipped" }) })}
           />
-          <ListRow title={words.rerolls} count={<CountUp value={summary.rerolls} />} />
+          <ListRow title={words.rerolls} count={summary.rerolls} />
         </div>
       </section>
 
@@ -244,7 +243,7 @@ function SummaryTab({
                   <ClassIcons id={row.id} />
                 </span>
               }
-              count={<CountUp value={row.count} />}
+              count={row.count}
             />
           ))}
         </section>
@@ -260,7 +259,7 @@ function SummaryTab({
               <ListRow
                 key={kind}
                 title={words.gearKinds[kind].row}
-                count={<CountUp value={gearCount(kind)} />}
+                count={gearCount(kind)}
                 {...(gearCount(kind) === 0 ? {} : { onClick: () => onList({ kind: "gear", gear: kind }) })}
               />
             ))}
@@ -278,7 +277,7 @@ function SummaryTab({
               key={row.id}
               title={row.name}
               {...(row.kind === null ? {} : { detail: words.rerolledKinds[row.kind] })}
-              count={<CountUp value={row.count} />}
+              count={row.count}
             />
           ))}
         </section>

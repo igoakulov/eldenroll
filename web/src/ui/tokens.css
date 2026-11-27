@@ -152,7 +152,6 @@
   --dur-digit: 120ms;
 
   /* A run's summary: its counts tick up together as the view opens */
-  --dur-count: 700ms;
 
   /* Start: the caret's blink and the loading pulse, the only motion that runs on its own */
   --dur-caret: 1060ms;

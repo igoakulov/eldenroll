@@ -46,7 +46,6 @@ The game's menus fade and nothing in them bounces; ours follow. Motion shows wha
 - **A slot fades in icon first,** its text following, on a new objective and a reroll. Returning to the card, resuming and undoing show it at once under the screen's fade: a cascade there replays what the player has already seen.
 - **A reroll** fades out and back in only the slots it changed, slowly enough to follow; the rest stay still, so the eye finds what is new.
 - **An enemy felled** is the one big moment. The card dims, the boss bar drains from the right with a trail lagging behind, as the game's bar shows damage, and the felled band fades in and glows. The countdown to undo hands off each second, the old digit fading out before the new one fades in, since two digits at half strength read as neither, and its ring drains like a boss bar, so the time left reads at a glance. A tap on the band or the countdown takes off one second, not all of it, and its target stops well above undo, so reaching for undo costs nothing. We echo the game's rhythm, not its art or type (#What we may use from the game).
-- **The run view's numbers** count up when the view opens, level and stats included, all together, like runes ticking up after a kill; not again on switching tabs. They start once the screen's fade is over, which would hide the start, and climb at an even pace, so the climb is seen. Section headings don't count.
 - **Loading** pulses the wordmark's lozenge slowly while the player waits.
 - **Start's tagline** types itself out (`web/README.md#Start`).
 
@@ -59,7 +58,7 @@ The game's menus fade and nothing in them bounces; ours follow. Motion shows wha
 - **The reroll slider** follows the finger with no lag, and its chips light one by one, so the scope visibly grows.
 - **The lozenge checkbox** fills and glows, like a grace being lit. **A raised stat** while levelling up stands out with a short fade; numbers there never count.
 - **Showing more** rows fades the new ones in, and the height jumps, since sliding height stutters on phones and drags the rows below.
-- **Not animated:** search results, the stepper's numbers, scrolling (no reveal on scroll) and the desktop frame.
+- **Not animated:** numbers anywhere, search results, scrolling (no reveal on scroll) and the desktop frame.
 
 ## UI kit
 

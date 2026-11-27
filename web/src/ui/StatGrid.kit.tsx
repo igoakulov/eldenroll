@@ -7,7 +7,6 @@ export const kit: readonly KitBlock[] = [
   {
     id: "stat-grid",
     title: "Stat grid",
-    note: "On the run view each stat counts up as it first appears, with the level and totals.",
     section: "groups",
     size: "phone",
     states: [
