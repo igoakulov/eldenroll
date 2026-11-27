@@ -321,7 +321,8 @@ function Game({ database, engine, saved, setup, finished: keptRuns }: Boot) {
     return <HowItWorks onClose={() => (howItWorksFromMenu ? home() : setView("start"))} onHome={() => setView("start")} />;
 
   if (view === "settings") {
-    const eyebrow = run === null ? copy.common.newRun : copy.common.objective(objectiveNumber(run));
+    // Settings belong to the run, not to one objective
+    const eyebrow = run === null ? copy.common.newRun : copy.runView.current;
     const board = run === null ? boardBefore(deadBosses, skippedBosses) : boardOf(run);
     return (
       <RunSettings

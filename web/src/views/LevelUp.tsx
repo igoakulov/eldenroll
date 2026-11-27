@@ -61,7 +61,7 @@ export function LevelUp({
   const nextIds = new Set(next.map((region) => region.id));
   const notice = mode === "next" && run.waiting !== null && editedAt !== run ? WAITING_MESSAGES[run.waiting] : null;
   const eyebrow =
-    mode === "next" ? copy.levelUp.complete(run.completed.length) : copy.common.objective(objectiveNumber(run));
+    mode === "next" ? copy.levelUp.complete(run.completed.length) : copy.runView.current;
 
   return (
     <Screen

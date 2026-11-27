@@ -12,7 +12,7 @@
   position: absolute;
   left: calc(var(--gutter) + var(--space-3));
   top: calc(-1 * var(--space-3));
-  height: calc(var(--space-3) + var(--space-4) + var(--space-3));
+  height: calc(var(--space-3) + var(--space-4) + var(--space-2) + var(--space-1));
   width: 1px;
   background: var(--frame);
 }
@@ -26,8 +26,8 @@
   content: "";
   position: absolute;
   left: calc(var(--gutter) + var(--space-3));
-  top: calc(var(--space-4) + var(--space-3));
-  bottom: calc(-1 * (var(--space-4) + var(--space-3)));
+  top: calc(var(--space-4) + var(--space-2) + var(--space-1));
+  bottom: calc(-1 * (var(--space-4) + var(--space-2) + var(--space-1)));
   width: 1px;
   background: var(--frame);
 }
@@ -55,7 +55,7 @@ div.timeline-head {
   justify-self: center;
   width: 9px;
   height: 9px;
-  margin-top: var(--space-3);
+  margin-top: calc(var(--space-2) + var(--space-1));
   transform: rotate(45deg);
   background: var(--gold-mute);
   outline: var(--space-2) solid var(--ground);

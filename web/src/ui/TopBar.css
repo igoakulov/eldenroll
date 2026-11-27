@@ -16,6 +16,11 @@
   gap: var(--space-3);
 }
 
+/* The wordmark's capitals ride high in their line, so it drops a little to centre them on the buttons beside it */
+.top-bar-mark {
+  margin-top: calc(var(--space-2) + var(--space-1));
+}
+
 .top-bar-glyph {
   display: grid;
   place-items: center;

@@ -28,7 +28,7 @@ export function TopBar({
       ) : (
         <div className="top-bar-left">
           <span className="sr-only">{eyebrow}</span>
-          {mark}
+          <span className="top-bar-mark">{mark}</span>
         </div>
       )}
       <div className="top-bar-right">{children}</div>
