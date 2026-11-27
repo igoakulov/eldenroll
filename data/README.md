@@ -37,9 +37,9 @@ Notable game data it does not store or use:
 
 ## Rows
 
-- **Identity.** `item.id` is a slug of the canonical name; where categories share a name, each takes a category suffix (`glintstone_pebble_ash`, `glintstone_pebble_sorcery`), and a unique slug takes none. `location.id` is the mod's area name, and `location.name` may repeat (`Academy of Raya Lucaria` names four areas). `boss_instance.id` is the boss's slug plus its sheet label's slug, so two fights of one boss never collide.
+- **Identity.** `item.id` is a slug of the canonical name; where categories share a name, each takes a category suffix (`glintstone_pebble_ash`, `glintstone_pebble_sorcery`), and a unique slug takes none. `location.id` is the mod's area name, and `location.name` may repeat across areas (`Academy of Raya Lucaria`). `boss_instance.id` is the boss's slug plus its sheet label's slug, so two fights of one boss never collide.
 - **`odds`** is on everything that rolls: class, boss, item, rule, armor set. It is for balance or for turning one off; a condition belongs in a modifier. An armor piece rolls only through its set and has no odds of its own.
-- **`infusable`** is a fact about one weapon; which ashes fit its class is `ash_compatibility`, a separate fact. `Raging Beast` fits beast claws; `Red Bear's Claw` is a beast claw that holds none. `false` wins over any ash row.
+- **`infusable`** is a fact about one weapon; which ashes fit its class is `ash_compatibility`, a separate fact. `false` wins over any ash row.
 - **`str_bonus_2h`** follows the weapon class, with exceptions in `overrides/str_bonus_2h.csv`. Every ranged class keeps it.
 - **`boss_instance.location`** is the short place the player sees (#Bosses). The sheet's label only builds the id and matches override rows; it never ships.
 - **`image`** stays `null` while the MVP has no item pictures; every item shows its subcategory icon until pictures come back.
@@ -51,14 +51,12 @@ Rules that shape many rows. A single item's reason is on its override row.
 
 ### Weapons and shields
 
-- `Throwing Blade` is a weapon class whose only member is `Smithscript Dagger`: melee, paired, and it holds an ash.
 - Thrusting shields are weapons outside `melee`.
-- Staves and seals stay in the catalog although only caster slots and `Jester` RH select them, so a later caster class needs a selector, not new data.
-- `infusable`: Fextralife decides where the unique-skill sheet is unclear (`overrides/infusable.csv`), and the 17 base staves follow the catalyst rule instead: `Carian Regal Scepter` holds no ash, the others take only `Spinning Weapon`, seals hold none.
+- `infusable`: Fextralife decides where the unique-skill sheet is unclear (`overrides/infusable.csv`), and base staves and seals follow the catalyst rule instead (`overrides/infusable.csv`).
 
 ### Armor
 
-- An altered piece merges into its plain piece, with both forms' locations, because altering is left to the player. Three can't be altered back and stay separate under their game names, because sets name those looks: `Banished Knight Helm (Altered)`, `Banished Knight Armor (Altered)`, `Fire Prelate Armor (Altered)`.
+- An altered piece merges into its plain piece, with both forms' locations, because altering is left to the player. A piece that can't be altered back stays separate under its game name, because sets name that look.
 - Sets start from the wiki's Armor Sets page and are ours to change: fill an empty slot, drop `(Altered)` variants, pick one variant per slot, split a set with two looks, add sets the page lacks, compose new ones. None of this touches code.
 - A slot a set lacks shows `any`, and the player wears what they like. Where weight matters, for Blue Dancer Charm, a set names `None` pieces instead (`overrides/added_armor.csv`), which keep the slot empty.
 
@@ -66,7 +64,6 @@ Rules that shape many rows. A single item's reason is on its override row.
 
 - The canonical name drops `Ash of War: `, because an ash rolls only on a weapon slot.
 - Ashes the mod has only on a weapon can be taken off, so they join the pool (`overrides/ash_sources.csv`); each takes its weapons' locations, boss-tied ones included.
-- `Parry` fits several weapon classes and small and medium shields; the other parry ashes fit those shields only. So `Any parry ash` is 1 option on a weapon and 5 on a shield.
 
 ## Placement
 
@@ -89,15 +86,11 @@ Rules that shape many rows. A single item's reason is on its override row.
 
 ## Bosses
 
-- **The pool is every boss fight the wikis name,** not only the 42 bosses the randomizer mod gates content on: the boss sheet's `[Boss]` rows plus the fights it leaves untagged (`overrides/boss_additions.csv`). Of Fandom's unmarked list only `Baleful Shadow` joins, because it forces Ranni's quest; `Elder Dragon Greyoll`, the non-boss tree spirits and avatars, and the Hippopotamus fights stay out. Nothing is filtered by difficulty or remembrance status.
+- **The pool is every boss fight the wikis name,** not only the bosses the randomizer mod gates content on: the boss sheet's `[Boss]` rows plus the fights it leaves untagged (`overrides/boss_additions.csv`). Of Fandom's unmarked list only `Baleful Shadow` joins, because it forces Ranni's quest; `Elder Dragon Greyoll`, the non-boss tree spirits and avatars, and the Hippopotamus fights stay out.
 - **One fight is one instance.** Phases and duos split across names merge (`overrides/boss_merges.csv`), and so do fights the sheet lists at two places: a dragon that flies away at half health is an instance only where it is finished.
 - **A boss's odds decide only whether it is an objective.** Fights kept for their drops sit at `odds = 0` and act as regular enemies.
-- **Shown location** is `Area, Place`, never the sheet's label: dungeons get their area, the mod's own names give way to the game's (`overrides/location_display.csv`), and a fight that would read the same as another of its boss gets a landmark (`overrides/boss_landmarks.csv`). The build fails when two fights of one boss read the same or a location is over 48 characters.
-
-## Settled
-
-Already decided, so not to be reopened without new data: talisman, tool and spell-shop locations, ground and chest pickups and armor-set locations all come from the sources as they are; crystal tears are combat rules, not items.
+- **Shown location** is `Area, Place`, never the sheet's label: dungeons get their area, the mod's own names give way to the game's (`overrides/location_display.csv`), and a fight that would read the same as another of its boss gets a landmark (`overrides/boss_landmarks.csv`). The build fails when two fights of one boss read the same or a location is too long.
 
 ## Build
 
-`pipeline/README.md` has the command. It runs the gate and writes `build/db.json` and `build/import-report.json` (counts, coverage, pools with several top-tier modifiers, guarantee targets off base odds, dropped values), or nothing when a check fails, naming every failure. Two runs with the same inputs give a byte-identical `db.json`: no timestamp, path or machine value. Nothing under `web/` reads `sources/`.
+`pipeline/README.md` has the command. It runs the gate and writes `build/db.json` and `build/import-report.json`, or nothing when a check fails, naming every failure. Two runs with the same inputs give a byte-identical `db.json`: no timestamp, path or machine value. Nothing under `web/` reads `sources/`.

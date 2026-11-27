@@ -4,22 +4,7 @@ The rules of an Elden Roll run, and the code that rolls it. Plain TypeScript wit
 
 ## Modules
 
-| Module | Holds |
-|---|---|
-| `database.ts` | the types of `db.json`, mirroring `pipeline/eldenroll/model/` |
-| `engineData.ts` | indexes built once from `db.json` |
-| `settings.ts` | stats, level and the run settings, with their limits and defaults |
-| `eligibility.ts` | which location rows count (#Eligibility); `countedItems` also counts every item with no row, everywhere |
-| `regions.ts` | selected locations, the Ashen Capital and Maliketh rules, the boss pool |
-| `selectors.ts`, `modifiers.ts` | what a selector matches, and which modifier rows hold for the slots rolled so far |
-| `stats.ts` | the stat gap filters, two-handing's Strength bonus included |
-| `slotRoll.ts` | one pool: filters, odds, modifiers, catch-up and its tally, sampling |
-| `loadout.ts` | every slot in roll order, ash and spell rules, rerolls, the weapon shortlist |
-| `pairRoll.ts` | the two talisman slots, rolled as one draw (`data/balance.md#Paired slots`) |
-| `run.ts` | the run as plain data and every action |
-| `display.ts` | what each card row shows |
-| `random.ts` | the seeded generator and weighted picking |
-| `hyperparams.ts` | balance values passed in, so a hidden page can tune them live; game mechanics never go here |
+Each module's header says what it holds. One rule spans them: `hyperparams.ts` holds the balance values passed in, so a hidden page can tune them live, and never a game mechanic.
 
 ## Pitfalls
 
@@ -33,52 +18,42 @@ The rules of an Elden Roll run, and the code that rolls it. Plain TypeScript wit
 
 - Build `Engine` once from the loaded `db.json`.
 - Before a run exists, the Start view holds plain `RunInputs`. `startRun` needs a 32-bit seed from the UI (the engine never calls `Math.random`) and returns either a run or the exact messages to show. After start, edits go through `editRun`, and bosses through `setBossState`, which returns the same run for a locked boss. So the boss controls have two paths: arrays before the run, run actions after.
-- `displaySlots` returns rows in card order. An `alias` armor piece is a `None` piece: the set keeps that slot empty, so the player wears nothing there, while `any` means they wear what they like. Make the two easy to tell apart.
-- The roll order differs from the card order: compute and show the slots a reroll will change in roll order (#Rerolls), where they always form one run; the panel lists it reversed, to match the slider. In card order a kept slot can sit between two that change.
+- The card's rows come in card order. An `alias` armor piece is a `None` piece: the set keeps that slot empty, so the player wears nothing there, while `any` means they wear what they like. Make the two easy to tell apart.
+- The roll order differs from the card order: compute and show the slots a reroll will change in roll order (#Rerolls), where they always form one run; the reroll control lists it reversed, to match its slider. In card order a kept slot can sit between two that change.
 - A slot the class has no row for can't be rerolled: `reroll` returns the run unchanged.
-- `done` leaves no current objective and the view calls `rollNext` after `Level up`, so edits made there apply to that roll. It already sets `waiting`, or finishes the run, from the regions as they stand. `Undo` puts back the run from before `Done`: every action returns a new run, so the engine needs no undo.
+- `done` leaves no current objective, and the view calls `rollNext` once the player has levelled up, so edits made then apply to that roll. It already sets `waiting`, or finishes the run, from the regions as they stand. Undo puts back the run from before: every action returns a new run, so the engine needs no undo of its own.
 - `alreadyDead` rerolls at once, before the countdown, and may leave the run waiting or finished as `done` does.
 - Keep UI state in plain data, so a save layer can store it.
 
 ## Run model
 
-An objective is a boss instance, a class loadout and a combat rule. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans roll once `Margit, the Fell Omen` is felled, as in the game, and one before (#Closed slots); talismans 3 and 4 never roll. In Limgrave, Liurnia and Caelid a rolled talisman may come up `any` (`data/balance.md#43. Early talisman slots`). The two talismans roll as one draw (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
+An objective is a boss instance, a class loadout and a combat rule. The player acquires the loadout unless already owned, equips it, defeats the boss and obeys the rules. Completion is self-reported. Two talismans roll once `Margit, the Fell Omen` is felled, as in the game, and one before (#Closed slots); talismans 3 and 4 never roll. In the early regions a rolled talisman may come up `any` (`data/balance.md#43. Early talisman slots`). The two talismans roll as one draw (`data/balance.md#Paired slots`). Only the first weapon in each hand is constrained; other weapon slots, consumables and spirit ashes are free. Combat rules win over the loadout.
 
 - **Owned** means it appeared in a completed objective this run; nothing else is known about the player's inventory.
-- **Felled** (code: `dead`) is a boss out of the run, by `Done`, `Felled?` or `Bosses`. **Skipped** keeps a boss out of the boss pool while it stays alive for its items.
+- **Felled** (code: `dead`) is a boss out of the run: its objective done, or marked felled from the card or the boss list. **Skipped** keeps a boss out of the boss pool while it stays alive for its items.
 - The objective number is completed + 1; rerolls don't change it.
 
 ### Lifecycle
 
-1. `Start run` validates inputs and rolls objective 1.
-2. `Done` marks the objective completed and its boss felled, stores the snapshot. `Great enemy felled` counts down 5 seconds with `Undo`, which restores the run exactly. `Level up` follows, to update stats and regions, then `Roll objective N`. If the selected regions hold no living boss, the run waits with no current objective until more are ticked.
-3. `Felled?` is for a boss felled before this objective: it marks it felled, so its items unlock, and rerolls the full objective after the same countdown, reading `Rerolling in`, with no `Level up`.
-4. `Finish run` works at any time; the current objective is discarded unless `Done`. The run finishes by itself when every boss with `odds > 0` is felled or skipped, whatever the regions. Once Maliketh is felled, a Royal Capital boss left alive outside the Shunning-Grounds doesn't count: his death turns the city to ash.
-5. `New run` finishes the current run as `Finish run` does, then clears all run state.
+1. Starting validates the inputs and rolls objective 1.
+2. Done marks the objective completed and its boss felled, and stores the snapshot; a short countdown lets the player undo it exactly. The player levels up and ticks regions, then the next objective rolls. If the selected regions hold no living boss, the run waits with no current objective until more are ticked.
+3. Marking the current boss felled from the card is for a boss felled before this objective: it unlocks the boss's items and rerolls the full objective after the same countdown, with no levelling up.
+4. Finishing works at any time; the current objective is discarded unless done. The run finishes by itself when every boss with `odds > 0` is felled or skipped, whatever the regions. Once Maliketh is felled, a Royal Capital boss left alive outside the Shunning-Grounds doesn't count: his death turns the city to ash.
+5. A new run finishes the current one the same way, then clears all run state.
 
 ### Rerolls
 
-Unlimited; they never change the objective number or any probability, and a discarded roll adds no ownership. A slider with 9 stops picks the scope; its target and every slot after it in the roll order re-roll:
+Unlimited; they never change the objective number or any probability, and a discarded roll adds no ownership. A slider picks the scope; its target and every slot after it in the roll order re-roll:
 
 ```
 boss → character_class → rh → rh_ash → lh → lh_ash → spell → item → talisman_1 → talisman_2 → rule → armor
 ```
 
-| Stop | Target |
-|---|---|
-| `Armor only` | `armor` |
-| `Rule` | `rule` |
-| `Talismans` | `talisman_1` |
-| `Item` | `item` |
-| `Spell` | `spell` |
-| `Left hand` | `lh` |
-| `Both hands` | `rh` |
-| `New class` | `character_class` (the panel opens here) |
-| `Full objective` | `boss` |
+The reroll control names each target by what the player sees; it opens on the class.
 
-Armor is last, so every reroll rerolls armor. A scope can skip a slot the card shows between two that change: `Talismans` keeps the item.
+Armor is last, so every reroll rerolls armor. A scope can skip a slot the card shows between two that change: rerolling the talismans keeps the item.
 
-Each objective keeps its rerolls' targets and the ids they replaced, which `Most rerolled` counts (`web/README.md#Summary`).
+Each objective keeps its rerolls' targets and the ids they replaced, which the summary's most rerolled counts (`web/README.md#Summary`).
 
 Why this order: weapons gate ashes and rule requirements, talismans gate rule odds, rules gate armor synergies, and nothing rolls after armor.
 
@@ -101,7 +76,7 @@ Each fight is its own instance: felling one says nothing about another fight of 
 
 Pools are `data/overrides/slot_pools.csv`. Odds and the class rules (Dual-Wield Warrior pairs, paired weapons, Knight's thrusting shield, Jester's right hand) are explained in `data/balance.md#Classes with extra rules`. What the engine itself does:
 
-- **Catalysts** are scoped by selectors, not odds, and the build checks it: staves in `Sorcerer`, seals in `Pyromancer`, both in `Spellblade` LH, and one staff in `Jester` RH, `Demi-Human Queen's Staff`, there for `Spinning Weapon`; both are tied to Margit, so they arrive together (`data/balance.md#19. Jester's right hand`). The card shows only `Any staff`, so one is enough.
+- **Catalysts** are scoped by selectors, not odds, and the build checks it: each casting class rolls only its own kind (`data/overrides/slot_pools.csv`, `data/balance.md#19. Jester's right hand`).
 - **A rolled catalyst decides the spell type,** for every class and hand, RH winning, so `Any seal` never pairs with a sorcery.
 - `Sorcerer` and `Pyromancer` are separate so a player levelling only INT or only FTH can drop the other.
 - A Knight's thrusting shield always leaves LH empty, so it gets the two-handing bonus.
@@ -148,13 +123,13 @@ The player lists favourite or upgraded weapons and greatshields; with the checkb
 
 An item rolls if at least one of its location rows counts (`eligibility.ts`). A place row counts when its region is selected. A boss row counts once the boss is felled, whatever the region, and never before: Radahn's weapons stay out while he lives, even with Caelid ticked, and keep rolling after he falls with Caelid unticked. There is no setting to turn this off. A boss at `odds = 0` always counts by region, like a regular enemy, and is absent from `Bosses`.
 
-- A boss is known felled only through `Done`, `Felled?` or `Bosses`; skipped bosses are presumed alive.
-- Gear shown on a done objective stays in reach whatever drops out afterwards, since the player has it: an item, or every piece of a set. This matters where a place drops out, as the Royal Capital does with the Ashen Capital or a felled Maliketh (owner, 2026-11-23). Gear only shown on a rerolled or discarded objective doesn't count.
+- A boss is known felled only when the player says so, through its objective, the card or the boss list; skipped bosses are presumed alive.
+- Gear shown on a done objective stays in reach whatever drops out afterwards, since the player has it: an item, or every piece of a set. This matters where a place drops out, as the Royal Capital does with the Ashen Capital or a felled Maliketh. Gear only shown on a rerolled or discarded objective doesn't count.
 - An item with no location row counts everywhere: consumables, whose result names a family the player fills with any variant, and the `None` pieces. A set rolls only if every piece is reachable.
 
 ## Golden fixtures
 
-`golden.test.ts` plays a few fixed runs, one per class plus Margit felled, Limgrave at starting stats, the weapon shortlist and rerolls, and compares every roll with a saved file. It runs them twice: on `golden/db.json`, a frozen copy of the database, and on the real one.
+`golden.test.ts` plays a few fixed runs that cover every class and the main mechanisms, and compares every roll with a saved file. It runs them twice: on `golden/db.json`, a frozen copy of the database, and on the real one.
 
 | Frozen | Real | Meaning |
 |---|---|---|
@@ -166,7 +141,7 @@ After an intended change, `pnpm test -u` saves the new rolls and the diff of `go
 
 ## Design constraints
 
-Each exists because the alternative was tried and failed.
+Each is a reason the design takes its current shape.
 
 1. Regions, not boss levels or runes, are the progression input: level data was unreliable.
 2. `region_level` orders the checkbox list and never filters: a second list in the frontend drifts.

@@ -2,9 +2,9 @@
 
 Everything the build knows beyond the source files: corrections to them, and the seeds we author. `data/sources/README.md` says which source wins where; this folder wins over all of them. The build reads only these files and the sources.
 
-- **Every correction carries a `reason`;** authored seeds (`regions.csv`, `region_areas.csv`, `character_classes.csv`, `combat_rules.csv`, `aliases.csv`, `slot_pools.csv`, `modifiers.csv`, `location_aliases.csv`) do not. A reason says why in plain words and where it comes from: a project decision, a wiki page, or what the mod's slot says.
+- **Every correction carries a `reason`;** authored seeds, the files we write from scratch such as `modifiers.csv`, do not. A reason says why in plain words and where it comes from: a project decision, a wiki page, or what the mod's slot says.
 - **Every row must apply.** A row that matches nothing stops the build, so a stale override can't linger.
-- **Names, not ids,** in files keyed on an item, ash, piece or boss name, written as the game spells them. Files keyed on an id say so in their header (`item_odds.csv`, `armor_set_odds.csv`, `boss_odds.csv`).
+- **Names, not ids,** in files keyed on an item, ash, piece or boss name, written as the game spells them. Files keyed on an id say so in their header.
 - **Odds files list only values other than 1.** Odds 0 keeps a row that never rolls.
 - **An exception between two items is not an override:** it is a conditional rule, explained in `data/balance.md` and written as rows in `modifiers.csv`.
 
@@ -31,7 +31,6 @@ Each file's name and header say what it holds. What they don't say:
 | `drop_areas.csv` | `enemy` and `label` are written as the drop tables write them, typos included (`Redmane Kngiht`); a row moves only that enemy's drops on that label, so the label's other items stay put |
 | `slot_pools.csv` | `opened_by` names the boss instance whose felling opens the slot (`web/src/engine/README.md#Closed slots`); empty means always open |
 | `aliases.csv` | `members` are selectors, never name matches; an item in two aliases stops the build |
-| `combat_rules.csv` | a rule has no description: its name says the whole rule |
 | `wiki_urls.csv` | the Fextralife page a name doesn't reach, and each alias's group page; an empty `url` means no link (`data/sources/README.md#Wiki lookups`) |
 
 ## Regions
@@ -78,7 +77,7 @@ Entry gates, for reference; nothing reads them:
 
 ## Selectors and modifiers
 
-A **selector cell** holds `kind:id id` parts split by `;`. A part with no ids means every option of that kind (`rule:`). A cell may name a subcategory group (`melee`, `paired`, `unpaired`, `ranged`, `catalyst`, `shield`, from `pipeline/eldenroll/model/vocabulary.py`); the stored selector is the expanded list. Every selector must match at least one item.
+A **selector cell** holds `kind:id id` parts split by `;`. A part with no ids means every option of that kind (`rule:`). A cell may name a subcategory group (`pipeline/eldenroll/model/vocabulary.py`); the stored selector is the expanded list. Every selector must match at least one item.
 
 A **modifier** row is `id`, `when`, `target`, `value`:
 
@@ -92,6 +91,6 @@ A **modifier** row is `id`, `when`, `target`, `value`:
 
 ## Gaps
 
-A gap is a source fact the build can't use as it stands: no stat record, a blank, all-zero or contradictory one, an ash or weapon class the ash sheet lacks, a weapon the unique-skill sheet can't settle, a remembrance whose boss nothing names. The checks in `pipeline/eldenroll/validate/gaps.py` find them, and the build fails on any gap its override file doesn't answer: `requirements.csv`, `infusable.csv`, `ash_compatibility.csv` or `remembrance_bosses.csv`. `python -m eldenroll.validate.gaps`, from `pipeline/`, lists the unanswered ones.
+A gap is a source fact the build can't use as it stands, such as a missing or contradictory stat record. The checks in `pipeline/eldenroll/validate/gaps.py` find them, and the build fails on any gap its override file doesn't answer: `requirements.csv`, `infusable.csv`, `ash_compatibility.csv` or `remembrance_bosses.csv`. `python -m eldenroll.validate.gaps`, from `pipeline/`, lists the unanswered ones.
 
 A check can't see a wrong value that looks normal. Such a doubt is tracked as an open question until it is answered, and the answer lands here as an override row with its reason.

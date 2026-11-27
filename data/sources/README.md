@@ -6,7 +6,7 @@ Read this before changing a loader, a build step or an override file. It holds w
 
 | File | Used for | Source | Original name |
 |---|---|---|---|
-| `locations/areas.yaml` | the 174 areas | PC randomizer mod | `annotations_stable.txt` |
+| `locations/areas.yaml` | the areas | PC randomizer mod | `annotations_stable.txt` |
 | `locations/submaps.yaml` | test: label cross-check | PC randomizer mod | `submaps.txt` |
 | `placement/item_slots.yaml` | where each item is placed | PC randomizer mod | `itemslots_stable.txt` |
 | `placement/enemy_drops.csv` | enemy drops | spreadsheet | `item_drop_locations.csv` |
@@ -54,8 +54,8 @@ All parse with `yaml.safe_load`; no line parsers.
 - **The `ignore` tag governs, not `Area: unknown`.** Every `unknown` slot is also `ignore`, and two `ignore` slots have a real area (`[ERROR]Rya's Necklace`, an unused-ESD `Glowstone`).
 - **`Area` is the grouping key; `FullArea` is reachability.** Map ids are never used for grouping: `m12_01_00_00` is both Ainsel and Lake of Rot, and one area spans several maps.
 - **Field shapes that break naive parsing:** `Tags`, `FullArea`, `QuestReqs` and `Includes` are space-separated strings, `''` when empty, not YAML lists. `Areas[].MapNames` is a list of `"<mapid> <name>"` strings. `Areas[].Req` is a boolean expression over areas, events, key items and switches. `Areas[].Until` occurs once: `leyndell` → `ashen`. Values containing `": "` are single-quoted in the source.
-- **`areas.yaml` `Events` are not the boss pool.** 42 are bosses the mod gates content on, 4 are world flags. They omit field and dungeon bosses and serve only as a cross-check that each gated boss exists at that area; `mimictear` is on no slot.
-- **Slot tags worth knowing:** `ignore` (junk), `tarnished` (real items on base-game maps, and they stay), `norandom` (valid, not randomized by the mod), the fight tags (`boss`, `altboss`, `overworldboss`, `minidungeonboss`, `remembranceboss`, `catacombboss`, `caveboss`, `dragonboss`, `miscboss`, `tunnelboss`, `graveboss`, `miniboss`, `gaolboss`), `cellarbosschest` (a chest a boss guards, so a boss drop), and Enia's `bosssoulshop` and `bossarmorshop`.
+- **`areas.yaml` `Events` are not the boss pool.** Some are bosses the mod gates content on, a few are world flags. They omit field and dungeon bosses and serve only as a cross-check that each gated boss exists at that area; `mimictear` is on no slot.
+- **Slot tags worth knowing:** `ignore` (junk), `tarnished` (real items on base-game maps, and they stay), `norandom` (valid, not randomized by the mod), the fight tags (every tag ending in `boss`), `cellarbosschest` (a chest a boss guards, so a boss drop), and Enia's `bosssoulshop` and `bossarmorshop`.
 
 ## The spreadsheets
 
@@ -73,15 +73,15 @@ All parse with `yaml.safe_load`; no line parsers.
 
 ## The base-game JSON files
 
-From the public `deliton/eldenring-api` dataset, base game only. Its other files are not used; `items.json` and `bosses.json` likely return for the image step.
+From the public `deliton/eldenring-api` dataset, base game only. Its other files are not used.
 
-- **Values can be wrong while looking normal.** Of 247 weapons compared with the wikis, 9 lacked or swapped a stat (`Grave Scythe` lacks DEX 13). Never write a test value from memory.
+- **Values can be wrong while looking normal.** Some weapons lack or swap a stat (`Grave Scythe` lacks DEX 13). Never write a test value from memory.
 - **Misses are reported, not assumed DLC.** Some base weapons are absent (`Bandit's Curved Sword`).
 - **Names are labels; ids are the identity.** Names repeat within a file, so no join is keyed on a name. Matching ignores case (`Hand Of Malenia`).
-- **Known defects,** each mapped in `data/overrides/name_variants.csv`: misspellings (`Godksin Noble Robe`), a second record of one piece (`Champion Gauntlets`), and `Redmane Knight Helm` naming two records, one of them the gauntlets, so that rename is keyed on the id. `Spellblade's Gloves` has the category `Gauntlet` for `Gauntlets`.
+- **Known defects,** each mapped in `data/overrides/name_variants.csv`: misspellings, second records of one piece and wrong categories, and `Redmane Knight Helm` naming two records, one of them the gauntlets, so that rename is keyed on the id.
 - **`Beast Claw` in `incantations.json`** is the incantation; the weapon is DLC and has no record.
 - **`ashes.json` writes the prefix three ways:** `Ash Of War: `, `Ashes Of War: ` and none. `Lost Ashes Of War` is not an ash.
-- **Only the fields the build reads are required:** `requiredAttributes` on weapons and shields, `category` on armor, `requires` on spells. A requirement with no usable stat name is left out and the gap check fails the build until `data/overrides/requirements.csv` answers it.
+- **Only the fields the build reads are required.** A requirement with no usable stat name is left out and the gap check fails the build until `data/overrides/requirements.csv` answers it.
 
 ## Matching names
 
@@ -99,7 +99,7 @@ From the public `deliton/eldenring-api` dataset, base game only. Its other files
 - `&` doesn't reach a page named with `and`: `Nox+Swordstress+%26+Nox+Monk` misses where `Nox+Swordstress+and+Nox+Monk` lands.
 - Look up only what the data lacks. No wiki is authoritative: Fextralife can be wrong, and existing records are not re-verified against it.
 - wiki.gg marks the same clashes with `(weapon)` and `(spell)`.
-- Fandom's boss count of 238 is not a checkable target: its lists add up to 209.
+- Fandom's boss count is not a checkable target: its own lists don't add up to it.
 - The armor sets start from the wiki.gg page above. It is a starting point, not a contract.
 
 ## Images

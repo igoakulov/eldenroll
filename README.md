@@ -13,11 +13,11 @@ The code is under the MIT licence (`LICENSE`). The game's names and data belong 
 A run is a chain of objectives. Each objective is a boss and a build to beat it with: a class, its gear (weapons, spells, talismans and armor) and a combat rule, or none.
 
 1. Set your stats and the regions you can reach, and start a run.
-2. Get the gear, beat the boss and tap `Done`.
+2. Get the gear, beat the boss and mark it done.
 3. Level up as in the game, and add regions as you reach them to unlock more bosses and gear.
 4. Beat every boss to finish the run.
 
-Defeated bosses leave the pool, and each item gets a fair share over the run, so objectives don't repeat and grow with the character. Gear that works together rolls together more often. Any part of an objective can be rerolled, and a boss defeated earlier can be marked so its gear unlocks. `Run settings` choose which classes roll, gear and rules never to roll, a shortlist of favourite weapons for the right hand, bosses already defeated or never to fight, and how far gear requirements may exceed your stats.
+Defeated bosses leave the pool, and each item gets a fair share over the run, so objectives don't repeat and grow with the character. Gear that works together rolls together more often. Any part of an objective can be rerolled, and a boss defeated earlier can be marked so its gear unlocks. Run settings shape what can roll, from classes and favourite weapons to gear never to roll and bosses to skip.
 
 Added to the Home Screen, it opens full screen and works offline. Runs stay on the device, with no account and no server; only anonymous usage stats may be sent. Nothing checks the game, so completion is self-reported.
 
@@ -42,7 +42,7 @@ cd ../web && pnpm install && pnpm dev
 
 ## Releasing
 
-Every push to `main` is a release. `.github/workflows/deploy.yml` builds `db.json` from the sources, runs every check, builds the app and deploys it to Cloudflare; a failed check deploys nothing, and the site stays as it was.
+Every push to `main` is a release. `.github/workflows/deploy.yml` checks and deploys it; a failed check deploys nothing, and the site stays as it was.
 
 - The site is a Cloudflare Worker serving `web/dist` (`web/wrangler.jsonc`); its only code, `web/worker/ingest.ts`, forwards `/ingest` to PostHog (`web/README.md#Analytics`). The config attaches `eldenroll.com` and `www.eldenroll.com`, and the first deploy creates their DNS records; a record already on either name makes it fail.
 - `www` is sent to the apex by a redirect rule set in the Cloudflare dashboard, not in the repository.
