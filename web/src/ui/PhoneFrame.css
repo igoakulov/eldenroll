@@ -104,7 +104,8 @@
     max-width: none;
     margin: 0;
     border-radius: 62px;
-    overflow-y: auto;
+    /* Always a scroller, never switching when content outgrows it: Safari shifts a zoomed box's content as it switches */
+    overflow-y: scroll;
     overscroll-behavior: contain;
     scrollbar-width: none;
     /* Fixed to the box, so a pull past either end shows the screen's own colour at that edge */
